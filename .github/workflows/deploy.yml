@@ -20,7 +20,6 @@ jobs:
   
       - name: Install dependencies
         run: |
-          cd frontend
           npm install
   
       - name: Set up SSH Agent
