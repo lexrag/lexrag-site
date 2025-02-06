@@ -17,8 +17,8 @@ import KTData from '../../helpers/data';
  */
 export class KTDataTable<T extends KTDataTableDataInterface> extends KTComponent implements KTDataTableInterface {
 	protected override _name: string = 'datatable';
-	protected override _config: KTDataTableConfigInterface;
-	protected override _defaultConfig: KTDataTableConfigInterface;
+	protected declare _config: KTDataTableConfigInterface;
+	protected declare _defaultConfig: KTDataTableConfigInterface;
 
 	private _tableElement: HTMLTableElement;
 	private _tbodyElement: HTMLTableSectionElement;
