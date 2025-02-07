@@ -2,6 +2,8 @@ import {axiosInstance} from "@/api/axiosInstance";
 import {setSession} from "@/utils/auth/setSession";
 
 type SignUpParams = {
+    first_name: string;
+    last_name: string;
     email: string;
     password: string;
 }

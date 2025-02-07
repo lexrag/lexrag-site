@@ -1,4 +1,9 @@
 import SignInCard from "@/components/Auth/SignIn/SignInCard";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: 'Sign In',
+}
 
 const SignInPage = () => {
     return (

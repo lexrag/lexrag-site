@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const SignUpHeader = () => {
     return (
         <>
@@ -8,7 +10,7 @@ const SignUpHeader = () => {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center font-medium">
                     <span className="text-2sm text-gray-600 me-1.5">Already have an Account ?</span>
-                    <a className="text-2sm link" href="#">Sign In</a>
+                    <Link className="text-2sm link" href="/auth/signin">Sign In</Link>
                 </div>
             </div>
 
