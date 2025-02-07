@@ -40,5 +40,5 @@ jobs:
           cd /home/deploy_user/lexrag_prod/lexrag-frontend &&
           git pull origin main &&
           cd /home/deploy_user/lexrag_prod &&
-          docker compose -f docker-compose.yml up --build
+          docker compose up frnt --build -d
           "
