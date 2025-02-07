@@ -17,7 +17,7 @@ const HeaderAuth = () => {
             <div className='h-[40%] border-r-2 border-gray-200' />
             <div className="tab">
                 <div
-                    className="size-10 rounded-full inline-flex items-center justify-center text-md font-semibold border border-primary-clarity bg-primary-light text-primary">
+                    className="size-[34px] rounded-full inline-flex items-center justify-center text-md font-semibold border border-primary-clarity bg-primary-light text-primary">
                     {userName.slice(0, 1)}
                 </div>
             </div>
