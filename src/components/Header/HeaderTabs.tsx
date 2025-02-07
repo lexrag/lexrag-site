@@ -8,7 +8,7 @@ const HeaderTabs = () => {
 
     return (
         <div className="flex items-center gap-10">
-            <img className="max-h-[25px] mr-5" src="/media/lexrag-logo.svg" alt="LexRAG" />
+            <img className="max-h-[25px] mr-5" src="/media/lexrag-logo.svg" alt="lexrag logo" />
             {tabs.map((tab) => (
                 <button
                     key={tab}
