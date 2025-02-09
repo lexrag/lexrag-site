@@ -11,9 +11,11 @@ export const signIn = async (params: SignInParams): Promise<{ success: boolean; 
         const response = await axiosInstance.post("/auth/signin", params);
 
         if (response.status === 200) {
-            localStorage.setItem("token", response.data.access_token);
-            axiosInstance.defaults.headers.common["Authorization"] = "Bearer " + response.data.access_token;
-            await setSession(response.data.access_token);
+            const token = response.data.access_token;
+            localStorage.setItem("token", token);
+            console.log("Token saved in localStorage:", localStorage.getItem("token")); // Debugging log
+            axiosInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
+            await setSession(token);
             return { success: true };
         }
     } catch (error: any) {
