@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "@/api/chat/chatApi";
 
 const ChatBox = () => {
@@ -8,6 +8,27 @@ const ChatBox = () => {
   const [input, setInput] = useState<string>("");
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Авто-скролл вниз при новых сообщениях
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Обновление высоты чата при изменении размеров окна
+  useEffect(() => {
+    const updateChatHeight = () => {
+      if (chatContainerRef.current) {
+        const headerHeight = document.querySelector("header")?.clientHeight || 0;
+        chatContainerRef.current.style.height = `calc(100vh - ${headerHeight}px)`;
+      }
+    };
+
+    updateChatHeight();
+    window.addEventListener("resize", updateChatHeight);
+    return () => window.removeEventListener("resize", updateChatHeight);
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -25,15 +46,15 @@ const ChatBox = () => {
   const handleMouseLeave = (msgId: string) => {
     const timeout = setTimeout(() => {
       setHoveredMessageId(null);
-    }, 2000); // Keep icons visible for 2 seconds after hover ends
-
+    }, 2000);
     setHoverTimeout(timeout);
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4">
-      <div className="w-full bg-gray-100 p-4 rounded-lg shadow-md">
-        <div className="h-64 overflow-y-auto space-y-2">
+    <div ref={chatContainerRef} className="flex flex-col w-full max-w-4xl mx-auto p-4">
+      {/* Окно сообщений с прозрачным фоном */}
+      <div className="flex-1 overflow-hidden bg-transparent p-4 rounded-lg">
+        <div className="h-full overflow-y-auto flex flex-col space-y-2 pb-4">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -48,22 +69,20 @@ const ChatBox = () => {
                 onMouseLeave={() => handleMouseLeave(msg.id)}
               >
                 <div
-                  className={`p-5 rounded-lg text-gray-900 fw-semibold text-sm ${
-                    msg.type === "incoming"
-                      ? "bg-gray-200 text-left"
-                      : "bg-gray-200 text-right"
+                  className={`p-5 rounded-lg text-gray-900 text-sm ${
+                    msg.type === "incoming" ? "bg-gray-200 text-left" : "bg-gray-200 text-right"
                   } message-text`}
                 >
                   {msg.content}
                 </div>
-                {/* Copy icons remain visible for 2 seconds after hover */}
+                {/* Кнопка копирования остается видимой 2 сек после ухода курсора */}
                 <div
                   className={`flex space-x-2 transition-opacity duration-300 ${
                     hoveredMessageId === msg.id ? "opacity-100 visible" : "opacity-0 invisible"
                   }`}
                 >
                   <button
-                    className="btn btn-sm btn-icon copy-button p-0 text-gray-500 hover:text-primary"
+                    className="btn btn-sm btn-icon p-0 text-gray-500 hover:text-primary"
                     type="button"
                     aria-label="Copy"
                     onClick={() => copyToClipboard(msg.id, msg.content)}
@@ -78,11 +97,15 @@ const ChatBox = () => {
               </div>
             </div>
           ))}
+          {/* Невидимый div для авто-скролла вниз */}
+          <div ref={messagesEndRef} />
         </div>
       </div>
-      <div className="flex w-full space-x-2">
+
+      {/* Поле ввода */}
+      <div className="flex w-full space-x-2 mt-2">
         <input
-          className="flex-1 p-2 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow focus:ring-0 focus:outline-none"
+          className="flex-1 p-3 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow focus:ring-0 focus:outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
