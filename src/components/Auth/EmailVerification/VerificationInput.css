@@ -1,0 +1,19 @@
+.verification-input-container {
+    display: flex;
+    justify-content: center;
+}
+
+.character {
+    border-radius: 10px;
+    max-width: 30px;
+    max-height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.character--selected {
+    color: #015A8D;
+    outline: 2px solid #015A8D;
+}

@@ -2,7 +2,7 @@
 
 import {useFormStatus} from "react-dom";
 
-type SubmitButtonProps = {
+interface SubmitButtonProps {
     text: string;
 }
 

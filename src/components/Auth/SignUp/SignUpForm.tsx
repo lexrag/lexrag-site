@@ -1,16 +1,16 @@
 "use client"
 
-import {IoEyeOff, IoEyeSharp} from "react-icons/io5";
 import SubmitButton from "@/components/SubmitButton";
 import {useRef, useState} from "react";
 import {redirect} from "next/navigation";
 import {RiErrorWarningFill} from "react-icons/ri";
 import {signUp} from "@/api/auth/signUp";
+import Input from "@/components/Layout/Input";
+import PasswordInput from "@/components/Layout/PasswordInput";
+import {sendVerificationCode} from "@/api/auth/sendVerificationCode";
 
 const SignUpForm = () => {
     const [error, setError] = useState<string | null>(null);
-    const [showPassword, setShowPassword] = useState(false);
-
     const firstNameRef = useRef<HTMLInputElement>(null);
     const lastNameRef = useRef<HTMLInputElement>(null);
     const emailRef = useRef<HTMLInputElement>(null);
@@ -36,20 +36,23 @@ const SignUpForm = () => {
 
         if (!result.success) {
             setError(result.error);
+            return
+        }
+
+        const verificationCodeResult = await sendVerificationCode(email)
+
+        if (!verificationCodeResult.success) {
+            setError(verificationCodeResult.error);
         } else {
-            redirect("/dashboard");
+            redirect(`/auth/email-verification/${email}`)
         }
     };
-
-    const onShowPasswordClick = () => {
-        setShowPassword(!showPassword);
-    }
 
     return (
         <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
             {error && (
                 <div
-                    className="flex items-center justify-center gap-2.5 border rounded-md p-3 border-danger-clarity bg-danger-light text-danger max-w-[370px]"
+                    className="flex items-center justify-center gap-2.5 border rounded-md p-3 border-danger-clarity bg-danger-light text-danger"
                     role="alert">
                     <RiErrorWarningFill color={'red'} size={0} className="w-[45px]"/>
                     <div className="text-gray-700 text-sm">{error}</div>
@@ -57,81 +60,13 @@ const SignUpForm = () => {
             )}
 
             <div className="flex flex-col sm:flex-row gap-5">
-                <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900">First Name</label>
-                    <label className="input">
-                        <input
-                            name="firstName"
-                            ref={firstNameRef}
-                            autoComplete="on"
-                            placeholder="Alex"
-                            className="form-control bg-transparent"
-                        />
-                    </label>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900">Last Name</label>
-                    <label className="input">
-                        <input
-                            name="lastName"
-                            ref={lastNameRef}
-                            autoComplete="on"
-                            placeholder="Smith"
-                            className="form-control bg-transparent"
-                        />
-                    </label>
-                </div>
+                <Input label="First Name" name="firstName" placeholder="Alex" ref={firstNameRef} />
+                <Input label="Last Name" name="lastName" placeholder="Smith" ref={lastNameRef} />
             </div>
 
-            <div className="flex flex-col gap-1">
-                <label className="form-label text-gray-900">Email</label>
-                <label className="input">
-                    <input
-                        name="email"
-                        ref={emailRef}
-                        autoComplete="off"
-                        placeholder="email@email.com"
-                        className="form-control bg-transparent"
-                    />
-                </label>
-            </div>
-
-            <div className="flex flex-col gap-1">
-                <label className="form-label text-gray-900">Password</label>
-                <label className="input">
-                    <input
-                        ref={passwordRef}
-                        name="password"
-                        placeholder="Enter Password"
-                        type={showPassword ? "text" : "password"}
-                        autoComplete="off"
-                        className="form-control bg-transparent"
-                    />
-
-                    <button onClick={onShowPasswordClick} className="btn btn-icon" type="button">
-                        {!showPassword ? <IoEyeSharp/> : <IoEyeOff/>}
-                    </button>
-                </label>
-            </div>
-
-            <div className="flex flex-col gap-1">
-                <label className="form-label text-gray-900">Confirm Password</label>
-                <label className="input">
-                    <input
-                        ref={secondPasswordRef}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Re-enter Password"
-                        autoComplete="off"
-                        name="changepassword"
-                        className="form-control bg-transparent"
-                    />
-
-                    <button onClick={onShowPasswordClick} className="btn btn-icon" type="button">
-                        {!showPassword ? <IoEyeSharp/> : <IoEyeOff/>}
-                    </button>
-                </label>
-            </div>
+            <Input label="Email" name="email" placeholder="email@email.com" ref={emailRef} />
+            <PasswordInput type="signup" label="Password" name="password" placeholder="Enter Password" ref={passwordRef} />
+            <PasswordInput type="signup" label="Confirm Password" name="changepassword" placeholder="Re-enter Password" ref={secondPasswordRef} />
 
             <label className="checkbox-group">
                 <input
