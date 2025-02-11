@@ -1,5 +1,6 @@
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
@@ -9,6 +10,7 @@ import {
   Link,
   Preview,
   Section,
+  Tailwind,
   Text,
 } from '@react-email/components';
 import * as React from 'react';
@@ -24,153 +26,76 @@ export default function VerificationEmail({
   verificationCode = '{verification_code}',
   userName = '{userName}',
 }: VerificationEmailProps) {
+  const previewText = `Your LEXRAG verification code is ${verificationCode}`;
+
   return (
     <Html>
       <Head />
-      <Preview>LEXRAG Email Verification</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={coverSection}>
-            <Section style={imageSection}>
+      <Preview>{previewText}</Preview>
+      <Tailwind>
+        <Body className="bg-white my-auto mx-auto font-sans px-2">
+          <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
+            {/* Логотип */}
+            <Section className="mt-[32px]">
               <Img
-                src={`${baseUrl}/logo/default_dark.svg`}
-                width="150"
-                height="30"
-                alt="lexrag's Logo"
+                src={`${baseUrl}/logo/default.svg`}
+                width="120"
+                height="24"
+                alt="LEXRAG Logo"
+                className="my-0 mx-auto"
               />
             </Section>
-            <Section style={upperSection}>
-              <Heading style={h1}>Verify your email address</Heading>
 
-              <Text style={mainText}>
-                Hello {userName}, thank you for starting the new LEXRAG account creation process. We want to make sure it's really you. Please enter the following verification code when prompted.
-              </Text>
+            {/* Основное сообщение */}
+            <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
+              Verify Your Email Address
+            </Heading>
 
-              <Text style={mainText}>
-                Thanks {userName}, for starting the new LEXRAG account creation process. We
-                want to make sure it's really you. Please enter the following
-                verification code when prompted. If you don&apos;t want to
-                create an account, you can ignore this message.
-              </Text>
-              <Section style={verificationSection}>
-                <Text style={verifyText}>Verification code</Text>
+            <Text className="text-black text-[14px] leading-[24px] text-center">
+              Hello <strong>{userName}</strong>, thank you for starting the new LEXRAG account
+              creation process. We want to make sure it's really you. Please enter the following
+              verification code when prompted.
+            </Text>
 
-                <Text style={codeText}>{verificationCode}</Text>
-                <Text style={validityText}>
-                  (This code is valid for 10 minutes)
-                </Text>
-              </Section>
+            {/* Код подтверждения */}
+            <Section className="text-center mt-[20px] mb-[20px]">
+              <Text className="text-black text-[14px] font-bold mb-[5px]">Verification Code</Text>
+              <Text className="text-black text-[36px] font-bold">{verificationCode}</Text>
+              <Text className="text-gray-500 text-[12px]">(This code is valid for 10 minutes)</Text>
             </Section>
-            <Hr />
-            <Section style={lowerSection}>
-              <Text style={cautionText}>
-                LEXRAG will never email you and ask you to disclose
-                or verify your password, credit card, or banking account number.
-              </Text>
-            </Section>
-          </Section>
-          <Text style={footerText}>
-            This message was produced and distributed by LEXRAG PTE LTD,
-            10 Anson Road #20-05, International Plaza, Singapore, 079903. All rights reserved.
-            of{' '}
-            <Link href="https://lexrag.com" target="_blank" style={link}>
-              lexrag.com
-            </Link>
-            , Inc. View our{' '}
-            <Link href="https://lexrag.com" target="_blank" style={link}>
-              privacy policy
-            </Link>
-            .
+
+            {/* Кнопка подтверждения */}
+            {/* <Section className="text-center mt-[32px] mb-[32px]">
+              <Button
+                className="bg-[#015a8d] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
+                href="https://lexrag.com/verify"
+              >
+                Verify Email
+              </Button>
+            </Section> */}
+
+            {/* Разделительная линия */}
+            <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
+
+            {/* Информационное сообщение */}
+            <Text className="text-[#666666] text-[12px] leading-[24px] text-center">
+              LEXRAG will never email you asking for your password, credit card, or banking
+              information. If you did not request this email, you can ignore it.
+            </Text>
+
+            {/* Футер */}
+            <Text className="text-[#666666] text-[12px] leading-[24px] text-center mt-[20px]">
+              This message was produced and distributed by <strong>LEXRAG PTE LTD</strong>, <br />
+              10 Anson Road #20-05, International Plaza, Singapore, 079903. <br />
+              View our{' '}
+              <Link href="https://lexrag.com/privacy" className="text-blue-600 no-underline">
+                privacy policy
+              </Link>
+              .
           </Text>
-        </Container>
-      </Body>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   );
 }
-
-const main = {
-  backgroundColor: '#fff',
-  color: '#212121',
-};
-
-const container = {
-  padding: '20px',
-  margin: '0 auto',
-  backgroundColor: '#eee',
-};
-
-const h1 = {
-  color: '#333',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: '20px',
-  fontWeight: 'bold',
-  marginBottom: '15px',
-};
-
-const link = {
-  color: '#2754C5',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: '14px',
-  textDecoration: 'underline',
-};
-
-const text = {
-  color: '#333',
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: '14px',
-  margin: '24px 0',
-};
-
-const imageSection = {
-  backgroundColor: '#252f3d',
-  display: 'flex',
-  padding: '20px 0',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-const coverSection = { backgroundColor: '#fff' };
-
-const upperSection = { padding: '25px 35px' };
-
-const lowerSection = { padding: '25px 35px' };
-
-const footerText = {
-  ...text,
-  fontSize: '12px',
-  padding: '0 20px',
-};
-
-const verifyText = {
-  ...text,
-  margin: 0,
-  fontWeight: 'bold',
-  textAlign: 'center' as const,
-};
-
-const codeText = {
-  ...text,
-  fontWeight: 'bold',
-  fontSize: '36px',
-  margin: '10px 0',
-  textAlign: 'center' as const,
-};
-
-const validityText = {
-  ...text,
-  margin: '0px',
-  textAlign: 'center' as const,
-};
-
-const verificationSection = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-const mainText = { ...text, marginBottom: '14px' };
-
-const cautionText = { ...text, margin: '0px' };
