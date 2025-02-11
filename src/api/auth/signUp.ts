@@ -1,7 +1,7 @@
 import {axiosInstance} from "@/api/axiosInstance";
 import {setSession} from "@/utils/auth/setSession";
 
-type SignUpParams = {
+interface SignUpParams {
     first_name: string;
     last_name: string;
     email: string;
@@ -17,7 +17,7 @@ export const signUp = async (params: SignUpParams) => {
         }
     } catch (error: any) {
         if (error.response) {
-            return { success: false, error: error.response.data.detail || "Authentication failed" };
+            return { success: false, error: error.response.data.detail || "Sign up failed" };
         }
         return { success: false, error: "Network error" };
     }

@@ -11,12 +11,10 @@ const ChatBox = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Авто-скролл вниз при новых сообщениях
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Обновление высоты чата при изменении размеров окна
   useEffect(() => {
     const updateChatHeight = () => {
       if (chatContainerRef.current) {
@@ -52,7 +50,6 @@ const ChatBox = () => {
 
   return (
     <div ref={chatContainerRef} className="flex flex-col w-full max-w-4xl mx-auto p-4">
-      {/* Окно сообщений с прозрачным фоном */}
       <div className="flex-1 overflow-hidden bg-transparent p-4 rounded-lg">
         <div className="h-full overflow-y-auto flex flex-col space-y-2 pb-4">
           {messages.map((msg) => (
@@ -75,7 +72,7 @@ const ChatBox = () => {
                 >
                   {msg.content}
                 </div>
-                {/* Кнопка копирования остается видимой 2 сек после ухода курсора */}
+
                 <div
                   className={`flex space-x-2 transition-opacity duration-300 ${
                     hoveredMessageId === msg.id ? "opacity-100 visible" : "opacity-0 invisible"
@@ -97,12 +94,11 @@ const ChatBox = () => {
               </div>
             </div>
           ))}
-          {/* Невидимый div для авто-скролла вниз */}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Поле ввода */}
       <div className="flex w-full space-x-2 mt-2">
         <input
           className="flex-1 p-3 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow focus:ring-0 focus:outline-none"

@@ -1,7 +1,6 @@
 import {axiosInstance} from "@/api/axiosInstance";
-import {setSession} from "@/utils/auth/setSession";
 
-type VerifyEmailParams = {
+interface VerifyEmailParams {
     email: string;
     code: string;
 }
@@ -15,7 +14,7 @@ export const verifyEmail = async (params: VerifyEmailParams) => {
         }
     } catch (error: any) {
         if (error.response) {
-            return {success: false, error: error.response.data.detail || "Authentication failed"};
+            return {success: false, error: error.response.data.detail || "Email verification failed"};
         }
         return {success: false, error: "Network error"};
     }

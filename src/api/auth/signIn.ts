@@ -1,10 +1,10 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import {setSession} from "@/utils/auth/setSession";
 
-type SignInParams = {
+interface SignInParams {
     email: string;
     password: string;
-};
+}
 
 export const signIn = async (params: SignInParams): Promise<{ success: boolean; error?: string }> => {
     try {

@@ -12,10 +12,7 @@ const ChatPage = () => {
         <>
             <Header />
             <ChatBox />
-         
         </>
- 
-
     );
 };
 

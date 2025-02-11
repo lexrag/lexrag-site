@@ -21,7 +21,7 @@ const PasswordInput = (props: PasswordInputProps) => {
             {props.type === "signin" && (
                 <div className="flex items-center justify-between gap-1">
                     <label className="form-label text-gray-900">{props.label}</label>
-                    <Link className="text-2sm link shrink-0" href="#">
+                    <Link className="text-2sm link shrink-0" href="/auth/reset-password">
                         Forgot Password?
                     </Link>
                 </div>

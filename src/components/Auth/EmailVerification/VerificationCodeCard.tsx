@@ -3,9 +3,10 @@
 import "./VerificationInput.css"
 import Card from "@/components/Layout/Card";
 import VerificationInput from "react-verification-input";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {RiErrorWarningFill} from "react-icons/ri";
 import {IoCheckmarkCircle} from "react-icons/io5";
+import ResendLink from "@/components/Auth/EmailVerification/ResendLink";
 
 interface VerificationCodeCardProps {
     email: string
@@ -77,7 +78,7 @@ const VerificationCodeCard = (props: VerificationCodeCardProps) => {
 
             <div className="flex items-center justify-center gap-1">
                 <span className="text-xs text-gray-600">Didn’t receive an email?</span>
-                <a className="text-xs font-medium link" href="#">Resend</a>
+                <ResendLink email={props.email} />
             </div>
         </Card>
     )

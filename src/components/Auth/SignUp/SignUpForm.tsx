@@ -77,7 +77,7 @@ const SignUpForm = () => {
                 />
                 <span className="checkbox-label">
                         I accept&nbsp;
-                    <a className="text-2sm link" href="/metronic/tailwind/react/demo7/auth/signup">
+                    <a className="text-2sm link" href="#">
                             Terms &amp; Conditions
                         </a>
                     </span>

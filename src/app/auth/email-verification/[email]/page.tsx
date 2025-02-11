@@ -1,11 +1,14 @@
 import EmailVerificationClient from "@/components/Auth/EmailVerification/EmailVerificationClient";
+import {redirect} from "next/navigation";
 
-const EmailVerification = async ({params}) => {
+const EmailVerificationPage = async ({params}) => {
     const email = decodeURIComponent((await params).email);
 
     return (
-        <EmailVerificationClient email={email} />
+        <div className="flex items-center justify-center w-full h-[100vh]">
+            <EmailVerificationClient email={email} />
+        </div>
     )
 }
 
-export default EmailVerification;
+export default EmailVerificationPage;

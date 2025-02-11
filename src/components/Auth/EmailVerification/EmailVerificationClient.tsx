@@ -2,14 +2,15 @@
 
 import VerificationCodeCard from "@/components/Auth/EmailVerification/VerificationCodeCard";
 import {verifyEmail} from "@/api/auth/verifyEmail";
-import {redirect} from "next/navigation";
 import {useState} from "react";
+import {redirect} from "next/navigation";
 
 interface EmailVerificationClientProps {
     email: string;
+    onSuccessfulVerification?: () => void;
 }
 
-const EmailVerificationClient = ({email}: EmailVerificationClientProps) => {
+const EmailVerificationClient = ({email, onSuccessfulVerification}: EmailVerificationClientProps) => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
     const [verificationCode, setVerificationCode] = useState("");
@@ -24,9 +25,16 @@ const EmailVerificationClient = ({email}: EmailVerificationClientProps) => {
             setError(result.error);
         } else {
             setSuccess(true)
-            setTimeout(() => {
-                redirect(`/auth/signin`);
-            }, 4000)
+
+            if (onSuccessfulVerification === undefined) {
+                setTimeout(() => {
+                    redirect('/auth/email-verification/verified');
+                }, 2000)
+            } else {
+                setTimeout(() => {
+                    onSuccessfulVerification();
+                }, 2000)
+            }
         }
     }
 
