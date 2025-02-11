@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@react-email/components": "0.0.33",
     "axios": "^1.7.9",
     "jose": "^5.9.6",
     "next": "^15",
