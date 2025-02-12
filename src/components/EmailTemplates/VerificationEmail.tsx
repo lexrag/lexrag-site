@@ -35,7 +35,7 @@ export default function VerificationEmail({
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
-            {/* Логотип */}
+            {/* Logo */}
             <Section className="mt-[32px]">
               <Img
                 src={`${baseUrl}/logo/default.svg`}
@@ -46,7 +46,7 @@ export default function VerificationEmail({
               />
             </Section>
 
-            {/* Основное сообщение */}
+            {/* Main message */}
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
               Verify Your Email Address
             </Heading>
@@ -57,14 +57,14 @@ export default function VerificationEmail({
               verification code when prompted.
             </Text>
 
-            {/* Код подтверждения */}
+            {/* Verification code */}
             <Section className="text-center mt-[20px] mb-[20px]">
               <Text className="text-black text-[14px] font-bold mb-[5px]">Verification Code</Text>
               <Text className="text-black text-[36px] font-bold">{verificationCode}</Text>
-              <Text className="text-gray-500 text-[12px]">(This code is valid for 10 minutes)</Text>
+              <Text className="text-gray-500 text-[12px]">(This code is valid for 5 minutes)</Text>
             </Section>
 
-            {/* Кнопка подтверждения */}
+            {/* Verification button */}
             {/* <Section className="text-center mt-[32px] mb-[32px]">
               <Button
                 className="bg-[#015a8d] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
@@ -74,16 +74,16 @@ export default function VerificationEmail({
               </Button>
             </Section> */}
 
-            {/* Разделительная линия */}
+            {/* Divider */}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
 
-            {/* Информационное сообщение */}
+            {/* Informational message */}
             <Text className="text-[#666666] text-[12px] leading-[24px] text-center">
               LEXRAG will never email you asking for your password, credit card, or banking
               information. If you did not request this email, you can ignore it.
             </Text>
 
-            {/* Футер */}
+            {/* Footer */}
             <Text className="text-[#666666] text-[12px] leading-[24px] text-center mt-[20px]">
               This message was produced and distributed by <strong>LEXRAG PTE LTD</strong>, <br />
               10 Anson Road #20-05, International Plaza, Singapore, 079903. <br />
@@ -92,7 +92,7 @@ export default function VerificationEmail({
                 privacy policy
               </Link>
               .
-          </Text>
+            </Text>
           </Container>
         </Body>
       </Tailwind>
