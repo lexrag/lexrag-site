@@ -1,13 +1,14 @@
 "use client"
 
 import SubmitButton from "@/components/SubmitButton";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {redirect} from "next/navigation";
 import {RiErrorWarningFill} from "react-icons/ri";
 import {signUp} from "@/api/auth/signUp";
 import Input from "@/components/Layout/Input";
 import PasswordInput from "@/components/Layout/PasswordInput";
 import {sendVerificationCode} from "@/api/auth/sendVerificationCode";
+import Link from "next/link";
 
 const SignUpForm = () => {
     const [error, setError] = useState<string | null>(null);
@@ -16,10 +17,16 @@ const SignUpForm = () => {
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
     const secondPasswordRef = useRef<HTMLInputElement>(null);
+    const [termsConfirmed, setTermsConfirmed] = useState<boolean>(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
+
+        if (!termsConfirmed) {
+            setError("Please confirm our Terms & Conditions to use the service");
+            return
+        }
 
         const first_name = firstNameRef.current?.value.trim() || "";
         const last_name = lastNameRef.current?.value.trim() || "";
@@ -73,14 +80,15 @@ const SignUpForm = () => {
                     className="checkbox checkbox-sm"
                     type="checkbox"
                     name="acceptTerms"
-                    value="false"
+                    value={termsConfirmed.toString()}
+                    onChange={(e) => setTermsConfirmed(e.target.checked)}
                 />
                 <span className="checkbox-label">
-                        I accept&nbsp;
-                    <a className="text-2sm link" href="#">
-                            Terms &amp; Conditions
-                        </a>
-                    </span>
+                    I accept&nbsp;
+                    <Link className="text-2sm link" href="/terms-and-conditions">
+                        Terms &amp; Conditions
+                    </Link>
+                </span>
             </label>
 
             <SubmitButton text={"Sign Up"}/>
