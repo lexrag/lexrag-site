@@ -56,7 +56,6 @@ const ChatBox = () => {
             <div
               key={msg.id}
               className={`flex ${msg.type === "incoming" ? "justify-start" : "justify-end"}`}
-              data-kt-element="template-out"
             >
               <div
                 className={`flex flex-col ${
@@ -74,7 +73,7 @@ const ChatBox = () => {
                 </div>
 
                 <div
-                  className={`flex space-x-2 transition-opacity duration-300 ${
+                  className={`flex space-x-2 transition-opacity duration-250 ${
                     hoveredMessageId === msg.id ? "opacity-100 visible" : "opacity-0 invisible"
                   }`}
                 >
@@ -86,7 +85,7 @@ const ChatBox = () => {
                   >
                     <i
                       className={`ki-outline ${
-                        copiedMessageId === msg.id ? "ki-copy-success" : "ki-copy"
+                        copiedMessageId === msg.id ? "ki-double-check" : "ki-copy"
                       } text-sm`}
                     ></i>
                   </button>
