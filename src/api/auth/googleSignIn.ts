@@ -1,14 +1,13 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import {setSession} from "@/utils/auth/setSession";
 
-interface SignInParams {
-    email: string;
-    password: string;
+interface GoogleSignInParams {
+    code: string;
 }
 
-export const signIn = async (params: SignInParams): Promise<{ success: boolean; error?: string }> => {
+export const googleSignIn = async (params: GoogleSignInParams): Promise<{ success: boolean; error?: string }> => {
     try {
-        const response = await axiosInstance.post("/auth/signin", params);
+        const response = await axiosInstance.post(`/auth/signin/google/callback?code=${params.code}`);
 
         if (response.status === 200) {
             const token = response.data.access_token;

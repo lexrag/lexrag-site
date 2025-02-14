@@ -1,4 +1,5 @@
 import Link from "next/link";
+import GoogleAuthButton from "@/components/Auth/GoogleAuth/GoogleAuthButton";
 
 const SignUpHeader = () => {
     return (
@@ -15,13 +16,7 @@ const SignUpHeader = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
-                <a href="#" className="btn btn-light btn-sm justify-center">
-                    <img
-                        src="/media/icons/google.svg"
-                        className="size-3.5 shrink-0"
-                    />
-                    <span className="hidden sm:block">Use Google</span>
-                </a>
+                <GoogleAuthButton />
 
                 <a href="#" className="btn btn-light btn-sm justify-center">
                     <img
