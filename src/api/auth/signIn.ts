@@ -12,7 +12,6 @@ export const signIn = async (params: SignInParams): Promise<{ success: boolean; 
 
         if (response.status === 200) {
             const token = response.data.access_token;
-            localStorage.setItem("token", token);
             axiosInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
             await setSession(token);
             return { success: true };

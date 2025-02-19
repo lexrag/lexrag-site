@@ -20,11 +20,11 @@ const middleware = async (req: NextRequest) => {
 
     const jwtPayload = await decrypt(session)
 
-    if (isProtectedRoute && !jwtPayload?.sub) {
+    if (isProtectedRoute && !jwtPayload?.is_active) {
         return NextResponse.redirect(new URL('/auth/signin', req.url));
     }
 
-    if (isPublicRoute && jwtPayload?.sub) {
+    if (isPublicRoute && jwtPayload?.is_active) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 

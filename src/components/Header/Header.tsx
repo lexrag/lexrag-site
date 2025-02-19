@@ -1,5 +1,5 @@
 import HeaderTabs from "@/components/Header/HeaderTabs";
-import HeaderAuth from "@/components/Header/HeaderAuth";
+import HeaderCornerMenu from "@/components/Header/HeaderCornerMenu";
 
 function Header() {
   return (
@@ -11,7 +11,7 @@ function Header() {
           id="header"
       >
           <HeaderTabs />
-          <HeaderAuth />
+          <HeaderCornerMenu />
       </header>
   )
 }

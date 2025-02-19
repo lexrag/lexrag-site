@@ -35,13 +35,17 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <span
-      onClick={handleThemeToggle}
-      className="cursor-pointer hover:text-primary transition-colors duration-200"
-      title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
-    >
-      {resolvedTheme === "dark" ? <FiSun size={15} /> : <FiMoon size={15} />}
-    </span>
+      <div className="menu-link">
+          <span className="menu-icon">
+              <i className="ki-filled ki-moon"></i>
+          </span>
+
+          <span className="menu-title">Dark Mode</span>
+
+          <label className="switch switch-sm">
+              <input name="theme" type="checkbox" checked={resolvedTheme === "dark"} onChange={handleThemeToggle} />
+          </label>
+      </div>
   );
 };
 
