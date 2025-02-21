@@ -11,7 +11,7 @@ const HeaderTabs = () => {
         { name: "Pricing", href: "/" },
         { name: "Contacts", href: "/" }
     ];
-    const [activeTab, setActiveTab] = useState(tabs[0].name);
+    const [activeTab, setActiveTab] = useState("");
 
     return (
         <div className="flex items-center gap-10">

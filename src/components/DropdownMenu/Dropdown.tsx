@@ -4,7 +4,7 @@ import {logOut} from "@/api/auth/logOut";
 
 const Dropdown = ({user}: any) => {
     return (
-        <div role="tooltip" className="base-Popper-root p-0 absolute translate-x-[-212px] translate-y-[10px]">
+        <div role="tooltip" className="base-Popper-root p-0 absolute z-[1000] translate-x-[-212px] translate-y-[10px]">
             <div className="menu-container">
                 <div className="menu-dropdown menu-default light:border-gray-300 w-[200px] md:w-[250px]">
 

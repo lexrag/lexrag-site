@@ -5,6 +5,6 @@ export async function decrypt(session: string | undefined = '') {
             return await response.json();
         }
     } catch (error) {
-        console.log('Failed to verify session')
+        // pass
     }
 }
