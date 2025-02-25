@@ -28,7 +28,7 @@ const SignInForm = () => {
         if (!result.success) {
             setError(result.error);
         } else {
-            redirect("/dashboard");
+            redirect("/general/dashboard");
         }
     };
 

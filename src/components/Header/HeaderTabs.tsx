@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const HeaderTabs = () => {
     const tabs = [
-        { name: "Chat", href: "/chat" },
+        { name: "Chat", href: "/general/chat" },
         { name: "Blog", href: "/" },
         { name: "News", href: "/" },
         { name: "Pricing", href: "/" },
