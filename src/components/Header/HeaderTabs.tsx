@@ -5,13 +5,13 @@ import Link from "next/link";
 
 const HeaderTabs = () => {
     const tabs = [
-        { name: "Chat", href: "/chat" },
+        { name: "Chat", href: "/general/chat" },
         { name: "Blog", href: "/" },
         { name: "News", href: "/" },
         { name: "Pricing", href: "/" },
         { name: "Contacts", href: "/" }
     ];
-    const [activeTab, setActiveTab] = useState(tabs[0].name);
+    const [activeTab, setActiveTab] = useState("");
 
     return (
         <div className="flex items-center gap-10">

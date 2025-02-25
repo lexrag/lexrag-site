@@ -3,11 +3,11 @@ import {cookies} from "next/headers";
 import {decrypt} from "@/utils/auth/decodeAccessToken";
 
 const protectedRoutes = [
-    "/dashboard", '/chat'
+    "/general/dashboard", '/general/chat'
 ]
 
 const publicRoutes = [
-    "/auth/signin", "/auth/signup",
+    "/", "/auth/signin", "/auth/signup",
 ]
 
 const middleware = async (req: NextRequest) => {
@@ -25,7 +25,7 @@ const middleware = async (req: NextRequest) => {
     }
 
     if (isPublicRoute && jwtPayload?.is_active) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
+        return NextResponse.redirect(new URL('/general/dashboard', req.url));
     }
 
     return NextResponse.next()

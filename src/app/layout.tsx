@@ -13,7 +13,7 @@ const RootLayout = ({ children }) => {
             <head>
                 <link rel="icon" href="/media/icons/favicon.svg" sizes="any" />
             </head>
-            <body className="pl-[18%] pr-[18%] min-h-[100vh]">
+            <body className="min-h-[100vh]">
                 <Providers>
                     {children}
                 </Providers>

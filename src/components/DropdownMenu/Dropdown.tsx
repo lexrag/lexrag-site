@@ -4,7 +4,7 @@ import {logOut} from "@/api/auth/logOut";
 
 const Dropdown = ({user}: any) => {
     return (
-        <div role="tooltip" className="base-Popper-root p-0 absolute translate-x-[-212px] translate-y-[10px]">
+        <div role="tooltip" className="base-Popper-root p-0 absolute z-[1000] translate-x-[-212px] translate-y-[10px]">
             <div className="menu-container">
                 <div className="menu-dropdown menu-default light:border-gray-300 w-[200px] md:w-[250px]">
 
@@ -28,7 +28,7 @@ const Dropdown = ({user}: any) => {
 
                     <div className="flex flex-col">
                         <div className="menu-item">
-                            <Link className="menu-link" href="/user-profile">
+                            <Link className="menu-link" href="/general/user-profile">
                                 <div className="menu-icon"><i className="ki-filled ki-profile-circle"></i></div>
                                 <div className="menu-title">My Profile</div>
                             </Link>
