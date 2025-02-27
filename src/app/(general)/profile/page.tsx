@@ -9,7 +9,9 @@ const UserProfilePage = async () => {
     return (
         <section className="">
             <PageTitle />
-            <PersonalInfoCard currentUser={currentUser} />
+            {currentUser && (
+                <PersonalInfoCard currentUser={currentUser} />
+            )}
         </section>
     )
 }
