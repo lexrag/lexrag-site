@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 
-export const Logo = () => {
-    const pathname = usePathname();
-    const isHomePage = pathname === "/";
+type LogoProps = {
+    isHomePage: boolean;
+};
 
+export const Logo = ({ isHomePage }: LogoProps) => {
     return (
         <Link
             href="/"

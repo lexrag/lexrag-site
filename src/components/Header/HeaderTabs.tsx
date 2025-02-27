@@ -4,28 +4,23 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
+import { tabs } from "@/components/Header/MenuLinks";
+import ThemeSwitch from "@/components/ThemeSwitch";
 
 const HeaderTabs = () => {
-    const tabs = [
-        { name: "Dashboard", href: "/dashboard" },
-        { name: "How It Works", href: "/#how-it-works" },
-        { name: "Product Features", href: "/features" },
-        { name: "Services", href: "/#services" },
-        { name: "Our Clients", href: "/#our_clients" },
-        { name: "Company", href: "/#company" },
-        { name: "FAQ", href: "/#faq" },
-    ];
 
     const pathname = usePathname();
     const [activeTab, setActiveTab] = useState("");
+    
+    const isHomePage = pathname === "/";
 
     useEffect(() => {
         setActiveTab(pathname);
     }, [pathname]);
 
     return (
-        <header className="flex items-center justify-between w-full h-20">
-            <Logo />
+        <div className="flex items-center justify-between w-full h-20">
+            <Logo isHomePage={isHomePage} />
 
             <nav className="flex items-center gap-10 flex-1 justify-center h-full">
                 {tabs.map((tab) => {
@@ -44,7 +39,10 @@ const HeaderTabs = () => {
                     );
                 })}
             </nav>
-        </header>
+            
+            <ThemeSwitch isHomePage={isHomePage} />
+
+        </div>
     );
 };
 

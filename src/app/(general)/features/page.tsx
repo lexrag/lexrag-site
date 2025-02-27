@@ -1,5 +1,5 @@
 import PageTitle from "@/components/Layout/PageTitle";
-import AllFeatures from "@/components/Features/FeaturesGrid";
+import FeaturesGrid from "@/components/Features/FeaturesGrid";
 import {Metadata} from "next";
 
 
@@ -13,7 +13,7 @@ const Features = () => {
     return (
         <>  <section>
                     <PageTitle />
-                    <AllFeatures/>
+                    <FeaturesGrid/>
             </section>
 
         </>

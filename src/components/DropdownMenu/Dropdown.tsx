@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ThemeSwitch from "@/components/ThemeSwitch";
 import {logOut} from "@/api/auth/logOut";
 
 const Dropdown = ({user}: any) => {
@@ -28,7 +27,13 @@ const Dropdown = ({user}: any) => {
 
                     <div className="flex flex-col">
                         <div className="menu-item">
-                            <Link className="menu-link" href="/user-profile">
+                            <Link className="menu-link" href="/dashboard">
+                                <div className="menu-icon"><i className="ki-filled ki-element-11"></i></div>
+                                <div className="menu-title">Dashboard</div>
+                            </Link>
+                        </div>
+                        <div className="menu-item">
+                            <Link className="menu-link" href="/profile">
                                 <div className="menu-icon"><i className="ki-filled ki-profile-circle"></i></div>
                                 <div className="menu-title">My Profile</div>
                             </Link>
@@ -38,9 +43,6 @@ const Dropdown = ({user}: any) => {
                     <div className="menu-separator"></div>
 
                     <div className="flex flex-col">
-                        <div className="menu-item mb-0.5">
-                            <ThemeSwitch />
-                        </div>
 
                         <div className="menu-item px-4 py-1.5">
                             <button onClick={logOut} className="btn btn-sm btn-light justify-center">Logout</button>
