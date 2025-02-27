@@ -6,5 +6,5 @@ import {redirect} from "next/navigation";
 export const logOut = async () => {
     localStorage.removeItem("token")
     await deleteSession()
-    redirect("/auth/signin")
+    redirect("/")
 }

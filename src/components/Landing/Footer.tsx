@@ -40,9 +40,9 @@ const LandingFooter = () => {
 
             <div className="bg-[#13263C] h-[100px] border-t border-dashed border-gray-700 text-white">
                 <div className="h-full flex justify-start items-center pl-[10%] pr-[10%]">
-                    <img className="max-h-[20px] mr-5" src="/media/lexrag-logo-dark.svg"
-                         alt="lexrag logo"/>
-                    <p>© 2025 Lexrag Ltd.</p>
+                    {/* <img className="max-h-[20px] mr-5" src="/media/lexrag-logo-dark.svg"
+                         alt="lexrag logo"/> */}
+                    <p className="text-gray-700">© 2025 LEXRAG PTE LTD</p>
                 </div>
             </div>
         </footer>

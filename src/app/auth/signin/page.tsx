@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 const SignInPage = () => {
     return (
-        <div className="flex items-center justify-center w-full h-[100vh]">
+        <div className="flex items-center justify-center w-full min-h-[100vh]">
             <SignInCard />
         </div>
     )
