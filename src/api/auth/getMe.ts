@@ -9,10 +9,6 @@ export const getMe = async () => {
             return await response.data;
         }
     } catch (error: any) {
-        console.log(error)
-        if (error.response) {
-            return { success: false, error: error.response.data.detail || "Authentication failed" };
-        }
-        return { success: false, error: "Network error" };
+        return null;
     }
 }

@@ -39,8 +39,6 @@ const HeaderTabs = () => {
                     );
                 })}
             </nav>
-            
-            <ThemeSwitch isHomePage={isHomePage} />
 
         </div>
     );

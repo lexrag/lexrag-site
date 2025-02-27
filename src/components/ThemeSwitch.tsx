@@ -5,11 +5,7 @@ import { useTheme } from "next-themes";
 import { FiMoon, FiSun } from "react-icons/fi";
 import Image from "next/image";
 
-type ThemeSwitchProps = {
-    isHomePage: boolean;
-};
-
-const ThemeSwitch = ({ isHomePage }: ThemeSwitchProps) => {
+const ThemeSwitch = () => {
     const [mounted, setMounted] = useState(false);
     const { setTheme, resolvedTheme } = useTheme();
 
@@ -47,12 +43,12 @@ const ThemeSwitch = ({ isHomePage }: ThemeSwitchProps) => {
             {resolvedTheme === "dark" ? (
                 <FiSun
                     size={15}
-                    className={isHomePage ? "text-amber-100 hover:text-amber-300" : ""}
+                    className={"text-amber-300 hover:text-amber-500"}
                 />
             ) : (
                 <FiMoon
                     size={15}
-                    className={isHomePage ? "text-gray-300 hover:text-stone-400" : ""}
+                    className={"text-stone-400 hover:text-stone-600"}
                 />
             )}
         </span>

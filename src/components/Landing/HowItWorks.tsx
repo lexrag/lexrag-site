@@ -9,7 +9,7 @@ const HowItWorks = () => {
             <div className="bg-[#13263C] min-h-[60vh] py-10">
                 <div className="text-center mb-10">
 
-                    <h3 className="text-2xl md:text-4xl mb-5 font-semibold">
+                    <h3 className="text-white text-2xl md:text-4xl mb-5 font-semibold">
                         How it Works
                     </h3>
 
@@ -53,7 +53,7 @@ const HowItWorks = () => {
                                 <span className="bg-green-100 text-green-500 rounded-full px-3 py-1 text-md font-bold mr-3">
                                 {item.step}
                                 </span>
-                                <div className="text-lg font-semibold text-gray-900">{item.title}</div>
+                                <div className="text-lg font-semibold text-white">{item.title}</div>
                             </div>
                             <p className="text-gray-500 text-[16px] max-w-[80%]">
                                 {item.description}
