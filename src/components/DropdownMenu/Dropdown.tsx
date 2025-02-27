@@ -28,7 +28,7 @@ const Dropdown = ({user}: any) => {
 
                     <div className="flex flex-col">
                         <div className="menu-item">
-                            <Link className="menu-link" href="/general/user-profile">
+                            <Link className="menu-link" href="/user-profile">
                                 <div className="menu-icon"><i className="ki-filled ki-profile-circle"></i></div>
                                 <div className="menu-title">My Profile</div>
                             </Link>
