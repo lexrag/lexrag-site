@@ -40,7 +40,7 @@ const Features = () => {
                     <div className="col-span-2">
 
                         <CardWithPic
-                            title="How Exploring Legal Graph?"
+                            title="Why and How to Explore Legal Graphs?"
                             description="Visualize your data in a graph format to better understand the relationships between different entities."
                             imgSrc="/media/images/graph.png"
                             clasName="max-h-[350px]"
