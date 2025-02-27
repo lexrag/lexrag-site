@@ -57,7 +57,7 @@ const ProductFeatures = () => {
                                         flex flex-col gap-5 p-5 lg:p-7.5 rounded-xl relative items-center
                                         shadow-md hover:shadow-lg transition-shadow`}
                                 >
-                                    <div className="flex items-center gap-2.5">
+                                    <div className="flex w-full items-center justify-start  gap-2.5">
                                         <div className="relative w-[44px] h-[44px] flex items-center justify-center 
                                             dark:bg-gray-100 light:bg-gray-200 rounded-full">
                                             <i className={`ki-duotone text-2xl ${colors.icon_color} ${feat.icon}`}></i>
@@ -76,13 +76,13 @@ const ProductFeatures = () => {
                                         {feat.description}
                                     </p>
 
-                                    <div className="flex items-center gap-2.5">
-                                        <p className="text-2sm dark:text-gray-700 light:text-gray-600">category:</p>
+                                    <div className="flex w-full items-center justify-start gap-3">
+                                        {/* <p className="text-2sm dark:text-gray-700 light:text-gray-600">category:</p> */}
                                         <span className="badge badge-sm badge-outline badge-secondary">
                                             {feat.category}
                                         </span>
 
-                                        <p className="text-2sm dark:text-gray-700 light:text-gray-600">plan:</p>
+                                        {/* <p className="text-2sm dark:text-gray-700 light:text-gray-600">plan:</p> */}
                                         <span
                                             className={`badge badge-sm badge-outline ${
                                                 {

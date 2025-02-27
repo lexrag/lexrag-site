@@ -8,7 +8,6 @@ import { tabs } from "@/components/Header/MenuLinks";
 import ThemeSwitch from "@/components/ThemeSwitch";
 
 const HeaderTabs = () => {
-
     const pathname = usePathname();
     const [activeTab, setActiveTab] = useState("");
     
@@ -39,6 +38,10 @@ const HeaderTabs = () => {
                     );
                 })}
             </nav>
+
+            <div>
+                
+            </div>
 
         </div>
     );

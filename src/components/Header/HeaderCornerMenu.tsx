@@ -1,6 +1,6 @@
 import SigninButton from "@/components/Header/SigninButton";
 import UserIcon from "@/components/DropdownMenu/UserIcon";
-import {getMe} from "@/api/auth/getMe";
+import { getMe } from "@/api/auth/getMe";
 import ThemeSwitch from "@/components/ThemeSwitch";
 
 const HeaderCornerMenu = async () => {
@@ -17,10 +17,15 @@ const HeaderCornerMenu = async () => {
                     </div>
                 </div>
             ) : (
-                <SigninButton />
+                <div className="flex items-center gap-8">
+                    <div className="h-[40%] border-r-2 border-gray-200" />
+                    <div className="tab">
+                        <SigninButton />
+                    </div>
+                </div>
             )}
         </div>
-    )
+    );
 };
 
 export default HeaderCornerMenu;
