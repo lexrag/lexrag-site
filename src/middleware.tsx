@@ -7,7 +7,7 @@ const publicRoutes = ["/", "/auth/signin", "/auth/signup", "/features"];
 
 const middleware = async (req: NextRequest) => {
     const path = req.nextUrl.pathname;
-    const isProtectedRoute = protectedRoutes.includes(path);
+    const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
     const isPublicRoute = publicRoutes.some(route => path.startsWith(route));
 
     const cookiesStore = await cookies(); 
@@ -18,8 +18,10 @@ const middleware = async (req: NextRequest) => {
     const response = NextResponse.next();
     if (jwtPayload?.is_active) {
         response.cookies.set("isAuthenticated", "true", { httpOnly: false });
+        response.cookies.set("token", session || "", { httpOnly: false });
     } else {
         response.cookies.set("isAuthenticated", "false", { httpOnly: false });
+        response.cookies.set("token", "", { httpOnly: false, maxAge: 0 });
     }
 
     if (isProtectedRoute && !jwtPayload?.is_active) {

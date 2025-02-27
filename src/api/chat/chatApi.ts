@@ -18,26 +18,17 @@ export const useChat = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false); // New state for ensuring component is mounted
 
   useEffect(() => {
-    setIsMounted(true); // Mark the component as mounted when it loads
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return; // Ensure the component is fully mounted before proceeding
     if (pathname !== "/chat") return;
-    if (typeof window === "undefined") return;
 
-    // Ensure that DOM is fully loaded
-    if (document.readyState !== "complete") {
-      console.warn("🔄 Waiting for page to fully load...");
-      return;
-    }
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
 
-    const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found. Redirecting to sign-in.");
+      console.error("No token found in cookies. Redirecting to sign-in.");
       localStorage.setItem("redirectAfterLogin", "/chat");
       router.push("/auth/signin");
       return;
@@ -48,62 +39,70 @@ export const useChat = () => {
       return;
     }
 
-    // Delay WebSocket creation to avoid conflicts
-    setTimeout(() => {
-      const wsProtocol = API_BASE_URL.startsWith("https") ? "wss" : "ws";
-      const wsUrl = `${wsProtocol}://${new URL(API_BASE_URL).host}/ws/chat`;
+    const wsProtocol = API_BASE_URL.startsWith("https") ? "wss" : "ws";
+    const wsUrl = `${wsProtocol}://${new URL(API_BASE_URL).host}/ws/chat`;
 
-      const websocket = new WebSocket(wsUrl);
-      wsRef.current = websocket;
+    console.log("🟢 WebSocket URL:", wsUrl);
 
-      websocket.onopen = () => {
-        console.log("✅ WebSocket connected:", wsUrl);
-        websocket.send(JSON.stringify({ type: "auth", token }));
-      };
+    const connectWebSocket = () => {
+      try {
+        const websocket = new WebSocket(wsUrl);
+        wsRef.current = websocket;
 
-      websocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
+        websocket.onopen = () => {
+          console.log("✅ WebSocket connected:", wsUrl);
+          websocket.send(JSON.stringify({ type: "auth", token }));
+        };
 
-          if (data.type === "error" && data.message === "Unauthorized") {
-            console.error("❌ Unauthorized WebSocket access. Redirecting to sign-in.");
-            localStorage.removeItem("token");
-            localStorage.setItem("redirectAfterLogin", "/chat");
-            router.push("/auth/signin");
-            websocket.close();
-            wsRef.current = null;
-            return;
+        websocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === "error" && data.message === "Unauthorized") {
+              console.error("❌ Unauthorized WebSocket access. Redirecting to sign-in.");
+              document.cookie = "token=; Path=/; Max-Age=0";
+              localStorage.setItem("redirectAfterLogin", "/chat");
+              router.push("/auth/signin");
+              websocket.close();
+              wsRef.current = null;
+              return;
+            }
+
+            if (data.type === "assistant_response") {
+              setMessages((prevMessages) => [
+                ...prevMessages,
+                { id: uuidv4(), content: data.content, type: "incoming" },
+              ]);
+            }
+          } catch (err) {
+            console.error("⚠️ Failed to parse WebSocket message:", err, event.data);
           }
+        };
 
-          if (data.type === "assistant_response") {
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              { id: uuidv4(), content: data.content, type: "incoming" },
-            ]);
-          }
-        } catch (err) {
-          console.error("⚠️ Failed to parse WebSocket message:", err, event.data);
-        }
-      };
+        websocket.onerror = (error) => {
+          console.error("⚠️ WebSocket error:", error);
+        };
 
-      websocket.onerror = (error) => {
-        console.error("⚠️ WebSocket error:", error);
-      };
+        websocket.onclose = (event) => {
+          console.log("🔌 WebSocket connection closed", event.reason);
+          wsRef.current = null;
+        };
+      } catch (error) {
+        console.error("❌ Failed to establish WebSocket connection:", error);
+      }
+    };
 
-      websocket.onclose = () => {
-        console.log("🔌 WebSocket connection closed");
-        wsRef.current = null;
-      };
-    }, 100); // Small delay before initializing WebSocket
+    const connectTimeout = setTimeout(connectWebSocket, 500);
 
     return () => {
       console.log("🛑 Cleaning up WebSocket...");
+      clearTimeout(connectTimeout);
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
       }
     };
-  }, [pathname, isMounted]);
+  }, [pathname]);
 
   const sendMessage = (input: string) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
