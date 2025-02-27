@@ -1,15 +1,15 @@
 import HeaderTabs from "@/components/Header/HeaderTabs";
 import HeaderCornerMenu from "@/components/Header/HeaderCornerMenu";
 
-function Header() {
+const Header = ({ className = "" }) => {
   return (
-      <header
-          className="flex justify-between border-b border-gray-200"
-          data-sticky="true"
-          data-sticky-class="shadow-sm dark:border-b dark:border-b-coal-100"
-          data-sticky-name="header"
-          id="header"
-      >
+        <header
+        className={`flex justify-between items-center w-full pl-[15%] pr-[15%] ${className}`}
+        data-sticky="true"
+        data-sticky-class="shadow-sm dark:border-b dark:border-b-coal-100"
+        data-sticky-name="header"
+        id="header"
+    >
           <HeaderTabs />
           <HeaderCornerMenu />
       </header>

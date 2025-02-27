@@ -1,11 +1,9 @@
-import Link from "next/link";
-import HowItWorks from "@/components/Landing/HowItWorks";
-import LandingHeading from "@/components/Landing/LandingHeading";
-import Statistics from "@/components/Landing/Statistics";
-import Testimonials from "@/components/Landing/Testimonials";
-import OurTeam from "@/components/Landing/OurTeam";
-import PricingSection from "@/components/Landing/PricingSection";
-import LandingFooter from "@/components/Landing/LandingFooter";
+import HowItWorks from "@/components/Landing/HowItWorks"; 
+import Benefits from "@/components/Landing/Benefits";
+import Footer from "@/components/Landing/Footer";
+import Header from "@/components/Landing/Header";
+import Hero from "@/components/Landing/Hero";
+import AllFeatures from "@/components/Features/FeaturesGrid";
 import {Metadata} from "next";
 
 
@@ -18,38 +16,37 @@ export const metadata: Metadata = {
 const LandingPage = () => {
     return (
         <>
-            <header className="flex items-center justify-between w-full p-5 pl-[10%] pr-[10%] bg-[#13263C]">
-                <img className="max-h-[20px] sm:max-h-[40px] mr-5" src="/media/lexrag-logo-dark.svg" alt="lexrag logo"/>
-                <Link href={"/auth/signin"} className="btn btn-primary">Sign In</Link>
-            </header>
+            <Header className="bg-[#13263C] sticky top-0 z-50"/>
 
-            <main className="w-full">
+            <main className="">
                 <section>
-                    <LandingHeading/>
+                    <Hero/>
                 </section>
 
-                <section className="pr-[10%] pl-[10%] mb-10">
+                <section id="benefits" className="pr-[10%] pl-[10%]">
+                    <Benefits/>
+                </section>
+
+                <section id="how-it-works" className="">
                     <HowItWorks/>
                 </section>
-
-                <section className="mb-10">
-                    <Statistics/>
-                </section>
-
-                <section className="pr-[10%] pl-[10%] mb-10">
-                    <OurTeam/>
-                </section>
-
-                <section className="mb-10">
-                    <PricingSection/>
-                </section>
-
-                <section className="pr-[10%] pl-[10%]">
-                    <Testimonials/>
+                
+                <section id="product-features" className="">
+                    {/* TODO: keep sections title separately for reuse */}
+                    <div className="text-center mb-10">
+                        <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 
+                            text-gray-900 dark:text-white">
+                            Product Features
+                        </h3>
+                        <p className="text-gray-700 dark:text-gray-400 transition-colors duration-300">
+                            Save time and resources by leveraging a single powerful tool for all your legal research needs.
+                        </p>
+                    </div>
+                    <AllFeatures/>
                 </section>
             </main>
 
-            <LandingFooter />
+            <Footer />
         </>
     )
 }

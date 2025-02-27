@@ -10,22 +10,23 @@ const ChatBox = () => {
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
-    const updateChatHeight = () => {
-      if (chatContainerRef.current) {
-        const headerHeight = document.querySelector("header")?.clientHeight || 0;
-        chatContainerRef.current.style.height = `calc(100vh - ${headerHeight}px)`;
+    const updateHeaderHeight = () => {
+      const header = document.querySelector("header");
+      if (header) {
+        setHeaderHeight(header.clientHeight);
       }
     };
 
-    updateChatHeight();
-    window.addEventListener("resize", updateChatHeight);
-    return () => window.removeEventListener("resize", updateChatHeight);
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+    return () => window.removeEventListener("resize", updateHeaderHeight);
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -49,9 +50,13 @@ const ChatBox = () => {
   };
 
   return (
-    <div ref={chatContainerRef} className="flex flex-col w-full max-w-4xl mx-auto p-4">
-      <div className="flex-1 overflow-hidden bg-transparent p-4 rounded-lg">
-        <div className="h-full overflow-y-auto flex flex-col space-y-2 pb-4">
+    <div 
+        ref={chatContainerRef} 
+        className="flex flex-col w-full max-w-4xl mx-auto p-4"
+        style={{ paddingTop: `${headerHeight}px`, height: `calc(102vh - ${headerHeight}px)` }}
+    >
+      <div className="flex-1 overflow-y-auto bg-transparent p-4 rounded-lg">
+        <div className="flex flex-col space-y-2 pb-4">
           {messages.map((msg) => (
             <div
               key={msg.id}
