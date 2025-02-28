@@ -1,11 +1,13 @@
+import React from "react";
+
 interface CardTableProps {
     title: string;
     children?: React.ReactNode;
 }
 
-const CardTable = ({title, children}: CardTableProps) => {
+const CardTable = ({ title, children }: CardTableProps) => {
     return (
-        <div className="card min-w-full">
+        <div className="card shadow-md hover:shadow-lg transition-shadow min-w-full">
             <div className="card-header">
                 <h3 className="card-title">{title}</h3>
             </div>
@@ -18,7 +20,7 @@ const CardTable = ({title, children}: CardTableProps) => {
                 </table>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default CardTable;
