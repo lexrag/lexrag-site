@@ -7,6 +7,7 @@ import InstructionCard from "@/components/Features/InstructionCard";
 import FeatureParams from "@/components/Features/FeatureParams";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ProductFeatures from "@/components/Features/FeaturesGrid";
 
 const toPascalCase = (str: string) => {
     return str
@@ -44,9 +45,21 @@ const FeaturePageTemplate = () => {
                         <DeffinitionCard />
                         <InstructionCard />
                     </div>
-
-                    <div className="flex flex-col gap-5 lg:gap-7.5">
+                    
+                    <div className="flex flex-col ">
                         <FeatureParams />
+                        <div className="">
+                        <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-5">
+                            Browse Relevamt Features
+                        </h2>
+                        </div>
+                        <ProductFeatures 
+                            gridClassName="grid grid-cols-1 mt-4 md:grid-cols-1 gap-5"
+                            showDescription={false}
+                            showSideBadges={true} 
+                            showBottomBadges={false}
+                            maxHeightBeforeShowAll={500} 
+                        />
                     </div>
                 </div>
             </section>

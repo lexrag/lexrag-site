@@ -7,7 +7,7 @@ interface CardTableProps {
 
 const CardTable = ({ title, children }: CardTableProps) => {
     return (
-        <div className="card shadow-md hover:shadow-lg transition-shadow min-w-full">
+        <div className="card pb-4 shadow-md hover:shadow-lg transition-shadow min-w-full">
             <div className="card-header">
                 <h3 className="card-title">{title}</h3>
             </div>

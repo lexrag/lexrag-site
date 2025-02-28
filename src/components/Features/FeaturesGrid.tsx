@@ -1,14 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { feats } from "@/components/Features/FeaturesData";
 
-const ProductFeatures = () => {
+interface ProductFeaturesProps {
+    gridClassName?: string;
+    showDescription?: boolean;
+    showSideBadges?: boolean;
+    showBottomBadges?: boolean;
+    maxHeightBeforeShowAll?: number;
+}
+
+const ProductFeatures = ({
+    gridClassName = "grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-7.5 lg:pr-[14%] lg:pl-[14%]",
+    showDescription = true,
+    showSideBadges = true,
+    showBottomBadges = true,
+    maxHeightBeforeShowAll = 500,
+}: ProductFeaturesProps) => {
     const [showAll, setShowAll] = useState(false);
+    const pathname = usePathname();
 
     const toggleShowAll = () => {
         setShowAll(!showAll);
     };
+
+    // Convert title to URL-friendly format
+    const toUrlFriendly = (title: string) => 
+        title
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
+
+    const currentPage = pathname.split("/").filter(Boolean).pop() || "";
 
     // set dynamic colors by feature category
     const categoryColors = {
@@ -30,16 +55,18 @@ const ProductFeatures = () => {
         },
     };
 
-    const visibleFeats = feats;
+    // Filter out the current page from the features list
+    const visibleFeats = feats.filter(
+        (feat) => toUrlFriendly(feat.title) !== currentPage
+    );
 
     return (
         <div className="relative pb-20">
             <div
-                className={`transition-max-height duration-500 pt-2 ease-in-out overflow-hidden ${
-                    showAll ? "max-h-[2000px]" : "max-h-[500px]"
-                }`}
+                className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
+                style={{ maxHeight: showAll ? "2000px" : `${maxHeightBeforeShowAll}px` }}
             >
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-7.5 lg:pr-[14%] lg:pl-[14%]">
+                <div className={gridClassName}>
                     {visibleFeats.map((feat, index) => {
                         const colors = categoryColors[feat.category] || {
                             icon_color: "dark:text-gray-300 light:text-gray-700",
@@ -54,48 +81,72 @@ const ProductFeatures = () => {
                             >
                                 <div
                                     className={`card dark:bg-coal-300 light:bg-white ${colors.border} 
-                                        flex flex-col gap-5 p-5 lg:p-7.5 rounded-xl relative items-center
+                                        flex flex-col gap-5 p-5 lg:p-6 rounded-xl relative items-center
                                         shadow-md hover:shadow-lg transition-shadow`}
                                 >
-                                    <div className="flex w-full items-center justify-start  gap-2.5">
-                                        <div className="relative w-[44px] h-[44px] flex items-center justify-center 
-                                            dark:bg-gray-100 light:bg-gray-200 rounded-full">
-                                            <i className={`ki-duotone text-2xl ${colors.icon_color} ${feat.icon}`}></i>
+                                    <div className="flex w-full items-center justify-between gap-4.5">
+                                        <div className="flex items-center gap-4.5">
+                                            <div className="relative w-[44px] h-[44px] flex items-center justify-center dark:bg-gray-100 light:bg-gray-200 rounded-full">
+                                                <i className={`ki-duotone text-2xl ${colors.icon_color} ${feat.icon}`}></i>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className={`text-md font-medium ${colors.icon_color} mb-px`}>
+                                                    {feat.title}
+                                                </span>
+                                                <span className="text-2sm dark:text-gray-700 light:text-gray-500">
+                                                    {feat.subtitle}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className={`text-md font-medium ${colors.icon_color} mb-px`}>
-                                                {feat.title}
-                                            </span>
-                                            <span className="text-2sm dark:text-gray-700 light:text-gray-500">
-                                                {feat.subtitle}
-                                            </span>
-                                        </div>
+
+                                        {showSideBadges && (
+                                            <div className="flex flex-col items-start gap-3">
+                                                <span className="badge badge-sm badge-outline badge-secondary">
+                                                    {feat.category}
+                                                </span>
+
+                                                <span
+                                                    className={`badge badge-sm badge-outline ${
+                                                        {
+                                                            freemium: "badge-dark",
+                                                            basic: "badge-success",
+                                                            advanced: "badge-warning",
+                                                            premium: "badge-info",
+                                                        }[feat.plan] || "badge-secondary"
+                                                    }`}
+                                                >
+                                                    {feat.plan}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <p className="text-2sm dark:text-gray-700 light:text-gray-600">
-                                        {feat.description}
-                                    </p>
+                                    {showDescription && (
+                                        <p className="text-2sm dark:text-gray-700 light:text-gray-600">
+                                            {feat.description}
+                                        </p>
+                                    )}
 
-                                    <div className="flex w-full items-center justify-start gap-3">
-                                        {/* <p className="text-2sm dark:text-gray-700 light:text-gray-600">category:</p> */}
-                                        <span className="badge badge-sm badge-outline badge-secondary">
-                                            {feat.category}
-                                        </span>
+                                    {showBottomBadges && (
+                                        <div className="flex w-full items-center justify-start gap-3">
+                                            <span className="badge badge-sm badge-outline badge-secondary">
+                                                {feat.category}
+                                            </span>
 
-                                        {/* <p className="text-2sm dark:text-gray-700 light:text-gray-600">plan:</p> */}
-                                        <span
-                                            className={`badge badge-sm badge-outline ${
-                                                {
-                                                    freemium: "badge-dark",
-                                                    basic: "badge-success",
-                                                    advanced: "badge-warning",
-                                                    premium: "badge-info",
-                                                }[feat.plan] || "badge-secondary"
-                                            }`}
-                                        >
-                                            {feat.plan}
-                                        </span>
-                                    </div>
+                                            <span
+                                                className={`badge badge-sm badge-outline ${
+                                                    {
+                                                        freemium: "badge-dark",
+                                                        basic: "badge-success",
+                                                        advanced: "badge-warning",
+                                                        premium: "badge-info",
+                                                    }[feat.plan] || "badge-secondary"
+                                                }`}
+                                            >
+                                                {feat.plan}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </a>
                         );
@@ -103,14 +154,16 @@ const ProductFeatures = () => {
                 </div>
             </div>
 
-            <div className="text-center mt-8">
-                <button
-                    onClick={toggleShowAll}
-                    className="btn btn-sm btn-primary transition-all duration-300"
-                >
-                    {showAll ? "Show Less" : "Show All"}
-                </button>
-            </div>
+            {visibleFeats.length > 0 && (
+                <div className="text-center mt-8">
+                    <button
+                        onClick={toggleShowAll}
+                        className="btn btn-sm btn-primary transition-all duration-300"
+                    >
+                        {showAll ? "Show Less" : "Show All"}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -49,7 +49,7 @@ const CardFlash = ({
                     <div className="px-7.5 py-5 lg:pr-12.5">
                         <div className="flex flex-wrap md:flex-nowrap items-center gap-6 md:gap-10">
                             <div className="flex flex-col items-start gap-3">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-4">
                                         {icon && (
                                             <div className="flex items-center justify-center shrink-0 rounded-full bg-gray-100 border border-gray-300 w-9 h-9">
                                                 <i className={`ki-filled ${icon} text-xl text-base`} aria-hidden="true"></i>
