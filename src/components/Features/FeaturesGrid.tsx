@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { feats } from "@/components/Features/FeaturesData";
+import { combinedFeaturesData } from "@/components/Features/CombinedFeaturesData";
 import { getBadgeColor } from "@/utils/badgeColorMapping.";
 
 interface ProductFeaturesProps {
@@ -57,8 +57,8 @@ const ProductFeatures = ({
     };
 
     // Filter out the current page from the features list
-    const visibleFeats = feats.filter(
-        (feat) => toUrlFriendly(feat.title) !== currentPage
+    const visibleFeats = combinedFeaturesData.filter(
+        (feat) => feat.key !== currentPage
     );
 
     return (

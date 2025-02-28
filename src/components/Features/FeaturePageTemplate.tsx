@@ -8,7 +8,6 @@ import FeatureParams from "@/components/Features/FeatureParams";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProductFeatures from "@/components/Features/FeaturesGrid";
-import {deffinitionCardDetails} from "@/components/Features/PageData/AdvancedQuery";
 
 const toPascalCase = (str: string) => {
     return str
