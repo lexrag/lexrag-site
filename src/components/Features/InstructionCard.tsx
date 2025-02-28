@@ -1,17 +1,29 @@
 "use client";
 
 import CardFlash from "@/components/Layout/CardFlash";
-import { usePageData } from "@/utils/pageDataLoader";
 
-const InstructionCard = () => {
-    const pageData = usePageData();
+interface InstructionCardProps {
+    details: {
+        subtitle: string;
+        title: string;
+        description: string;
+        imgSrcLight: string;
+        imgSrcDark: string;
+        imgClassName: string;
+    };
+    features: {
+        title: string;
+        description: string;
+    }[];
+}
 
-    if (!pageData?.instructionCardDetails) return null;
+const InstructionCard = ({ details, features }: InstructionCardProps) => {
+    if (!details) return null;
 
     return (
-        <CardFlash {...pageData.instructionCardDetails}>
+        <CardFlash {...details}>
             <div className="grid md:grid-cols-1 gap-2">
-                {pageData.instructionCardFeatures?.map((feature, index) => (
+                {features.map((feature, index) => (
                     <div key={index} className="flex items-start gap-3 pe-7.5">
                         <i className="ki-filled ki-check-circle text-base text-success mt-1" />
                         <div className="flex flex-col">

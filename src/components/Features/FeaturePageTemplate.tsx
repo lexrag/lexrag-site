@@ -6,34 +6,22 @@ import DeffinitionCard from "@/components/Features/DeffinitionCard";
 import InstructionCard from "@/components/Features/InstructionCard";
 import FeatureParams from "@/components/Features/FeatureParams";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import ProductFeatures from "@/components/Features/FeaturesGrid";
-
-const toPascalCase = (str: string) => {
-    return str
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join('');
-};
+import { combinedFeaturesData, FeatureData } from "@/components/Features/FeaturesData";
 
 const FeaturePageTemplate = () => {
-    const [pageMetadata, setPageMetadata] = useState<Metadata | null>(null);
     const pathname = usePathname();
+    const pageName = pathname.split("/").filter(Boolean).pop() || "graph-visualization";
 
-    useEffect(() => {
-        const pageName = pathname.split("/").filter(Boolean).pop() || "GraphVisualization";
-        const moduleName = toPascalCase(pageName);
+    // Поиск данных о фиче напрямую из combinedFeaturesData
+    const featureData: FeatureData | undefined = combinedFeaturesData.find(
+        (feature) => feature.key === pageName
+    );
 
-        import(`@/components/Features/PageData/${moduleName}`)
-            .then((module) => {
-                setPageMetadata(module.pageMetadata);
-            })
-            .catch((error) => {
-                console.error("Failed to load page metadata:", error);
-            });
-    }, [pathname]);
-
-    if (!pageMetadata) return null;
+    if (!featureData) {
+        console.error(`Feature data not found for page: ${pageName}`);
+        return null;
+    }
 
     return (
         <>
@@ -42,12 +30,15 @@ const FeaturePageTemplate = () => {
             <section className="pr-[15%] pl-[15%]">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
                     <div className="flex flex-col gap-5 lg:gap-7.5 col-span-2">
-                        <DeffinitionCard />
-                        <InstructionCard />
+                        <DeffinitionCard details={featureData.deffinitionCardDetails} />
+                        <InstructionCard 
+                            details={featureData.instructionCardDetails} 
+                            features={featureData.instructionCardFeatures} 
+                        />
                     </div>
                     
                     <div className="flex flex-col ">
-                        <FeatureParams />
+                        <FeatureParams rows={featureData.featureRows} />
                         <div className="">
                             <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-5">
                                 Browse Relevant Features

@@ -1,15 +1,19 @@
 "use client";
 
 import CardFlash from "@/components/Layout/CardFlash";
-import { usePageData } from "@/utils/pageDataLoader";
 
-const DeffinitionCard = () => {
-    const pageData = usePageData();
+interface DeffinitionCardProps {
+    details: {
+        subtitle: string;
+        icon: string;
+        title: string;
+        description: string[];
+    };
+}
 
-    if (!pageData?.deffinitionCardDetails) return null;
-
+const DeffinitionCard = ({ details }: DeffinitionCardProps) => {
     return (
-        <CardFlash {...pageData.deffinitionCardDetails} />
+        <CardFlash {...details} />
     );
 };
 

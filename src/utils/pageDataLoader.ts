@@ -1,38 +1,25 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-
-interface PageDataModule {
-    deffinitionCardDetails?: any;
-    instructionCardDetails?: any;
-    instructionCardFeatures?: any[];
-    mappedFeatureRows?: any[];
-}
-
-const toPascalCase = (str: string) =>
-    str
-        .toLowerCase()
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join("");
+import { combinedFeaturesData, FeatureData } from "@/components/Features/FeaturesData";
 
 export const usePageData = () => {
-    const [pageData, setPageData] = useState<PageDataModule | null>(null);
+    const [pageData, setPageData] = useState<FeatureData | null>(null);
     const pathname = usePathname();
 
     useEffect(() => {
-        const pageName = pathname.split("/").filter(Boolean).pop() || "GraphVisualization";
-        const pascalCasePageName = toPascalCase(pageName);
+        
+        const pageKey = pathname.split("/").filter(Boolean).pop() || "graph-visualization";
 
-        console.log(`Importing module from: /components/Features/PageData/${pascalCasePageName}.tsx`);
+        console.log(`Поиск данных для страницы: ${pageKey}`);
 
-        import(`@/components/Features/PageData/${pascalCasePageName}.tsx`)
-            .then((module) => {
-                setPageData(module);
-            })
-            .catch((error) => {
-                console.error("Failed to load page data:", error);
-                setPageData(null);
-            });
+        const foundData = combinedFeaturesData.find((feature) => feature.key === pageKey);
+
+        if (foundData) {
+            setPageData(foundData);
+        } else {
+            console.error(`Не удалось найти данные для страницы: ${pageKey}`);
+            setPageData(null);
+        }
     }, [pathname]);
 
     return pageData;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { combinedFeaturesData } from "@/components/Features/CombinedFeaturesData";
+import { combinedFeaturesData } from "@/components/Features/FeaturesData";
 import { getBadgeColor } from "@/utils/badgeColorMapping.";
 
 interface ProductFeaturesProps {
