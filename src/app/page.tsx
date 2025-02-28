@@ -43,11 +43,11 @@ const LandingPage = () => {
                         </p>
                     </div>
                     <ProductFeatures 
+                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
                         showDescription={true}
                         showSideBadges={false} 
                         showBottomBadges={true}
                         maxHeightBeforeShowAll={500}
-                        gridClassName="grid grid-cols-1 md:grid-cols-4 gap-4 pr-[15%] pl-[15%]"
                     />
                 </section>
             </main>

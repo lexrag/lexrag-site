@@ -82,8 +82,8 @@ const ProductFeatures = ({
                             >
                                 <div
                                     className={`card dark:bg-coal-300 light:bg-white ${colors.border} 
-                                        flex flex-col gap-5 p-5 lg:p-6 rounded-xl relative items-center
-                                        justify-around shadow-md hover:shadow-lg transition-shadow min-h-[230px]`}
+                                        flex flex-col gap-5 p-5 lg:p-5 rounded-xl relative items-center
+                                        justify-around shadow-md hover:shadow-lg transition-shadow`}
                                 >
                                     <div className="flex w-full items-center justify-between gap-4.5">
                                         <div className="flex items-center gap-4.5">
