@@ -43,7 +43,7 @@ const ThemeSwitch = () => {
             {resolvedTheme === "dark" ? (
                 <FiSun
                     size={15}
-                    className={"text-amber-300 hover:text-amber-500"}
+                    className={"text-amber-50 hover:text-amber-200"}
                 />
             ) : (
                 <FiMoon

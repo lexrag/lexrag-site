@@ -39,10 +39,6 @@ const HeaderTabs = () => {
                 })}
             </nav>
 
-            <div>
-                
-            </div>
-
         </div>
     );
 };

@@ -3,7 +3,7 @@ import Benefits from "@/components/Landing/Benefits";
 import Footer from "@/components/Landing/Footer";
 import Header from "@/components/Header/Header";
 import Hero from "@/components/Landing/Hero";
-import AllFeatures from "@/components/Features/FeaturesGrid";
+import ProductFeatures from "@/components/Features/FeaturesGrid";
 import {Metadata} from "next";
 
 
@@ -42,7 +42,13 @@ const LandingPage = () => {
                             Save time and resources by leveraging a single powerful tool for all your legal research needs.
                         </p>
                     </div>
-                    <AllFeatures/>
+                    <ProductFeatures 
+                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
+                        showDescription={true}
+                        showSideBadges={false} 
+                        showBottomBadges={true}
+                        maxHeightBeforeShowAll={500}
+                    />
                 </section>
             </main>
 
