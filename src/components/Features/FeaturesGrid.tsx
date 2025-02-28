@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { feats } from "@/components/Features/FeaturesData";
+import { getBadgeColor } from "@/utils/badgeColorMapping.";
 
 interface ProductFeaturesProps {
     gridClassName?: string;
@@ -101,19 +102,12 @@ const ProductFeatures = ({
 
                                         {showSideBadges && (
                                             <div className="flex flex-col items-start gap-3">
-                                                <span className="badge badge-sm badge-outline badge-secondary">
+                                                <span className={`badge badge-sm badge-outline ${getBadgeColor(feat.category)}`}>
                                                     {feat.category}
                                                 </span>
 
                                                 <span
-                                                    className={`badge badge-sm badge-outline ${
-                                                        {
-                                                            freemium: "badge-dark",
-                                                            basic: "badge-success",
-                                                            advanced: "badge-warning",
-                                                            premium: "badge-info",
-                                                        }[feat.plan] || "badge-secondary"
-                                                    }`}
+                                                    className={`badge badge-sm badge-outline ${getBadgeColor(feat.plan)}`}
                                                 >
                                                     {feat.plan}
                                                 </span>
@@ -129,19 +123,12 @@ const ProductFeatures = ({
 
                                     {showBottomBadges && (
                                         <div className="flex w-full items-center justify-start gap-3">
-                                            <span className="badge badge-sm badge-outline badge-secondary">
+                                            <span className={`badge badge-sm badge-outline ${getBadgeColor(feat.category)}`}>
                                                 {feat.category}
                                             </span>
 
                                             <span
-                                                className={`badge badge-sm badge-outline ${
-                                                    {
-                                                        freemium: "badge-dark",
-                                                        basic: "badge-success",
-                                                        advanced: "badge-warning",
-                                                        premium: "badge-info",
-                                                    }[feat.plan] || "badge-secondary"
-                                                }`}
+                                                className={`badge badge-sm badge-outline ${getBadgeColor(feat.plan)}`}
                                             >
                                                 {feat.plan}
                                             </span>

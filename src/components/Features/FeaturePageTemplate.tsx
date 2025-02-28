@@ -49,9 +49,9 @@ const FeaturePageTemplate = () => {
                     <div className="flex flex-col ">
                         <FeatureParams />
                         <div className="">
-                        <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-5">
-                            Browse Relevamt Features
-                        </h2>
+                            <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-5">
+                                Browse Relevant Features
+                            </h2>
                         </div>
                         <ProductFeatures 
                             gridClassName="grid grid-cols-1 mt-4 md:grid-cols-1 gap-5"

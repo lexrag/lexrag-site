@@ -7,7 +7,7 @@ export const feats = [
         subtitle: "seamlessly explore legal data",
         description: "Interactive graph displays relations and properties of case law and legislation",
         category: "search",
-        plan: "fremium",
+        plan: "freemium",
         link: "/features/graph-visualization",
     },
     {
@@ -16,7 +16,7 @@ export const feats = [
         subtitle: "no more keyword search",
         description: "Obtain case law and legislation attrs with natural language queries",
         category: "search",
-        plan: "fremium",
+        plan: "freemium",
         link: "/features/semantic-attributes",
     },
     {
@@ -43,7 +43,7 @@ export const feats = [
         subtitle: "simplify complex legal data",
         description: "Decompose queries and extract concepts for precise legal answers",
         category: "query",
-        plan: "fremium",
+        plan: "freemium",
         link: "/features/legal-breakdown",
     },
     {
