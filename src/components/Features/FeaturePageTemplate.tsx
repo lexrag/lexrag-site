@@ -1,7 +1,6 @@
 "use client";
 
 import Navigation from "@/components/Layout/PageTitle";
-import { Metadata } from "next";
 import DeffinitionCard from "@/components/Features/DeffinitionCard";
 import InstructionCard from "@/components/Features/InstructionCard";
 import FeatureParams from "@/components/Features/FeatureParams";
@@ -13,7 +12,6 @@ const FeaturePageTemplate = () => {
     const pathname = usePathname();
     const pageName = pathname.split("/").filter(Boolean).pop() || "graph-visualization";
 
-    // Поиск данных о фиче напрямую из combinedFeaturesData
     const featureData: FeatureData | undefined = combinedFeaturesData.find(
         (feature) => feature.key === pageName
     );

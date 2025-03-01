@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { tabs } from "@/components/Header/MenuLinks";
-import ThemeSwitch from "@/components/ThemeSwitch";
 
 const HeaderTabs = () => {
     const pathname = usePathname();
