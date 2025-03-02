@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { FiMoon, FiSun } from "react-icons/fi";
 import Image from "next/image";
 
 const ThemeSwitch = () => {
@@ -27,29 +26,19 @@ const ThemeSwitch = () => {
         );
 
     const handleThemeToggle = () => {
-        if (resolvedTheme === "dark") {
-            setTheme("light");
-        } else {
-            setTheme("dark");
-        }
+        setTheme(resolvedTheme === "dark" ? "light" : "dark");
     };
 
     return (
         <span
             onClick={handleThemeToggle}
-            className="cursor-pointer hover:text-primary transition-colors duration-200"
+            className="cursor-pointer ki-outline hover:text-primary transition-colors duration-200"
             title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
         >
             {resolvedTheme === "dark" ? (
-                <FiSun
-                    size={15}
-                    className={"text-amber-50 hover:text-amber-200"}
-                />
+                <i className="ki-filled ki-moon text-lg text-gray-600 hover:text-primary" />
             ) : (
-                <FiMoon
-                    size={15}
-                    className={"text-stone-400 hover:text-stone-600"}
-                />
+                <i className="ki-filled ki-sun text-lg text-gray-600 hover:text-primary" />
             )}
         </span>
     );
