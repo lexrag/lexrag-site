@@ -39,7 +39,6 @@ export interface FeatureData {
     }[];
 }
 
-// Автоматическая генерация badgeColor для featureRows
 const generateFeatureRows = (rows: { icon: string; label: string; badge: string }[]) => {
     return rows.map((row) => ({
         ...row,
@@ -64,7 +63,7 @@ export const combinedFeaturesData: FeatureData[] = [
         deffinitionCardDetails: {
             subtitle: "Definition",
             icon: "ki-graph",
-            title: "What is Legal Graphs??",
+            title: "What is Legal Graphs?",
             description: [
                 "A Legal Graph is a structured representation of legal information using graph technology, where laws, regulations, court cases, and legal concepts are modeled as interconnected nodes and edges.",
                 "This approach enables advanced legal research by visualizing relationships, identifying influential precedents, and uncovering hidden patterns within legal data.",

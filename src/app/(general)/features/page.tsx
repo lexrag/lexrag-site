@@ -18,7 +18,7 @@ const Features = () => {
                     showDescription={true}
                     showSideBadges={false} 
                     showBottomBadges={true}
-                    maxHeightBeforeShowAll={600} 
+                    maxHeightBeforeShowAll={500} 
                 />
             </section>
 

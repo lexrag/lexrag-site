@@ -36,9 +36,9 @@ const ThemeSwitch = () => {
             title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
         >
             {resolvedTheme === "dark" ? (
-                <i className="ki-filled ki-moon text-lg text-gray-600 hover:text-primary" />
-            ) : (
                 <i className="ki-filled ki-sun text-lg text-gray-600 hover:text-primary" />
+            ) : (
+                <i className="ki-filled ki-moon text-lg text-gray-600 hover:text-primary" />
             )}
         </span>
     );
