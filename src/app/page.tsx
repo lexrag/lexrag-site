@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const LandingPage = () => {
     return (
         <>
-            <Header className="bg-[#13263C] sticky top-0 z-50"/>
+            <Header className="bg-[#13263C] fixed top-0 z-10"/>
 
             <main className="">
                 <section>

@@ -18,7 +18,7 @@ const CardTableRow = ({
     action 
 }: CardTableRowProps) => {
     return (
-        <tr className="border-b border-gray-200">
+        <tr className="card-group flex-col">
             
             {icon && (
                 <td className="py-3 px-4 text-gray-600 font-normal w-[70px]">
@@ -29,8 +29,8 @@ const CardTableRow = ({
             )}
 
             {label && (
-                <td className="py-3 text-gray-800 font-normal">
-                    <span className="text-gray-800 truncate">{label}</span>
+                <td className="py-3">
+                    <span className="text-gray-800 font-normal">{label}</span>
                 </td>
             )}
 

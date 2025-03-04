@@ -4,12 +4,12 @@ import CurveDown from "@/components/Landing/CurveDown";
 const LandingHeading = () => {
     return (
         <>       
-            <div className="relative h-[40vh] lg:h-[50vh] flex justify-center items-center">
+            <div className="relative h-[55vh] lg:h-[65vh] flex justify-center items-center">
                 
-                <div className="absolute inset-0 bg-[#13263C] z-0"></div>
+                <div className="absolute inset-0 bg-[#13263C]"></div>
 
                 <div 
-                    className="absolute inset-0 z-10 bg-no-repeat bg-contain bg-bottom"
+                    className="absolute inset-0  bg-no-repeat bg-contain bg-bottom"
                     style={{
                         backgroundImage: "url(/media/images/singapore_1.png)", 
                         backgroundRepeat: "no-repeat",
@@ -26,7 +26,7 @@ const LandingHeading = () => {
                     ></div>
                 </div>
 
-                <div className="relative z-20 text-center">
+                <div className="relative text-center">
                     <h1 
                         className="text-white tracking-wide font-semibold text-2xl md:text-4xl mb-[20px] transition-all duration-300"
                         style={{ lineHeight: "50px", textShadow: "1px 1px 4px rgba(0, 0, 0, 0.2)" }}

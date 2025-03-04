@@ -2,13 +2,14 @@ import React from "react";
 
 interface CardTableProps {
     title: string;
+    className?: string;
     children?: React.ReactNode;
 }
 
-const CardTable = ({ title, children }: CardTableProps) => {
+const CardTable = ({ title, className, children }: CardTableProps) => {
     return (
-        <div className="card pb-4 shadow-md hover:shadow-lg transition-shadow min-w-full">
-            <div className="card-header">
+        <div className={`card pb-4 shadow-md hover:shadow-lg transition-shadow min-w-full ${className}`}>
+            <div className="card-header mb-2">
                 <h3 className="card-title">{title}</h3>
             </div>
 

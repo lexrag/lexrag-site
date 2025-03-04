@@ -630,7 +630,8 @@ export default {
 		require('./src/metronic/core/plugins/components/scrollable'),
 		require('./src/metronic/core/plugins/components/progress'),
 		require('./src/metronic/core/plugins/components/apexcharts'),
-		require('./src/metronic/core/plugins/components/leaflet')
+		require('./src/metronic/core/plugins/components/leaflet'),
+		require('tailwind-scrollbar-hide')
 	]
 }
 

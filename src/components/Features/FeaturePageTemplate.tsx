@@ -1,6 +1,6 @@
 "use client";
-
-import Navigation from "@/components/Layout/PageTitle";
+ 
+import PageTitle from "@/components/Layout/PageTitle";
 import DeffinitionCard from "@/components/Features/DeffinitionCard";
 import InstructionCard from "@/components/Features/InstructionCard";
 import FeatureParams from "@/components/Features/FeatureParams";
@@ -23,7 +23,7 @@ const FeaturePageTemplate = () => {
 
     return (
         <>
-            <Navigation />
+            <PageTitle />
 
             <section className="pr-[15%] pl-[15%]">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
@@ -38,7 +38,7 @@ const FeaturePageTemplate = () => {
                     <div className="flex flex-col ">
                         <FeatureParams rows={featureData.featureRows} />
                         <div className="">
-                            <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-5">
+                            <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-10">
                                 Browse Relevant Features
                             </h2>
                         </div>
@@ -56,4 +56,4 @@ const FeaturePageTemplate = () => {
     );
 };
 
-export default FeaturePageTemplate;
+export default FeaturePageTemplate; 

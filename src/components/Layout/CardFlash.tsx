@@ -16,6 +16,7 @@ interface CardFlashProps extends PropsWithChildren {
     link?: string;
     LinkText?: string;
     maxImgHeight?: number;
+    className?: string;
 }
 
 const CardFlash = ({ 
@@ -29,6 +30,7 @@ const CardFlash = ({
     LinkText = "Learn More",
     imgClassName,
     maxImgHeight,
+    className,
     children 
 }: CardFlashProps) => {
     const { resolvedTheme } = useTheme();
@@ -46,10 +48,10 @@ const CardFlash = ({
         <CardTable title={subtitle}>
             <tr>
                 <td colSpan={5}>
-                    <div className="px-7.5 py-5 lg:pr-12.5">
-                        <div className="flex flex-wrap md:flex-nowrap items-center gap-6 md:gap-10">
-                            <div className="flex flex-col items-start gap-3">
-                                <div className="flex items-center gap-4">
+                    <div className="px-2">
+                        <div className="flex flex-wrap md:flex-nowrap gap-6 md:gap-10">
+                            <div className="flex flex-col ps-4 gap-3">
+                                <div className="flex items-center mt-3 gap-4">
                                         {icon && (
                                             <div className="flex items-center justify-center shrink-0 rounded-full bg-gray-100 border border-gray-300 w-9 h-9">
                                                 <i className={`ki-filled ${icon} text-xl text-base`} aria-hidden="true"></i>

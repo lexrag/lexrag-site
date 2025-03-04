@@ -16,7 +16,10 @@ const FeatureParams = ({ rows }: FeatureParamsProps) => {
     if (!rows || rows.length === 0) return null;
 
     return (
-        <CardTable title="Feature Parameters">
+        <CardTable
+            title="Feature Parameters"
+            className="h-[290px]"
+        >
             {rows.map((row, index) => (
                 <CardTableRow 
                     key={index}
