@@ -1,44 +1,62 @@
-name: Lex RAG Frontend CI/CD
+name: Deploy to ECS (Frontend)
 
 on:
   push:
     branches:
       - main
 
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: lexrag-frontend
+  ECS_CLUSTER: lxrg-frntnd-cluster
+  ECS_SERVICE: frontend-service
+  TASK_FAMILY: lexrag-frontend
+
 jobs:
-  frontend-deploy:
+  deploy:
+    name: Build & Deploy Frontend
     runs-on: ubuntu-latest
-  
+
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-  
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          node-version: '18'
-  
-      - name: Install dependencies
+          role-to-assume: arn:aws:iam::110266626277:role/GitHubDeployRole
+          role-session-name: GitHubActionsSession
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push Docker image
+        id: build-image
         run: |
-          npm install
-  
-      - name: Set up SSH Agent
-        uses: webfactory/ssh-agent@v0.5.3
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+      - name: Prepare task definition
+        run: |
+          sed "s|<IMAGE_URI>|${{ env.IMAGE_URI }}|g" task-definition.json > new-task-definition.json
+
+      - name: Register ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-register-task-definition@v1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-  
-      - name: Add remote server to known hosts
-        run: ssh-keyscan -H ${{ secrets.SERVER_HOST  }} >> ~/.ssh/known_hosts
-  
-      - name: Deploy to Server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-        run: |
-          ssh $SERVER_USER@$SERVER_HOST "
-          cd /home/deploy_user/lexrag_prod/lexrag-frontend &&
-          git pull origin main &&
-          cd /home/deploy_user/lexrag_prod &&
-          docker compose up frnt --build -d
-          "
+          task-definition: new-task-definition.json
+
+      - name: Deploy to ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          task-definition: ${{ steps.task-def.outputs.task-definition-arn }}
