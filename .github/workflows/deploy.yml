@@ -44,19 +44,18 @@ jobs:
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-      - name: Prepare task definition
-        run: |
-          sed "s|<IMAGE_URI>|${IMAGE_URI}|g" task-definition.json > new-task-definition.json
-
-      - name: Register ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-register-task-definition@v1
+      - name: Render Amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: new-task-definition.json
+          task-definition: task-definition.json
+          container-name: frontend
+          image: ${{ env.IMAGE_URI }}
 
-      - name: Deploy to ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.3.1
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
           cluster: ${{ env.ECS_CLUSTER }}
           service: ${{ env.ECS_SERVICE }}
-          task-definition: ${{ steps.task-def.outputs.task-definition-arn }}
+          wait-for-service-stability: true
