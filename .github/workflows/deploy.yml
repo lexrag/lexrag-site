@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (e.g. main or feature/temporary_landing)'
+        required: true
+        default: 'main'
+      tag:
+        description: 'Docker tag (e.g. latest or temporary)'
+        required: true
+        default: 'latest'
 
 env:
   AWS_REGION: ap-southeast-1
@@ -22,29 +32,40 @@ jobs:
       contents: read
 
     steps:
+      - name: Set branch
+        run: |
+          BRANCH="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Set tag
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'latest' }}"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::110266626277:role/GitHubDeployRole
-          role-session-name: GitHubActionsSession
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push Docker image
+      - name: Build and push Docker image
         id: build-image
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest"
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}"
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-      - name: Render Amazon ECS task definition
+      - name: Render ECS task definition
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -52,7 +73,7 @@ jobs:
           container-name: frontend
           image: ${{ env.IMAGE_URI }}
 
-      - name: Deploy to Amazon ECS service
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
