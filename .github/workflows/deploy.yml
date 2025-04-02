@@ -46,16 +46,16 @@ jobs:
 
       - name: Prepare task definition
         run: |
-          sed "s|<IMAGE_URI>|${{ env.IMAGE_URI }}|g" task-definition.json > new-task-definition.json
+          sed "s|<IMAGE_URI>|${IMAGE_URI}|g" task-definition.json > new-task-definition.json
 
       - name: Register ECS task definition
         id: task-def
-        uses: aws-actions/amazon-ecs-register-task-definition@v1
+        uses: aws-actions/amazon-ecs-register-task-definition@v1.0.6
         with:
           task-definition: new-task-definition.json
 
       - name: Deploy to ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.3.1
         with:
           cluster: ${{ env.ECS_CLUSTER }}
           service: ${{ env.ECS_SERVICE }}
