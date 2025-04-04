@@ -23,7 +23,15 @@
             "name": "NEXT_PUBLIC_VERIFICATION_CODE_TTL",
             "value": "30"
           }
-        ]
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/frontend",
+            "awslogs-region": "ap-southeast-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
       }
     ],
     "requiresCompatibilities": ["FARGATE"],
