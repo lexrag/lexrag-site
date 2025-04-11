@@ -31,11 +31,11 @@
       "secrets": [
         {
           "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD"
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD:JWT_SECRET::"
         },
         {
           "name": "JWT_ALGORITHM",
-          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD"
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD:JWT_ALGORITHM::"
         }
       ],
       "logConfiguration": {
