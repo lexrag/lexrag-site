@@ -3,6 +3,9 @@
   "executionRoleArn": "arn:aws:iam::110266626277:role/ecsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::110266626277:role/ecsTaskRole",
   "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
   "containerDefinitions": [
     {
       "name": "frontend",
@@ -47,8 +50,5 @@
         }
       }
     }
-  ],
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "256",
-  "memory": "512"
-} 
+  ]
+}
