@@ -1,40 +1,54 @@
 {
-    "family": "lexrag-frontend",
-    "executionRoleArn": "arn:aws:iam::110266626277:role/ecsTaskExecutionRole",
-    "taskRoleArn": "arn:aws:iam::110266626277:role/ecsTaskRole",
-    "networkMode": "awsvpc",
-    "containerDefinitions": [
-      {
-        "name": "frontend",
-        "image": "<IMAGE_URI>",
-        "essential": true,
-        "portMappings": [
-          {
-            "containerPort": 3000,
-            "protocol": "tcp"
-          }
-        ],
-        "environment": [
-          {
-            "name": "NEXT_PUBLIC_API_BASE_URL",
-            "value": "https://api.lexrag.com"
-          },
-          {
-            "name": "NEXT_PUBLIC_VERIFICATION_CODE_TTL",
-            "value": "30"
-          }
-        ],
-        "logConfiguration": {
-          "logDriver": "awslogs",
-          "options": {
-            "awslogs-group": "/ecs/frontend",
-            "awslogs-region": "ap-southeast-1",
-            "awslogs-stream-prefix": "ecs"
-          }
+  "family": "lexrag-frontend",
+  "executionRoleArn": "arn:aws:iam::110266626277:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::110266626277:role/ecsTaskRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "frontend",
+      "image": "<IMAGE_URI>",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NEXT_PUBLIC_API_BASE_URL",
+          "value": "https://api.lexrag.com"
+        },
+        {
+          "name": "NEXT_PUBLIC_VERIFICATION_CODE_TTL",
+          "value": "30"
+        },
+        {
+          "name": "JWT_EXPIRATION_MINUTES",
+          "value": "60"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD"
+        },
+        {
+          "name": "JWT_ALGORITHM",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:110266626277:secret:lexrag_main-DT00UD"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/frontend",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs"
         }
       }
-    ],
-    "requiresCompatibilities": ["FARGATE"],
-    "cpu": "256",
-    "memory": "512"
-  }
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512"
+}
