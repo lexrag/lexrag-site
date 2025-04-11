@@ -33,6 +33,13 @@ jobs:
       contents: read
 
     steps:
+      - name: Create .env.production
+        run: |
+          echo "NEXT_PUBLIC_API_BASE_URL=https://api.lexrag.com" >> .env.production
+          echo "NEXT_PUBLIC_VERIFICATION_CODE_TTL=30" >> .env.production
+          echo "JWT_EXPIRATION_MINUTES=60" >> .env.production
+
+
       - name: Set branch
         run: |
           BRANCH="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}"
