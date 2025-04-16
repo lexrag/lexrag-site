@@ -1,18 +1,15 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
 import SubmitButton from "@/components/SubmitButton";
 import { signIn } from "@/api/auth/signIn";
 import {RiErrorWarningFill} from "react-icons/ri";
-import Link from "next/link";
 import {redirect} from "next/navigation";
 import Input from "@/components/Layout/Input";
 import PasswordInput from "@/components/Layout/PasswordInput";
 
 const SignInForm = () => {
     const [error, setError] = useState<string | null>(null);
-    const [showPassword, setShowPassword] = useState(false);
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -28,13 +25,9 @@ const SignInForm = () => {
         if (!result.success) {
             setError(result.error);
         } else {
-            redirect("/dashboard");
+            redirect("/chat");
         }
     };
-
-    const onShowPasswordClick = () => {
-        setShowPassword(!showPassword);
-    }
 
     return (
         <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
