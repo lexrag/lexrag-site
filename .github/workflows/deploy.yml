@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/temporary_landing
+      - main
   workflow_dispatch:
     inputs:
       branch:
