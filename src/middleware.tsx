@@ -26,7 +26,7 @@ const middleware = async (req: NextRequest) => {
     }
 
     if (isProtectedRoute && jwtPayload?.sub && !jwtPayload.is_active) {
-        return NextResponse.redirect(new URL("/auth/email-verification", req.url));
+        return NextResponse.redirect(new URL(`/auth/email-verification/${jwtPayload?.sub}`, req.url));
     }
 
     if (isProtectedRoute && !jwtPayload?.sub) {
