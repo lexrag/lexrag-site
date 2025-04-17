@@ -16,6 +16,7 @@ const middleware = async (req: NextRequest) => {
     const jwtPayload = await decrypt(session);
 
     const response = NextResponse.next();
+
     if (jwtPayload?.is_active) {
         response.cookies.set("isAuthenticated", "true", { httpOnly: false });
         response.cookies.set("token", session || "", { httpOnly: false });
@@ -24,7 +25,11 @@ const middleware = async (req: NextRequest) => {
         response.cookies.set("token", "", { httpOnly: false, maxAge: 0 });
     }
 
-    if (isProtectedRoute && !jwtPayload?.is_active) {
+    if (isProtectedRoute && jwtPayload?.sub && !jwtPayload.is_active) {
+        return NextResponse.redirect(new URL("/auth/email-verification", req.url));
+    }
+
+    if (isProtectedRoute && !jwtPayload?.sub) {
         return NextResponse.redirect(new URL("/auth/signin", req.url));
     }
 
