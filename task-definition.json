@@ -27,7 +27,7 @@
           "value": "30"
         },
         {
-          "name": "JWT_EXPIRATION_MINUTES",
+          "name": "NEXT_PUBLIC_JWT_EXPIRATION_MINUTES",
           "value": "60"
         }
       ],
