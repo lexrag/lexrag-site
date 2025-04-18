@@ -6,7 +6,7 @@ import {v4 as uuidv4} from "uuid";
 import {Message} from "@/types/Message";
 import {MessageTypes} from "@/types/MessageTypes";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const useChat = () => {
     const wsRef = useRef<WebSocket | null>(null);
@@ -95,7 +95,7 @@ export const useChat = () => {
         const connectTimeout = setTimeout(() => connectToWebSocket(wsUrl), 500);
 
         return () => {
-            console.log("🛑 Cleaning up WebSocket...");
+            console.log("Cleaning up WebSocket...");
             clearTimeout(connectTimeout);
             if (wsRef.current) {
                 wsRef.current.close();
