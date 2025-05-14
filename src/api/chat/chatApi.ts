@@ -13,6 +13,7 @@ export const useChat = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>("");
     const currentResponseRef = useRef(currentResponseContent);
+    const accumulatedContentRef = useRef("");
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -34,22 +35,23 @@ export const useChat = () => {
         websocket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
+                console.log("Received data:", data);
 
-                if (data.type == MessageTypes.token) {
-                    setCurrentResponseContent(
-                        (prevCurrentResponse) => prevCurrentResponse + data.content
-                    );
-                    console.log(currentResponseContent);
+                if (data.type === MessageTypes.token) {
+                    accumulatedContentRef.current += data.content;
+                    setCurrentResponseContent(accumulatedContentRef.current);
                 }
 
-                if (data.type == MessageTypes.stop) {
-                    const message = {...data, content: currentResponseRef.current}
-                    setCurrentResponseContent("");
+                if (data.type === MessageTypes.stop) {
+                    const message = {
+                        ...data,
+                        content: accumulatedContentRef.current,
+                    };
 
-                    setMessages((prevMessages) => [
-                        ...prevMessages,
-                        message
-                    ]);
+                    setMessages((prev) => [...prev, message]);
+
+                    accumulatedContentRef.current = "";
+                    setCurrentResponseContent("");
                 }
 
             } catch (err) {
