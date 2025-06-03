@@ -1,12 +1,39 @@
-import {getMe} from "@/api/auth/getMe";
-import UserIconClient from "@/components/DropdownMenu/UserIconClient";
+"use client"
+
+import {useEffect, useRef, useState} from "react";
+import Dropdown from "@/components/DropdownMenu/Dropdown";
 import {User} from "@/types/User";
 
-const UserIcon = async () => {
-    const currentUser: User = await getMe()
+interface UserIconProps {
+    user: User;
+}
+
+const UserIcon = ({ user }: UserIconProps) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
-        <UserIconClient user={currentUser} />
+        <div ref={dropdownRef} className="realtive">
+            <div
+                onClick={() => setIsOpen(!isOpen)}
+                className="size-[34px] rounded-full inline-flex items-center justify-center text-md font-semibold border border-primary-clarity bg-primary-light text-primary cursor-pointer">
+                {user?.first_name?.slice(0, 1)}
+            </div>
+
+            {isOpen && (
+                <Dropdown user={user} />
+            )}
+        </div>
     )
 }
 

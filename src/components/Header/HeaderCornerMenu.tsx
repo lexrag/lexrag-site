@@ -1,11 +1,23 @@
+"use client"
+
 import SigninButton from "@/components/Header/SigninButton";
 import UserIcon from "@/components/DropdownMenu/UserIcon";
-import { getMe } from "@/api/auth/getMe";
+import { getMeClient } from "@/api/auth/getMeClient";
 import ThemeSwitch from "@/components/ThemeSwitch";
 import Link from "next/link";
+import {useEffect, useState} from "react";
 
-const HeaderCornerMenu = async () => {
-    const user = await getMe();
+const HeaderCornerMenu = () => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const getMe = async () => {
+            const user = await getMeClient()
+            setUser(user);
+        };
+
+        getMe();
+    }, []);
 
     return (
         <div className="flex items-center justify-between">
@@ -17,7 +29,7 @@ const HeaderCornerMenu = async () => {
                         <i className="ki-filled ki-message-text-2 text-lg mr-1 text-gray-600 hover:text-primary" />
                     </Link>
                     <div className="tab">
-                        <UserIcon />
+                        <UserIcon user={user} />
                     </div>
                 </div>
             ) : (

@@ -1,5 +1,3 @@
-import {axiosInstance} from "@/api/axiosInstance";
-
 interface ResetPasswordParams {
     email: string;
     token: string;
@@ -7,16 +5,23 @@ interface ResetPasswordParams {
 }
 
 export const resetPassword = async (params: ResetPasswordParams) => {
-    try {
-        const response = await axiosInstance.post(`auth/reset-password`, params)
+    const response = await fetch(`/api/auth/reset-password`, {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
 
-        if (response.status === 200) {
-            return { success: true };
-        }
-    } catch (error: any) {
-        if (error.response) {
-            return {success: false, error: error.response.data.detail || "Password reset failed"};
-        }
+    const data = await response.json()
+
+    if (response.ok) {
+        return { success: true };
+    }
+
+    if (data?.detail) {
+        return {success: false, error: data.detail || "Password reset failed"};
+    } else {
         return {success: false, error: "Network error"};
     }
 }

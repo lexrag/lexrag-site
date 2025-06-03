@@ -1,4 +1,3 @@
-import { axiosInstance } from "@/api/axiosInstance";
 import {setSession} from "@/utils/auth/setSession";
 
 interface GoogleSignInParams {
@@ -6,20 +5,25 @@ interface GoogleSignInParams {
 }
 
 export const googleSignIn = async (params: GoogleSignInParams): Promise<{ success: boolean; error?: string }> => {
-    try {
-        const response = await axiosInstance.post(`/auth/signin/google/callback?code=${params.code}`);
+    const response = await fetch(`/api/auth/signin/google/callback?code=${params.code}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
 
-        if (response.status === 200) {
-            const token = response.data.access_token;
-            localStorage.setItem("token", token);
-            axiosInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
-            await setSession(token);
-            return { success: true };
-        }
-    } catch (error: any) {
-        if (error.response) {
-            return { success: false, error: error.response.data.detail || "Authentication failed" };
-        }
+    const data = await response.json();
+
+    if (response.ok) {
+        const token = data.access_token;
+        localStorage.setItem("token", token);
+        await setSession(token);
+        return { success: true };
+    }
+
+    if (data?.detail) {
+        return { success: false, error: data.detail || "Authentication failed" };
+    } else {
         return { success: false, error: "Network error" };
     }
 };

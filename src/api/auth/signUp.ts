@@ -1,6 +1,3 @@
-import {axiosInstance} from "@/api/axiosInstance";
-import {setSession} from "@/utils/auth/setSession";
-
 interface SignUpParams {
     first_name: string;
     last_name: string;
@@ -9,16 +6,23 @@ interface SignUpParams {
 }
 
 export const signUp = async (params: SignUpParams) => {
-    try {
-        const response = await axiosInstance.post("/auth/signup", params);
+    const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
 
-        if (response.status === 200) {
-            return { success: true };
-        }
-    } catch (error: any) {
-        if (error.response) {
-            return { success: false, error: error.response.data.detail || "Sign up failed" };
-        }
+    const data = await response.json();
+
+    if (response.ok) {
+        return { success: true };
+    }
+
+    if (data?.detail) {
+        return { success: false, error: data.detail || "Sign up failed" };
+    } else {
         return { success: false, error: "Network error" };
     }
 }
