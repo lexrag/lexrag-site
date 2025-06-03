@@ -11,7 +11,7 @@ const middleware = async (req: NextRequest) => {
     const isPublicRoute = publicRoutes.some(route => path.startsWith(route));
 
     const cookiesStore = await cookies(); 
-    const session = cookiesStore.get("session")?.value;
+    const session = cookiesStore.get("token")?.value;
 
     const jwtPayload = await decrypt(session);
 

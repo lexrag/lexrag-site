@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const getAuthorizedAxiosInstance = async () => {
     const cookiesStore = await cookies();
-    const session = cookiesStore.get("session")?.value;
+    const session = cookiesStore.get("token")?.value;
 
     return axios.create({
         baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
