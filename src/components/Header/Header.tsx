@@ -13,7 +13,7 @@ const Header = ({className = " "}: HeaderProps) => {
 
     return (
         <header
-            className={`flex justify-between items-center w-full pl-[16%] pr-[16%] ${className}`}
+            className={`flex justify-between items-center w-full ${className}`}
             id="header"
         >
             <Logo isHomePage={pathname === "/"} />

@@ -1,13 +1,12 @@
-import ChatBox from "@/components/Chat/ChatBox";
-
 import {Metadata} from "next";
+import ChatPageClient from "@/components/Chat/ChatPageClient";
 
 export const metadata: Metadata = {
     title: 'Chat',
 }
 
 const ChatPage = () => {
-    return <ChatBox />
+    return <ChatPageClient />
 };
 
 export default ChatPage;

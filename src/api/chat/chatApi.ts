@@ -1,22 +1,25 @@
 "use client";
 
 import {useState, useEffect, useRef} from "react";
-import {useRouter, usePathname} from "next/navigation";
+import {useRouter, usePathname, useParams} from "next/navigation";
 import {v4 as uuidv4} from "uuid";
 import {Message} from "@/types/Message";
 import {MessageTypes} from "@/types/MessageTypes";
+import {getConversationSnapshot} from "@/api/chat/getConversationSnapshot";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const useChat = () => {
     const wsRef = useRef<WebSocket | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>("");
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef("");
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const router = useRouter();
     const pathname = usePathname();
+    const params = useParams();
 
     const connectToWebSocket = (wsUrl: string) => {
         try {
@@ -28,14 +31,27 @@ export const useChat = () => {
 
         const websocket = wsRef.current;
 
-        websocket.onopen = () => {
+        websocket.onopen = async () => {
             console.log("WebSocket connected:", wsUrl);
+            console.log(params);
+
+            setMessages(
+                await getConversationSnapshot(params.thread_id as string)
+            );
         };
 
         websocket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
                 console.log("Received data:", data);
+
+                if (data.type === "event") {
+
+                    setEvents(
+                        (prev) => [...prev, data]
+                    );
+
+                }
 
                 if (data.type === MessageTypes.token) {
                     accumulatedContentRef.current += data.content;
@@ -74,7 +90,7 @@ export const useChat = () => {
     }, [currentResponseContent]);
 
     useEffect(() => {
-        if (pathname !== "/chat") return;
+        if (!pathname.startsWith("/chat")) return;
 
         const token = document.cookie
             .split("; ")
@@ -106,7 +122,7 @@ export const useChat = () => {
         };
     }, [pathname]);
 
-    const sendMessage = (input: string) => {
+    const sendMessage = (input: string, isNew: boolean) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             console.error("WebSocket is not connected.");
             return;
@@ -117,7 +133,7 @@ export const useChat = () => {
             {id: uuidv4(), content: input, direction: "outgoing"},
         ]);
 
-        wsRef.current.send(JSON.stringify({type: "message", content: input}));
+        wsRef.current.send(JSON.stringify({type: "message", content: input, is_new: isNew, thread_id: params.thread_id}));
     };
 
     const copyToClipboard = (messageId: string, text: string) => {
@@ -130,5 +146,5 @@ export const useChat = () => {
             .catch((err) => console.error("Failed to copy text:", err));
     };
 
-    return {messages, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId};
+    return {messages, events, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId};
 };

@@ -16,7 +16,7 @@ const renderMessageContent = (content: string) => {
 };
 
 const ChatBox = () => {
-    const {messages, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId} = useChat();
+    const {messages, events, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId} = useChat();
     const [input, setInput] = useState<string>("");
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -47,6 +47,11 @@ const ChatBox = () => {
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
+
+    // Handle events
+    useEffect(() => {
+
+    }, [events]);
 
     return (
         <div
@@ -129,7 +134,7 @@ const ChatBox = () => {
                 </div>
             </div>
 
-            <div className="fixed bottom-[50px] left-0 w-full pr-[15%] pl-[15%] pb-2">
+            <div className="absolute bottom-[50px] left-0 w-full pr-[15%] pl-[15%] pb-2">
                 <ChatTextArea
                     input={input}
                     setInput={setInput}

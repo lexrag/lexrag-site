@@ -25,7 +25,7 @@ const HeaderCornerMenu = () => {
             {user ? (
                 <div className="flex items-center gap-4">
                     <div className="h-[40%] border-r-2 border-gray-200" />
-                    <Link href="/chat">
+                    <Link href="/chat/new">
                         <i className="ki-filled ki-message-text-2 text-lg mr-1 text-gray-600 hover:text-primary" />
                     </Link>
                     <div className="tab">
