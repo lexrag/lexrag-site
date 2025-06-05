@@ -3,6 +3,7 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useChat} from "@/api/chat/chatApi";
 import ChatTextArea from "@/components/Chat/ChatTextArea";
+import {Conversation} from "@/types/Conversation";
 
 // Helper function to render message content.
 // If content is a valid JSON string with a "content" field, display that; otherwise, display the raw content.
@@ -15,8 +16,17 @@ const renderMessageContent = (content: string) => {
     }
 };
 
-const ChatBox = () => {
-    const {messages, events, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId} = useChat();
+interface ChatBoxProps {
+    socket: WebSocket;
+    setConversations: (conversations: Conversation[]) => void;
+}
+
+const ChatBox = (props: ChatBoxProps) => {
+    const {messages, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId} = useChat({
+        websocket: props.socket,
+        setConversations: props.setConversations
+    });
+
     const [input, setInput] = useState<string>("");
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -47,11 +57,6 @@ const ChatBox = () => {
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
-
-    // Handle events
-    useEffect(() => {
-
-    }, [events]);
 
     return (
         <div

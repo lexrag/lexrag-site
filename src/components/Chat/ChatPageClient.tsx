@@ -3,15 +3,18 @@
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Layout/Footer";
 import ChatSidebar from "@/components/Chat/ChatSidebar";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {GoSidebarCollapse} from "react-icons/go";
 import ChatBox from "@/components/Chat/ChatBox";
 import {Conversation} from "@/types/Conversation";
 import {getConversations} from "@/api/chat/getConversations";
+import deleteConversation from "@/api/chat/deleteConversation";
+import {ChatSocketContext} from "@/components/Chat/ChatProvider";
 
 const ChatPageClient = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [conversations, setConversations] = useState<Conversation[]>([]);
+    const socket = useContext(ChatSocketContext);
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -20,6 +23,11 @@ const ChatPageClient = () => {
         }
         fetchConversations();
     }, [])
+
+    const onDeleteConversation = async (threadId: string) => {
+        await deleteConversation(threadId);
+        setConversations(prev => prev.filter(c => c.thread_id !== threadId));
+    }
 
     return (
 
@@ -30,7 +38,12 @@ const ChatPageClient = () => {
                 transition-all duration-300 ease-in-out
                 ${isSidebarOpen ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 -translate-x-full pointer-events-none'}
             `}>
-                <ChatSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} conversations={conversations} />
+                <ChatSidebar
+                    isOpen={isSidebarOpen}
+                    setIsOpen={setIsSidebarOpen}
+                    conversations={conversations}
+                    onDeleteConversation={onDeleteConversation}
+                />
             </div>
 
             <div className={`
@@ -42,9 +55,9 @@ const ChatPageClient = () => {
                     ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}
                 `}>
                     <GoSidebarCollapse
-                        className="absolute top-4.5 left-4 z-15 cursor-pointer"
+                        className="absolute top-5.5 left-4 z-15 cursor-pointer"
                         onClick={() => setIsSidebarOpen(true)}
-                        size={30}
+                        size={25}
                     />
                 </div>
 
@@ -54,7 +67,7 @@ const ChatPageClient = () => {
                 }/>
 
                 <main className="flex-grow mt-20">
-                    <ChatBox />
+                    <ChatBox socket={socket} setConversations={setConversations} />
                 </main>
 
                 <div className="absolute bottom-0 w-full light:bg-white dark:bg-[#0D0E12]">
