@@ -22,9 +22,9 @@ const ChatPageClient = () => {
         const fetchConversations = async () => {
             const conversations = await getConversations();
             setConversations(conversations);
-        }
+        };
         fetchConversations();
-    }, [])
+    }, []);
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
@@ -34,13 +34,12 @@ const ChatPageClient = () => {
             window.history.replaceState(null, "", "/chat/new");
             window.location.reload();
         }
-    }
+    };
 
     return (
-
-        <div>
+        <div className="flex h-screen overflow-hidden">
             <div className={`
-                fixed h-[100vh] w-[15%] 
+                fixed h-screen w-[20%] 
                 flex flex-col items-center justify-center
                 transition-all duration-300 ease-in-out
                 ${isSidebarOpen ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 -translate-x-full pointer-events-none'}
@@ -54,31 +53,27 @@ const ChatPageClient = () => {
             </div>
 
             <div className={`
-                flex flex-col min-h-screen relative transition-all duration-300 ease-in-out
-                ${isSidebarOpen ? 'ml-[15%]' : 'ml-0'}
+                flex flex-col w-full h-full transition-all duration-300 ease-in-out
+                ${isSidebarOpen ? 'ml-[20%]' : 'ml-0'}
             `}>
-                <div className={`
-                    flex items-center transition-opacity duration-300 ease-in-out
-                    ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}
-                `}>
+                <div className="h-[64px] shrink-0 relative">
+                    <Header className={`
+                        absolute top-0 z-10 dark:bg-coal-500 light:bg-white transition-colors 
+                        ${isSidebarOpen ? "pl-[2%]" : "pl-[5%]"} pr-[5%]`
+                    }/>
                     <GoSidebarCollapse
-                        className="absolute top-5.5 left-4 z-15 cursor-pointer"
+                        className={`${isSidebarOpen ? "opacity-0" : ""} absolute top-5.5 left-4 z-15 cursor-pointer`}
                         onClick={() => setIsSidebarOpen(true)}
                         size={25}
                     />
                 </div>
 
-                <Header className={`
-                    absolute top-0 z-10 dark:bg-coal-500 light:bg-white transition-colors 
-                    ${isSidebarOpen ? "pl-[2%]" : "pl-[5%]"} pr-[5%]`
-                }/>
-
-                <main className="flex-grow mt-20">
+                <div className="flex-1 overflow-hidden">
                     <ChatBox socket={socket} setConversations={setConversations} />
-                </main>
+                </div>
 
-                <div className="absolute bottom-0 w-full light:bg-white dark:bg-[#0D0E12]">
-                    <Footer/>
+                <div className="h-[48px] shrink-0">
+                    <Footer />
                 </div>
             </div>
         </div>
