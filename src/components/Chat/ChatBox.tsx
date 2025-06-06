@@ -1,18 +1,9 @@
 "use client";
 
-import React, {useState, useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useChat} from "@/api/chat/chatApi";
 import ChatTextArea from "@/components/Chat/ChatTextArea";
 import {Conversation} from "@/types/Conversation";
-
-const renderMessageContent = (content: string) => {
-    try {
-        const parsed = JSON.parse(content);
-        return parsed.content;
-    } catch (e) {
-        return content;
-    }
-};
 
 interface ChatBoxProps {
     socket: WebSocket;
@@ -74,8 +65,8 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                     className={`p-5 rounded-lg text-gray-900 text-sm ${
                                         msg.direction === "incoming" ? "" : "bg-gray-200 text-right"
                                     } message-text`}
+                                    dangerouslySetInnerHTML={{ __html: msg.html }}
                                 >
-                                    {renderMessageContent(msg.content)}
                                 </div>
                                 <div
                                     className={`flex space-x-2 transition-opacity duration-250 ${
@@ -110,7 +101,7 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
                                 <div className="p-5 rounded-lg text-gray-900 text-sm message-text">
-                                    {renderMessageContent(currentResponseContent)}
+                                    {currentResponseContent}
                                 </div>
                             </div>
                         </div>

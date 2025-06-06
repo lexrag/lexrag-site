@@ -6,6 +6,7 @@ import { MessageTypes } from "@/types/MessageTypes";
 import { getConversationSnapshot } from "@/api/chat/getConversationSnapshot";
 import eventHandler from "@/api/chat/eventHandler";
 import {Conversation} from "@/types/Conversation";
+import renderMessageMd from "@/utils/renderMessageMd";
 
 interface UseChatArgs {
     websocket: WebSocket | null;
@@ -30,6 +31,12 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     }, [currentResponseContent]);
 
     useEffect(() => {
+        if (currentResponseContent !== "") {
+            setCurrentResponseContent("");
+        }
+    }, [messages]);
+
+    useEffect(() => {
         if (!websocket) return;
         if (!pathname.startsWith("/chat")) return;
 
@@ -46,14 +53,16 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             }
 
             if (data.type === MessageTypes.stop) {
+                const html = await renderMessageMd(accumulatedContentRef.current);
+
                 const message = {
                     ...data,
+                    html,
                     content: accumulatedContentRef.current,
                 };
 
                 setMessages((prev) => [...prev, message]);
                 accumulatedContentRef.current = "";
-                setCurrentResponseContent("");
             }
         };
 
@@ -73,7 +82,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
 
         setMessages((prev) => [
             ...prev,
-            { id: uuidv4(), content: input, direction: "outgoing" },
+            { id: uuidv4(), content: input, direction: "outgoing", html: input },
         ]);
 
         websocket.send(JSON.stringify({

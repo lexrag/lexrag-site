@@ -12,24 +12,20 @@ interface EventHandlerProps {
 
 const eventHandler = async (event: CustomEvent, props: EventHandlerProps) => {
     switch (event.name) {
-        case "init":
-            handleConversationInit(event);
+        case "new_conversation":
+            handleNewConversation(event);
             break;
-        case "update_title":
+        case "title_update":
             await handleConversationTitleUpdate(props.setConversations);
             break;
     }
 
 }
 
-const handleConversationInit = (
+const handleNewConversation = (
     event: CustomEvent,
 ) => {
-    if (!(event.name === "init")) {
-        return
-    } else {
-        window.history.replaceState(null, '', `/chat/${event.params.thread_id}`);
-    }
+    window.history.replaceState(null, '', `/chat/${event.params.thread_id}`);
 }
 
 

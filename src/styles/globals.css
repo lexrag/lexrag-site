@@ -35,3 +35,7 @@ body.dark,
 .scrollable:not(:hover)::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.2); /* gray-400 @ 20% */
 }
+
+a {
+    color: #449fdb;
+}

@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from "uuid";
+import renderMessageMd from "@/utils/renderMessageMd";
 
 export const getConversationSnapshot = async (threadId: string) => {
     const response = await fetch(`/api/conversations/${threadId}`, {
@@ -13,7 +14,12 @@ export const getConversationSnapshot = async (threadId: string) => {
         return [];
     }
 
-    return data.messages.map((m) => {
-        return {id: uuidv4(), content: m.data.content, direction: m.type === "human" ? "outgoing" : "incoming"}
-    });
+    return await Promise.all(
+        data.messages.map(async (m) => ({
+            id: uuidv4(),
+            content: m.data.content,
+            direction: m.type === "human" ? "outgoing" : "incoming",
+            html: await renderMessageMd(m.data.content),
+        }))
+    );
 }

@@ -4,6 +4,7 @@ import {GoSidebarExpand} from "react-icons/go";
 import {Conversation} from "@/types/Conversation";
 import Link from "next/link";
 import {FaRegTrashAlt} from "react-icons/fa";
+import {useRouter} from "next/navigation";
 
 interface ChatSidebarProps {
     isOpen: boolean;
@@ -15,6 +16,8 @@ interface ChatSidebarProps {
 const ChatSidebar = (
     {isOpen, setIsOpen, conversations, onDeleteConversation}: ChatSidebarProps
 ) => {
+    const router = useRouter();
+    console.log(conversations);
 
     return (
         <div className="w-[98%] h-[98%] border-2 border-gray-200 rounded-xl flex flex-col">
@@ -33,17 +36,20 @@ const ChatSidebar = (
                 <ul>
                     {conversations.map((c) => {
                         return (
-                            <Link key={c.thread_id} href={`/chat/${c.thread_id}`}>
-                                <li className="flex justify-between p-4 m-2 border-2 rounded">
-                                    <p className="overflow-x-hidden whitespace-nowrap">
-                                        {c.title}
-                                    </p>
-                                    <FaRegTrashAlt
-                                        className="cursor-pointer ml-1"
-                                        onClick={() => onDeleteConversation(c.thread_id)}
-                                    />
-                                </li>
-                            </Link>
+                            <li
+                                key={c.thread_id}
+                                onClick={() => router.push(`/chat/${c.thread_id}`)}
+                                className="flex justify-between p-4 m-2 border-2 rounded cursor-pointer"
+                            >
+                                <p className="overflow-x-hidden whitespace-nowrap">{c.title}</p>
+                                <FaRegTrashAlt
+                                    className="cursor-pointer ml-1"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteConversation(c.thread_id);
+                                    }}
+                                />
+                            </li>
                         )
                     })}
                 </ul>

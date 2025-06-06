@@ -3,4 +3,5 @@ export interface Message {
     content: string;
     direction: "incoming" | "outgoing";
     type?: string | undefined;
+    html?: string;
 }
