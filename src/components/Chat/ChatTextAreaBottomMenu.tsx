@@ -7,6 +7,11 @@ interface ChatTextAreaBottomMenuProps extends ChatTextAreaProps {
 }
 
 const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
+    const handleSendButtonClick = () => {
+        props.sendMessage(props.input, props.isNewConversation)
+        props.setInput("");
+    }
+
     return (
         <div className="flex items-center justify-between border-t-2 dark:border-gray-300">
 
@@ -57,7 +62,8 @@ const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
             <IoSendSharp
                 size={25}
                 color={"#015A8D"}
-                onClick={() => props.sendMessage(props.input, props.isNewConversation)}
+                onClick={handleSendButtonClick}
+                className="cursor-pointer"
             />
 
         </div>

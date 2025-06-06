@@ -10,11 +10,13 @@ import {Conversation} from "@/types/Conversation";
 import {getConversations} from "@/api/chat/getConversations";
 import deleteConversation from "@/api/chat/deleteConversation";
 import {ChatSocketContext} from "@/components/Chat/ChatProvider";
+import {usePathname} from "next/navigation";
 
 const ChatPageClient = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const socket = useContext(ChatSocketContext);
+    const pathname = usePathname();
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -27,6 +29,11 @@ const ChatPageClient = () => {
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
         setConversations(prev => prev.filter(c => c.thread_id !== threadId));
+
+        if (pathname.includes(threadId)) {
+            window.history.replaceState(null, "", "/chat/new");
+            window.location.reload();
+        }
     }
 
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { Message } from "@/types/Message";
@@ -19,7 +19,11 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const accumulatedContentRef = useRef("");
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
-    const params = useParams();
+
+    const threadId = useMemo(() => {
+        const match = pathname.match(/^\/chat\/([^\/]+)/);
+        return match ? match[1] : null;
+    }, [pathname]);
 
     useEffect(() => {
         currentResponseRef.current = currentResponseContent;
@@ -33,7 +37,6 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             const data = JSON.parse(event.data);
 
             if (data.type === "event") {
-                console.log("event", data);
                 await eventHandler(data, { setConversations });
             }
 
@@ -58,8 +61,8 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             await handleMessage(event);
         }
 
-        if (params.thread_id !== "new") {
-            getConversationSnapshot(params.thread_id as string).then(setMessages);
+        if (threadId !== "new") {
+            getConversationSnapshot(threadId as string).then(setMessages);
         }
 
         return () => websocket.removeEventListener("message", handleMessage);
@@ -77,7 +80,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             type: "message",
             content: input,
             is_new: isNew,
-            thread_id: params.thread_id,
+            thread_id: threadId,
         }));
     };
 
