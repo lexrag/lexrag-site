@@ -1,21 +1,29 @@
 import { IoSendSharp } from "react-icons/io5";
 import ChatTextAreaBottomMenu from "@/components/Chat/ChatTextAreaBottomMenu";
 import React from "react";
+import {usePathname} from "next/navigation";
 
 export interface ChatTextAreaProps {
     input: string;
     setInput: (text: string) => void;
-    sendMessage: (message: string) => void;
+    sendMessage: (message: string, isNew: boolean) => void;
     activeMsgType: string;
     toggleMsgType: (msgType: string) => void;
 }
 
 const ChatTextArea = (props: ChatTextAreaProps) => {
+    const pathname = usePathname();
+
+    let isNewConversation = false;
+
+    if (pathname.includes("/new")) {
+        isNewConversation = true;
+    }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            props.sendMessage(props.input);
+            props.sendMessage(props.input, isNewConversation);
             props.setInput("");
         }
     };
@@ -53,6 +61,7 @@ const ChatTextArea = (props: ChatTextAreaProps) => {
                 activeMsgType={props.activeMsgType}
                 toggleMsgType={props.toggleMsgType}
                 sendMessage={props.sendMessage}
+                isNewConversation={isNewConversation}
             />
         </div>
     )

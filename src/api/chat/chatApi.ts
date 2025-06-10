@@ -1,134 +1,104 @@
-"use client";
+import {useEffect, useMemo, useRef, useState} from "react";
+import { usePathname, useParams, useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import { Message } from "@/types/Message";
+import { MessageTypes } from "@/types/MessageTypes";
+import { getConversationSnapshot } from "@/api/chat/getConversationSnapshot";
+import eventHandler from "@/api/chat/eventHandler";
+import {Conversation} from "@/types/Conversation";
+import renderMessageMd from "@/utils/renderMessageMd";
 
-import {useState, useEffect, useRef} from "react";
-import {useRouter, usePathname} from "next/navigation";
-import {v4 as uuidv4} from "uuid";
-import {Message} from "@/types/Message";
-import {MessageTypes} from "@/types/MessageTypes";
+interface UseChatArgs {
+    websocket: WebSocket | null;
+    setConversations: (conversations: Conversation[]) => void;
+}
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-export const useChat = () => {
-    const wsRef = useRef<WebSocket | null>(null);
+export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>("");
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef("");
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-    const router = useRouter();
     const pathname = usePathname();
 
-    const connectToWebSocket = (wsUrl: string) => {
-        try {
-            wsRef.current = new WebSocket(wsUrl);
-        } catch (error) {
-            console.error("Failed to establish WebSocket connection:", error);
-            return;
-        }
-
-        const websocket = wsRef.current;
-
-        websocket.onopen = () => {
-            console.log("WebSocket connected:", wsUrl);
-        };
-
-        websocket.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                console.log("Received data:", data);
-
-                if (data.type === MessageTypes.token) {
-                    accumulatedContentRef.current += data.content;
-                    setCurrentResponseContent(accumulatedContentRef.current);
-                }
-
-                if (data.type === MessageTypes.stop) {
-                    const message = {
-                        ...data,
-                        content: accumulatedContentRef.current,
-                    };
-
-                    setMessages((prev) => [...prev, message]);
-
-                    accumulatedContentRef.current = "";
-                    setCurrentResponseContent("");
-                }
-
-            } catch (err) {
-                console.error("Failed to parse WebSocket message:", err, event.data);
-            }
-        };
-
-        websocket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-
-        websocket.onclose = (event) => {
-            console.log("WebSocket connection closed", event.reason);
-            wsRef.current = null;
-        };
-    };
+    const threadId = useMemo(() => {
+        const match = pathname.match(/^\/chat\/([^\/]+)/);
+        return match ? match[1] : null;
+    }, [pathname]);
 
     useEffect(() => {
         currentResponseRef.current = currentResponseContent;
     }, [currentResponseContent]);
 
     useEffect(() => {
-        if (pathname !== "/chat") return;
-
-        const token = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("token="))
-            ?.split("=")[1];
-
-        if (!token) {
-            console.error("No token found in cookies. Redirecting to sign-in.");
-            router.push("/auth/signin");
-            return;
+        if (currentResponseContent !== "") {
+            setCurrentResponseContent("");
         }
+    }, [messages]);
 
-        if (wsRef.current) {
-            console.warn("WebSocket already exists. Skipping reinitialization.");
-            return;
-        }
+    useEffect(() => {
+        if (!websocket) return;
+        if (!pathname.startsWith("/chat")) return;
 
-        const wsProtocol = API_BASE_URL.startsWith("https") ? "wss" : "ws";
-        const wsUrl = `${wsProtocol}://${new URL(API_BASE_URL).host}/ws/chat?token=${token}`;
-        const connectTimeout = setTimeout(() => connectToWebSocket(wsUrl), 500);
+        const handleMessage = async (event: MessageEvent) => {
+            const data = JSON.parse(event.data);
 
-        return () => {
-            console.log("Cleaning up WebSocket...");
-            clearTimeout(connectTimeout);
-            if (wsRef.current) {
-                wsRef.current.close();
-                wsRef.current = null;
+            if (data.type === "event") {
+                await eventHandler(data, { setConversations });
+            }
+
+            if (data.type === MessageTypes.token) {
+                accumulatedContentRef.current += data.content;
+                setCurrentResponseContent(accumulatedContentRef.current);
+            }
+
+            if (data.type === MessageTypes.stop) {
+                const html = await renderMessageMd(accumulatedContentRef.current);
+
+                const message = {
+                    ...data,
+                    html,
+                    content: accumulatedContentRef.current,
+                };
+
+                setMessages((prev) => [...prev, message]);
+                accumulatedContentRef.current = "";
             }
         };
-    }, [pathname]);
 
-    const sendMessage = (input: string) => {
-        if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-            console.error("WebSocket is not connected.");
-            return;
+        websocket.onmessage = async (event: MessageEvent) => {
+            await handleMessage(event);
         }
 
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            {id: uuidv4(), content: input, direction: "outgoing"},
+        if (threadId !== "new") {
+            getConversationSnapshot(threadId as string).then(setMessages);
+        }
+
+        return () => websocket.removeEventListener("message", handleMessage);
+    }, [websocket, pathname]);
+
+    const sendMessage = (input: string, isNew: boolean) => {
+        if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
+
+        setMessages((prev) => [
+            ...prev,
+            { id: uuidv4(), content: input, direction: "outgoing", html: input },
         ]);
 
-        wsRef.current.send(JSON.stringify({type: "message", content: input}));
+        websocket.send(JSON.stringify({
+            type: "message",
+            content: input,
+            is_new: isNew,
+            thread_id: threadId,
+        }));
     };
 
     const copyToClipboard = (messageId: string, text: string) => {
-        navigator.clipboard
-            .writeText(text)
-            .then(() => {
-                setCopiedMessageId(messageId);
-                setTimeout(() => setCopiedMessageId(null), 2000);
-            })
-            .catch((err) => console.error("Failed to copy text:", err));
+        navigator.clipboard.writeText(text).then(() => {
+            setCopiedMessageId(messageId);
+            setTimeout(() => setCopiedMessageId(null), 2000);
+        });
     };
 
-    return {messages, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId};
+    return { messages, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId };
 };

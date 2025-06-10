@@ -25,7 +25,7 @@ const SignInForm = () => {
         if (!result.success) {
             setError(result.error);
         } else {
-            redirect("/chat");
+            redirect("/chat/new");
         }
     };
 

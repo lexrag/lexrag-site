@@ -27,12 +27,6 @@ const Dropdown = ({user}: any) => {
 
                     <div className="flex flex-col">
                         <div className="menu-item">
-                            <Link className="menu-link" href="/dashboard">
-                                <div className="menu-icon"><i className="ki-filled ki-element-11"></i></div>
-                                <div className="menu-title">Dashboard</div>
-                            </Link>
-                        </div>
-                        <div className="menu-item">
                             <Link className="menu-link" href="/profile">
                                 <div className="menu-icon"><i className="ki-filled ki-profile-circle"></i></div>
                                 <div className="menu-title">My Profile</div>

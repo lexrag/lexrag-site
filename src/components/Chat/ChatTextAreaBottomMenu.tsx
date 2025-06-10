@@ -2,9 +2,16 @@ import {IoSendSharp} from "react-icons/io5";
 import React from "react";
 import {ChatTextAreaProps} from "@/components/Chat/ChatTextArea";
 
-interface ChatTextAreaBottomMenuProps extends ChatTextAreaProps {}
+interface ChatTextAreaBottomMenuProps extends ChatTextAreaProps {
+    isNewConversation?: boolean;
+}
 
 const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
+    const handleSendButtonClick = () => {
+        props.sendMessage(props.input, props.isNewConversation)
+        props.setInput("");
+    }
+
     return (
         <div className="flex items-center justify-between border-t-2 dark:border-gray-300">
 
@@ -55,7 +62,8 @@ const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
             <IoSendSharp
                 size={25}
                 color={"#015A8D"}
-                onClick={() => props.sendMessage(props.input)}
+                onClick={handleSendButtonClick}
+                className="cursor-pointer"
             />
 
         </div>

@@ -1,21 +1,26 @@
-import {axiosInstance} from "@/api/axiosInstance";
-
 interface VerifyEmailParams {
     email: string;
     code: string;
 }
 
 export const verifyEmail = async (params: VerifyEmailParams) => {
-    try {
-        const response = await axiosInstance.post('auth/verify-email', params)
+    const response = await fetch('/api/auth/verify-email', {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
 
-        if (response.status === 200) {
-            return { success: true };
-        }
-    } catch (error: any) {
-        if (error.response) {
-            return {success: false, error: error.response.data.detail || "Email verification failed"};
-        }
+    const data = await response.json();
+
+    if (response.ok) {
+        return { success: true };
+    }
+
+    if (data?.detail) {
+        return {success: false, error: data.detail || "Email verification failed"};
+    } else {
         return {success: false, error: "Network error"};
     }
 }

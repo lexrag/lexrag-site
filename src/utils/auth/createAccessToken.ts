@@ -1,12 +1,14 @@
-import {axiosInstance} from "@/api/axiosInstance";
+export const createAccessToken = async (params: object) => {
+    const response = await fetch('/auth/create-token', {
+        method: "POST",
+        body: JSON.stringify(params),
+    })
 
-export const createAccessToken = async (data: object) => {
-    try {
-        const response = await axiosInstance.post('/auth/create-token', data)
-        if (response.status === 200) {
-            return response.data.access_token;
-        }
-    } catch (error) {
+    const data = await response.json();
+
+    if (response.ok) {
+        return data.access_token;
+    } else {
         console.log('Failed to verify session')
     }
 }

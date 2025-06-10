@@ -1,10 +1,10 @@
 import PageTitle from "@/components/Layout/PageTitle";
 import PersonalInfoCard from "@/components/UserProfile/PersonalInfoCard";
-import {getMe} from "@/api/auth/getMe";
+import getMeServer from "@/api/auth/getMeServer";
 import {User} from "@/types/User";
 
 const UserProfilePage = async () => {
-    const currentUser: User = await getMe();
+    const currentUser: User = await getMeServer();
 
     return (
         <section className="">

@@ -15,7 +15,7 @@ const OauthCallback = () => {
         if (!result.success) {
             console.log("error", result.error)
         } else {
-            redirect("/dashboard");
+            redirect("/chat/new");
         }
     }
 
