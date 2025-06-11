@@ -25,7 +25,7 @@ const middleware = async (req: NextRequest) => {
         response.cookies.set("token", "", { httpOnly: false, maxAge: 0 });
     }
 
-    if (isProtectedRoute && jwtPayload?.sub && !jwtPayload.is_active && !jwtPayload.is_social_network_user) {
+    if (isProtectedRoute && jwtPayload?.sub && !jwtPayload.is_active) {
         return NextResponse.redirect(new URL(`/auth/email-verification/${jwtPayload?.sub}`, req.url));
     }
 
