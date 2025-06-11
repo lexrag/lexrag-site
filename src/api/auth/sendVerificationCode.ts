@@ -1,6 +1,7 @@
 export const sendVerificationCode = async (email: string) => {
     const response = await fetch(`/api/auth/send-code/${email}`, {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

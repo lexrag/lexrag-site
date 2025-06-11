@@ -1,6 +1,7 @@
 const deleteConversation = async (threadId: string): Promise<object> => {
     const response = await fetch(`/api/conversations/${threadId}`, {
         method: 'DELETE',
+        credentials: "include",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }

@@ -7,6 +7,7 @@ export const verifyEmail = async (params: VerifyEmailParams) => {
     const response = await fetch('/api/auth/verify-email', {
         method: "POST",
         body: JSON.stringify(params),
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

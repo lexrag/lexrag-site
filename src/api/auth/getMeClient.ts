@@ -2,6 +2,7 @@
 
 export const getMeClient = async () => {
     const response = await fetch("/api/auth/me", {
+        credentials: "include",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }

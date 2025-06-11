@@ -7,6 +7,7 @@ export const getMeServer = async () => {
     const session = cookiesStore.get("token")?.value;
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+        credentials: "include",
         headers: {
             "Authorization": `Bearer ${session}`,
         }

@@ -3,6 +3,7 @@ import renderMessageMd from "@/utils/renderMessageMd";
 
 export const getConversationSnapshot = async (threadId: string) => {
     const response = await fetch(`/api/conversations/${threadId}`, {
+        credentials: "include",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }

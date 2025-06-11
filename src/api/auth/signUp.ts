@@ -9,6 +9,7 @@ export const signUp = async (params: SignUpParams) => {
     const response = await fetch("/api/auth/signup", {
         method: "POST",
         body: JSON.stringify(params),
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

@@ -1,5 +1,5 @@
 export const getGoogleAuthLink = async () => {
-    const response = await fetch('/api/auth/signin/google')
+    const response = await fetch('/api/auth/signin/google', {credentials: "include",})
     const data = await response.json()
 
     if (response.ok) {

@@ -8,6 +8,7 @@ export const resetPassword = async (params: ResetPasswordParams) => {
     const response = await fetch(`/api/auth/reset-password`, {
         method: "POST",
         body: JSON.stringify(params),
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

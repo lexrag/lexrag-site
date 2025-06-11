@@ -2,6 +2,7 @@
 
 export const getConversations = async () => {
     const response = await fetch("/api/conversations/all", {
+        credentials: "include",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }
