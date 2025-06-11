@@ -1,7 +1,6 @@
 const deleteConversation = async (threadId: string): Promise<object> => {
-    const response = await fetch(`/api/conversations/${threadId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/conversations/${threadId}`, {
         method: 'DELETE',
-        credentials: "include",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }

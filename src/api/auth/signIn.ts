@@ -6,10 +6,9 @@ interface SignInParams {
 }
 
 export const signIn = async (params: SignInParams): Promise<{ success: boolean; error?: string }> => {
-    const response = await fetch("/api/auth/signin", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin`, {
         method: "POST",
         body: JSON.stringify(params),
-        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

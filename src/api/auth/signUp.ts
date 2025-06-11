@@ -6,10 +6,9 @@ interface SignUpParams {
 }
 
 export const signUp = async (params: SignUpParams) => {
-    const response = await fetch("/api/auth/signup", {
+    const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signup", {
         method: "POST",
         body: JSON.stringify(params),
-        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

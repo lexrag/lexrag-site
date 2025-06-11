@@ -5,9 +5,8 @@ interface GoogleSignInParams {
 }
 
 export const googleSignIn = async (params: GoogleSignInParams): Promise<{ success: boolean; error?: string }> => {
-    const response = await fetch(`/api/auth/signin/google/callback?code=${params.code}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin/google/callback?code=${params.code}`, {
         method: "POST",
-        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },

@@ -2,8 +2,7 @@ import {v4 as uuidv4} from "uuid";
 import renderMessageMd from "@/utils/renderMessageMd";
 
 export const getConversationSnapshot = async (threadId: string) => {
-    const response = await fetch(`/api/conversations/${threadId}`, {
-        credentials: "include",
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/conversations/${threadId}`, {
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }
