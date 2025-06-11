@@ -5,7 +5,7 @@ var react_1 = require("react");
 var fs_1 = require("fs");
 var path_1 = require("path");
 var server_1 = require("react-dom/server");
-var VerificationEmail_1 = require("../src/components/EmailTemplates/VerificationEmail");
+var VerificationEmail_1 = require("../../components/EmailTemplates/VerificationEmail");
 // Данные для генерации шаблона – используем тестовые данные или маркеры
 var testData = {
     userName: '{user}', // placeholder для имени пользователя

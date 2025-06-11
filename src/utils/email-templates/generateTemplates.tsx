@@ -3,7 +3,7 @@ import React from 'react';
 import fs from 'fs';
 import path from 'path';
 import { renderToStaticMarkup } from 'react-dom/server';
-import VerificationEmail from '../src/components/EmailTemplates/VerificationEmail';
+import VerificationEmail from '../../components/EmailTemplates/VerificationEmail';
 
 // Data for template generation – using test data or placeholders
 const testData = {

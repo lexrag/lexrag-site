@@ -9,7 +9,7 @@
       "outDir": "dist-scripts"
     },
     "include": [
-      "scripts/**/*",
+      "src/utils/email-templates/**/*",
       "src/components/EmailTemplate/**/*",
       "src/metronic/**/*",
       "src/styles/**/*"
