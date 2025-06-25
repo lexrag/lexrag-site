@@ -1,13 +1,14 @@
 "use client";
 
 import React, {useEffect, useRef, useState} from "react";
+import type { Dispatch, SetStateAction } from "react";
 import {useChat} from "@/api/chat/chatApi";
 import ChatTextArea from "@/components/Chat/ChatTextArea";
 import {Conversation} from "@/types/Conversation";
 
 interface ChatBoxProps {
-    socket: WebSocket;
-    setConversations: (conversations: Conversation[]) => void;
+  socket: WebSocket;
+  setConversations: Dispatch<SetStateAction<Conversation[]>>;
 }
 
 const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
@@ -22,7 +23,7 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
     const [input, setInput] = useState<string>("");
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
-    const [activeMsgType, setActiveMsgType] = useState<string>("semantic_graph");
+    const [activeMsgType, setActiveMsgType] = useState<string | null>("semantic_graph");
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -62,10 +63,12 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <div
-                                    className={`p-5 rounded-lg text-gray-900 text-sm ${
-                                        msg.direction === "incoming" ? "" : "bg-gray-200 text-right"
-                                    } message-text`}
-                                    dangerouslySetInnerHTML={{ __html: msg.html }}
+                                className={`p-5 rounded-lg text-sm message-text ${
+                                    msg.direction === "incoming"
+                                    ? "bg-stone-100 dark:bg-stone-900 text-gray-900 dark:text-white"
+                                    : "bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
+                                }`}
+                                dangerouslySetInnerHTML={{ __html: msg.html ?? "" }}
                                 >
                                 </div>
                                 <div

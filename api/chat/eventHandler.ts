@@ -16,7 +16,9 @@ const eventHandler = async (event: CustomEvent, props: EventHandlerProps) => {
             handleNewConversation(event);
             break;
         case "title_update":
-            await handleConversationTitleUpdate(props.setConversations);
+            if (props.setConversations) {
+                await handleConversationTitleUpdate(props.setConversations);
+            }
             break;
     }
 
@@ -34,7 +36,8 @@ const handleConversationTitleUpdate = async (
 ) => {
     const conversations = await getConversations();
     setConversations(conversations);
-}
+};
+
 
 
 export default eventHandler;

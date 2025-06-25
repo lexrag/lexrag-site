@@ -8,12 +8,12 @@ interface ChatTextAreaBottomMenuProps extends ChatTextAreaProps {
 
 const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
     const handleSendButtonClick = () => {
-        props.sendMessage(props.input, props.isNewConversation)
+        props.sendMessage(props.input, props.isNewConversation ?? false);
         props.setInput("");
-    }
+    };
 
     return (
-        <div className="flex items-center justify-between border-t-2 dark:border-gray-300">
+       <div className="flex items-center justify-between border-t-2 border-gray-200 dark:border-gray-600">
 
             <div className="flex space-x-1 mt-2">
                 <div className="group">

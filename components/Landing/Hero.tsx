@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AuroraText } from "@/components/magicui/aurora-text";
 import CurveDown from '@/components/Landing/CurveDown';
 import { Button } from '../ui/button';
 
@@ -9,7 +10,7 @@ const LandingHeading = () => {
         <div className="absolute inset-0 bg-[#13263C]"></div>
 
         <div
-          className="absolute inset-0  bg-no-repeat bg-contain bg-bottom"
+          className="absolute inset-0 bg-no-repeat bg-contain bg-bottom"
           style={{
             backgroundImage: 'url(/media/images/singapore_1.png)',
             backgroundRepeat: 'no-repeat',
@@ -35,16 +36,9 @@ const LandingHeading = () => {
               textShadow: '1px 1px 4px rgba(0, 0, 0, 0.2)',
             }}
           >
-            <span
-              style={{
-                background:
-                  'linear-gradient(to right, #12CE5D 0%, #FFD80C 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
+            <AuroraText>
               Confidence in Every Decision
-            </span>
+            </AuroraText>
             <br />
             legal AI with graph-vector context &nbsp;
           </h1>

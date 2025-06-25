@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { TooltipsProvider } from '@/providers/tooltips-provider';
 import { Toaster } from '@/components/ui/sonner';
-import '@/css/styles.css';
+import '@/css/globals.css';
 import '@/components/keenicons/assets/styles.css';
 import { Metadata } from 'next';
 import { QueryProvider } from '@/providers/query-provider';

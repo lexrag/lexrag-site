@@ -5,12 +5,12 @@ import { Message } from "@/types/Message";
 import { MessageTypes } from "@/types/MessageTypes";
 import { getConversationSnapshot } from "@/api/chat/getConversationSnapshot";
 import eventHandler from "@/api/chat/eventHandler";
-import {Conversation} from "@/types/Conversation";
+import { Conversation } from "@/types/Conversation";
 import renderMessageMd from "@/utils/renderMessageMd";
 
 interface UseChatArgs {
-    websocket: WebSocket | null;
-    setConversations: (conversations: Conversation[]) => void;
+  websocket: WebSocket | null;
+  setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
 }
 
 export const useChat = ({ websocket, setConversations }: UseChatArgs) => {

@@ -75,7 +75,13 @@ const ChatPageClient = () => {
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <ChatBox socket={socket} setConversations={setConversations} />
+          {socket ? (
+            <ChatBox socket={socket} setConversations={setConversations} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted">
+              Connecting...
+            </div>
+          )}
         </div>
 
         <div className="h-[48px] shrink-0">
