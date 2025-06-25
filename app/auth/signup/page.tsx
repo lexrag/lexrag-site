@@ -28,7 +28,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/common/icons';
-import { RecaptchaPopover } from '@/components/common/recaptcha-popover';
 import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
 
 export default function Page() {
@@ -38,12 +37,12 @@ export default function Page() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(false);
-  const [showRecaptcha, setShowRecaptcha] = useState(false);
 
   const form = useForm<SignupSchemaType>({
     resolver: zodResolver(getSignupSchema()),
     defaultValues: {
-      name: '',
+      first_name: '',
+      last_name: '',
       email: '',
       password: '',
       passwordConfirmation: '',
@@ -58,46 +57,30 @@ export default function Page() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const result = await form.trigger();
-    if (!result) return;
+  const onSubmit = async (values: SignupSchemaType) => {
+    setIsProcessing(true);
+    setError(null);
 
-    setShowRecaptcha(true);
-  };
+    const { first_name, last_name, email, password } = values;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleVerifiedSubmit = async (token: string) => {
-    try {
-      const { name, email, password } = form.getValues();
-      const [first_name, last_name] = name.split(' ');
+    const response = await signUp({
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      email,
+      password,
+    });
 
-      setIsProcessing(true);
-      setError(null);
-      setShowRecaptcha(false);
+    if (!response.success) {
+      setError(response.error);
+      return;
+    }
 
-      const response = await signUp({ first_name, last_name, email, password });
+    const verificationCodeResult = await sendVerificationCode(email);
 
-      if (!response.success) {
-        setError(response.error);
-        return;
-      }
-
-      const verificationCodeResult = await sendVerificationCode(email);
-
-      if (!verificationCodeResult.success) {
-        setError(verificationCodeResult.error);
-      } else {
-        redirect(`/auth/email-verification/${email}`);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'An unexpected error occurred. Please try again.',
-      );
-    } finally {
-      setIsProcessing(false);
+    if (!verificationCodeResult.success) {
+      setError(verificationCodeResult.error);
+    } else {
+      redirect(`/auth/email-verification/${email}`);
     }
   };
 
@@ -125,7 +108,10 @@ export default function Page() {
   return (
     <Suspense>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="block w-full space-y-5">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="block w-full space-y-5"
+        >
           <div className="text-center mb-2.5">
             <h3 className="text-lg font-semibold leading-none mb-2.5">
               Sign up
@@ -178,19 +164,34 @@ export default function Page() {
             </Alert>
           )}
 
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your First Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your Last Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -318,23 +319,12 @@ export default function Page() {
           </div>
 
           <div className="flex flex-col gap-2.5">
-            <RecaptchaPopover
-              open={showRecaptcha}
-              onOpenChange={(open) => {
-                if (!open) {
-                  setShowRecaptcha(false);
-                }
-              }}
-              onVerify={handleVerifiedSubmit}
-              trigger={
-                <Button type="submit" disabled={isProcessing}>
-                  {isProcessing ? (
-                    <LoaderCircleIcon className="size-4 animate-spin" />
-                  ) : null}
-                  Continue
-                </Button>
-              }
-            />
+            <Button type="submit" disabled={isProcessing}>
+              {isProcessing ? (
+                <LoaderCircleIcon className="size-4 animate-spin" />
+              ) : null}
+              Continue
+            </Button>
           </div>
         </form>
       </Form>

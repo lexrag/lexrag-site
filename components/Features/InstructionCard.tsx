@@ -27,7 +27,7 @@ const InstructionCard = ({ details, features }: InstructionCardProps) => {
                     <div key={index} className="flex items-start gap-3 pe-7.5">
                         <i className="ki-filled ki-check-circle text-base text-success mt-1" />
                         <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-gray-900">
+                            <span className="text-sm font-semibold">
                                 {feature.title}
                             </span>
                             <p className="text-xs text-gray-600 mt-1">

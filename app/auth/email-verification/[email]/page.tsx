@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import ResendLink from '@/components/Auth/EmailVerification/ResendLink';
 
 const formSchema = z.object({
   code: z.string().min(6, 'Please enter the verification code'),
@@ -49,24 +50,13 @@ export default function Page() {
     setError(null);
     setMessage(null);
 
-    try {
-      const result = await verifyEmail({
-        email,
-        code: data.code,
-      });
+    const result = await verifyEmail({
+      email,
+      code: data.code,
+    });
 
-      if (!result.success) {
-        setError(result.error || 'Verification failed.');
-      } else {
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'An error occurred during verification.',
-      );
-    } finally {
-      setIsProcessing(false);
+    if (!result.success) {
+      setError(result.error || 'Verification failed.');
     }
   };
 
@@ -138,6 +128,13 @@ export default function Page() {
             <Button variant="outline" asChild className="w-full">
               <Link href="/auth/signin">Back to Login</Link>
             </Button>
+
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xs text-gray-600">
+                Didn’t receive an email?
+              </span>
+              <ResendLink email={email} />
+            </div>
           </form>
         </Form>
       </div>

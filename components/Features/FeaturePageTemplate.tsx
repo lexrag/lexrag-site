@@ -42,7 +42,7 @@ const FeaturePageTemplate = () => {
           <div className="flex flex-col ">
             <FeatureParams rows={featureData.featureRows} />
             <div className="">
-              <h2 className="text-1.5xl text-center font-medium text-gray-900 mt-10">
+              <h2 className="text-xl text-center font-medium mt-10">
                 Browse Relevant Features
               </h2>
             </div>

@@ -49,27 +49,19 @@ export default function Page() {
     setIsProcessing(true);
     setError(null);
 
-    try {
-      const email = values.email.trim();
-      const password = values.password.trim();
+    const { email, password } = values;
 
-      const response = await signIn({ email, password });
-
-      if (response?.error) {
-        const errorData = JSON.parse(response.error);
-        setError(errorData.message);
-      } else {
-        router.push('/chat/new');
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'An unexpected error occurred. Please try again.',
-      );
-    } finally {
-      setIsProcessing(false);
+    const response = await signIn({
+      email: email.trim(),
+      password: password.trim(),
+    });
+    if (response?.error) {
+      setError(response.error);
+    } else {
+      router.push('/chat/new');
     }
+
+    setIsProcessing(false);
   }
 
   return (

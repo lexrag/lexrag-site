@@ -4,7 +4,7 @@ interface VerifyEmailParams {
 }
 
 export const verifyEmail = async (params: VerifyEmailParams) => {
-    const response = await fetch('${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`, {
         method: "POST",
         body: JSON.stringify(params),
         headers: {

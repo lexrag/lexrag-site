@@ -85,11 +85,11 @@ const ProductFeatures = ({
                 className="transform transition-transform duration-300 hover:-translate-y-2"
               >
                 <div
-                  className={`dark:bg-coal-300 light:bg-white ${colors.border} flex flex-col gap-5 p-5 lg:p-5 rounded-xl relative items-center justify-around shadow-md hover:shadow-lg transition-shadow`}
+                  className={`dark:bg-coal-300 light:bg-white border-[1px] ${colors.border} flex flex-col gap-5 p-5 lg:p-5 rounded-xl relative items-center justify-around shadow-md hover:shadow-lg transition-shadow`}
                 >
                   <div className="flex w-full items-center justify-between gap-4.5">
-                    <div className="flex items-center gap-4.5">
-                      <div className="relative w-[44px] h-[44px] flex items-center justify-center dark:bg-gray-100 light:bg-gray-200 rounded-full aspect-square">
+                    <div className="flex items-start gap-4.5">
+                      <div className="relative w-[44px] h-[44px] flex items-center justify-center border-[1px] light:bg-gray-200 rounded-full aspect-square">
                         <i
                           className={`ki-duotone text-2xl ${colors.icon_color} ${feat.icon}`}
                         ></i>
@@ -108,17 +108,19 @@ const ProductFeatures = ({
 
                     {showSideBadges && (
                       <div className="flex flex-col items-start gap-3">
-                        <span
-                          className={`badge badge-sm badge-outline ${getBadgeColor(feat.category)}`}
+                        <Badge
+                          appearance="outline"
+                          variant={getBadgeColor(feat.category)}
                         >
                           {feat.category}
-                        </span>
+                        </Badge>
 
-                        <span
-                          className={`badge badge-sm badge-outline ${getBadgeColor(feat.plan)}`}
+                        <Badge
+                          appearance="outline"
+                          variant={getBadgeColor(feat.category)}
                         >
                           {feat.plan}
-                        </span>
+                        </Badge>
                       </div>
                     )}
                   </div>

@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { logOut } from '@/api/auth/logOut';
 import { User } from '@/types/User';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +22,7 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="size-[34px] rounded-full inline-flex items-center justify-center text-md font-semibold border border-primary-clarity bg-primary-light text-primary cursor-pointer"
+          className="size-[34px] border-[#015A8D] bg-[#172331] dark:bg-[#EFF6FF] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer"
           aria-label="User menu"
         >
           {user?.first_name?.slice(0, 1) || '?'}
@@ -43,9 +45,9 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
               {user?.email}
             </Link>
           </div>
-          <span className="badge badge-xs badge-primary badge-outline">
+          <Badge variant="primary" appearance="outline">
             Pro
-          </span>
+          </Badge>
         </div>
 
         <DropdownMenuSeparator />
@@ -63,12 +65,13 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
         <DropdownMenuSeparator />
 
         <div className="px-4 py-2">
-          <button
+          <Button
             onClick={logOut}
-            className="btn btn-sm btn-light w-full justify-center"
+            variant="outline"
+            className="w-full justify-center"
           >
             Logout
-          </button>
+          </Button>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

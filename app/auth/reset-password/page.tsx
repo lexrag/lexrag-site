@@ -2,7 +2,9 @@
 
 import { Suspense, useState } from 'react';
 import Link from 'next/link';
+import { resetPassword } from '@/api/auth/resetPassword';
 import { sendVerificationCode } from '@/api/auth/sendVerificationCode';
+import { verifyEmail } from '@/api/auth/verifyEmail';
 import { createAccessToken } from '@/utils/auth/createAccessToken';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ArrowLeft, Check, LoaderCircleIcon } from 'lucide-react';
@@ -19,7 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { RecaptchaPopover } from '@/components/common/recaptcha-popover';
+import ResendLink from '@/components/Auth/EmailVerification/ResendLink';
 
 const emailSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -45,10 +47,9 @@ export default function Page() {
   const [success, setSuccess] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showRecaptcha, setShowRecaptcha] = useState(false);
 
   const form = useForm<any>({
-    resolver: zodResolver(
+    resolver: zodResolver<any>(
       step === 1 ? emailSchema : step === 2 ? codeSchema : passwordSchema,
     ),
     defaultValues: {
@@ -59,19 +60,7 @@ export default function Page() {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const result = await form.trigger();
-    if (!result) return;
-
-    if (step === 1) {
-      setShowRecaptcha(true);
-    } else {
-      processStep();
-    }
-  };
-
-  const processStep = async (recaptchaToken?: string) => {
+  const onSubmit = async () => {
     try {
       setIsProcessing(true);
       setError(null);
@@ -80,10 +69,9 @@ export default function Page() {
       if (step === 1) {
         const email = form.getValues('email');
 
-        const response = await sendVerificationCode(email);
-
-        if (!response.error) {
-          const errorData = JSON.parse(response.error);
+        const result = await sendVerificationCode(email);
+        if (!result.success) {
+          const errorData = JSON.parse(result.error);
           return setError(errorData.message);
         }
 
@@ -94,6 +82,12 @@ export default function Page() {
       if (step === 2) {
         const { email, code } = form.getValues();
 
+        const result = await verifyEmail({ email, code });
+
+        if (!result.success) {
+          setError(result.error || 'Verification failed.');
+          return;
+        }
         setAccessToken(await createAccessToken({ sub: email }));
 
         setSuccess('Code verified');
@@ -101,7 +95,18 @@ export default function Page() {
       }
 
       if (step === 3) {
-        const { email, code, password } = form.getValues();
+        const { email, password } = form.getValues();
+
+        const result = await resetPassword({
+          email,
+          token: accessToken as string,
+          new_password: password,
+        });
+
+        if (!result.success) {
+          const errorData = JSON.parse(result.error);
+          return setError(errorData.message);
+        }
 
         setSuccess('Password updated successfully');
         form.reset();
@@ -121,7 +126,10 @@ export default function Page() {
   return (
     <Suspense>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="block w-full space-y-5">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="block w-full space-y-5"
+        >
           <div className="text-center space-y-1 pb-3">
             <h1 className="text-2xl font-semibold tracking-tight">
               {step === 1 && 'Reset Password'}
@@ -237,28 +245,12 @@ export default function Page() {
           )}
 
           {step === 1 ? (
-            <RecaptchaPopover
-              open={showRecaptcha}
-              onOpenChange={(open) => {
-                if (!open) setShowRecaptcha(false);
-              }}
-              onVerify={(token) => {
-                setShowRecaptcha(false);
-                processStep(token);
-              }}
-              trigger={
-                <Button
-                  type="submit"
-                  disabled={isProcessing}
-                  className="w-full"
-                >
-                  {isProcessing ? (
-                    <LoaderCircleIcon className="animate-spin" />
-                  ) : null}
-                  Submit
-                </Button>
-              }
-            />
+            <Button type="submit" disabled={isProcessing} className="w-full">
+              {isProcessing ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : null}
+              Submit
+            </Button>
           ) : (
             <Button type="submit" disabled={isProcessing} className="w-full">
               {isProcessing ? (
@@ -275,6 +267,14 @@ export default function Page() {
               </Link>
             </Button>
           </div>
+          {step === 2 && (
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xs text-gray-600">
+                Didn’t receive an email?
+              </span>
+              <ResendLink email={form.getValues('email')} />
+            </div>
+          )}
         </form>
       </Form>
     </Suspense>

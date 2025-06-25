@@ -10,7 +10,7 @@ export const badgeColorMapping: Record<string, string> = {
     "development": "warning",
     "production": "success",
     "ready": "success",
-    "not supported": "warning",
+    "not supported": "destructive",
     "suspended": "warning",
 };
 
