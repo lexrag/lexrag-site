@@ -22,7 +22,7 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="size-[34px] border-[#015A8D] bg-[#172331] dark:bg-[#EFF6FF] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer"
+          className="size-[34px] border-[#015A8D] bg-[#EFF6FF] dark:bg-[#172331] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer"
           aria-label="User menu"
         >
           {user?.first_name?.slice(0, 1) || '?'}

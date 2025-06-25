@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { verifyEmail } from '@/api/auth/verifyEmail';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, LoaderCircleIcon } from 'lucide-react';
@@ -26,6 +26,7 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const router = useRouter();
   const params = useParams() as { email: string };
   const email = decodeURIComponent(params.email);
 
@@ -46,17 +47,30 @@ export default function Page() {
       return;
     }
 
-    setIsProcessing(true);
-    setError(null);
-    setMessage(null);
+    try {
+      setIsProcessing(true);
+      setError(null);
+      setMessage(null);
 
-    const result = await verifyEmail({
-      email,
-      code: data.code,
-    });
+      const result = await verifyEmail({
+        email,
+        code: data.code,
+      });
 
-    if (!result.success) {
-      setError(result.error || 'Verification failed.');
+      if (!result.success) {
+        return setError(result.error || 'Verification failed.');
+      }
+
+      router.push('/auth/signin');
+    } catch (err) {
+      console.log(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'An unexpected error occurred. Please try again.',
+      );
+    } finally {
+      setIsProcessing(false);
     }
   };
 
