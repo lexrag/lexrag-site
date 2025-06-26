@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { logOut } from '@/api/auth/logOut';
 import { User } from '@/types/User';
+import { useLogOut } from '@/hooks/use-log-out';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import {
@@ -18,6 +18,7 @@ interface HeaderUserMenuProps {
 }
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
+  const logOut = useLogOut();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

@@ -8,6 +8,7 @@ import '@/components/keenicons/assets/styles.css';
 import { Metadata } from 'next';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { UserProvider } from '@/providers/user-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -34,8 +35,10 @@ export default async function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <TooltipsProvider>
-              <Suspense>{children}</Suspense>
-              <Toaster />
+              <UserProvider>
+                <Suspense>{children}</Suspense>
+                <Toaster />
+              </UserProvider>
             </TooltipsProvider>
           </ThemeProvider>
         </QueryProvider>
