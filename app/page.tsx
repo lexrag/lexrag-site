@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const LandingPage = () => {
     return (
-        <div>
+        <div className="overflow-y-auto">
             <Header className="" />
 
             <main className="">

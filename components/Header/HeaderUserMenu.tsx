@@ -19,11 +19,12 @@ interface HeaderUserMenuProps {
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
     const logOut = useLogOut();
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className="size-[34px] border-[#015A8D] bg-[#EFF6FF] dark:bg-[#172331] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer"
+                    className="size-[34px] border-[#015A8D] bg-[#EFF6FF] dark:bg-[#172331] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                     aria-label="User menu"
                 >
                     {user?.first_name?.slice(0, 1) || '?'}
