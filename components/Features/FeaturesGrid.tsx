@@ -2,10 +2,25 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { getBadgeColor } from '@/utils/badgeColorMapping.';
+import { motion } from 'framer-motion';
+import { getBadgeColor, getCategoryColorScheme } from '@/utils/colorMapping';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
+
+type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
+
+interface FeatureData {
+  key: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: string;
+  link: string;
+  category: FeatureCategory | string;
+  plan: string;
+}
 
 interface ProductFeaturesProps {
   gridClassName?: string;
@@ -25,42 +40,11 @@ const ProductFeatures = ({
   const [showAll, setShowAll] = useState(false);
   const pathname = usePathname();
 
-  const toggleShowAll = () => {
-    setShowAll(!showAll);
-  };
-
-  // Convert title to URL-friendly format
-  const toUrlFriendly = (title: string) =>
-    title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+  const toggleShowAll = () => setShowAll(!showAll);
 
   const currentPage = pathname.split('/').filter(Boolean).pop() || '';
-
-  // set dynamic colors by feature category
-  const categoryColors = {
-    search: {
-      icon_color: 'text-blue-500 dark:text-blue-300',
-      border: 'hover:border-blue-500 dark:hover:border-blue-300',
-    },
-    query: {
-      icon_color: 'text-green-500 dark:text-green-300',
-      border: 'hover:border-green-500 dark:hover:border-green-300',
-    },
-    storage: {
-      icon_color: 'text-yellow-500 dark:text-yellow-300',
-      border: 'hover:border-yellow-500 dark:hover:border-yellow-300',
-    },
-    analytics: {
-      icon_color: 'text-purple-500 dark:text-purple-300',
-      border: 'hover:border-purple-500 dark:hover:border-purple-300',
-    },
-  };
-
-  // Filter out the current page from the features list
   const visibleFeats = combinedFeaturesData.filter(
-    (feat) => feat.key !== currentPage,
+    (feat) => feat.key !== currentPage
   );
 
   return (
@@ -73,31 +57,41 @@ const ProductFeatures = ({
       >
         <div className={gridClassName}>
           {visibleFeats.map((feat, index) => {
-            const colors = categoryColors[feat.category] || {
-              icon_color: 'dark:text-gray-300 light:text-gray-700',
-              border: 'dark:border-gray-300 light:border-gray-400',
-            };
+            const colors = getCategoryColorScheme(feat.category);
 
             return (
-              <a
+              <motion.a
                 key={index}
                 href={feat.link}
-                className="transform transition-transform duration-300 hover:-translate-y-2"
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="group block"
               >
                 <div
-                  className={`dark:bg-coal-300 light:bg-white border-[1px] ${colors.border} flex flex-col gap-5 p-5 lg:p-5 rounded-xl relative items-center justify-around shadow-md hover:shadow-lg transition-shadow`}
+                  className={cn(
+                    'relative overflow-hidden flex flex-col gap-5 p-5 lg:p-5 rounded-xl items-center justify-around',
+                    'border border-transparent shadow-md transition-all hover:shadow-lg',
+                    'dark:bg-coal-300 light:bg-white',
+                    colors.border
+                  )}
                 >
+                  {/* Hover bottom border */}
+                  <div
+                    className={cn(
+                      'absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r transform scale-x-0 group-hover:scale-x-100',
+                      'transition-transform duration-500 origin-left',
+                      colors.gradient
+                    )}
+                  />
+
+                  {/* Card content */}
                   <div className="flex w-full items-center justify-between gap-4.5">
                     <div className="flex items-start gap-4.5">
                       <div className="relative w-[44px] h-[44px] flex items-center justify-center border-[1px] light:bg-gray-200 rounded-full aspect-square">
-                        <i
-                          className={`ki-duotone text-2xl ${colors.icon_color} ${feat.icon}`}
-                        ></i>
+                        <i className={cn('ki-duotone text-2xl', colors.icon_color, feat.icon)} />
                       </div>
                       <div className="flex flex-col">
-                        <span
-                          className={`text-md font-medium ${colors.icon_color} mb-px`}
-                        >
+                        <span className={cn('text-md font-medium mb-px', colors.icon_color)}>
                           {feat.title}
                         </span>
                         <span className="text-2sm dark:text-gray-700 light:text-gray-500">
@@ -108,17 +102,10 @@ const ProductFeatures = ({
 
                     {showSideBadges && (
                       <div className="flex flex-col items-start gap-3">
-                        <Badge
-                          appearance="outline"
-                          variant={getBadgeColor(feat.category)}
-                        >
+                        <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
                           {feat.category}
                         </Badge>
-
-                        <Badge
-                          appearance="outline"
-                          variant={getBadgeColor(feat.category)}
-                        >
+                        <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
                           {feat.plan}
                         </Badge>
                       </div>
@@ -133,23 +120,16 @@ const ProductFeatures = ({
 
                   {showBottomBadges && (
                     <div className="flex w-full items-center justify-start gap-3">
-                      <Badge
-                        appearance="outline"
-                        variant={getBadgeColor(feat.category)}
-                      >
+                      <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
                         {feat.category}
                       </Badge>
-
-                      <Badge
-                        appearance="outline"
-                        variant={getBadgeColor(feat.category)}
-                      >
+                      <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
                         {feat.plan}
                       </Badge>
                     </div>
                   )}
                 </div>
-              </a>
+              </motion.a>
             );
           })}
         </div>
@@ -157,10 +137,7 @@ const ProductFeatures = ({
 
       {visibleFeats.length > 0 && (
         <div className="text-center mt-8">
-          <Button
-            onClick={toggleShowAll}
-            className="transition-all duration-300"
-          >
+          <Button onClick={toggleShowAll} className="transition-all duration-300">
             {showAll ? 'Show Less' : 'Show All'}
           </Button>
         </div>

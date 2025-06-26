@@ -1,4 +1,4 @@
-import { getBadgeColor } from "@/utils/badgeColorMapping.";
+import { getBadgeColor } from "@/utils/colorMapping";
 
 export interface FeatureData {
     key: string;
