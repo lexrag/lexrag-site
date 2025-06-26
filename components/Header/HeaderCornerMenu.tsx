@@ -6,6 +6,7 @@ import { getMeClient } from '@/api/auth/getMeClient';
 import SigninButton from '@/components/Header/SigninButton';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import HeaderUserMenu from './HeaderUserMenu';
+import { ShinyButton } from "@/components/magicui/shiny-button";
 
 const HeaderCornerMenu = () => {
   const [user, setUser] = useState(null);
@@ -36,7 +37,8 @@ const HeaderCornerMenu = () => {
         <div className="flex items-center gap-5">
           <div className="h-[40%] border-r-2 border-gray-200" />
           <div className="tab">
-            <SigninButton />
+              <SigninButton />
+            
           </div>
         </div>
       )}

@@ -7,13 +7,13 @@ import Hero from '@/components/Landing/Hero';
 import HowItWorks from '@/components/Landing/HowItWorks';
 
 export const metadata: Metadata = {
-  title: 'Lexrag',
+  title: 'LEXRAG',
 };
 
 const LandingPage = () => {
   return (
     <div>
-      <Header className="bg-[#13263C] fixed top-0 z-10 py-5 px-[16%]" />
+      <Header className=""/>
 
       <main className="">
         <section>

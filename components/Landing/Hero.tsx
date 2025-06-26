@@ -1,16 +1,32 @@
 import Link from 'next/link';
 import { AuroraText } from "@/components/magicui/aurora-text";
 import CurveDown from '@/components/Landing/CurveDown';
-import { Button } from '../ui/button';
+import { ShinyButton } from "@/components/magicui/shiny-button";
+import { DotPattern } from "@/components/magicui/dot-pattern";
+import { cn } from "@/lib/utils";
 
 const LandingHeading = () => {
   return (
     <>
       <div className="relative h-[55vh] lg:h-[65vh] flex justify-center items-center">
         <div className="absolute inset-0 bg-[#13263C]"></div>
+          {/* Dot Pattern */}
+          <DotPattern
+            className={cn(
+              "opacity-80 text-sky-300 dark:text-sky-100",
+              "[mask-image:conic-gradient(from_180deg_at_center,transparent_45deg,white_180deg_285deg,transparent_45deg)]"
+            )}
+            width={20}
+            height={20}
+            cx={0}
+            cy={0}
+            cr={1}
+            glow={true}
+          />
+
 
         <div
-          className="absolute inset-0 bg-no-repeat bg-contain bg-bottom"
+          className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40"
           style={{
             backgroundImage: 'url(/media/images/singapore_1.png)',
             backgroundRepeat: 'no-repeat',
@@ -20,7 +36,7 @@ const LandingHeading = () => {
           }}
         >
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 opacity-90"
             style={{
               background:
                 'linear-gradient(to bottom, rgba(19, 38, 60, 0.9) 0%, rgba(19, 38, 60, 0.95) 100%)',
@@ -44,9 +60,9 @@ const LandingHeading = () => {
           </h1>
 
           <Link href="/auth/signin" passHref>
-            <Button className="transition-transform duration-300 hover:scale-105 shadow-lg">
+            <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg">
               Try Lexrag
-            </Button>
+            </ShinyButton>
           </Link>
         </div>
       </div>
