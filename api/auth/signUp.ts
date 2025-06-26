@@ -7,10 +7,10 @@ interface SignUpParams {
 
 export const signUp = async (params: SignUpParams) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signup`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(params),
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
     });
 
@@ -21,8 +21,8 @@ export const signUp = async (params: SignUpParams) => {
     }
 
     if (data?.detail) {
-        return { success: false, error: data.detail || "Sign up failed" };
+        return { success: false, error: data.detail || 'Sign up failed' };
     } else {
-        return { success: false, error: "Network error" };
+        return { success: false, error: 'Network error' };
     }
-}
+};

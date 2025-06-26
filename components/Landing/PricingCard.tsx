@@ -13,16 +13,16 @@ interface PricingCardProps {
 }
 
 const PricingCard = ({
-     title,
-     description,
-     price,
-     priceSuffix,
-     currency = '$',
-     features,
-     variant = 'default',
-     buttonLink = '#',
-     buttonText = 'Select',
- }: PricingCardProps) => {
+    title,
+    description,
+    price,
+    priceSuffix,
+    currency = '$',
+    features,
+    variant = 'default',
+    buttonLink = '#',
+    buttonText = 'Select',
+}: PricingCardProps) => {
     const isActive = variant === 'active';
 
     // Container styles based on variant
@@ -31,21 +31,11 @@ const PricingCard = ({
         : 'md:w-[400px] m-auto flex flex-col items-center rounded-xl bg-white py-10 px-5';
 
     // Heading styles
-    const titleClasses = isActive
-        ? 'text-white mb-5 text-2xl'
-        : 'text-gray-900 mb-5 text-2xl';
-    const descClasses = isActive
-        ? 'text-white opacity-75 mb-5'
-        : 'text-gray-500 mb-5';
-    const priceCurrencyClasses = isActive
-        ? 'mb-2 text-white'
-        : 'mb-2 text-blue-600';
-    const priceNumberClasses = isActive
-        ? 'text-4xl font-semibold text-white'
-        : 'text-4xl font-semibold text-blue-600';
-    const priceSuffixClasses = isActive
-        ? 'text-sm text-white opacity-75'
-        : 'text-sm opacity-50';
+    const titleClasses = isActive ? 'text-white mb-5 text-2xl' : 'text-gray-900 mb-5 text-2xl';
+    const descClasses = isActive ? 'text-white opacity-75 mb-5' : 'text-gray-500 mb-5';
+    const priceCurrencyClasses = isActive ? 'mb-2 text-white' : 'mb-2 text-blue-600';
+    const priceNumberClasses = isActive ? 'text-4xl font-semibold text-white' : 'text-4xl font-semibold text-blue-600';
+    const priceSuffixClasses = isActive ? 'text-sm text-white opacity-75' : 'text-sm opacity-50';
 
     // Feature text
     const featureTextClasses = isActive
@@ -83,11 +73,7 @@ const PricingCard = ({
                 {features.map((feature, index) => (
                     <div key={index} className="flex justify-between items-center">
                         <span className={featureTextClasses}>{feature.text}</span>
-                        {feature.available ? (
-                            <i className={checkIconClasses} />
-                        ) : (
-                            <i className={crossIconClasses} />
-                        )}
+                        {feature.available ? <i className={checkIconClasses} /> : <i className={crossIconClasses} />}
                     </div>
                 ))}
             </div>

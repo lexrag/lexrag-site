@@ -1,4 +1,4 @@
-import {ReactNode} from "react";
+import { ReactNode } from 'react';
 
 export interface InputProps {
     label: string;
@@ -24,7 +24,7 @@ const Input = (props: InputProps) => {
                     />
                 )}
 
-                {(props.value !== undefined && props.onChange !== undefined) && (
+                {props.value !== undefined && props.onChange !== undefined && (
                     <input
                         value={props.value}
                         onChange={(event) => props.onChange(event.target.value)}
@@ -36,7 +36,7 @@ const Input = (props: InputProps) => {
                 )}
             </label>
         </div>
-    )
-}
+    );
+};
 
 export default Input;

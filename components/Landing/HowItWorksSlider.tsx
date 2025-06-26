@@ -1,15 +1,15 @@
-"use client"
+'use client';
 
-import Slider from "@/components/Layout/Slider";
+import Slider from '@/components/Layout/Slider';
 
 const HowItWorksSlider = () => {
     return (
         <Slider>
             {[
-                "/media/images/placeholder.jpg",
-                "/media/images/placeholder.jpg",
-                "/media/images/placeholder.jpg",
-                "/media/images/placeholder.jpg",
+                '/media/images/placeholder.jpg',
+                '/media/images/placeholder.jpg',
+                '/media/images/placeholder.jpg',
+                '/media/images/placeholder.jpg',
             ].map((src, index) => (
                 <div key={index} className="text-center px-5 pt-5 lg:pt-10">
                     <img
@@ -20,7 +20,7 @@ const HowItWorksSlider = () => {
                 </div>
             ))}
         </Slider>
-    )
-}
+    );
+};
 
 export default HowItWorksSlider;

@@ -13,36 +13,27 @@ import { UserProvider } from '@/providers/user-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: {
-    template: '%s | Metronic',
-    default: 'Metronic', // a default is required when creating a template
-  },
+    title: {
+        template: '%s | Metronic',
+        default: 'Metronic', // a default is required when creating a template
+    },
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  return (
-    <html className="h-full" suppressHydrationWarning>
-      <body
-        className={cn(
-          'antialiased flex h-full text-base text-foreground bg-background',
-          inter.className,
-        )}
-      >
-        <QueryProvider>
-          <ThemeProvider>
-            <TooltipsProvider>
-              <UserProvider>
-                <Suspense>{children}</Suspense>
-                <Toaster />
-              </UserProvider>
-            </TooltipsProvider>
-          </ThemeProvider>
-        </QueryProvider>
-      </body>
-    </html>
-  );
+export default async function RootLayout({ children }: { children: ReactNode }) {
+    return (
+        <html className="h-full" suppressHydrationWarning>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
+                <QueryProvider>
+                    <ThemeProvider>
+                        <TooltipsProvider>
+                            <UserProvider>
+                                <Suspense>{children}</Suspense>
+                                <Toaster />
+                            </UserProvider>
+                        </TooltipsProvider>
+                    </ThemeProvider>
+                </QueryProvider>
+            </body>
+        </html>
+    );
 }

@@ -6,22 +6,22 @@ interface ResetPasswordParams {
 
 export const resetPassword = async (params: ResetPasswordParams) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(params),
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
-    })
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     if (response.ok) {
         return { success: true };
     }
 
     if (data?.detail) {
-        return {success: false, error: data.detail || "Password reset failed"};
+        return { success: false, error: data.detail || 'Password reset failed' };
     } else {
-        return {success: false, error: "Network error"};
+        return { success: false, error: 'Network error' };
     }
-}
+};

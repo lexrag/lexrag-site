@@ -6,17 +6,17 @@ import { deleteSession } from '@/utils/auth/deleteSession';
 import { useUser } from '@/providers/user-provider';
 
 export const useLogOut = () => {
-  const router = useRouter();
-  const { setUser } = useUser();
+    const router = useRouter();
+    const { setUser } = useUser();
 
-  const logOut = useCallback(async () => {
-    localStorage.removeItem('token');
+    const logOut = useCallback(async () => {
+        localStorage.removeItem('token');
 
-    await deleteSession();
-    setUser(null);
+        await deleteSession();
+        setUser(null);
 
-    router.push('/');
-  }, [router, setUser]);
+        router.push('/');
+    }, [router, setUser]);
 
-  return logOut;
+    return logOut;
 };

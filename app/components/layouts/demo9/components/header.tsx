@@ -11,37 +11,37 @@ import { HeaderSearch } from './header-search';
 import { HeaderTopbar } from './header-topbar';
 
 export function Header() {
-  const pathname = usePathname();
-  const { settings } = useSettings();
-  const scrollPosition = useScrollPosition();
-  const [headerStickyOn, setHeaderStickyOn] = useState(false);
+    const pathname = usePathname();
+    const { settings } = useSettings();
+    const scrollPosition = useScrollPosition();
+    const [headerStickyOn, setHeaderStickyOn] = useState(false);
 
-  useEffect(() => {
-    const isSticky = scrollPosition > settings.layouts.demo2.headerStickyOffset;
-    setHeaderStickyOn(isSticky);
-  }, [scrollPosition, settings]);
+    useEffect(() => {
+        const isSticky = scrollPosition > settings.layouts.demo2.headerStickyOffset;
+        setHeaderStickyOn(isSticky);
+    }, [scrollPosition, settings]);
 
-  useEffect(() => {
-    if (headerStickyOn === true) {
-      document.body.setAttribute('data-sticky-header', 'on');
-    } else {
-      document.body.removeAttribute('data-sticky-header');
-    }
-  }, [headerStickyOn]);
+    useEffect(() => {
+        if (headerStickyOn === true) {
+            document.body.setAttribute('data-sticky-header', 'on');
+        } else {
+            document.body.removeAttribute('data-sticky-header');
+        }
+    }, [headerStickyOn]);
 
-  return (
-    <header
-      className={cn(
-        'flex items-center transition-[height] shrink-0 h-(--header-height)',
-        headerStickyOn &&
-          'transition-[height] fixed z-10 top-0 start-0 end-0 shadow-xs backdrop-blur-md bg-background/70',
-      )}
-    >
-      <Container className="flex lg:justify-between items-center gap-2.5">
-        <HeaderLogo />
-        {!pathname.includes('/store-client') && <HeaderSearch />}
-        <HeaderTopbar />
-      </Container>
-    </header>
-  );
+    return (
+        <header
+            className={cn(
+                'flex items-center transition-[height] shrink-0 h-(--header-height)',
+                headerStickyOn &&
+                    'transition-[height] fixed z-10 top-0 start-0 end-0 shadow-xs backdrop-blur-md bg-background/70',
+            )}
+        >
+            <Container className="flex lg:justify-between items-center gap-2.5">
+                <HeaderLogo />
+                {!pathname.includes('/store-client') && <HeaderSearch />}
+                <HeaderTopbar />
+            </Container>
+        </header>
+    );
 }

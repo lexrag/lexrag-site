@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
 
 const ThemeSwitch = () => {
     const [mounted, setMounted] = useState(false);
@@ -26,16 +26,16 @@ const ThemeSwitch = () => {
         );
 
     const handleThemeToggle = () => {
-        setTheme(resolvedTheme === "dark" ? "light" : "dark");
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
     };
 
     return (
         <span
             onClick={handleThemeToggle}
             className="cursor-pointer ki-outline hover:text-primary transition-colors duration-200"
-            title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
+            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
         >
-            {resolvedTheme === "dark" ? (
+            {resolvedTheme === 'dark' ? (
                 <i className="ki-filled ki-sun text-lg text-gray-600 hover:text-primary" />
             ) : (
                 <i className="ki-filled ki-moon text-lg text-gray-600 hover:text-primary" />

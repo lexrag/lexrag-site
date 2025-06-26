@@ -1,26 +1,24 @@
-import {PropsWithChildren, useEffect} from "react";
-import { tns } from "tiny-slider";
-import "tiny-slider/dist/tiny-slider.css";
+import { PropsWithChildren, useEffect } from 'react';
+import { tns } from 'tiny-slider';
+import 'tiny-slider/dist/tiny-slider.css';
 
-const Slider = ({children}: PropsWithChildren) => {
+const Slider = ({ children }: PropsWithChildren) => {
     useEffect(() => {
         tns({
-            container: ".tns-carousel",
+            container: '.tns-carousel',
             items: 1,
-            slideBy: "page",
+            slideBy: 'page',
             nav: false,
             autoplayTimeout: 18000,
             speed: 2000,
-            prevButton: "#slider_prev",
-            nextButton: "#slider_next",
+            prevButton: '#slider_prev',
+            nextButton: '#slider_next',
         });
     }, []);
 
     return (
         <div className="relative">
-            <div className="tns-carousel flex overflow-hidden">
-                {children}
-            </div>
+            <div className="tns-carousel flex overflow-hidden">{children}</div>
 
             <button
                 id="slider_prev"

@@ -4,14 +4,14 @@ import PageTitle from '@/components/Layout/PageTitle';
 import PersonalInfoCard from '@/components/UserProfile/PersonalInfoCard';
 
 const UserProfilePage = async () => {
-  const currentUser: User = await getMeServer();
+    const currentUser: User = await getMeServer();
 
-  return (
-    <section>
-      <PageTitle />
-      {currentUser && <PersonalInfoCard currentUser={currentUser} />}
-    </section>
-  );
+    return (
+        <section>
+            <PageTitle />
+            {currentUser && <PersonalInfoCard currentUser={currentUser} />}
+        </section>
+    );
 };
 
 export default UserProfilePage;

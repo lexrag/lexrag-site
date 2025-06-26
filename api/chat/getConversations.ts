@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
 export const getConversations = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/conversations/all`, {
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
     });
 
     const data = await response.json();
@@ -14,4 +14,4 @@ export const getConversations = async () => {
     } else {
         return [];
     }
-}
+};

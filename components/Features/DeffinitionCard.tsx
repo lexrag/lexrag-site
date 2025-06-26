@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import CardFlash from "@/components/Layout/CardFlash";
+import CardFlash from '@/components/Layout/CardFlash';
 
 interface DeffinitionCardProps {
     details: {
@@ -12,9 +12,7 @@ interface DeffinitionCardProps {
 }
 
 const DeffinitionCard = ({ details }: DeffinitionCardProps) => {
-    return (
-        <CardFlash {...details} />
-    );
+    return <CardFlash {...details} />;
 };
 
 export default DeffinitionCard;

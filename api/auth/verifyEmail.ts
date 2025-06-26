@@ -5,12 +5,12 @@ interface VerifyEmailParams {
 
 export const verifyEmail = async (params: VerifyEmailParams) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(params),
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
-    })
+    });
 
     const data = await response.json();
 
@@ -19,8 +19,8 @@ export const verifyEmail = async (params: VerifyEmailParams) => {
     }
 
     if (data?.detail) {
-        return {success: false, error: data.detail || "Email verification failed"};
+        return { success: false, error: data.detail || 'Email verification failed' };
     } else {
-        return {success: false, error: "Network error"};
+        return { success: false, error: 'Network error' };
     }
-}
+};

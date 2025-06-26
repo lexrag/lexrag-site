@@ -6,28 +6,28 @@ import { googleSignIn } from '@/api/auth/googleSignIn';
 import Loading from '@/app/loading';
 
 const OauthCallback = () => {
-  const searchParams = useSearchParams();
-  const code = searchParams.get('code');
+    const searchParams = useSearchParams();
+    const code = searchParams.get('code');
 
-  const handleGoogleSignIn = async () => {
-    if (!code) return;
+    const handleGoogleSignIn = async () => {
+        if (!code) return;
 
-    const result = await googleSignIn({ code });
+        const result = await googleSignIn({ code });
 
-    if (!result.success) {
-      console.log('error', result.error);
-    } else {
-      redirect('/chat/new');
-    }
-  };
+        if (!result.success) {
+            console.log('error', result.error);
+        } else {
+            redirect('/chat/new');
+        }
+    };
 
-  useEffect(() => {
-    if (code !== undefined) {
-      handleGoogleSignIn();
-    }
-  }, [code]);
+    useEffect(() => {
+        if (code !== undefined) {
+            handleGoogleSignIn();
+        }
+    }, [code]);
 
-  return <Loading />;
+    return <Loading />;
 };
 
 export default OauthCallback;
