@@ -1,91 +1,90 @@
 name: Deploy to ECS (Frontend)
 
 on:
-  push:
-    branches:
-      - feature/temporary_landing
-      - main
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to deploy (e.g. main or feature/temporary_landing)'
-        required: true
-        default: 'main'
-      tag:
-        description: 'Docker tag (e.g. latest or temporary)'
-        required: true
-        default: 'latest'
+    push:
+        branches:
+            - feature/temporary_landing
+            - main
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: 'Branch to deploy (e.g. main or feature/temporary_landing)'
+                required: true
+                default: 'main'
+            tag:
+                description: 'Docker tag (e.g. latest or temporary)'
+                required: true
+                default: 'latest'
 
 env:
-  AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: lexrag-frontend
-  ECS_CLUSTER: lxrg-frntnd-cluster
-  ECS_SERVICE: frontend-service
-  TASK_FAMILY: lexrag-frontend
-  NEXT_PUBLIC_API_BASE_URL: https://api.lexrag.com
-  NEXT_PUBLIC_VERIFICATION_CODE_TTL: 30
-  NEXT_PUBLIC_JWT_EXPIRATION_MINUTES: 60
+    AWS_REGION: ap-southeast-1
+    ECR_REPOSITORY: lexrag-frontend
+    ECS_CLUSTER: lxrg-frntnd-cluster
+    ECS_SERVICE: frontend-service
+    TASK_FAMILY: lexrag-frontend
+    NEXT_PUBLIC_API_BASE_URL: https://api.lexrag.com
+    NEXT_PUBLIC_VERIFICATION_CODE_TTL: 30
+    NEXT_PUBLIC_JWT_EXPIRATION_MINUTES: 60
 
 jobs:
-  deploy:
-    name: Build & Deploy Frontend
-    runs-on: ubuntu-latest
+    deploy:
+        name: Build & Deploy Frontend
+        runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
+        permissions:
+            id-token: write
+            contents: read
 
-    steps:
+        steps:
+            - name: Set branch
+              run: |
+                  BRANCH="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}"
+                  echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Set branch
-        run: |
-          BRANCH="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}"
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+            - name: Set tag
+              run: |
+                  TAG="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'latest' }}"
+                  echo "TAG=$TAG" >> $GITHUB_ENV
 
-      - name: Set tag
-        run: |
-          TAG="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'latest' }}"
-          echo "TAG=$TAG" >> $GITHUB_ENV
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ env.BRANCH }}
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ env.BRANCH }}
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+            - name: Build and push Docker image
+              id: build-image
+              run: |
+                  IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}"
+                  echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+                  docker build \
+                    --build-arg NEXT_PUBLIC_API_BASE_URL=${{env.NEXT_PUBLIC_API_BASE_URL}} \
+                    --build-arg NEXT_PUBLIC_VERIFICATION_CODE_TTL=${{env.NEXT_PUBLIC_VERIFICATION_CODE_TTL}} \
+                    --build-arg NEXT_PUBLIC_JWT_EXPIRATION_MINUTES=${{env.NEXT_PUBLIC_JWT_EXPIRATION_MINUTES}} \
+                    -t $IMAGE_URI .
+                  docker push $IMAGE_URI
 
-      - name: Build and push Docker image
-        id: build-image
-        run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}"
-          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-          docker build \
-            --build-arg NEXT_PUBLIC_API_BASE_URL=${{env.NEXT_PUBLIC_API_BASE_URL}} \
-            --build-arg NEXT_PUBLIC_VERIFICATION_CODE_TTL=${{env.NEXT_PUBLIC_VERIFICATION_CODE_TTL}} \
-            --build-arg NEXT_PUBLIC_JWT_EXPIRATION_MINUTES=${{env.NEXT_PUBLIC_JWT_EXPIRATION_MINUTES}} \
-            -t $IMAGE_URI .
-          docker push $IMAGE_URI
+            - name: Render ECS task definition
+              id: render-task-def
+              uses: aws-actions/amazon-ecs-render-task-definition@v1
+              with:
+                  task-definition: task-definition.json
+                  container-name: frontend
+                  image: ${{ env.IMAGE_URI }}
 
-      - name: Render ECS task definition
-        id: render-task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: frontend
-          image: ${{ env.IMAGE_URI }}
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          service: ${{ env.ECS_SERVICE }}
-          wait-for-service-stability: true
+            - name: Deploy to ECS
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+              with:
+                  task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+                  cluster: ${{ env.ECS_CLUSTER }}
+                  service: ${{ env.ECS_SERVICE }}
+                  wait-for-service-stability: true

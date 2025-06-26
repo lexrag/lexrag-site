@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+/* 1. Global base layer */
+@import './base/reset.css';
+
+/* 2. Theme for ReUI/Metronic */
+@import './themes/reui.css';
+
+/* 3. Metronic Layout (sidebar, header) */
+@import './demos/demo1.css';
+
+/* 4. Component-level styles */
+@import './components/apexcharts.css';
+@import './components/leaflet.css';
+@import './components/rating.css';
+
+/* 5. Scoped shadcn/magicui theme */
+@import './themes/shadcn-theme.css';
