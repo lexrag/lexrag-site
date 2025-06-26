@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { getMeClient } from '@/api/auth/getMeClient';
 import SigninButton from '@/components/Header/SigninButton';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import HeaderUserMenu from './HeaderUserMenu';
+import { useUser } from '@/providers/user-provider';
 
 const HeaderCornerMenu = () => {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     const getMe = async () => {
