@@ -60,7 +60,7 @@ const LandingHeading = () => {
           </h1>
 
           <Link href="/auth/signin" passHref>
-            <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg">
+            <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg py-3 px-6">
               Try Lexrag
             </ShinyButton>
           </Link>

@@ -6,7 +6,6 @@ import { getMeClient } from '@/api/auth/getMeClient';
 import SigninButton from '@/components/Header/SigninButton';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import HeaderUserMenu from './HeaderUserMenu';
-import { ShinyButton } from "@/components/magicui/shiny-button";
 
 const HeaderCornerMenu = () => {
   const [user, setUser] = useState(null);
