@@ -13,7 +13,7 @@ interface ChatSidebarProps {
     onDeleteConversation: (threadId: string) => void;
 }
 
-const ChatSidebar = ({ isOpen, setIsOpen, conversations, onDeleteConversation }: ChatSidebarProps) => {
+const ChatSidebar = ({ setIsOpen, conversations, onDeleteConversation }: ChatSidebarProps) => {
     const router = useRouter();
     console.log(conversations);
 

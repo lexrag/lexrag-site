@@ -35,7 +35,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         if (currentResponseContent !== '') {
             setCurrentResponseContent('');
         }
-    }, [messages]);
+    }, [currentResponseContent, messages]);
 
     useEffect(() => {
         if (!websocket) return;
@@ -77,7 +77,8 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         }
 
         return () => websocket.removeEventListener('message', handleMessage);
-    }, [websocket, pathname]);
+
+    }, [websocket, pathname, threadId]);
 
     const sendMessage = (input: string, isNew: boolean) => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) return;

@@ -11,7 +11,7 @@ interface PageTitleProps {
     children?: React.ReactNode;
 }
 
-const PageTitle = ({ title, finalTitle, className, children }: PageTitleProps) => {
+const PageTitle = ({ title, finalTitle, className }: PageTitleProps) => {
     const pathname = usePathname();
     // Split the URL into segments
     const pathSegments = pathname.split('/').filter(Boolean);

@@ -82,6 +82,7 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                             try {
                                                 const parsed = JSON.parse(msg.content);
                                                 if (parsed.content) copyText = parsed.content;
+                                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
                                             copyToClipboard(msg.id, copyText);
                                         }}

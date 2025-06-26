@@ -1,6 +1,5 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { IoSendSharp } from 'react-icons/io5';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
 
 export interface ChatTextAreaProps {

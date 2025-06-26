@@ -6,7 +6,6 @@ export const ChatSocketContext = createContext<WebSocket | null>(null);
 
 const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [isReady, setIsReady] = useState(false);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = 5;
 
@@ -30,13 +29,11 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
             ws.onopen = () => {
                 console.log('WebSocket connected:', wsUrl);
-                setIsReady(true);
                 reconnectAttempts.current = 0;
             };
 
             ws.onclose = (e) => {
                 console.log('WebSocket closed:', e.reason);
-                setIsReady(false);
                 if (reconnectAttempts.current < maxReconnectAttempts) {
                     const timeout = 1000 * 2 ** reconnectAttempts.current;
                     reconnectTimeout = setTimeout(connect, timeout);

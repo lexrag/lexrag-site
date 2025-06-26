@@ -5,6 +5,7 @@ const renderMessageMd = async (content: string) => {
     try {
         const processedContent = await remark().use(html).process(content);
         return processedContent.toString();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
         return content;
     }

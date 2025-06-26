@@ -9,7 +9,7 @@ interface ResetPasswordFormCardProps {
     error: string | null;
 }
 
-const ResetPasswordFormCard = ({ handleSubmit, passwordRef, secondPasswordRef, error }: ResetPasswordFormCardProps) => {
+const ResetPasswordFormCard = ({ handleSubmit, passwordRef, secondPasswordRef }: ResetPasswordFormCardProps) => {
     return (
         <Card>
             <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center gap-5 p-10">

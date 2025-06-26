@@ -86,7 +86,6 @@ export interface DataGridProps<TData extends object> {
 }
 
 const DataGridContext = createContext<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DataGridContextProps<any> | undefined
 >(undefined);
 

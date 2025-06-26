@@ -9,18 +9,18 @@ import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
+// type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
 
-interface FeatureData {
-    key: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    icon: string;
-    link: string;
-    category: FeatureCategory | string;
-    plan: string;
-}
+// interface FeatureData {
+//     key: string;
+//     title: string;
+//     subtitle: string;
+//     description: string;
+//     icon: string;
+//     link: string;
+//     category: FeatureCategory | string;
+//     plan: string;
+// }
 
 interface ProductFeaturesProps {
     gridClassName?: string;

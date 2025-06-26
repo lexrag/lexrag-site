@@ -1,7 +1,5 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import CardFlash from '@/components/Layout/CardFlash';
 import PageTitle from '@/components/Layout/PageTitle';
 import ScrollspyNav from '../../../../utils/scrollspy';

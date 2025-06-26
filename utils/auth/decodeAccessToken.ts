@@ -4,7 +4,8 @@ export async function decrypt(session: string | undefined = '') {
         if (response.ok) {
             return await response.json();
         }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-        // pass
+
     }
 }
