@@ -42,7 +42,7 @@ export default function Page() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const form = useForm<any>({
-        resolver: zodResolver<any>(step === 1 ? emailSchema : step === 2 ? codeSchema : passwordSchema),
+        resolver: zodResolver<any, any, any>(step === 1 ? emailSchema : step === 2 ? codeSchema : passwordSchema),
         defaultValues: {
             email: '',
             code: '',

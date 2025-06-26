@@ -15,7 +15,7 @@ export const getConversationSnapshot = async (threadId: string) => {
     }
 
     return await Promise.all(
-        data.messages.map(async (m) => ({
+        data.messages.map(async (m: any) => ({
             id: uuidv4(),
             content: m.data.content,
             direction: m.type === 'human' ? 'outgoing' : 'incoming',

@@ -10,7 +10,7 @@ interface FeatureParamsProps {
         icon: string;
         label: string;
         badge: string;
-        badgeColor: string;
+        badgeColor: "success" | "secondary" | "primary" | "destructive" | "info" | "mono" | "warning" | null | undefined;
     }[];
     className?: string;
 }

@@ -9,7 +9,7 @@ export const sendVerificationCode = async (email: string) => {
     const data = await response.json();
 
     if (response.ok) {
-        const delay = Number.parseInt(process.env.NEXT_PUBLIC_VERIFICATION_CODE_TTL);
+        const delay = Number.parseInt(process.env.NEXT_PUBLIC_VERIFICATION_CODE_TTL as string);
         const unlockTime = Date.now() + delay * 1000;
         localStorage.setItem('resendDisabledUntil', unlockTime.toString());
         return { success: true };

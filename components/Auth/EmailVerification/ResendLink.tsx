@@ -8,7 +8,7 @@ interface ResendLinkProps {
 }
 
 const ResendLink = ({ email }: ResendLinkProps) => {
-    const RESEND_DELAY = Number.parseInt(process.env.NEXT_PUBLIC_VERIFICATION_CODE_TTL);
+    const RESEND_DELAY = Number.parseInt(process.env.NEXT_PUBLIC_VERIFICATION_CODE_TTL as string);
     const [timeLeft, setTimeLeft] = useState(0);
 
     useEffect(() => {

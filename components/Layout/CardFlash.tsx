@@ -3,7 +3,7 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { cn } from '@/lib/utils'; // Якщо використовуєте clsx/cn для класів
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardHeading, CardTitle } from '@/components/ui/card';
 
