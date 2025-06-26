@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import { usePathname, useParams, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { Message } from "@/types/Message";
 import { MessageTypes } from "@/types/MessageTypes";
@@ -15,6 +15,7 @@ interface UseChatArgs {
 
 export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [isThinking, setIsThinking] = useState<boolean>(false);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>("");
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef("");
@@ -67,6 +68,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         };
 
         websocket.onmessage = async (event: MessageEvent) => {
+            setIsThinking(false);
             await handleMessage(event);
         }
 
@@ -91,6 +93,8 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             is_new: isNew,
             thread_id: threadId,
         }));
+
+        setIsThinking(true);
     };
 
     const copyToClipboard = (messageId: string, text: string) => {
@@ -100,5 +104,5 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         });
     };
 
-    return { messages, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId };
+    return { messages, isThinking, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId };
 };

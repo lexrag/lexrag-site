@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '../ui/button';
 import { ShinyButton } from "@/components/magicui/shiny-button";
 
 const SigninButton = () => {
@@ -21,4 +20,3 @@ export default SigninButton;
 
     // h-[2rem] whitespace-nowrap
              
-            

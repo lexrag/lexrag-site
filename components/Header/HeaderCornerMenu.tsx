@@ -37,7 +37,6 @@ const HeaderCornerMenu = () => {
           <div className="h-[40%] border-r-2 border-gray-200" />
           <div className="tab">
               <SigninButton />
-            
           </div>
         </div>
       )}

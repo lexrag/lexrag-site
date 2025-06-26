@@ -7,9 +7,7 @@ const publicRoutes = ['/', '/auth/signin', '/auth/signup', '/features'];
 
 const middleware = async (req: NextRequest) => {
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    path.startsWith(route),
-  );
+  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
 
   const cookiesStore = await cookies();

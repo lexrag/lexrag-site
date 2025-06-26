@@ -58,7 +58,7 @@ const ChatSidebar = ({
 
       <div className="p-4 border-t-2">
         <Link href={'/chat/new'}>
-          <button className="w-full border-2 p-2 rounded">New</button>
+          <button className="w-full border-2 p-2 rounded cursor-pointer">New</button>
         </Link>
       </div>
     </div>

@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import {useChat} from "@/api/chat/chatApi";
 import ChatTextArea from "@/components/Chat/ChatTextArea";
 import {Conversation} from "@/types/Conversation";
+import { AuroraText } from "../magicui/aurora-text";
 
 interface ChatBoxProps {
   socket: WebSocket;
@@ -14,6 +15,7 @@ interface ChatBoxProps {
 const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
     const {
         messages,
+        isThinking,
         sendMessage,
         currentResponseContent,
         copyToClipboard,
@@ -105,6 +107,16 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                             <div className="flex flex-col items-start relative">
                                 <div className="p-5 rounded-lg text-gray-900 text-sm message-text">
                                     {currentResponseContent}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {isThinking && (
+                        <div className="flex justify-start">
+                            <div className="flex flex-col items-start relative">
+                                <div className="p-5 rounded-lg text-gray-900 text-sm message-text">
+                                    <AuroraText className={"text-lg"} speed={2}>Thinking...</AuroraText>
                                 </div>
                             </div>
                         </div>

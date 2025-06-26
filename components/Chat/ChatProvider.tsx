@@ -27,7 +27,7 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       const wsUrl = `${protocol}://${new URL(base).host}/ws/chat?token=${token}`;
 
       const ws = new WebSocket(wsUrl);
-      setSocket(ws); // <== сохраняем socket в стейт
+      setSocket(ws);
 
       ws.onopen = () => {
         console.log("WebSocket connected:", wsUrl);
