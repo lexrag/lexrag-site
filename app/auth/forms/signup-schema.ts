@@ -20,7 +20,7 @@ export const getSignupSchema = () => {
       passwordConfirmation: z.string().min(1, {
         message: 'Password confirmation is required.',
       }),
-      accept: z.boolean().refine((val) => val === true, {
+      accept: z.boolean().refine((val) => val, {
         message: 'You must accept the terms and conditions.',
       }),
     })
