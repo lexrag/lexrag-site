@@ -77,9 +77,9 @@ const LandingHeading = () => {
             legal AI with graph-vector context &nbsp;
           </h1>
 
-          <Link href="/chat" passHref>
+          <Link href="/chat/new" passHref>
             <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg py-2 px-4 transition-transform duration-300 hover:scale-110 shadow">
-              Try Lexrag
+              Try LEXRAG
             </ShinyButton>
           </Link>
         </div>

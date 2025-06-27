@@ -10,7 +10,7 @@ const UseCases = () => {
                     <h3 className="text-white text-2xl md:text-4xl mb-5 font-semibold">
                         Use Cases
                     </h3>
-                    <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
+                    <p className="font-medium text-gray-400 dark:text-gray-400 transition-colors duration-300">
                         Power every legal task — from research to risk — with retrieval-augmented AI<br/>
                     </p>
                 </div>
@@ -62,7 +62,7 @@ const UseCases = () => {
                             {item.title}
                         </div>
                     </div>
-                    <p className="text-gray-500 dark:text-gray-300 text-[16px] max-w-[80%]">
+                    <p className="text-gray-400 dark:text-gray-400 text-[16px] max-w-[80%]">
                         {item.description}
                     </p>
                 </div>
