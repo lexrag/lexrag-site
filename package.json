@@ -7,7 +7,7 @@
         "build": "next build",
         "start": "next start",
         "build:staging": "cp .env.staging .env.local && next build",
-        "lint": "eslint .",
+        "lint": "tsc --noEmit && eslint .",
         "format": "prettier --write ."
     },
     "dependencies": {
