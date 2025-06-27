@@ -94,7 +94,7 @@ const ProductFeatures = ({
                                                 <span className={cn('text-md font-medium mb-px', colors.icon_color)}>
                                                     {feat.title}
                                                 </span>
-                                                <span className="text-2sm dark:text-gray-700 light:text-gray-500">
+                                                <span className="text-2sm dark:text-gray-400 light:text-gray-500">
                                                     {feat.subtitle}
                                                 </span>
                                             </div>
@@ -113,7 +113,7 @@ const ProductFeatures = ({
                                     </div>
 
                                     {showDescription && (
-                                        <p className="text-2sm dark:text-gray-700 light:text-gray-600">
+                                        <p className="text-2sm dark:text-gray-400 light:text-gray-500">
                                             {feat.description}
                                         </p>
                                     )}
