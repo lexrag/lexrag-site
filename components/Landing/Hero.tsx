@@ -62,27 +62,31 @@ const LandingHeading = () => {
           ></div>
         </div>
 
-        <div className="relative text-center">
-          <h1
-            className="text-white tracking-wide font-semibold text-4xl md:text-4xl mb-[20px] transition-all duration-300"
-            style={{
-              lineHeight: '70px',
-              textShadow: '1px 1px 4px rgba(0, 0, 0, 0.2)',
-            }}
-          >
-            <AuroraText className='text-4xl md:text-5xl font-bold tracking-tight'>
-              Confidence in Every Decision
-            </AuroraText>
-            <br />
-            legal AI with graph-vector context &nbsp;
-          </h1>
+<div className="relative text-center flex flex-col items-center justify-center">
+  <h1
+    className=""
+    style={{
+      lineHeight: '70px',
+      textShadow: '1px 1px 4px rgba(0, 0, 0, 0.2)',
+    }}
+  >
+    <AuroraText className="text-4xl md:text-5xl font-bold tracking-tight">
+      Confidence in Every Decision
+    </AuroraText>
+    <br />
+    <span className="text-white tracking-wide font-semibold text-4xl md:text-4xl mb-5 transition-all duration-300">
+      legal AI with graph-vector context
+    </span>
+  </h1>
 
-          <Link href="/chat/new" passHref>
-            <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg py-2 px-4 transition-transform duration-300 hover:scale-110 shadow">
-              Try LEXRAG
-            </ShinyButton>
-          </Link>
-        </div>
+  <Link href="/chat/new" passHref>
+    <div className="mt-4">
+      <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg py-2 px-4 transition-transform duration-300 hover:scale-105 shadow">
+        Try LEXRAG
+      </ShinyButton>
+    </div>
+  </Link>
+</div>
       </div>
       <CurveDown />
     </>

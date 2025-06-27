@@ -34,7 +34,7 @@ const LandingPage = () => {
                         <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-gray-900 dark:text-white mb-10">
                             Product Features
                         </h3>
-                        <p className="font-medium text-base mb-4 capitalize  text-muted-foreground/80">
+                        <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
                             Explore legal data like never before — through graphs, vectors, and intelligent query breakdowns
                         </p>
                     </div>
