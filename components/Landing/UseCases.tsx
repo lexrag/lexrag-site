@@ -1,5 +1,4 @@
 import CurveUp from "@/components/Landing/CurveUp";
-import Link from "next/link";
 
 const UseCases = () => {
     return (
