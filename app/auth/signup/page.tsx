@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
+import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
 import { sendVerificationCode } from '@/api/auth/sendVerificationCode';
 import { signUp } from '@/api/auth/signUp';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,6 +39,13 @@ export default function Page() {
 
     async function googleButtonOnClick() {
         const result = await getGoogleAuthLink();
+        if (result.success) {
+            window.location.replace(result.redirect_url);
+        }
+    }
+
+    async function linkedinButtonOnClick() {
+        const result = await getLinkedinAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
         }
@@ -106,7 +114,7 @@ export default function Page() {
                         <Button variant="outline" type="button" onClick={googleButtonOnClick}>
                             <Icons.googleColorful className="size-4!" /> Use Google
                         </Button>
-                        <Button variant="outline" type="button">
+                        <Button variant="outline" type="button" onClick={linkedinButtonOnClick}>
                             <Icons.linkedinColorfull className="size-5! opacity-100!" /> Use LinkedIn
                         </Button>
                     </div>

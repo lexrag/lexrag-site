@@ -7,7 +7,7 @@ export const getGoogleAuthLink = async () => {
     }
 
     if (data?.detail) {
-        return { success: false, error: data.detail || 'Email verification failed' };
+        return { success: false, error: data.detail || 'Google auth failed' };
     } else {
         return { success: false, error: 'Network error' };
     }
