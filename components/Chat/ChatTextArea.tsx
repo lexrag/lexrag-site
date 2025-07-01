@@ -37,11 +37,7 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
     };
 
     return (
-        <div
-            className="flex flex-col w-full mt-2 p-3 rounded-2xl border 
-                 bg-background border-border hover:shadow-lg transition-shadow 
-                 min-h-[72px]"
-        >
+        <div className="flex flex-col w-full mt-2 p-3 rounded-md border bg-background border-border hover:shadow-lg transition-shadow min-h-[72px]">
             <textarea
                 className="flex-1 w-full p-3 bg-transparent text-foreground 
                    focus:ring-0 focus:outline-none overflow-y-auto resize-none 

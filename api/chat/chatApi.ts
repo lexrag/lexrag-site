@@ -49,6 +49,8 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             }
 
             if (data.type === MessageTypes.token) {
+                setIsThinking(false);
+                
                 accumulatedContentRef.current += data.content;
                 setCurrentResponseContent(accumulatedContentRef.current);
             }
@@ -68,7 +70,6 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         };
 
         websocket.onmessage = async (event: MessageEvent) => {
-            setIsThinking(false);
             await handleMessage(event);
         };
 
@@ -77,7 +78,6 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         }
 
         return () => websocket.removeEventListener('message', handleMessage);
-
     }, [websocket, pathname, threadId]);
 
     const sendMessage = (input: string, isNew: boolean) => {
