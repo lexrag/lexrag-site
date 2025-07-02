@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { Moon, Sun, UserRound } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { User } from '@/types/User';
 import { useLogOut } from '@/hooks/use-log-out';
 import { Badge } from '../ui/badge';
@@ -18,7 +20,12 @@ interface HeaderUserMenuProps {
 }
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
+    const { setTheme, resolvedTheme } = useTheme();
     const logOut = useLogOut();
+
+    const handleThemeToggle = () => {
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    };
 
     return (
         <DropdownMenu>
@@ -50,9 +57,16 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
 
                 <DropdownMenuItem asChild className="rounded-none">
                     <Link href="/profile" className="w-full px-4 py-2 flex items-center gap-2">
-                        <i className="ki-filled ki-profile-circle" />
+                        <UserRound />
                         My Profile
                     </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild className="rounded-none">
+                    <div className="w-full px-4 py-2 flex items-center gap-2" onClick={handleThemeToggle}>
+                        {resolvedTheme === 'dark' ? <Sun /> : <Moon />}
+                        {resolvedTheme === 'dark' ? 'Light theme' : 'Dark theme'}
+                    </div>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

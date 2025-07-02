@@ -3,7 +3,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 import { useDirection } from '@radix-ui/react-direction';
-import { RiChatNewLine, RiDeleteBinLine } from 'react-icons/ri';
+import { MessageSquarePlus, Trash2 } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Input } from '../ui/input';
@@ -28,7 +28,7 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                         <div className="w-full flex items-center justify-between gap-5">
                             <Input placeholder="Search" />
                             <Link href="/chat/new">
-                                <RiChatNewLine className="size-5" />
+                                <MessageSquarePlus className="size-5" />
                             </Link>
                         </div>
                     </CardHeader>
@@ -40,8 +40,8 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                                 href={`chat/${thread_id}`}
                             >
                                 <span className="truncate w-[calc(100%-30px)]">{title}</span>
-                                <RiDeleteBinLine
-                                    className="text-muted-foreground hover:text-destructive transition-colors"
+                                <Trash2
+                                    className="size-5 text-muted-foreground hover:text-destructive transition-colors"
                                     onClick={() => handleDeleteConversation(thread_id)}
                                 />
                             </Link>

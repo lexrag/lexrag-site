@@ -878,6 +878,7 @@ export const MENU_MEGA: MenuConfig = [
             {
                 title: 'General Pages',
                 children: [
+                    { title: 'Chat', icon: MessageSquare, path: '/chat/new' },
                     { title: 'Integrations', icon: Plug, path: '/account/integrations' },
                     {
                         title: 'Notifications',
@@ -958,32 +959,6 @@ export const MENU_MEGA: MenuConfig = [
                                 path: '/account/security/current-sessions',
                             },
                             { title: 'Security Log', path: '/account/security/security-log' },
-                        ],
-                    },
-                    {
-                        title: 'Members & Roles',
-                        children: [
-                            { title: 'Teams Starter', path: '/account/members/team-starter' },
-                            { title: 'Teams', path: '/account/members/teams' },
-                            { title: 'Team Info', path: '/account/members/team-info' },
-                            {
-                                title: 'Members Starter',
-                                path: '/account/members/members-starter',
-                            },
-                            { title: 'Team Members', path: '/account/members/team-members' },
-                            {
-                                title: 'Import Members',
-                                path: '/account/members/import-members',
-                            },
-                            { title: 'Roles', path: '/account/members/roles' },
-                            {
-                                title: 'Permissions - Toggler',
-                                path: '/account/members/permissions-toggle',
-                            },
-                            {
-                                title: 'Permissions - Check',
-                                path: '/account/members/permissions-check',
-                            },
                         ],
                     },
                     {
