@@ -45,13 +45,13 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-6xl mx-auto p-4">
+        <div className="flex flex-col h-full w-full max-w-6xl mx-auto px-4">
             <div className="scrollable flex-1 overflow-y-auto space-y-2">
                 <div className="flex flex-col">
-                    {messages.map((msg) => (
+                    {messages.map((msg, i) => (
                         <div
                             key={msg.id}
-                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'}`}
+                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'} ${i === 0 ? 'pt-8' : 'pt-0'}`}
                         >
                             <div
                                 className={`flex flex-col ${

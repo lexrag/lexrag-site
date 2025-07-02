@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { tabs } from '@/components/Header/MenuLinks';
-import { Logo } from './Logo';
 import { MegaMenu } from './MegaMenu';
 
 const HeaderTabs = () => {

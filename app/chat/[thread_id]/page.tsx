@@ -45,17 +45,15 @@ export default function ChatPage() {
 
     return (
         <div className="flex flex-col h-screen w-full">
-            <header className="h-[40px] w-full hidden md:flex items-center justify-between">
-                <div className="w-1/4" />
-                <div className="w-1/2">
+            <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50">
+                <div className="w-1/4 flex justify-end">
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
-
                 <div className="w-1/4 flex justify-start">
                     <HeaderCornerMenu />
                 </div>
             </header>
-            <header className="h-[60px] w-full flex md:hidden items-center justify-between px-2">
+            <header className="w-full flex md:hidden items-center justify-between px-2">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
                 <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
@@ -68,7 +66,7 @@ export default function ChatPage() {
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
             <main className="flex flex-1 overflow-hidden">
-                <aside className="w-1/4 hidden md:block overflow-y-auto">
+                <aside className="w-1/4 hidden md:block overflow-y-auto pt-8">
                     <Card className="h-full rounded-none border-0">
                         <CardHeader className="border-none p-3">
                             <div className="w-full flex items-center justify-between gap-5">
@@ -108,7 +106,7 @@ export default function ChatPage() {
                     </div>
                 </section>
 
-                <aside className="w-1/4 hidden md:block overflow-y-auto">
+                <aside className="w-1/4 hidden md:block overflow-y-auto pt-8">
                     <Card className="h-full rounded-none border-0">
                         <CardHeader className="border-none p-3">
                             <CardHeading>
