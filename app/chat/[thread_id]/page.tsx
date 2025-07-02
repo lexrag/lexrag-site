@@ -1,17 +1,14 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { getConversations } from '@/api/chat/getConversations';
-import { Menu, MessageSquarePlus, Trash2 } from 'lucide-react';
-import { Conversation } from '@/types/Conversation';
+import { Menu } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardHeading, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import ChatBox from '@/components/Chat/ChatBox';
+import ChatConversations from '@/components/Chat/ChatConversations';
 import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
-import { ChatSocketContext } from '@/components/Chat/ChatProvider';
+import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import HeaderCornerMenu from '@/components/Header/HeaderCornerMenu';
 import { MegaMenu } from '@/components/Header/MegaMenu';
@@ -19,20 +16,11 @@ import Footer from '@/components/Layout/Footer';
 
 export default function ChatPage() {
     const pathname = usePathname();
-    const socket = useContext(ChatSocketContext);
     const router = useRouter();
+    const { socket, conversations, setConversations } = useChatContext();
 
-    const [conversations, setConversations] = useState<Conversation[]>([]);
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
-
-    useEffect(() => {
-        const fetchConversations = async () => {
-            const result = await getConversations();
-            setConversations(result.reverse());
-        };
-        fetchConversations();
-    }, []);
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
@@ -67,31 +55,7 @@ export default function ChatPage() {
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
             <main className="flex flex-1 overflow-hidden">
                 <aside className="w-1/4 hidden md:block overflow-y-auto pt-8">
-                    <Card className="h-full rounded-none border-0">
-                        <CardHeader className="border-none p-3">
-                            <div className="w-full flex items-center justify-between gap-5">
-                                <Input placeholder="Search" />
-                                <Link href="/chat/new">
-                                    <MessageSquarePlus className="size-5" />
-                                </Link>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-3 space-y-2">
-                            {conversations.map(({ thread_id, title }) => (
-                                <Link
-                                    key={thread_id}
-                                    className="flex items-center justify-between py-2 px-3 border-b border-dashed last:border-none text-sm over:bg-muted cursor-pointer rounded-md transition-colors"
-                                    href={`/chat/${thread_id}`}
-                                >
-                                    <span className="truncate w-[calc(100%-30px)]">{title}</span>
-                                    <Trash2
-                                        className="size-4 text-muted-foreground hover:text-destructive transition-colors"
-                                        onClick={() => onDeleteConversation(thread_id)}
-                                    />
-                                </Link>
-                            ))}
-                        </CardContent>
-                    </Card>
+                    <ChatConversations conversations={conversations} onDeleteConversation={onDeleteConversation} />
                 </aside>
 
                 <section className="flex-1 flex flex-col overflow-hidden">

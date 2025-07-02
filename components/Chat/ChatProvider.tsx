@@ -1,28 +1,60 @@
 'use client';
 
-import { createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { getConversations } from '@/api/chat/getConversations';
+import { Conversation } from '@/types/Conversation';
 
-export const ChatSocketContext = createContext<WebSocket | null>(null);
+interface ChatContextType {
+    socket: WebSocket | null;
+    conversations: Conversation[];
+    setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
+}
 
-const ChatProvider = ({ children }: { children: React.ReactNode }) => {
+export const ChatSocketContext = createContext<ChatContextType | undefined>(undefined);
+
+export const useChatContext = () => {
+    const context = useContext(ChatSocketContext);
+    if (!context) {
+        throw new Error('useChatContext must be used within a ChatProvider');
+    }
+    return context;
+};
+
+const ChatProvider = ({ children }: { children: ReactNode }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const [conversations, setConversations] = useState<Conversation[]>([]);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = 5;
+    const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        let reconnectTimeout: NodeJS.Timeout;
+        const fetchConversations = async () => {
+            try {
+                const result = await getConversations();
+                setConversations(result.reverse());
+            } catch (error) {
+                console.error('Failed to fetch conversations:', error);
+            }
+        };
+        fetchConversations();
+    }, []);
 
-        const connect = () => {
+    useEffect(() => {
+        const connectWebSocket = () => {
             const token = document.cookie
                 .split('; ')
                 .find((row) => row.startsWith('token='))
                 ?.split('=')[1];
 
-            if (!token) return;
+            if (!token) {
+                console.warn('Token not found, skipping WebSocket connection');
+                return;
+            }
 
-            const base = process.env.NEXT_PUBLIC_API_BASE_URL!;
-            const protocol = base.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = `${protocol}://${new URL(base).host}/ws/chat?token=${token}`;
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL!;
+            const protocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
+            const host = new URL(baseUrl).host;
+            const wsUrl = `${protocol}://${host}/ws/chat?token=${token}`;
 
             const ws = new WebSocket(wsUrl);
             setSocket(ws);
@@ -34,11 +66,7 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
             ws.onclose = (e) => {
                 console.log('WebSocket closed:', e.reason);
-                if (reconnectAttempts.current < maxReconnectAttempts) {
-                    const timeout = 1000 * 2 ** reconnectAttempts.current;
-                    reconnectTimeout = setTimeout(connect, timeout);
-                    reconnectAttempts.current += 1;
-                }
+                attemptReconnect();
             };
 
             ws.onerror = (e) => {
@@ -47,15 +75,29 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             };
         };
 
-        connect();
+        const attemptReconnect = () => {
+            if (reconnectAttempts.current < maxReconnectAttempts) {
+                const delay = 1000 * 2 ** reconnectAttempts.current;
+                reconnectTimeout.current = setTimeout(connectWebSocket, delay);
+                reconnectAttempts.current += 1;
+            } else {
+                console.error('Max WebSocket reconnect attempts reached');
+            }
+        };
+
+        connectWebSocket();
 
         return () => {
-            socket?.close();
-            clearTimeout(reconnectTimeout);
+            if (socket) socket.close();
+            if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
         };
     }, []);
 
-    return <ChatSocketContext.Provider value={socket}>{children}</ChatSocketContext.Provider>;
+    return (
+        <ChatSocketContext.Provider value={{ socket, conversations, setConversations }}>
+            {children}
+        </ChatSocketContext.Provider>
+    );
 };
 
 export default ChatProvider;
