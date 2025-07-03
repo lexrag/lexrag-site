@@ -1,3 +1,5 @@
+import { IconType } from 'react-icons';
+
 export interface InputRowProps {
     label: string;
     value: string;
@@ -8,6 +10,7 @@ export interface InputRowProps {
     children?: React.ReactNode;
     id: string;
     onChange?: (value: string) => void;
+    className?: string;
 }
 
 export interface UserSettingsAvatarRowProps {
@@ -16,10 +19,12 @@ export interface UserSettingsAvatarRowProps {
     labelClassName?: string;
     contentClassName?: string;
     children?: React.ReactNode;
+    className?: string;
 }
 
 export interface RowProps {
     label: string;
     children: React.ReactNode;
-    actionIcon?: React.ReactNode;
+    actionIcon?: IconType | React.ReactNode;
+    onClick?: () => void;
 }

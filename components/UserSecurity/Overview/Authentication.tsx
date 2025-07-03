@@ -3,20 +3,13 @@
 import { useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
-import { Copy } from 'lucide-react';
 import { FaRegEdit } from 'react-icons/fa';
-import { User } from '@/types/User';
 import PasswordResetModal from '@/components/UserSettings/PasswordResetModal';
-import { Icons } from '../common/icons';
-import { Button } from '../ui/button';
-import CardWrapper from '../ui/card-wrapper';
-import Row from './Row';
+import { Icons } from '../../common/icons';
+import CardWrapper from '../../ui/card-wrapper';
+import Row from '../../UserProfile/Row';
 
-interface BasicSettingsProps {
-    currentUser: User;
-}
-
-const BasicSettingsCard = ({ currentUser }: BasicSettingsProps) => {
+const Authentication = () => {
     const [resetOpen, setResetOpen] = useState(false);
 
     const handleGoogleAuth = async () => {
@@ -33,10 +26,7 @@ const BasicSettingsCard = ({ currentUser }: BasicSettingsProps) => {
     };
 
     return (
-        <CardWrapper title="Basic Settings">
-            <Row label="Email">
-                <span>{currentUser.email}</span>
-            </Row>
+        <CardWrapper title="Authentication">
             <Row
                 label="Password"
                 actionIcon={
@@ -53,17 +43,10 @@ const BasicSettingsCard = ({ currentUser }: BasicSettingsProps) => {
                 <span>Password last changed 2 months ago</span>
                 <PasswordResetModal open={resetOpen} onOpenChange={setResetOpen} />
             </Row>
-            <Row
-                label="2FA"
-                actionIcon={
-                    <Button variant="link" size="sm">
-                        Setup
-                    </Button>
-                }
-            >
-                <span>To be set</span>
+            <Row label="2FA" actionIcon={<FaRegEdit />}>
+                <span>Not set</span>
             </Row>
-            <Row label="Sign in">
+            <Row label="Sign in" actionIcon={<FaRegEdit />}>
                 <div className="flex items-center gap-2">
                     <Icons.googleColorful
                         className="hover:text-primary size-5 cursor-pointer"
@@ -75,34 +58,8 @@ const BasicSettingsCard = ({ currentUser }: BasicSettingsProps) => {
                     />
                 </div>
             </Row>
-            <Row
-                label="Team Account"
-                actionIcon={
-                    <Button variant="link" size="sm">
-                        Setup
-                    </Button>
-                }
-            >
-                <span>To be set</span>
-            </Row>
-            <Row label="Social Profiles">
-                <span />
-            </Row>
-            <Row
-                label="Referral Link"
-                actionIcon={
-                    <Button variant="link" size="sm">
-                        Re-create
-                    </Button>
-                }
-            >
-                <div className="flex items-center gap-2 w-[80%]">
-                    <span className="truncate">https://lexrag.com/profile</span>{' '}
-                    <Copy className="text-muted-foreground hover:text-primary size-4 cursor-pointer" />
-                </div>
-            </Row>
         </CardWrapper>
     );
 };
 
-export default BasicSettingsCard;
+export default Authentication;

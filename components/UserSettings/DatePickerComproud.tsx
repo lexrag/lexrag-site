@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar } from 'lucide-react';
 import {
-    DatePickerCompoundContentProps,
-    DatePickerCompoundContextType,
-    DatePickerCompoundLabelProps,
-    DatePickerCompoundProviderProps,
-    DatePickerCompoundRootProps,
-    DatePickerCompoundTriggerProps,
+    DatePickerContentProps,
+    DatePickerContextType,
+    DatePickerLabelProps,
+    DatePickerProviderProps,
+    DatePickerRootProps,
+    DatePickerTriggerProps,
 } from '@/types/DatePicker';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -35,7 +35,7 @@ export function DatePickerRoot({ value, onChange, children }: DatePickerRootProp
     );
 }
 
-export function DatePickerTrigger({ placeholder, formatString = 'MMM dd yyyy' }: DatePickerCompoundTriggerProps) {
+export function DatePickerTrigger({ placeholder, formatString = 'MMM dd yyyy' }: DatePickerTriggerProps) {
     const { value } = useDatePicker();
     return (
         <PopoverTrigger asChild>
@@ -47,11 +47,11 @@ export function DatePickerTrigger({ placeholder, formatString = 'MMM dd yyyy' }:
     );
 }
 
-export function DatePickerContent({ children }: DatePickerCompoundContentProps) {
+export function DatePickerContent({ children }: DatePickerContentProps) {
     return <PopoverContent className="p-0 w-auto min-w-[280px]">{children}</PopoverContent>;
 }
 
-export function DatePickerLabel({ children, className }: DatePickerCompoundLabelProps) {
+export function DatePickerLabel({ children, className }: DatePickerLabelProps) {
     return <label className={className}>{children}</label>;
 }
 

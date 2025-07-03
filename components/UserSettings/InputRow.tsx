@@ -1,4 +1,3 @@
-import React from 'react';
 import { InputRowProps } from '@/types/Rows';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,8 +12,9 @@ const InputRow = ({
     children,
     id,
     onChange,
+    className,
 }: InputRowProps) => (
-    <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 py-2">
+    <div className={`flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 p-4 ${className}`}>
         <Label htmlFor={id} className={`flex w-full max-w-56 text-sm font-medium ${labelClassName}`}>
             {label}
         </Label>

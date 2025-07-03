@@ -3,7 +3,7 @@ import { User } from '@/types/User';
 import PageTitle from '@/components/Layout/PageTitle';
 import DeleteAccount from '@/components/UserSettings/DeleteAccount';
 import GeneralSettings from '@/components/UserSettings/GeneralSettings';
-import PasswordReset from '@/components/UserSettings/PasswordReset';
+import PasswordChange from '@/components/UserSettings/PasswordReset';
 
 export default async function SettingsPage() {
     const currentUser: User = await getMeServer();
@@ -14,7 +14,7 @@ export default async function SettingsPage() {
             {currentUser && (
                 <div className="flex flex-col w-full max-w-3xl gap-8 items-center justify-center px-4">
                     <GeneralSettings currentUser={currentUser} />
-                    <PasswordReset />
+                    <PasswordChange />
                     <DeleteAccount />
                 </div>
             )}
