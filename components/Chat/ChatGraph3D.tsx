@@ -19,7 +19,11 @@ export function genRandomTree(N = 300, reverse = false) {
     };
 }
 
-const ChatGraph3D = () => {
+interface ChatGraph3DProps {
+    isFullScreen: boolean;
+}
+
+const ChatGraph3D = ({ isFullScreen }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -27,8 +31,8 @@ const ChatGraph3D = () => {
     useEffect(() => {
         const updateDimensions = () => {
             setDimensions({
-                width: window.innerWidth * 0.6,
-                height: window.innerHeight * 0.6,
+                width: window.innerWidth * (isFullScreen ? 0.9 : 0.6) - 24,
+                height: window.innerHeight * (isFullScreen ? 0.9 : 0.6) - 24,
             });
         };
 
@@ -36,7 +40,7 @@ const ChatGraph3D = () => {
         window.addEventListener('resize', updateDimensions);
 
         return () => window.removeEventListener('resize', updateDimensions);
-    }, []);
+    }, [isFullScreen]);
 
     const data = genRandomTree();
 

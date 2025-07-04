@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { Menu } from 'lucide-react';
+import { Menu, Network } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatConversations from '@/components/Chat/ChatConversations';
@@ -23,7 +23,6 @@ export default function ChatPage() {
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
-    const [graphType, setGraphType] = useState<string>('');
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
@@ -36,7 +35,7 @@ export default function ChatPage() {
 
     return (
         <div className="flex flex-col h-screen w-full">
-            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} graphType={graphType} />
+            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2">
                 <div className="w-1/4 flex justify-end">
                     <MegaMenu isHomePage={pathname === '/'} />
@@ -76,24 +75,13 @@ export default function ChatPage() {
 
                 <aside className="w-1/4 hidden md:block overflow-y-auto pt-10">
                     <Card className="h-full rounded-none border-0 shadow-none">
-                        <CardContent className="p-0">
+                        <CardContent className="p-0 pt-4">
                             <div
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    setGraphType('2d');
-                                    setIsOpenGraphModal(true);
-                                }}
+                                className="flex items-center gap-2 py-2 px-3 text-sm hover:bg-muted cursor-pointer rounded-md transition-colors"
+                                onClick={() => setIsOpenGraphModal(true)}
                             >
-                                Open 2D Graph
-                            </div>
-                            <div
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    setGraphType('3d');
-                                    setIsOpenGraphModal(true);
-                                }}
-                            >
-                                Open 3D Graph
+                                <Network />
+                                Open Graph
                             </div>
                         </CardContent>
                     </Card>

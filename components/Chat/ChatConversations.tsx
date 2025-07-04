@@ -26,7 +26,7 @@ const ChatConversations = ({ conversations, onDeleteConversation }: ChatConversa
                 {conversations.map(({ thread_id, title }) => (
                     <Link
                         key={thread_id}
-                        className="flex items-center justify-between py-2 px-3 border-b border-dashed last:border-none text-sm over:bg-muted cursor-pointer rounded-md transition-colors"
+                        className="flex items-center justify-between py-2 px-3 text-sm hover:bg-muted cursor-pointer rounded-md transition-colors"
                         href={`/chat/${thread_id}`}
                     >
                         <span className="truncate w-[calc(100%-30px)]">{title}</span>
