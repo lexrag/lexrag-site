@@ -1,6 +1,6 @@
 export interface InputRowProps {
     label: string;
-    value: string;
+    value: string | null;
     type?: string;
     placeholder?: string;
     inputClassName?: string;

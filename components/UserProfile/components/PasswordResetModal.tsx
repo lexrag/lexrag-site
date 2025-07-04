@@ -79,7 +79,7 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
                     <InputRow
                         label="Current Password"
                         id="old-password-modal"
-                        value={form.watch('oldPassword')}
+                        value={form.watch('oldPassword') || ''}
                         onChange={(v) => form.setValue('oldPassword', v)}
                         placeholder="Current Password"
                         type="password"
@@ -91,7 +91,7 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
                     <InputRow
                         label="New Password"
                         id="new-password-modal"
-                        value={form.watch('newPassword')}
+                        value={form.watch('newPassword') || ''}
                         onChange={(v) => form.setValue('newPassword', v)}
                         placeholder="New Password"
                         type="password"
@@ -103,7 +103,7 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
                     <InputRow
                         label="Confirm Password"
                         id="confirm-password-modal"
-                        value={form.watch('confirmPassword')}
+                        value={form.watch('confirmPassword') || ''}
                         onChange={(v) => form.setValue('confirmPassword', v)}
                         placeholder="Confirm Password"
                         type="password"

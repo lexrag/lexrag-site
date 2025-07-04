@@ -85,7 +85,7 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                 <InputRow
                     label="Name"
-                    value={form.watch('first_name')}
+                    value={form.watch('first_name') || ''}
                     id="name"
                     onChange={(v) => form.setValue('first_name', v)}
                 />
@@ -94,7 +94,7 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
                 )}
                 <InputRow
                     label="Last Name"
-                    value={form.watch('last_name')}
+                    value={form.watch('last_name') || ''}
                     id="last-name"
                     onChange={(v) => form.setValue('last_name', v)}
                 />
@@ -113,7 +113,7 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
                 )}
                 <InputRow
                     label="Email"
-                    value={form.watch('email')}
+                    value={form.watch('email') || ''}
                     id="email"
                     onChange={(v) => form.setValue('email', v)}
                     placeholder="Email"
