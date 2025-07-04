@@ -1,6 +1,6 @@
 'use client';
 
-import { FaRegEdit } from 'react-icons/fa';
+import { SquarePen } from 'lucide-react';
 import { RowProps } from '@/types/Rows';
 import { Button } from '@/components/ui/button';
 
@@ -9,7 +9,7 @@ const Row = ({
     children,
     actionIcon = (
         <Button variant="ghost" size="icon">
-            <FaRegEdit />
+            <SquarePen />
         </Button>
     ),
     onClick,

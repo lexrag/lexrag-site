@@ -1,9 +1,9 @@
 export interface User {
     id: string;
     email: string;
-    first_name: string;
-    last_name: string;
-    phone_number: string;
+    first_name: string | null;
+    last_name: string | null;
+    phone_number: string | null;
     is_active: boolean;
     is_social_network_user: boolean;
     is_superuser: boolean;

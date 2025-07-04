@@ -25,7 +25,7 @@ const InputRow = ({
                 onChange={(e) => onChange?.(e.target.value)}
                 id={id}
                 type={type}
-                value={value}
+                value={value || ''}
                 placeholder={placeholder}
                 className={`flex w-full ${inputClassName}`}
             />

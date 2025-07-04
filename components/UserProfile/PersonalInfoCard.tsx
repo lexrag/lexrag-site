@@ -17,8 +17,8 @@ interface PersonalInfoCardProps {
 
 const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
     const [isProcessing, setIsProcessing] = useState(false);
-    const [firstName, setFirstName] = useState(currentUser.first_name);
-    const [lastName, setLastName] = useState(currentUser.last_name);
+    const [firstName, setFirstName] = useState(currentUser.first_name || '');
+    const [lastName, setLastName] = useState(currentUser.last_name || '');
     const [birthday, setBirthday] = useState('28 May 1996');
     const [gender, setGender] = useState('Male');
     const [address, setAddress] = useState('Warsaw, Poland');
