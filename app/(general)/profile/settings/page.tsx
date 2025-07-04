@@ -6,6 +6,7 @@ import Other from '@/components/UserProfile/Other';
 import PersonalInfoCard from '@/components/UserProfile/PersonalInfoCard';
 import LoginSessions from '@/components/UserProfile/Security/LoginSessions';
 import Security from '@/components/UserProfile/Security/Security';
+import Notifications from '@/components/UserProfile/Settings/Nofications';
 
 const SettingsPage = async () => {
     const currentUser: User = await getMeServer();
@@ -20,6 +21,7 @@ const SettingsPage = async () => {
                     <Security currentUser={currentUser} />
                     <LoginSessions />
                     <Legal />
+                    <Notifications />
                 </div>
             )}
         </section>
