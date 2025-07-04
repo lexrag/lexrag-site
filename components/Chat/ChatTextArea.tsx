@@ -31,7 +31,7 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
         textarea.rows = 2;
         textarea.parentElement!.style.height = 'auto';
 
-        const newHeight = Math.min(textarea.scrollHeight + siblingHeight, 5 * 30 + siblingHeight);
+        const newHeight = Math.min(textarea.scrollHeight + siblingHeight, 7 * 30 + siblingHeight);
 
         textarea.parentElement!.style.height = `${newHeight}px`;
     };

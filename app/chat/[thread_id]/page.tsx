@@ -1,18 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardHeading, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatConversations from '@/components/Chat/ChatConversations';
+import ChatGraphModal from '@/components/Chat/ChatGraphModal';
 import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import HeaderCornerMenu from '@/components/Header/HeaderCornerMenu';
 import { MegaMenu } from '@/components/Header/MegaMenu';
-import Footer from '@/components/Layout/Footer';
 
 export default function ChatPage() {
     const pathname = usePathname();
@@ -21,6 +22,8 @@ export default function ChatPage() {
 
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
+    const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
+    const [graphType, setGraphType] = useState<string>('');
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
@@ -33,7 +36,8 @@ export default function ChatPage() {
 
     return (
         <div className="flex flex-col h-screen w-full">
-            <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50">
+            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} graphType={graphType} />
+            <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2">
                 <div className="w-1/4 flex justify-end">
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
@@ -41,7 +45,7 @@ export default function ChatPage() {
                     <HeaderCornerMenu />
                 </div>
             </header>
-            <header className="w-full flex md:hidden items-center justify-between px-2">
+            <header className="w-full flex md:hidden items-center justify-between pt-2 px-2">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
                 <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
@@ -53,8 +57,8 @@ export default function ChatPage() {
                 handleDeleteConversation={onDeleteConversation}
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
-            <main className="flex flex-1 overflow-hidden">
-                <aside className="w-1/4 hidden md:block overflow-y-auto pt-8">
+            <main className="flex flex-1 overflow-hidden pb-4">
+                <aside className="w-1/4 hidden md:block overflow-y-auto pt-10">
                     <ChatConversations conversations={conversations} onDeleteConversation={onDeleteConversation} />
                 </aside>
 
@@ -70,18 +74,52 @@ export default function ChatPage() {
                     </div>
                 </section>
 
-                <aside className="w-1/4 hidden md:block overflow-y-auto pt-8">
-                    <Card className="h-full rounded-none border-0">
-                        <CardHeader className="border-none p-3">
-                            <CardHeading>
-                                <CardTitle>Files</CardTitle>
-                            </CardHeading>
-                        </CardHeader>
-                        <CardContent></CardContent>
+                <aside className="w-1/4 hidden md:block overflow-y-auto pt-10">
+                    <Card className="h-full rounded-none border-0 shadow-none">
+                        <CardContent className="p-0">
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    setGraphType('2d');
+                                    setIsOpenGraphModal(true);
+                                }}
+                            >
+                                Open 2D Graph
+                            </div>
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    setGraphType('3d');
+                                    setIsOpenGraphModal(true);
+                                }}
+                            >
+                                Open 3D Graph
+                            </div>
+                        </CardContent>
                     </Card>
                 </aside>
             </main>
-            <Footer />
+            <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
+                <div className="w-1/4 flex justify-end">
+                    <div className="flex order-2 md:order-1 gap-2 font-normal text-2sm">
+                        <span className="text-gray-600 dark:text-gray-600">© {new Date().getFullYear()}</span>
+                        <span className="text-gray-600 dark:text-gray-600">LEXRAG PTE LTD</span>
+                    </div>
+                </div>
+                <div className="w-1/4 flex justify-start">
+                    <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
+                        <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                            Company
+                        </Link>
+                        <Link
+                            href={'/terms-and-conditions'}
+                            className="text-gray-600 dark:text-gray-300 hover:text-primary"
+                        >
+                            Legal Docs
+                        </Link>
+                    </nav>
+                </div>
+            </footer>
         </div>
     );
 }
