@@ -5,7 +5,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useChat } from '@/api/chat/chatApi';
 import { Conversation } from '@/types/Conversation';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
-import { AuroraText } from '../magicui/aurora-text';
+import BouncingBall from './BouncingBall';
 
 interface ChatBoxProps {
     socket: WebSocket;
@@ -45,13 +45,13 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-6xl mx-auto p-4">
+        <div className="flex flex-col h-full w-full max-w-6xl mx-auto px-4">
             <div className="scrollable flex-1 overflow-y-auto space-y-2">
-                <div className="flex flex-col pb-4">
-                    {messages.map((msg) => (
+                <div className="flex flex-col">
+                    {messages.map((msg, i) => (
                         <div
                             key={msg.id}
-                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'}`}
+                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'} ${i === 0 ? 'pt-8' : 'pt-0'}`}
                         >
                             <div
                                 className={`flex flex-col ${
@@ -82,7 +82,7 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                             try {
                                                 const parsed = JSON.parse(msg.content);
                                                 if (parsed.content) copyText = parsed.content;
-                                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
                                             copyToClipboard(msg.id, copyText);
                                         }}
@@ -112,9 +112,7 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
                                 <div className="p-5 rounded-lg text-gray-900 text-sm message-text">
-                                    <AuroraText className={'text-lg'} speed={2}>
-                                        Thinking...
-                                    </AuroraText>
+                                    <BouncingBall />
                                 </div>
                             </div>
                         </div>
