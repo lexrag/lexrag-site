@@ -28,7 +28,7 @@ const PageTitle = ({ title, finalTitle, className }: PageTitleProps) => {
     const breadcrumbFinalTitle = finalTitle || defaultTitle;
 
     return (
-        <div className={`w-full pl-[15%] pr-[15%] ${className}`}>
+        <div className={`w-full pl-[5%] pr-[5%] ${className}`}>
             <Separator />
 
             <div className="flex items-center justify-between flex-wrap px-5 gap-2 la:gap-5 my-5">
