@@ -21,6 +21,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const accumulatedContentRef = useRef('');
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
+    const bottomRef = useRef<HTMLDivElement | null>(null);
 
     const threadId = useMemo(() => {
         const match = pathname.match(/^\/chat\/([^\/]+)/);
@@ -35,11 +36,14 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         if (currentResponseContent !== '') {
             setCurrentResponseContent('');
         }
-    }, [currentResponseContent, messages]);
+    }, [messages]);
 
     useEffect(() => {
-        if (!websocket) return;
-        if (!pathname.startsWith('/chat')) return;
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, currentResponseContent]);
+
+    useEffect(() => {
+        if (!websocket || !pathname.startsWith('/chat')) return;
 
         const handleMessage = async (event: MessageEvent) => {
             const data = JSON.parse(event.data);
@@ -49,41 +53,53 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             }
 
             if (data.type === MessageTypes.token) {
-                accumulatedContentRef.current += data.content;
-                setCurrentResponseContent(accumulatedContentRef.current);
+                setIsThinking(false);
+
+                setCurrentResponseContent((prev) => {
+                    const updated = prev + data.content;
+                    accumulatedContentRef.current = updated;
+                    return updated;
+                });
             }
 
             if (data.type === MessageTypes.stop) {
                 const html = await renderMessageMd(accumulatedContentRef.current);
 
-                const message = {
+                const message: Message = {
                     ...data,
                     html,
                     content: accumulatedContentRef.current,
+                    direction: 'incoming',
                 };
 
                 setMessages((prev) => [...prev, message]);
+                setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
             }
         };
 
-        websocket.onmessage = async (event: MessageEvent) => {
-            setIsThinking(false);
-            await handleMessage(event);
-        };
+        websocket.onmessage = handleMessage;
 
         if (threadId !== 'new') {
             getConversationSnapshot(threadId as string).then(setMessages);
         }
 
-        return () => websocket.removeEventListener('message', handleMessage);
-
-    }, [websocket, pathname, threadId]);
+        return () => {
+            websocket.removeEventListener('message', handleMessage);
+        };
+    }, [websocket, pathname, threadId, setConversations]);
 
     const sendMessage = (input: string, isNew: boolean) => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
 
-        setMessages((prev) => [...prev, { id: uuidv4(), content: input, direction: 'outgoing', html: input }]);
+        const outgoingMessage: Message = {
+            id: uuidv4(),
+            content: input,
+            html: input,
+            direction: 'outgoing',
+        };
+
+        setMessages((prev) => [...prev, outgoingMessage]);
 
         websocket.send(
             JSON.stringify({
@@ -104,5 +120,13 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         });
     };
 
-    return { messages, isThinking, currentResponseContent, sendMessage, copyToClipboard, copiedMessageId };
+    return {
+        messages,
+        isThinking,
+        currentResponseContent,
+        sendMessage,
+        copyToClipboard,
+        copiedMessageId,
+        bottomRef,
+    };
 };

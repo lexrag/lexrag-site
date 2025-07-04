@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import HeaderCornerMenu from '@/components/Header/HeaderCornerMenu';
-import { Logo } from '@/components/Header/Logo';
+import { MegaMenu } from './MegaMenu';
 
 interface HeaderProps {
     className?: string;
@@ -20,7 +20,7 @@ const Header = ({ className = '' }: HeaderProps) => {
                 className,
             )}
         >
-            <Logo isHomePage={pathname === '/'} />
+            <MegaMenu isHomePage={pathname === '/'} />
             <HeaderCornerMenu />
         </header>
     );
