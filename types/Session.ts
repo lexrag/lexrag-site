@@ -1,7 +1,5 @@
 export interface LoginSession {
-    name: string;
-    avatar: string;
-    connections: number;
-    location: string;
-    activity: string;
+    ip: string;
+    device: string;
+    last_seen: string;
 }
