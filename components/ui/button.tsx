@@ -22,6 +22,7 @@ const buttonVariants = cva(
                 dim: 'text-muted-foreground hover:text-foreground data-[state=open]:text-foreground',
                 foreground: '',
                 inverse: '',
+                link: 'inline-flex items-center justify-center cursor-pointer group text-xs font-medium text-primary hover:text-primary/90 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent p-0 h-auto rounded-none gap-1.25 underline decoration-dashed decoration-1 underline-offset-4 [&_svg]:opacity-60 [&_svg:not([class*=size-])]:size-3.5 [&_svg]:shrink-0 has-data-[arrow=true]:justify-between focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-60 ring-offset-background transition-[color,box-shadow]',
             },
             appearance: {
                 default: '',

@@ -35,7 +35,8 @@ const LandingPage = () => {
                             Product Features
                         </h3>
                         <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                            Explore legal data like never before — through graphs, vectors, and intelligent query breakdowns
+                            Explore legal data like never before — through graphs, vectors, and intelligent query
+                            breakdowns
                         </p>
                     </div>
                     <ProductFeatures

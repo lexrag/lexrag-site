@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { Moon, UserRound } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { User } from '@/types/User';
 import { useLogOut } from '@/hooks/use-log-out';
 import { Badge } from '../ui/badge';
@@ -12,19 +14,25 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Switch } from '../ui/switch';
 
 interface HeaderUserMenuProps {
     user: User;
 }
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
+    const { setTheme, resolvedTheme } = useTheme();
     const logOut = useLogOut();
+
+    const handleThemeToggle = () => {
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className="size-[34px] border-[#015A8D] bg-[#EFF6FF] dark:bg-[#172331] rounded-full inline-flex items-center justify-center text-md font-semibold border text-primary cursor-pointer focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                    className="size-[24px] border-[#015A8D] bg-[#EFF6FF] dark:bg-[#172331] rounded-full inline-flex items-center justify-center text-xs font-semibold border text-primary cursor-pointer focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                     aria-label="User menu"
                 >
                     {user?.first_name?.slice(0, 1) || '?'}
@@ -50,12 +58,22 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
 
                 <DropdownMenuItem asChild className="rounded-none">
                     <Link href="/profile" className="w-full px-4 py-2 flex items-center gap-2">
-                        <i className="ki-filled ki-profile-circle" />
+                        <UserRound />
                         My Profile
                     </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild className="rounded-none" onSelect={(event) => event.preventDefault()}>
+                    <div className="w-full px-4 py-2 flex items-center justify-between" onClick={handleThemeToggle}>
+                        <span className="flex items-center gap-2">
+                            <Moon />
+                            Dark mode
+                        </span>
+                        <Switch size="sm" checked={resolvedTheme === 'dark'} />
+                    </div>
+                </DropdownMenuItem>
 
                 <div className="px-4 py-2">
                     <Button onClick={logOut} variant="outline" className="w-full justify-center">

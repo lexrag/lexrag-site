@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { tabs } from '@/components/Header/MenuLinks';
-import { Logo } from './Logo';
+import { MegaMenu } from './MegaMenu';
 
 const HeaderTabs = () => {
     const pathname = usePathname();
@@ -18,7 +18,7 @@ const HeaderTabs = () => {
 
     return (
         <div className="flex items-center justify-between w-full h-20">
-            <Logo isHomePage={isHomePage} />
+            <MegaMenu isHomePage={isHomePage} />
 
             <nav className="flex items-center gap-10 flex-1 justify-center h-full">
                 {tabs.map((tab) => {
