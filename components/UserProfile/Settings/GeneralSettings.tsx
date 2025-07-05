@@ -40,11 +40,6 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
     const [availability, setAvailability] = useState<Date>(new Date('2025-07-01T00:00:00Z'));
     const [address, setAddress] = useState<string>('');
     const [country, setCountry] = useState<string>('');
-    const [city, setCity] = useState<string>('');
-    const [postalCode, setPostalCode] = useState<string>('');
-    const [success, setSuccess] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [isProcessing, setIsProcessing] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -57,9 +52,6 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
     });
 
     const onSubmit = async (data: FormValues) => {
-        setSuccess(null);
-        setError(null);
-        setIsProcessing(true);
         try {
             const response = await updateUser(data);
             if (!response) {
@@ -68,11 +60,8 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
             if (!response.success) {
                 throw new Error(response.error || 'Failed to update profile');
             }
-            setSuccess('Profile updated successfully.');
-        } catch (err) {
-            setError('Failed to update profile.');
-        } finally {
-            setIsProcessing(false);
+        } catch {
+            // setError('Failed to update profile.');
         }
     };
 
@@ -195,16 +184,6 @@ const GeneralSettings = ({ currentUser }: GeneralSettingsProps) => {
                         </SelectContent>
                     </Select>
                 </InputRow>
-                <InputRow label="City" value={city} id="city" onChange={setCity} placeholder="City" />
-                <InputRow
-                    label="Postcode"
-                    value={postalCode}
-                    id="postal-code"
-                    onChange={setPostalCode}
-                    placeholder="Postcode"
-                />
-                {success && <div className="mb-2 text-green-600 text-sm font-medium">{success}</div>}
-                {error && <div className="mb-2 text-red-600 text-sm font-medium">{error}</div>}
             </form>
         </CardWrapper>
     );

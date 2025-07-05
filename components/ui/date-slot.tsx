@@ -14,7 +14,7 @@ export default function DateSlot({
     disabledSlots = [],
     dayLabel = 'Friday, 20',
 }: DateSlotProps) {
-    const timeSlots = generateTimeSlots();
+    const timeSlots = generateTimeSlots('09:00', '18:00');
 
     return (
         <div className="space-y-3">

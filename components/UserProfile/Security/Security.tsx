@@ -20,8 +20,6 @@ interface AuthenticationProps {
 const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState(currentUser.email);
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -52,7 +50,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 open={open}
                 onOpenChange={setOpen}
                 onSave={() => {}}
-                loading={loading}
+                loading={false}
                 currentEmail={currentUser.email}
             />
             <Row label="Phone Number" actionIcon={<FaRegEdit />}>

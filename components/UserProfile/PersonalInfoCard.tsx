@@ -16,9 +16,12 @@ interface PersonalInfoCardProps {
 }
 
 const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [firstName, setFirstName] = useState(currentUser.first_name || '');
-    const [lastName, setLastName] = useState(currentUser.last_name || '');
+    const [formData, setFormData] = useState({
+        firstName: currentUser.first_name || '',
+        lastName: currentUser.last_name || '',
+        email: currentUser.email || '',
+        phone: currentUser.phone_number || '',
+    });
     const [birthday, setBirthday] = useState('28 May 1996');
     const [gender, setGender] = useState('Male');
     const [address, setAddress] = useState('Warsaw, Poland');
@@ -29,8 +32,8 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
             <AvatarRow label="Photo" url={''}>
                 150x150px JPEG, PNG Image
             </AvatarRow>
-            <InputRow label="First Name" value={firstName} id="first_name" onChange={setFirstName} />
-            <InputRow label="Last Name" value={lastName} id="last_name" onChange={setLastName} />
+            <InputRow label="First Name" value={formData.firstName} id="first_name" onChange={(value) => setFormData({ ...formData, firstName: value })} />
+            <InputRow label="Last Name" value={formData.lastName} id="last_name" onChange={(value) => setFormData({ ...formData, lastName: value })} />
             <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 p-4">
                 <DatePicker.Label className="flex w-full max-w-56">Birthday</DatePicker.Label>
                 <div className="flex w-full">
@@ -86,8 +89,8 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
             </InputRow>
             <InputRow label="Address" value={address} id="address" onChange={setAddress} />
             <div className="flex justify-end">
-                <Button className="py-2 px-4 my-4 mr-4" type="submit" disabled={isProcessing}>
-                    {isProcessing ? 'Saving...' : 'Save Changes'}
+                <Button className="py-2 px-4 my-4 mr-4" type="submit" disabled={false}>
+                    Save Changes
                 </Button>
             </div>
         </CardWrapper>

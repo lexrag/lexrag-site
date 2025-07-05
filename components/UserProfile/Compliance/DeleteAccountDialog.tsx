@@ -1,7 +1,9 @@
+'use client';
+
+import React from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
