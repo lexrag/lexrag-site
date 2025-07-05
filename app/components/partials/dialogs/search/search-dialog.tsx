@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { DropdownMenu4 } from '@/partials/dropdown-menu/dropdown-menu-4';
 import {
     Badge,
@@ -245,7 +245,7 @@ export function SearchDialog({ trigger }: { trigger: ReactNode }) {
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="lg:max-w-[600px] lg:top-[15%] lg:translate-y-0 p-0 [&_[data-slot=dialog-close]]:top-5.5 [&_[data-slot=dialog-close]]:end-5.5">
                 <DialogHeader className="px-4 py-1 mb-1">
-                    <DialogTitle></DialogTitle>
+                    <DialogTitle className="sr-only">Search Dialog</DialogTitle>
                     <DialogDescription></DialogDescription>
                     <div className="relative">
                         <Search className="absolute top-1/2 -translate-y-1/2 size-4" />

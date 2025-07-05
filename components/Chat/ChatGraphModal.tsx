@@ -3,7 +3,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
 import { Expand, Shrink } from 'lucide-react';
-import DialogContent, { Dialog, DialogBody, DialogHeader } from '../ui/dialog';
+import DialogContent, { Dialog, DialogBody, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Switch } from '../ui/switch';
 import ChatGraph2D from './ChatGraph2D';
 import ChatGraph3D from './ChatGraph3D';
@@ -30,6 +30,7 @@ const ChatGraphModal = ({ open, onOpenChange }: ChatGraphModalProps) => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-fit" dir={direction}>
                 <DialogHeader className="flex-row items-center gap-2">
+                    <DialogTitle className="sr-only">Chat Graph Modal</DialogTitle>
                     {isFullScreen ? (
                         <Shrink onClick={() => setIsFullScreen(false)} />
                     ) : (
