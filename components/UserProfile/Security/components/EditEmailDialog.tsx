@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import ReusableDialog from '@/components/common/ReusableDialog';
 
 interface EditEmailDialogProps {
     open: boolean;
@@ -26,28 +26,16 @@ const EditEmailDialog = ({ open, onOpenChange, onSave, loading, currentEmail, er
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-full max-w-xs sm:max-w-sm sm:mx-auto">
-                <DialogHeader>
-                    <DialogTitle className="text-xl font-medium text-mono mb-2">Edit Email</DialogTitle>
-                </DialogHeader>
-                <div className="mb-2 text-sm text-mono">
-                    Current email: <span className="font-medium">{currentEmail}</span>
-                </div>
-                <Input
-                    type="email"
-                    className="w-full border rounded px-3 py-2 mb-2 text-mono"
-                    placeholder="Enter new email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                />
-                {error && <div className="text-destructive text-sm mb-2">{error}</div>}
-                <DialogFooter className="flex-row gap-2 justify-end">
+        <ReusableDialog
+            open={open}
+            onOpenChange={onOpenChange}
+            title="Edit Email"
+            contentClassName=""
+            footer={
+                <>
                     <Button variant="outline" disabled={loading} onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-
                     <Button
                         variant="primary"
                         onClick={handleSave}
@@ -55,9 +43,22 @@ const EditEmailDialog = ({ open, onOpenChange, onSave, loading, currentEmail, er
                     >
                         {loading ? 'Saving...' : 'Save'}
                     </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </>
+            }
+        >
+            <div className="mb-2 text-sm text-mono">
+                Current email: <span className="font-medium">{currentEmail}</span>
+            </div>
+            <Input
+                type="email"
+                className="w-full border rounded px-3 py-2 mb-2 text-mono"
+                placeholder="Enter new email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+            />
+            {error && <div className="text-destructive text-sm mb-2">{error}</div>}
+        </ReusableDialog>
     );
 };
 

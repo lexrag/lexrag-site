@@ -54,14 +54,6 @@ export const MENU_ITEMS_TRUSTED_DEVICES: MenuItem[] = [
 
 export const MENU_ITEMS_LOGIN_SESSIONS: MenuItem[] = [
     {
-        icon: Plus,
-        label: 'Add',
-    },
-    {
-        icon: Upload,
-        label: 'Import',
-    },
-    {
         icon: FileDown,
         label: 'Export',
         items: [

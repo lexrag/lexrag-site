@@ -54,6 +54,7 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
             setSuccess('Password updated successfully.');
             form.reset();
             if (onSuccess) onSuccess();
+            if (onOpenChange) onOpenChange(false);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
         } finally {

@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
+import { updatePhoneNumber } from '@/api/auth/updatePhoneNumber';
+import { formatDistanceToNow } from 'date-fns';
 import { SquarePen } from 'lucide-react';
+import { toast } from 'sonner';
 import { User } from '@/types/User';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +15,7 @@ import { Icons } from '@/components/common/icons';
 import PasswordResetModal from '@/components/UserProfile/components/PasswordResetModal';
 import Row from '@/components/UserProfile/components/Row';
 import EditEmailDialog from '@/components/UserProfile/Security/components/EditEmailDialog';
+import EditPhoneNumberDialog from '@/components/UserProfile/Security/components/EditPhoneNumberDialog';
 
 interface AuthenticationProps {
     currentUser: User;
@@ -20,7 +24,13 @@ interface AuthenticationProps {
 const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
     const [open, setOpen] = useState(false);
+    const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState(currentUser.phone_number || '');
+    const [prevPhoneNumber, setPrevPhoneNumber] = useState<string | null>(null);
+    const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
+        currentUser.password_last_changed_at || null,
+    );
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -32,6 +42,24 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
         const res = await getLinkedinAuthLink();
         if (res.success) {
             window.location.href = res.redirect_url;
+        }
+    };
+
+    const handlePhoneNumberSave = async (newPhoneNumber: string, rollback?: () => void) => {
+        setPrevPhoneNumber(phoneNumber);
+        setPhoneNumber(newPhoneNumber);
+        try {
+            setLoading(true);
+            const res = await updatePhoneNumber(newPhoneNumber);
+
+            setOpenPhoneNumber(false);
+        } catch (error) {
+            toast.error('Failed to update phone number');
+            if (rollback) rollback();
+            setPhoneNumber(prevPhoneNumber || '');
+            setOpenPhoneNumber(false);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,9 +82,21 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 loading={loading}
                 currentEmail={currentUser.email}
             />
-            <Row label="Phone Number">
+            <Row
+                label="Phone Number"
+                actionIcon={
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setOpenPhoneNumber(true)}
+                        aria-label="Edit Phone Number"
+                    >
+                        <SquarePen />
+                    </Button>
+                }
+            >
                 <span>
-                    {currentUser.phone_number || (
+                    {phoneNumber || (
                         <Badge variant="warning" appearance="outline">
                             Not set
                         </Badge>
@@ -82,8 +122,23 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                     </Button>
                 }
             >
-                <span>Password last changed 2 months ago</span>
-                <PasswordResetModal open={resetOpen} onOpenChange={setResetOpen} />
+                <span>
+                    {passwordLastChangedAt
+                        ? `Password last changed ${formatDistanceToNow(new Date(passwordLastChangedAt), { addSuffix: true })}`
+                        : 'Password never changed'}
+                </span>
+                <PasswordResetModal
+                    open={resetOpen}
+                    onOpenChange={setResetOpen}
+                    onSuccess={() => setPasswordLastChangedAt(new Date().toISOString())}
+                />
+                <EditPhoneNumberDialog
+                    open={openPhoneNumber}
+                    onOpenChange={setOpenPhoneNumber}
+                    onSave={handlePhoneNumberSave}
+                    loading={loading}
+                    currentPhoneNumber={phoneNumber}
+                />
             </Row>
         </CardWrapper>
     );

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updateUser } from '@/api/auth/updateUser';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { User } from '@/types/User';
 import CardWrapper from '@/components/ui/card-wrapper';
@@ -11,11 +12,15 @@ import { Button } from '../ui/button';
 import { Calendar } from '../ui/calendar';
 import AvatarRow from './components/AvatarRow';
 import { DatePicker } from './components/DatePickerComproud';
-import { GENDER_OPTIONS, LANGUAGE_OPTIONS } from './constants/PERSONAL';
+import { COUNTRY_OPTIONS, GENDER_OPTIONS, LANGUAGE_OPTIONS } from './constants/PERSONAL';
 
 const personalInfoSchema = z.object({
-    first_name: z.string().min(1, 'First name is required').max(50, 'First name must be less than 50 characters'),
-    last_name: z.string().min(1, 'Last name is required').max(50, 'Last name must be less than 50 characters'),
+    first_name: z.string().max(50, 'First name must be less than 50 characters'),
+    last_name: z.string().max(50, 'Last name must be less than 50 characters'),
+    gender: z.string().optional(),
+    language: z.string().optional(),
+    country: z.string().optional(),
+    birthday: z.string().optional(),
 });
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
@@ -26,22 +31,39 @@ interface PersonalInfoCardProps {
 
 const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
     const [isProcessing, setIsProcessing] = useState(false);
+    const [prevState, setPrevState] = useState<PersonalInfoFormData | null>(null);
     const [firstName, setFirstName] = useState(currentUser.first_name || '');
     const [lastName, setLastName] = useState(currentUser.last_name || '');
-    const [birthday, setBirthday] = useState('28 May 1996');
-    const [gender, setGender] = useState('Male');
-    const [address, setAddress] = useState('Warsaw, Poland');
-    const [language, setLanguage] = useState('en');
-    const [error, setError] = useState<string | null>(null);
+    const [birthday, setBirthday] = useState(
+        currentUser.birthday
+            ? new Date(currentUser.birthday).toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10),
+    );
+    const [gender, setGender] = useState(currentUser.gender || '');
+    const [country, setCountry] = useState(currentUser.country || '');
+    const [language, setLanguage] = useState(currentUser.language || '');
 
     const handleSave = async () => {
+        const previous = {
+            first_name: firstName,
+            last_name: lastName,
+            gender,
+            language,
+            country,
+            birthday,
+        };
+        setPrevState(previous);
+
         try {
             setIsProcessing(true);
-            setError(null);
 
             const formData: PersonalInfoFormData = {
                 first_name: firstName,
                 last_name: lastName,
+                gender,
+                language,
+                country,
+                birthday,
             };
 
             const validatedData = personalInfoSchema.parse(formData);
@@ -50,16 +72,27 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                 ...validatedData,
                 email: currentUser.email,
             });
-
+            console.log(currentUser);
             if (!response?.success) {
                 throw new Error(response?.error || 'Failed to update user information');
             }
+            toast.success('User information updated successfully');
         } catch (err) {
-            if (err instanceof z.ZodError) {
-                setError(err.errors[0].message);
-            } else {
-                setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+            if (prevState) {
+                setFirstName(prevState.first_name);
+                setLastName(prevState.last_name);
+                setGender(prevState.gender || '');
+                setLanguage(prevState.language || '');
+                setCountry(prevState.country || '');
+                setBirthday(prevState.birthday || new Date().toISOString().slice(0, 10));
             }
+            let errorMessage = 'An unexpected error occurred';
+            if (err instanceof z.ZodError) {
+                errorMessage = err.errors[0].message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            toast.error(errorMessage);
         } finally {
             setIsProcessing(false);
         }
@@ -67,9 +100,7 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
 
     return (
         <CardWrapper title="Personal Information">
-            <AvatarRow label="Photo" url={''}>
-                150x150px JPEG, PNG Image
-            </AvatarRow>
+            <AvatarRow label="Photo">150x150px JPEG, PNG Image</AvatarRow>
             <InputRow label="First Name" value={firstName} id="first_name" onChange={setFirstName} />
             <InputRow label="Last Name" value={lastName} id="last_name" onChange={setLastName} />
             <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 p-4">
@@ -77,7 +108,9 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                 <div className="flex w-full">
                     <DatePicker
                         value={new Date(birthday)}
-                        onChange={(date) => setBirthday(date?.toLocaleDateString() || new Date().toLocaleDateString())}
+                        onChange={(date) =>
+                            setBirthday(date?.toISOString().slice(0, 10) || new Date().toISOString().slice(0, 10))
+                        }
                     >
                         <DatePicker.Trigger placeholder="Pick a date" formatString="MMM dd yyyy" />
                         <DatePicker.Content>
@@ -87,7 +120,10 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                                         mode="single"
                                         selected={new Date(birthday)}
                                         onSelect={(date) =>
-                                            setBirthday(date?.toLocaleDateString() || new Date().toLocaleDateString())
+                                            setBirthday(
+                                                date?.toISOString().slice(0, 10) ||
+                                                    new Date().toISOString().slice(0, 10),
+                                            )
                                         }
                                         required={false}
                                     />
@@ -125,13 +161,25 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                     </SelectContent>
                 </Select>
             </InputRow>
-            <InputRow label="Address" value={address} id="address" onChange={setAddress} />
+            <InputRow label="Country" value={country} id="country" onChange={setCountry}>
+                <Select value={country} onValueChange={setCountry}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {COUNTRY_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </InputRow>
             <div className="flex justify-end">
                 <Button className="py-2 px-4 my-4 mr-4" disabled={isProcessing} onClick={handleSave}>
                     {isProcessing ? 'Saving...' : 'Save Changes'}
                 </Button>
             </div>
-            {error && <div className="text-sm text-red-500 px-4">{error}</div>}
         </CardWrapper>
     );
 };

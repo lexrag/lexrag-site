@@ -1,9 +1,4 @@
-interface UpdateUserParams {
-    first_name: string;
-    last_name: string;
-    phone_number?: string;
-    email: string;
-}
+import { UpdateUserParams } from '@/types/User';
 
 export const updateUser = async (data: UpdateUserParams) => {
     const token = localStorage.getItem('token');
@@ -20,9 +15,8 @@ export const updateUser = async (data: UpdateUserParams) => {
         },
         body: JSON.stringify(data),
     });
-    console.log(response);
-    const responseData = await response.json();
 
+    const responseData = await response.json();
     if (response.ok) {
         return { success: true };
     }
