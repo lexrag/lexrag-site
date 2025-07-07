@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { updateUser } from '@/api/auth/updateUser';
+import { z } from 'zod';
 import { User } from '@/types/User';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +12,13 @@ import { Calendar } from '../ui/calendar';
 import AvatarRow from './components/AvatarRow';
 import { DatePicker } from './components/DatePickerComproud';
 import { GENDER_OPTIONS, LANGUAGE_OPTIONS } from './constants/PERSONAL';
+
+const personalInfoSchema = z.object({
+    first_name: z.string().min(1, 'First name is required').max(50, 'First name must be less than 50 characters'),
+    last_name: z.string().min(1, 'Last name is required').max(50, 'Last name must be less than 50 characters'),
+});
+
+type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
 interface PersonalInfoCardProps {
     currentUser: User;
@@ -23,6 +32,38 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
     const [gender, setGender] = useState('Male');
     const [address, setAddress] = useState('Warsaw, Poland');
     const [language, setLanguage] = useState('en');
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSave = async () => {
+        try {
+            setIsProcessing(true);
+            setError(null);
+
+            const formData: PersonalInfoFormData = {
+                first_name: firstName,
+                last_name: lastName,
+            };
+
+            const validatedData = personalInfoSchema.parse(formData);
+
+            const response = await updateUser({
+                ...validatedData,
+                email: currentUser.email,
+            });
+
+            if (!response?.success) {
+                throw new Error(response?.error || 'Failed to update user information');
+            }
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message);
+            } else {
+                setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+            }
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <CardWrapper title="Personal Information">
@@ -86,10 +127,11 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
             </InputRow>
             <InputRow label="Address" value={address} id="address" onChange={setAddress} />
             <div className="flex justify-end">
-                <Button className="py-2 px-4 my-4 mr-4" type="submit" disabled={isProcessing}>
+                <Button className="py-2 px-4 my-4 mr-4" disabled={isProcessing} onClick={handleSave}>
                     {isProcessing ? 'Saving...' : 'Save Changes'}
                 </Button>
             </div>
+            {error && <div className="text-sm text-red-500 px-4">{error}</div>}
         </CardWrapper>
     );
 };

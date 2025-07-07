@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
-import { FaRegEdit } from 'react-icons/fa';
+import { SquarePen } from 'lucide-react';
 import { User } from '@/types/User';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,6 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState(currentUser.email);
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -42,7 +41,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 label="Email"
                 actionIcon={
                     <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label="Edit Email">
-                        <FaRegEdit />
+                        <SquarePen />
                     </Button>
                 }
             >
@@ -55,7 +54,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 loading={loading}
                 currentEmail={currentUser.email}
             />
-            <Row label="Phone Number" actionIcon={<FaRegEdit />}>
+            <Row label="Phone Number">
                 <span>
                     {currentUser.phone_number || (
                         <Badge variant="warning" appearance="outline">
@@ -64,12 +63,12 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                     )}
                 </span>
             </Row>
-            <Row label="2FA" actionIcon={<FaRegEdit />}>
+            <Row label="2FA">
                 <Badge variant="warning" appearance="outline">
                     Not set
                 </Badge>
             </Row>
-            <Row label="Sign in" actionIcon={<FaRegEdit />}>
+            <Row label="Sign in">
                 <div className="flex items-center gap-2">
                     <Icons.googleColorful className="size-5 cursor-pointer" onClick={handleGoogleAuth} />
                     <Icons.linkedinColorfull className="size-5 cursor-pointer" onClick={handleLinkedinAuth} />
@@ -79,7 +78,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 label="Password"
                 actionIcon={
                     <Button variant="ghost" size="icon" onClick={() => setResetOpen(true)} aria-label="Reset Password">
-                        <FaRegEdit />
+                        <SquarePen />
                     </Button>
                 }
             >

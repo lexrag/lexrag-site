@@ -1,5 +1,3 @@
-import { IconProps } from '@/components/common/icons';
-
 export interface Device {
     deviceType: 'desktop' | 'laptop' | 'smartphone' | 'tablet';
     deviceName: string;

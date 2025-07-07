@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ interface EditEmailDialogProps {
 const EditEmailDialog = ({ open, onOpenChange, onSave, loading, currentEmail, error }: EditEmailDialogProps) => {
     const [email, setEmail] = useState(currentEmail);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (open) setEmail(currentEmail);
     }, [open, currentEmail]);
 

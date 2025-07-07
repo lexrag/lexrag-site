@@ -3,6 +3,9 @@
 import {
     ArrowDown,
     ArrowUp,
+    Bell,
+    Edit,
+    File,
     FileDown,
     FileSpreadsheet,
     FileText,
@@ -11,18 +14,18 @@ import {
     Plus,
     Send,
     Settings,
+    Trash,
     Upload,
 } from 'lucide-react';
-import { FaBell, FaEdit, FaFile, FaTrash } from 'react-icons/fa';
 import { MenuItem } from '@/types/MenuItem';
 
 export const MENU_ITEMS_TRUSTED_DEVICES: MenuItem[] = [
     {
-        icon: FaFile,
+        icon: File,
         label: 'View',
     },
     {
-        icon: FaBell,
+        icon: Bell,
         label: 'Export',
         items: [
             {
@@ -40,11 +43,11 @@ export const MENU_ITEMS_TRUSTED_DEVICES: MenuItem[] = [
         ],
     },
     {
-        icon: FaEdit,
+        icon: Edit,
         label: 'Edit',
     },
     {
-        icon: FaTrash,
+        icon: Trash,
         label: 'Delete',
     },
 ];

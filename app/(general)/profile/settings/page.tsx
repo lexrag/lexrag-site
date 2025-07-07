@@ -18,10 +18,10 @@ const SettingsPage = async () => {
                 <div className="flex flex-col w-full max-w-3xl gap-8 items-center justify-center px-4">
                     <PersonalInfoCard currentUser={currentUser} />
                     <Other />
+                    <Notifications />
                     <Security currentUser={currentUser} />
                     <LoginSessions />
                     <Legal />
-                    <Notifications />
                 </div>
             )}
         </section>
