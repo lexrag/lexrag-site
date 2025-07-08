@@ -13,9 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Icons } from '@/components/common/icons';
+import ReusableDialog from '@/components/common/ReusableDialog';
 import PasswordResetModal from '@/components/UserProfile/components/PasswordResetModal';
 import Row from '@/components/UserProfile/components/Row';
-import EditEmailDialog from '@/components/UserProfile/Security/components/EditEmailDialog';
+import ChangeEmailFlow from '@/components/UserProfile/Security/components/ChangeEmailFlow';
 import EditPhoneNumberDialog from '@/components/UserProfile/Security/components/EditPhoneNumberDialog';
 
 interface AuthenticationProps {
@@ -24,14 +25,14 @@ interface AuthenticationProps {
 
 const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
-    const [open, setOpen] = useState(false);
     const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState(currentUser.phone_number || '');
+    const [phoneNumber, setPhoneNumber] = useState(currentUser?.phone_number || '');
     const [prevPhoneNumber, setPrevPhoneNumber] = useState<string | null>(null);
     const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
-        currentUser.password_last_changed_at || null,
+        currentUser?.password_last_changed_at || null,
     );
+    const [open, setOpen] = useState(false);
 
     const phoneUtil = PhoneNumberUtil.getInstance();
     const formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
@@ -82,13 +83,9 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
             >
                 <span>{currentUser.email}</span>
             </Row>
-            <EditEmailDialog
-                open={open}
-                onOpenChange={setOpen}
-                onSave={() => {}}
-                loading={loading}
-                currentEmail={currentUser.email}
-            />
+            <ReusableDialog open={open} onOpenChange={setOpen} title="Change Email" contentClassName="" footer={null}>
+                <ChangeEmailFlow />
+            </ReusableDialog>
             <Row
                 label="Phone Number"
                 actionIcon={
