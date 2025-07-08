@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { PhoneNumberUtil } from 'google-libphonenumber';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import ReusableDialog from '@/components/common/ReusableDialog';
 interface EditPhoneNumberDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSave: (newPhoneNumber: string, rollback?: () => void) => void;
+    onSave: (newPhoneNumber: string) => void;
     loading: boolean;
     currentPhoneNumber: string;
 }
@@ -29,18 +29,21 @@ const EditPhoneNumberDialog = ({
 
     const handleSave = async () => {
         const formattedNumber = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
-        if (!isValidPhoneNumber(formattedNumber)) {
+        try {
+            const phoneUtil = PhoneNumberUtil.getInstance();
+            const parsedNumber = phoneUtil.parse(formattedNumber);
+            if (!phoneUtil.isValidNumber(parsedNumber)) {
+                toast.error('Please enter a valid phone number');
+                return;
+            }
+        } catch (error) {
             toast.error('Please enter a valid phone number');
             return;
         }
-        setPrevPhoneNumber(phoneNumber);
-        setPhoneNumber(formattedNumber);
         try {
-            onSave(formattedNumber, () => setPhoneNumber(prevPhoneNumber));
-            toast.success('Phone number updated successfully');
+            onSave(formattedNumber);
         } catch (error) {
-            setPhoneNumber(prevPhoneNumber);
-            toast.error('Failed to update phone number');
+            setPhoneNumber(currentPhoneNumber);
         }
     };
 

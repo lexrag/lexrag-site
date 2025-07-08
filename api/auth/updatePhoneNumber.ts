@@ -2,7 +2,7 @@ export const updatePhoneNumber = async (phone_number: string) => {
     const token = localStorage.getItem('token');
 
     if (!token) {
-        return null;
+        return { success: false, error: 'No token' };
     }
 
     try {
@@ -17,13 +17,12 @@ export const updatePhoneNumber = async (phone_number: string) => {
         const data = await response.json();
 
         if (response.ok) {
-            return data;
+            return { success: true, ...data };
         } else {
-            throw new Error(data.detail || 'Unknown error');
+            return { success: false, ...data };
         }
     } catch (error) {
         console.error('Error updating phone number:', error);
+        return { success: false, error: 'An unknown error occurred' };
     }
-
-    return null;
 };

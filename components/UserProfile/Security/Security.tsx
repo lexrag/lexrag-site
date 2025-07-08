@@ -45,17 +45,20 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
         }
     };
 
-    const handlePhoneNumberSave = async (newPhoneNumber: string, rollback?: () => void) => {
+    const handlePhoneNumberSave = async (newPhoneNumber: string) => {
         setPrevPhoneNumber(phoneNumber);
         setPhoneNumber(newPhoneNumber);
         try {
             setLoading(true);
             const res = await updatePhoneNumber(newPhoneNumber);
-
+            if (res.success) {
+                toast.success('Phone number updated');
+            } else {
+                toast.error('Failed to update phone number');
+            }
             setOpenPhoneNumber(false);
         } catch (error) {
             toast.error('Failed to update phone number');
-            if (rollback) rollback();
             setPhoneNumber(prevPhoneNumber || '');
             setOpenPhoneNumber(false);
         } finally {
