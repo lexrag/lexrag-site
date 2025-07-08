@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { updateUser } from '@/api/auth/updateUser';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { Button } from '../ui/button';
 import { Calendar } from '../ui/calendar';
 import AvatarRow from './components/AvatarRow';
 import { DatePicker } from './components/DatePickerComproud';
+import YearPicker from './components/YearPicker';
 import { COUNTRY_OPTIONS, GENDER_OPTIONS, LANGUAGE_OPTIONS } from './constants/PERSONAL';
 
 const personalInfoSchema = z.object({
@@ -42,6 +43,13 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
     const [gender, setGender] = useState(currentUser.gender || '');
     const [country, setCountry] = useState(currentUser.country || '');
     const [language, setLanguage] = useState(currentUser.language || '');
+    const [calendarMonth, setCalendarMonth] = useState(birthday ? new Date(birthday) : new Date());
+
+    useEffect(() => {
+        if (birthday) {
+            setCalendarMonth(new Date(birthday));
+        }
+    }, [birthday]);
 
     const handleSave = async () => {
         const previous = {
@@ -72,7 +80,7 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                 ...validatedData,
                 email: currentUser.email,
             });
-            console.log(currentUser);
+
             if (!response?.success) {
                 throw new Error(response?.error || 'Failed to update user information');
             }
@@ -109,23 +117,41 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
                     <DatePicker
                         value={new Date(birthday)}
                         onChange={(date) =>
-                            setBirthday(date?.toISOString().slice(0, 10) || new Date().toISOString().slice(0, 10))
+                            setBirthday(
+                                date
+                                    ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+                                    : new Date().toISOString().slice(0, 10),
+                            )
                         }
                     >
                         <DatePicker.Trigger placeholder="Pick a date" formatString="MMM dd yyyy" />
                         <DatePicker.Content>
-                            <div className="flex flex-col sm:flex-row">
-                                <div className="rdp-root p-2 sm:pe-5">
+                            <div className="flex flex-col lg:flex-row">
+                                <div className="p-2 pr-0">
                                     <Calendar
                                         mode="single"
-                                        selected={new Date(birthday)}
-                                        onSelect={(date) =>
+                                        selected={birthday ? new Date(birthday) : undefined}
+                                        month={calendarMonth}
+                                        onMonthChange={setCalendarMonth}
+                                        onSelect={(date) => {
                                             setBirthday(
-                                                date?.toISOString().slice(0, 10) ||
-                                                    new Date().toISOString().slice(0, 10),
-                                            )
-                                        }
+                                                date
+                                                    ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+                                                    : new Date().toISOString().slice(0, 10),
+                                            );
+                                        }}
                                         required={false}
+                                    />
+                                </div>
+                                <div className="pl-0 p-2">
+                                    <YearPicker
+                                        value={birthday ? new Date(birthday).getFullYear().toString() : undefined}
+                                        onChange={(year) => {
+                                            if (!birthday) return;
+                                            const date = new Date(birthday);
+                                            date.setFullYear(Number(year));
+                                            setBirthday(date.toISOString().slice(0, 10));
+                                        }}
                                     />
                                 </div>
                             </div>

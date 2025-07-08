@@ -7,19 +7,14 @@ import { AvatarRowProps } from '@/types/Rows';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 
-interface AvatarRowUploadProps extends AvatarRowProps {
-    onUpload?: (url: string) => void;
-}
-
 const AvatarRow = ({
     label = 'Photo',
-
     labelClassName = '',
     contentClassName = '',
     children,
     className,
     onUpload,
-}: AvatarRowUploadProps) => {
+}: AvatarRowProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
     const [isUploading, setIsUploading] = useState(false);
@@ -40,7 +35,6 @@ const AvatarRow = ({
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        console.log(file);
         setIsUploading(true);
         try {
             const localUrl = URL.createObjectURL(file);

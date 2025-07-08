@@ -29,8 +29,6 @@ export const updateUserPhoto = async (photo: FormData) => {
     });
     const responseData = await response.json();
 
-    console.log(responseData);
-    console.log(response);
     if (response.ok) {
         return { success: true, data: responseData };
     }

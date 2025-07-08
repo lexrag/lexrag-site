@@ -5,6 +5,7 @@ import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
 import { updatePhoneNumber } from '@/api/auth/updatePhoneNumber';
 import { formatDistanceToNow } from 'date-fns';
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 import { SquarePen } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/types/User';
@@ -31,6 +32,9 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
         currentUser.password_last_changed_at || null,
     );
+
+    const phoneUtil = PhoneNumberUtil.getInstance();
+    const formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -99,7 +103,9 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 }
             >
                 <span>
-                    {phoneNumber || (
+                    {phoneNumber ? (
+                        formatted
+                    ) : (
                         <Badge variant="warning" appearance="outline">
                             Not set
                         </Badge>

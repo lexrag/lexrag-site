@@ -22,3 +22,11 @@ export const generateTimeSlots = (
 
     return slots;
 };
+
+export const generateYears = (startYear: number = 1940, endYear: number = 2025) => {
+    const years: number[] = [];
+    for (let year = startYear; year <= endYear; year++) {
+        years.push(year);
+    }
+    return years;
+};

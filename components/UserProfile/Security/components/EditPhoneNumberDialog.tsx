@@ -21,17 +21,16 @@ const EditPhoneNumberDialog = ({
     loading,
     currentPhoneNumber,
 }: EditPhoneNumberDialogProps) => {
-    const [prevPhoneNumber, setPrevPhoneNumber] = useState(currentPhoneNumber);
     const [phoneNumber, setPhoneNumber] = useState(currentPhoneNumber);
+
     useEffect(() => {
         if (open) setPhoneNumber(currentPhoneNumber);
     }, [open, currentPhoneNumber]);
 
     const handleSave = async () => {
-        const formattedNumber = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
         try {
             const phoneUtil = PhoneNumberUtil.getInstance();
-            const parsedNumber = phoneUtil.parse(formattedNumber);
+            const parsedNumber = phoneUtil.parse(phoneNumber);
             if (!phoneUtil.isValidNumber(parsedNumber)) {
                 toast.error('Please enter a valid phone number');
                 return;
@@ -41,7 +40,7 @@ const EditPhoneNumberDialog = ({
             return;
         }
         try {
-            onSave(formattedNumber);
+            onSave(phoneNumber);
         } catch (error) {
             setPhoneNumber(currentPhoneNumber);
         }

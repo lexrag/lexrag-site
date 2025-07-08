@@ -11,7 +11,6 @@ import Notifications from '@/components/UserProfile/Settings/Nofications';
 
 const SettingsPage = async () => {
     const currentUser: User = await getUserInfoServer();
-    console.log(currentUser);
 
     return (
         <section className="flex flex-col items-center justify-center bg-background">

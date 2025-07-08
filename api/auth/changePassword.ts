@@ -14,8 +14,6 @@ export const changePassword = async (old_password: string, new_password: string)
         body: JSON.stringify({ old_password, new_password }),
     });
 
-    console.log(response);
-
     const data = await response.json();
 
     if (response.ok) {
