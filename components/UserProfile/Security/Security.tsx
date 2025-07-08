@@ -83,7 +83,13 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
             >
                 <span>{currentUser.email}</span>
             </Row>
-            <ReusableDialog open={open} onOpenChange={setOpen} title="Change Email" contentClassName="" footer={null}>
+            <ReusableDialog
+                open={open}
+                onOpenChange={setOpen}
+                title="Change Email"
+                headerClassName="mb-0"
+                footer={null}
+            >
                 <ChangeEmailFlow />
             </ReusableDialog>
             <Row

@@ -138,15 +138,18 @@ export default function ChangeEmailFlow() {
     const secondsLeft = Math.max(0, Math.ceil((resendDisabledUntil - now) / 1000));
 
     return (
-        <div className="w-full max-w-sm mx-auto space-y-6">
+        <div className="w-full max-w-sm mx-auto">
             {step === 1 && (
                 <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4">
+                    <div className="text-sm text-secondary-foreground/80 mb-2">
+                        Please verify your identity by entering your current password
+                    </div>
                     <Input
                         type="password"
                         value={passwordForm.watch('password')}
                         onChange={(e) => passwordForm.setValue('password', e.target.value)}
                         disabled={isProcessing}
-                        placeholder="Enter your password"
+                        placeholder="Enter your current password"
                     />
                     <Button type="submit" disabled={isProcessing} className="w-full">
                         Next
@@ -156,12 +159,15 @@ export default function ChangeEmailFlow() {
 
             {step === 2 && (
                 <form onSubmit={emailForm.handleSubmit(handleEmailSubmit)} className="space-y-4">
+                    <div className="text-sm text-secondary-foreground/80 mb-2">
+                        Enter your new email to receive a verification code
+                    </div>
                     <Input
                         type="email"
                         value={emailForm.watch('newEmail')}
                         onChange={(e) => emailForm.setValue('newEmail', e.target.value)}
                         disabled={isProcessing}
-                        placeholder="Enter new email"
+                        placeholder="Enter your email"
                     />
                     <Button type="submit" disabled={isProcessing || secondsLeft > 0} className="w-full">
                         {secondsLeft > 0 ? `Wait ${secondsLeft}s` : 'Next'}
@@ -171,8 +177,8 @@ export default function ChangeEmailFlow() {
 
             {step === 3 && (
                 <form onSubmit={codeForm.handleSubmit(handleCodeSubmit)} className="space-y-4">
-                    <div className="text-sm text-center mb-2">
-                        Enter the code sent to your <b>new email</b>: <span className="font-mono">{newEmail}</span>
+                    <div className="text-sm text-secondary-foreground/80 mb-2">
+                        Enter the code sent to your new email: <span className="font-mono">{newEmail}</span>
                     </div>
                     <Input
                         value={codeForm.watch('code')}
