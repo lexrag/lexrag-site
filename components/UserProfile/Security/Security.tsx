@@ -35,7 +35,14 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [open, setOpen] = useState(false);
 
     const phoneUtil = PhoneNumberUtil.getInstance();
-    const formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
+    let formatted: string | null = null;
+    if (phoneNumber) {
+        try {
+            formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
+        } catch (e) {
+            formatted = null;
+        }
+    }
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -106,7 +113,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 }
             >
                 <span>
-                    {phoneNumber ? (
+                    {phoneNumber && formatted ? (
                         formatted
                     ) : (
                         <Badge variant="warning" appearance="outline">
