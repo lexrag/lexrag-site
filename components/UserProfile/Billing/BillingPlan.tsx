@@ -1,8 +1,11 @@
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const BillingPlan = () => {
+    const isFreePlan = true;
+
     return (
         <Card className="w-full">
             <CardContent className="w-full">
@@ -20,8 +23,10 @@ const BillingPlan = () => {
                             </p>
                         </div>
                         <div className="flex gap-2.5">
-                            <Button variant="secondary">Cancel Plan</Button>
-                            <Button>Upgrade Plan</Button>
+                            {!isFreePlan && <Button variant="secondary">Cancel Plan</Button>}
+                            <Link href="/profile/billing/plans">
+                                <Button>Upgrade Plan</Button>
+                            </Link>
                         </div>
                     </div>
                     <div className="flex items-center flex-wrap gap-2 lg:gap-5 w-full">

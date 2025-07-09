@@ -1,7 +1,7 @@
 import PageTitle from '@/components/Layout/PageTitle';
 import BillingPlan from '@/components/UserProfile/Billing/BillingPlan';
-import InvoicesHistory from '@/components/UserProfile/Billing/InvoicesHistory';
 import PaymentMethods from '@/components/UserProfile/Billing/PaymentMethods';
+import PaymentsHistory from '@/components/UserProfile/Billing/PaymentsHistory';
 
 const BillingPage = () => {
     return (
@@ -11,7 +11,7 @@ const BillingPage = () => {
                 <div className="flex flex-col w-full max-w-3xl gap-8 items-center justify-center px-4">
                     <BillingPlan />
                     <PaymentMethods />
-                    <InvoicesHistory />
+                    <PaymentsHistory />
                 </div>
             </div>
         </section>

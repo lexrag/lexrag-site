@@ -1,27 +1,27 @@
 import { Download } from 'lucide-react';
-import { Invoice } from '@/types/Invoice';
+import { Billing } from '@/types/Billing';
 import { statusColor } from '@/types/StatusColor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
 
 interface PaymentRowProps {
-    invoice: Invoice;
+    billing: Billing;
     onDownload?: () => void;
 }
 
-const PaymentRow = ({ invoice, onDownload }: PaymentRowProps) => {
+const PaymentRow = ({ billing, onDownload }: PaymentRowProps) => {
     return (
         <TableRow>
-            <TableCell className="text-sm text-foreground font-normal">{invoice.invoice}</TableCell>
+            <TableCell className="text-sm text-foreground font-normal">{billing.billing}</TableCell>
             <TableCell className="lg:text-end">
-                <Badge variant={statusColor[invoice.status]} appearance="outline" size="md">
-                    {invoice.status}
+                <Badge variant={statusColor[billing.status]} appearance="outline" size="md">
+                    {billing.status}
                 </Badge>
             </TableCell>
-            <TableCell className="text-sm text-foreground font-normal lg:text-end">{invoice.date}</TableCell>
+            <TableCell className="text-sm text-foreground font-normal lg:text-end">{billing.date}</TableCell>
             <TableCell className="text-sm text-secondary-foreground font-normal lg:text-end">
-                {invoice.amount}
+                {billing.amount}
             </TableCell>
             <TableCell>
                 <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={onDownload}>
