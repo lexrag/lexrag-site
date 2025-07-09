@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { toAbsoluteUrl } from '@/lib/helpers';
 import {
@@ -16,7 +17,7 @@ export function WelcomeMessageDialog({ open, onOpenChange }: { open: boolean; on
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-[500px]">
                 <DialogHeader className="border-0">
-                    <DialogTitle></DialogTitle>
+                    <DialogTitle className="sr-only">Welcome Message</DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <DialogBody className="flex flex-col items-center pt-10 pb-10">

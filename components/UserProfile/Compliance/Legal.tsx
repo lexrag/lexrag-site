@@ -6,28 +6,27 @@ import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import Row from '../components/Row';
 import DeleteAccount from './DeleteAccount';
-import DeleteAccountDialog from './DeleteAccountDialog';
 
 const acceptedDate = '2025-07-04';
 
 const Legal = () => {
     const [requested, setRequested] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+    // const [loading, setLoading] = useState(false);
+    // const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
-    const handleDelete = async () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            setDeleteAccountOpen(false);
-        }, 1000);
-    };
+    // const handleDelete = async () => {
+    //     setLoading(true);
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //         setDeleteAccountOpen(false);
+    //     }, 1000);
+    // };
 
     const handleRequest = async () => {
-        setLoading(true);
+        // setLoading(true);
         setTimeout(() => {
             setRequested(true);
-            setLoading(false);
+            // setLoading(false);
         }, 1000);
     };
 

@@ -1,5 +1,51 @@
+# Dependencies
 node_modules
+.pnp
+.pnp.js
+
+# Next.js
 .next
-dist
-public
+out
 build
+dist
+dist-ssr
+
+# Production builds
+*.tgz
+*.tar.gz
+
+# Environment files
+.env*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs
+logs
+*.log
+
+# Coverage
+coverage
+.nyc_output
+
+# Cache
+.cache
+.parcel-cache
+.eslintcache
+.stylelintcache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+
+# Cursor
+.cursor
+
+# Misc
+*.pem

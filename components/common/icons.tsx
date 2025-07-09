@@ -1,6 +1,6 @@
 'use client';
 
-type IconProps = React.HTMLAttributes<SVGElement>;
+export type IconProps = React.HTMLAttributes<SVGElement>;
 
 export const Icons = {
     google: (props: IconProps) => (

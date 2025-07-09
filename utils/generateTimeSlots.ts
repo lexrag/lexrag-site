@@ -1,27 +1,16 @@
-export const generateTimeSlots = (
-    startTime: string = '09:00',
-    endTime: string = '24:00',
-    intervalMinutes: number = 30,
-) => {
+export function generateTimeSlots(startTime: string, endTime: string, intervalMinutes: number = 30): string[] {
     const slots: string[] = [];
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
+    const currentDate = new Date(start);
 
-    let currentDate = new Date();
-    currentDate.setHours(startHour, startMinute, 0);
-
-    const endDate = new Date();
-    endDate.setHours(endHour, endMinute, 0);
-
-    while (currentDate <= endDate) {
-        const hours = currentDate.getHours().toString().padStart(2, '0');
-        const minutes = currentDate.getMinutes().toString().padStart(2, '0');
-        slots.push(`${hours}:${minutes}`);
+    while (currentDate <= end) {
+        slots.push(currentDate.toTimeString().slice(0, 5));
         currentDate.setMinutes(currentDate.getMinutes() + intervalMinutes);
     }
 
     return slots;
-};
+}
 
 export const generateYears = (startYear: number = 1940, endYear: number = 2025) => {
     const years: number[] = [];

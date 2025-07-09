@@ -1,22 +1,22 @@
 'use client';
 
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import { SortState } from '@/types/SortState';
-import { Button } from '@/components/ui/button';
-import { Card, CardFooter, CardHeader, CardTable, CardToolbar } from '@/components/ui/card';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+// import { SortState } from '@/types/SortState';
+// import { Button } from '@/components/ui/button';
+import { Card, CardFooter, CardHeader, CardTable } from '@/components/ui/card';
+// import {
+//     DropdownMenu,
+//     DropdownMenuContent,
+//     DropdownMenuItem,
+//     DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { COLUMNS } from '../../constants/COLUMNS';
-import { DEVICES } from '../../constants/DEVICES';
+// import { COLUMNS } from '../../constants/COLUMNS';
+// import { DEVICES } from '../../constants/DEVICES';
 import { SESSIONS } from '../../constants/SESSIONS';
-import DeviceTableRow from './components/DeviceTableRow';
+// import DeviceTableRow from './components/DeviceTableRow';
 import DeviceTableHeader from './components/TableHeader';
 import TablePagination from './components/TablePagination';
 

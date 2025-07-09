@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { toAbsoluteUrl } from '@/lib/helpers';
 import {
@@ -16,7 +17,7 @@ export function AccountDeactivatedDialog({ open, onOpenChange }: { open: boolean
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="w-full max-w-[500px] max-h-[95%] scrollable-y-auto">
                 <DialogHeader className="justify-end border-0 pt-5">
-                    <DialogTitle></DialogTitle>
+                    <DialogTitle className="sr-only">Account Deactivated</DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <DialogBody className="flex flex-col items-center pt-0 pb-10">

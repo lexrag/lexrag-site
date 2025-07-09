@@ -1,9 +1,9 @@
+import React from 'react';
 import getMeServer from '@/api/auth/getMeServer';
 import { User } from '@/types/User';
 import PageTitle from '@/components/Layout/PageTitle';
 import LoginSessions from '@/components/UserProfile/Security/LoginSessions';
 import Security from '@/components/UserProfile/Security/Security';
-import PasswordReset from '@/components/UserProfile/Settings/PasswordReset';
 
 const SecurityPage = async () => {
     const currentUser: User = await getMeServer();
