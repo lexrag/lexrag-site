@@ -36,6 +36,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         if (currentResponseContent !== '') {
             setCurrentResponseContent('');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages]);
 
     useEffect(() => {

@@ -11,11 +11,9 @@ import {
     FileText,
     Mail,
     MessageSquare,
-    Plus,
     Send,
     Settings,
     Trash,
-    Upload,
 } from 'lucide-react';
 import { MenuItem } from '@/types/MenuItem';
 

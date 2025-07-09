@@ -39,7 +39,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
     if (phoneNumber) {
         try {
             formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
-        } catch (e) {
+        } catch {
             formatted = null;
         }
     }
@@ -69,7 +69,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 toast.error('Failed to update phone number');
             }
             setOpenPhoneNumber(false);
-        } catch (error) {
+        } catch {
             toast.error('Failed to update phone number');
             setPhoneNumber(prevPhoneNumber || '');
             setOpenPhoneNumber(false);

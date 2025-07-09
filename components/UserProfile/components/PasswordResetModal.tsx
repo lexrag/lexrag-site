@@ -40,6 +40,7 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
             setSuccess(null);
             setError(null);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open]);
 
     const onSubmit = async (data: ResetPasswordSchemaType) => {
@@ -55,8 +56,8 @@ const PasswordResetModal = ({ open, onOpenChange, onSuccess }: PasswordResetModa
             form.reset();
             if (onSuccess) onSuccess();
             if (onOpenChange) onOpenChange(false);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+        } catch {
+            setError('An unexpected error occurred.');
         } finally {
             setIsProcessing(false);
         }

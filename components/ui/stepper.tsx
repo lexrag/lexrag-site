@@ -125,6 +125,7 @@ function Stepper({
             triggerNodes,
             indicators,
         }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [currentStep, handleSetActiveStep, children, orientation, registerTrigger, triggerNodes],
     );
 
@@ -204,11 +205,13 @@ function StepperTrigger({ asChild = false, className, children, tabIndex, ...pro
         if (btnRef.current) {
             registerTrigger(btnRef.current);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [btnRef.current]);
 
     // Find our index among triggers for navigation
     const myIdx = React.useMemo(
         () => triggerNodes.findIndex((n: HTMLButtonElement) => n === btnRef.current),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [triggerNodes, btnRef.current],
     );
 
