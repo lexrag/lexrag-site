@@ -1,38 +1,59 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { genRandomTree } from '@/utils/genRandomTree';
 import { useTheme } from 'next-themes';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
-export function genRandomTree(N = 300, reverse = false) {
-    return {
-        nodes: [...Array(N).keys()].map((i) => ({ id: i })),
-        links: [...Array(N).keys()]
-            .filter((id) => id)
-            .map((id) => ({
-                [reverse ? 'target' : 'source']: id,
-                [reverse ? 'source' : 'target']: Math.round(Math.random() * (id - 1)),
-                color: '#007AFF',
-            })),
-    };
-}
-
 interface ChatGraph3DProps {
-    isFullScreen: boolean;
+    height?: number;
+    width?: number;
 }
 
-const ChatGraph3D = ({ isFullScreen }: ChatGraph3DProps) => {
+const ChatGraph3D = ({ height, width }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
-
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    const fullData = useMemo(() => genRandomTree(300, true), []);
+    const rootId = 0;
+
+    const nodesById = useMemo(() => {
+        const map = Object.fromEntries(fullData.nodes.map((node) => [node.id, node]));
+        fullData.nodes.forEach((node) => {
+            node.collapsed = Math.random() < 0.2;
+            node.childLinks = [];
+        });
+        fullData.links.forEach((link) => {
+            const source = typeof link.source === 'object' ? link.source.id : link.source;
+            map[source].childLinks.push(link);
+        });
+        return map;
+    }, [fullData]);
+
+    const getPrunedTree = useCallback(() => {
+        const visibleNodes = [];
+        const visibleLinks: any[] = [];
+        (function traverse(node = nodesById[rootId]) {
+            visibleNodes.push(node);
+            if (node.collapsed) return;
+            node.childLinks.forEach((link) => {
+                visibleLinks.push(link);
+                const child = typeof link.target === 'object' ? link.target : nodesById[link.target];
+                traverse(child);
+            });
+        })();
+        return { nodes: visibleNodes, links: visibleLinks };
+    }, [nodesById]);
+
+    const [prunedTree, setPrunedTree] = useState(getPrunedTree());
 
     useEffect(() => {
         const updateDimensions = () => {
             setDimensions({
-                width: window.innerWidth * (isFullScreen ? 0.9 : 0.6) - 24,
-                height: window.innerHeight * (isFullScreen ? 0.9 : 0.6) - 24,
+                width: window.innerWidth * 0.9 - 24,
+                height: window.innerHeight * 0.9 - 24,
             });
         };
 
@@ -40,25 +61,27 @@ const ChatGraph3D = ({ isFullScreen }: ChatGraph3DProps) => {
         window.addEventListener('resize', updateDimensions);
 
         return () => window.removeEventListener('resize', updateDimensions);
-    }, [isFullScreen]);
-
-    const data = genRandomTree();
+    }, []);
 
     return (
-        <div>
-            {dimensions.width > 0 && dimensions.height > 0 && (
-                <ForceGraph3D
-                    width={dimensions.width}
-                    height={dimensions.height}
-                    graphData={data}
-                    backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
-                    nodeAutoColorBy="group"
-                    linkDirectionalParticles={2}
-                    linkDirectionalParticleSpeed={() => 0.005}
-                    nodeLabel={(node) => `${node.id}`}
-                />
-            )}
-        </div>
+        <ForceGraph3D
+            width={width || dimensions.width}
+            height={height || dimensions.height}
+            graphData={prunedTree}
+            backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
+            nodeAutoColorBy="group"
+            linkDirectionalParticles={2}
+            linkDirectionalParticleSpeed={() => 0.005}
+            nodeLabel={(node) => `${node.id}`}
+            nodeColor={(node) => (!node.childLinks.length ? 'green' : node.collapsed ? 'red' : 'yellow')}
+            onNodeClick={(node, event) => {
+                event.preventDefault?.();
+                event.stopPropagation?.();
+
+                node.collapsed = !node.collapsed;
+                setPrunedTree(getPrunedTree());
+            }}
+        />
     );
 };
 

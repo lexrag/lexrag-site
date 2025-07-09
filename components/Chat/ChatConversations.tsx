@@ -13,7 +13,7 @@ interface ChatConversationsProps {
 
 const ChatConversations = ({ conversations, onDeleteConversation }: ChatConversationsProps) => {
     return (
-        <Card className="h-full rounded-none border-0">
+        <Card className="rounded-none border-0 shadow-none">
             <CardHeader className="border-none p-3">
                 <div className="w-full flex items-center justify-between gap-5">
                     <Input placeholder="Search" />

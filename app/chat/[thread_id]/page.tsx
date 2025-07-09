@@ -4,15 +4,15 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { Menu, Network } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ClockArrowDown, ClockArrowUp, Expand, Menu, MessageSquare, Network, Rows3 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatBox from '@/components/Chat/ChatBox';
-import ChatConversations from '@/components/Chat/ChatConversations';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
+import ChatLeftPanel from '@/components/Chat/ChatLeftPanel';
 import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
+import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
-import HeaderCornerMenu from '@/components/Header/HeaderCornerMenu';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
@@ -20,6 +20,8 @@ export default function ChatPage() {
     const router = useRouter();
     const { socket, conversations, setConversations } = useChatContext();
 
+    const [rightPanelView, setRightPanelView] = useState<string>('card');
+    const [graphView, setGraphView] = useState<string>('2d');
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
@@ -33,15 +35,54 @@ export default function ChatPage() {
         }
     };
 
+    if (!socket) return null;
+
     return (
         <div className="flex flex-col h-screen w-full">
-            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} />
-            <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2">
-                <div className="w-1/4 flex justify-end">
+            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} graphView={graphView} />
+            <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
+                <div className="w-1/4 flex items-center justify-between">
+                    <Tabs defaultValue="chats">
+                        <TabsList className="w-fit grid grid-cols-3">
+                            <TabsTrigger value="chats" className="text-[12px] py-1 px-2">
+                                <MessageSquare />
+                            </TabsTrigger>
+                            <TabsTrigger value="1" className="text-[12px] py-1 px-2">
+                                <ClockArrowDown />
+                            </TabsTrigger>
+                            <TabsTrigger value="2" className="text-[12px] py-1 px-2">
+                                <ClockArrowUp />
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
-                <div className="w-1/4 flex justify-start">
-                    <HeaderCornerMenu />
+                <div className="w-1/4 flex items-center justify-start gap-2">
+                    <Tabs value={rightPanelView} onValueChange={setRightPanelView}>
+                        <TabsList className="w-fit grid grid-cols-2">
+                            <TabsTrigger value="card" className="text-[12px] py-1 px-2">
+                                <Rows3 />
+                            </TabsTrigger>
+                            <TabsTrigger value="graph" className="text-[12px] py-1 px-2">
+                                <Network />
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                    {rightPanelView === 'graph' && (
+                        <>
+                            <Tabs value={graphView} onValueChange={setGraphView}>
+                                <TabsList className="w-fit grid grid-cols-2">
+                                    <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                        2D
+                                    </TabsTrigger>
+                                    <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                        3D
+                                    </TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                            <Expand onClick={() => setIsOpenGraphModal(true)} />
+                        </>
+                    )}
                 </div>
             </header>
             <header className="w-full flex md:hidden items-center justify-between pt-2 px-2">
@@ -56,44 +97,19 @@ export default function ChatPage() {
                 handleDeleteConversation={onDeleteConversation}
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
-            <main className="flex flex-1 overflow-hidden pb-4">
-                <aside className="w-1/4 hidden md:block overflow-y-auto pt-10">
-                    <ChatConversations conversations={conversations} onDeleteConversation={onDeleteConversation} />
-                </aside>
+            <main className="flex flex-1 overflow-hidden pb-4 z-40">
+                <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} />
 
                 <section className="flex-1 flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto">
-                        {socket ? (
-                            <ChatBox socket={socket} setConversations={setConversations} />
-                        ) : (
-                            <div className="flex items-center justify-center h-full">
-                                <h5 className="text-muted-foreground">Connecting...</h5>
-                            </div>
-                        )}
+                        <ChatBox socket={socket} setConversations={setConversations} />
                     </div>
                 </section>
 
-                <aside className="w-1/4 hidden md:block overflow-y-auto pt-10">
-                    <Card className="h-full rounded-none border-0 shadow-none">
-                        <CardContent className="p-0 pt-4">
-                            <div
-                                className="flex items-center gap-2 py-2 px-3 text-sm hover:bg-muted cursor-pointer rounded-md transition-colors"
-                                onClick={() => setIsOpenGraphModal(true)}
-                            >
-                                <Network />
-                                Open Graph
-                            </div>
-                        </CardContent>
-                    </Card>
-                </aside>
+                <ChatRightPanel panelView={rightPanelView} graphView={graphView} />
             </main>
             <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
-                <div className="w-1/4 flex justify-end">
-                    <div className="flex order-2 md:order-1 gap-2 font-normal text-2sm">
-                        <span className="text-gray-600 dark:text-gray-600">© {new Date().getFullYear()}</span>
-                        <span className="text-gray-600 dark:text-gray-600">LEXRAG PTE LTD</span>
-                    </div>
-                </div>
+                <div className="w-1/4" />
                 <div className="w-1/4 flex justify-start">
                     <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
                         <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
