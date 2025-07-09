@@ -13,7 +13,7 @@ const middleware = async (req: NextRequest) => {
     const cookiesStore = await cookies();
     const session = cookiesStore.get('token')?.value;
 
-    const jwtPayload = await decrypt(session);
+    const jwtPayload = await decrypt(session || '');
 
     const response = NextResponse.next();
 

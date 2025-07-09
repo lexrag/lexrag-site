@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getEmailChangeCode } from '@/api/auth/getEmailChangeCode';
 import { validatePassword } from '@/api/auth/validatePassword';
 import { verifyEmailChangeCode } from '@/api/auth/verifyEmailChangeCode';
+import { clearServerCache } from '@/utils/auth/decodeAccessToken';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -123,6 +124,7 @@ export default function ChangeEmailFlow() {
             toast.success('Email changed successfully');
             localStorage.removeItem('resendDisabledUntil');
             localStorage.removeItem('token');
+            clearServerCache('token');
             router.push('/');
         } catch (err) {
             if (err instanceof Error) {
