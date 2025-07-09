@@ -1,11 +1,11 @@
-import getMeServer from '@/api/auth/getMeServer';
+import getUserInfoServer from '@/api/auth/getUserInfoServer';
 import { User } from '@/types/User';
 import PageTitle from '@/components/Layout/PageTitle';
 import Other from '@/components/UserProfile/Other';
 import PersonalInfoCard from '@/components/UserProfile/PersonalInfoCard';
 
 const UserProfilePage = async () => {
-    const currentUser: User = await getMeServer();
+    const currentUser: User = await getUserInfoServer();
 
     return (
         <section className="flex flex-col items-center justify-center bg-background">
