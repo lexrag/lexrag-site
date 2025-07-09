@@ -62,7 +62,7 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 toast.error('Failed to update phone number');
             }
             setOpenPhoneNumber(false);
-        } catch (error) {
+        } catch {
             toast.error('Failed to update phone number');
             setPhoneNumber(prevPhoneNumber || '');
             setOpenPhoneNumber(false);

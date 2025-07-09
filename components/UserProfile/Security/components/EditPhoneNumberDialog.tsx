@@ -35,13 +35,13 @@ const EditPhoneNumberDialog = ({
                 toast.error('Please enter a valid phone number');
                 return;
             }
-        } catch (error) {
+        } catch {
             toast.error('Please enter a valid phone number');
             return;
         }
         try {
             onSave(phoneNumber);
-        } catch (error) {
+        } catch {
             setPhoneNumber(currentPhoneNumber);
         }
     };
