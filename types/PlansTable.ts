@@ -27,6 +27,6 @@ export interface PlansRowProps {
 
 export interface PlanButton {
     label: string;
-    variant: 'primary' | 'outline' | 'ghost';
+    variant: 'primary' | 'outline';
     disabled: boolean;
 }

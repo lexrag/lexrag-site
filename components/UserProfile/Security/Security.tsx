@@ -17,7 +17,7 @@ import ReusableDialog from '@/components/common/ReusableDialog';
 import PasswordResetModal from '@/components/UserProfile/components/PasswordResetModal';
 import Row from '@/components/UserProfile/components/Row';
 import ChangeEmailFlow from '@/components/UserProfile/Security/components/ChangeEmailFlow';
-import EditPhoneNumberDialog from '@/components/UserProfile/Security/components/EditPhoneNumberDialog';
+import ChangePhoneNumberFlow from '@/components/UserProfile/Security/components/ChangePhoneNumberFlow';
 
 interface AuthenticationProps {
     currentUser: User;
@@ -65,10 +65,10 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
             const res = await updatePhoneNumber(newPhoneNumber);
             if (res.success) {
                 toast.success('Phone number updated');
+                setOpenPhoneNumber(false);
             } else {
                 toast.error('Failed to update phone number');
             }
-            setOpenPhoneNumber(false);
         } catch {
             toast.error('Failed to update phone number');
             setPhoneNumber(prevPhoneNumber || '');
@@ -151,12 +151,13 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                     onOpenChange={setResetOpen}
                     onSuccess={() => setPasswordLastChangedAt(new Date().toISOString())}
                 />
-                <EditPhoneNumberDialog
+
+                <ChangePhoneNumberFlow
                     open={openPhoneNumber}
                     onOpenChange={setOpenPhoneNumber}
-                    onSave={handlePhoneNumberSave}
+                    onSuccess={handlePhoneNumberSave}
                     loading={loading}
-                    currentPhoneNumber={phoneNumber}
+                    currentPhoneNumber={phoneNumber || ''}
                 />
             </Row>
         </CardWrapper>
