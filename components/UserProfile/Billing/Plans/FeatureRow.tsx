@@ -18,15 +18,7 @@ function FeatureRow({ feature }: FeatureRowProps) {
                         (idx === PLANS.length - 1 ? ' border-e' : '')
                     }
                 >
-                    {typeof value === 'string' ? (
-                        value === 'Yes' ? (
-                            <Check className="text-green-500 text-lg" />
-                        ) : value === 'No' ? null : (
-                            <div className="text-foreground text-sm">{value}</div>
-                        )
-                    ) : (
-                        value
-                    )}
+                    {typeof value === 'boolean' ? value ? <Check className="text-green-500 text-lg" /> : null : value}
                 </TableCell>
             ))}
         </TableRow>

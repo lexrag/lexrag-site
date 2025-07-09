@@ -9,7 +9,6 @@ export function mapPlans(PLANS: Plan[]): Plan[] {
         button: {
             label: idx === 0 ? 'Switch' : 'Upgrade',
             variant: (idx === 0 ? 'outline' : 'primary') as 'primary' | 'outline',
-            disabled: idx === 0,
         },
     }));
 }

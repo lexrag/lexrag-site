@@ -28,5 +28,5 @@ export interface PlansRowProps {
 export interface PlanButton {
     label: string;
     variant: 'primary' | 'outline';
-    disabled: boolean;
+    disabled?: boolean;
 }

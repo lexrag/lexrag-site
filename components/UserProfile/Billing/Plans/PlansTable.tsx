@@ -17,7 +17,7 @@ function PlansTable() {
         <Table className="w-full caption-bottom text-foreground text-sm table-fixed border-separate border-spacing-0 mt-3 min-w-4xl rounded-xl">
             <TableBody>
                 <TableRow className="border-b transition-colors">
-                    <TableCell className="p-4 border-b-0 align-bottom pt-7.5 pb-6 ">
+                    <TableCell className="p-4 border-b-0 align-bottom pt-7.5 pb-6 no-hover-effect">
                         <div className="flex items-center space-x-2">
                             <SwitchWrapper>
                                 <Switch checked={annual} onCheckedChange={setAnnual} />

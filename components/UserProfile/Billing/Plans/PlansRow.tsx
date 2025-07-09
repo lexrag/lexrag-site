@@ -29,10 +29,10 @@ function PlansRow({ plan, idx, annual }: PlansRowProps) {
             <div className="text-secondary-foreground text-sm">{plan.description}</div>
             <div className="py-4">
                 <h4 className="text-2xl font-semibold leading-none">{annual ? plan.priceAnnual : plan.priceMonthly}</h4>
-                {plan.name !== 'Basic' && <div className="text-secondary-foreground text-xs">per month</div>}
+                <div className="text-secondary-foreground text-xs">per month</div>
             </div>
             <Button
-                variant={plan.button?.variant as 'primary' | 'outline' | 'ghost'}
+                variant={plan.button?.variant as 'primary' | 'outline'}
                 className="w-full justify-center"
                 disabled={plan.button?.disabled}
             >
