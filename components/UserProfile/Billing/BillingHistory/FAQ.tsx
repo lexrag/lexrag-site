@@ -38,7 +38,7 @@ const FAQ = () => {
     return (
         <>
             <CardWrapper title={'FAQ'} className="w-full">
-                <Accordion type="single" collapsible defaultValue={FAQ_QUESTIONS[1].value} className="w-full ">
+                <Accordion type="single" collapsible className="w-full ">
                     {FAQ_QUESTIONS.map(({ value, question, answer }) => (
                         <AccordionItem value={value} key={value} className="px-4">
                             <AccordionTrigger className="text-left font-semibold">{question}</AccordionTrigger>

@@ -1,7 +1,6 @@
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { FeatureRowProps } from '@/types/PlansTable';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { PLANS } from '../../constants/PLANS';
 
 function FeatureRow({ feature }: FeatureRowProps) {
     return (
@@ -15,10 +14,18 @@ function FeatureRow({ feature }: FeatureRowProps) {
                     className={
                         'p-4 align-middle border-b border-s px-5 py-3.5 border' +
                         (idx === 0 ? ' bg-muted/40' : '') +
-                        (idx === PLANS.length - 1 ? ' border-e' : '')
+                        (idx === feature.values.length - 1 ? ' border-e' : '')
                     }
                 >
-                    {typeof value === 'boolean' ? value ? <Check className="text-green-500 text-lg" /> : null : value}
+                    {typeof value === 'boolean' ? (
+                        value ? (
+                            <Check className="text-green-500 text-lg" />
+                        ) : (
+                            <X className="text-red-500 text-lg" />
+                        )
+                    ) : (
+                        value
+                    )}
                 </TableCell>
             ))}
         </TableRow>

@@ -2,11 +2,29 @@ export interface Plan {
     id: string;
     name: string;
     description?: string;
-    priceMonthly?: string;
-    priceAnnual?: string;
+    price: number;
     isCurrent?: boolean;
-    badge?: string;
     button?: PlanButton;
+}
+
+export interface Tariff {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    storage: number;
+    team_members: number;
+    support_type: string;
+    analytics_type: string;
+    api_access: boolean;
+    mobile_app_access: boolean;
+    custom_domain: boolean;
+    duration: number;
+}
+
+export interface PlansTableProps {
+    currentPlanId: string;
+    onChangePlan: (planId: string) => void;
 }
 
 export interface Feature {
@@ -22,7 +40,8 @@ export interface FeatureRowProps {
 export interface PlansRowProps {
     plan: Plan;
     idx: number;
-    annual: boolean;
+    currentPlanId: string;
+    onChangePlan: (planId: string) => void;
 }
 
 export interface PlanButton {
