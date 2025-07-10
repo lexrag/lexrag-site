@@ -1,23 +1,30 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-import { useChat } from '@/api/chat/chatApi';
-import { Conversation } from '@/types/Conversation';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Copy, CopyCheck, Network } from 'lucide-react';
+import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import BouncingBall from './BouncingBall';
 
 interface ChatBoxProps {
-    socket: WebSocket;
-    setConversations: Dispatch<SetStateAction<Conversation[]>>;
+    messages: Message[];
+    isThinking: boolean;
+    currentResponseContent: string;
+    copiedMessageId: string | null;
+    sendMessage: (input: string, isNew: boolean) => void;
+    copyToClipboard: (messageId: string, text: string) => void;
+    handleCurrentRelevantContext: Dispatch<SetStateAction<any>>;
 }
 
-const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
-    const { messages, isThinking, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } = useChat({
-        websocket: socket,
-        setConversations,
-    });
-
+const ChatBox = ({
+    messages,
+    isThinking,
+    currentResponseContent,
+    copiedMessageId,
+    sendMessage,
+    copyToClipboard,
+    handleCurrentRelevantContext,
+}: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -69,14 +76,12 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                     dangerouslySetInnerHTML={{ __html: msg.html ?? '' }}
                                 ></div>
                                 <div
-                                    className={`flex space-x-2 transition-opacity duration-250 ${
+                                    className={`flex space-x-2 transition-opacity duration-250 pt-1 ${
                                         hoveredMessageId === msg.id ? 'opacity-100 visible' : 'opacity-0 invisible'
                                     }`}
                                 >
                                     <button
                                         className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary"
-                                        type="button"
-                                        aria-label="Copy"
                                         onClick={() => {
                                             let copyText = msg.content;
                                             try {
@@ -87,12 +92,20 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                             copyToClipboard(msg.id, copyText);
                                         }}
                                     >
-                                        <i
-                                            className={`ki-outline ${
-                                                copiedMessageId === msg.id ? 'ki-double-check' : 'ki-copy'
-                                            } text-sm`}
-                                        />
+                                        {copiedMessageId === msg.id ? (
+                                            <CopyCheck className="size-4" />
+                                        ) : (
+                                            <Copy className="size-4" />
+                                        )}
                                     </button>
+                                    {msg.direction === 'incoming' && (
+                                        <button className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary">
+                                            <Network
+                                                className="size-4"
+                                                onClick={() => handleCurrentRelevantContext(msg.relevantContext)}
+                                            />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>

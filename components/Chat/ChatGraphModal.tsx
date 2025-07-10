@@ -1,51 +1,42 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
-import { Expand, Shrink } from 'lucide-react';
 import DialogContent, { Dialog, DialogBody, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Switch } from '../ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import ChatGraph2D from './ChatGraph2D';
 import ChatGraph3D from './ChatGraph3D';
 
 interface ChatGraphModalProps {
     open: boolean;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
+    graphView: string;
+    currentRelevantContext: any;
 }
 
-const ChatGraphModal = ({ open, onOpenChange }: ChatGraphModalProps) => {
+const ChatGraphModal = ({ open, onOpenChange, graphView, currentRelevantContext }: ChatGraphModalProps) => {
     const direction = useDirection();
-
-    const [graphType, setGraphType] = useState<string>('2d');
-    const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (!open) {
-            setGraphType('2d');
-            setIsFullScreen(false);
-        }
-    }, [open]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-fit" dir={direction}>
-                <DialogHeader className="flex-row items-center gap-2">
-                    <DialogTitle className="sr-only">Chat Graph Modal</DialogTitle>
-                    {isFullScreen ? (
-                        <Shrink onClick={() => setIsFullScreen(false)} />
-                    ) : (
-                        <Expand onClick={() => setIsFullScreen(true)} />
-                    )}
-                    <div className="flex items-center gap-2 justify-between">
-                        2D
-                        <Switch size="sm" onCheckedChange={(chacked) => setGraphType(chacked ? '3d' : '2d')} />
-                        3D
-                    </div>
-                </DialogHeader>
-                <DialogBody>
-                    {graphType === '2d' && <ChatGraph2D isFullScreen={isFullScreen} />}
-                    {graphType === '3d' && <ChatGraph3D isFullScreen={isFullScreen} />}
-                </DialogBody>
+                <Tabs defaultValue={graphView} className="w-full text-sm text-muted-foreground">
+                    <DialogHeader className="flex-row items-center gap-2">
+                        <DialogTitle className="sr-only">Chat Graph Modal</DialogTitle>
+                        <TabsList className="grid w-fit grid-cols-2">
+                            <TabsTrigger value="2d">2D</TabsTrigger>
+                            <TabsTrigger value="3d">3D</TabsTrigger>
+                        </TabsList>
+                    </DialogHeader>
+                    <DialogBody>
+                        <TabsContent value="2d">
+                            <ChatGraph2D data={currentRelevantContext} />
+                        </TabsContent>
+                        <TabsContent value="3d">
+                            <ChatGraph3D data={currentRelevantContext} />
+                        </TabsContent>
+                    </DialogBody>
+                </Tabs>
             </DialogContent>
         </Dialog>
     );
