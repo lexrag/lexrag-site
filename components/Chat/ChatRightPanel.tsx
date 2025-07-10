@@ -7,7 +7,7 @@ import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 interface ChatRightPanelProps {
-    currentRelevantContext: string;
+    currentRelevantContext: any;
     panelView: string;
     graphView: string;
 }
@@ -63,7 +63,7 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                     <CardContent className="p-0 pt-4 px-2">
                         {panelView === 'card' && (
                             <Accordion type="multiple" className="w-full">
-                                {currentRelevantContext?.nodes?.map((node) => (
+                                {currentRelevantContext.nodes.map((node: any) => (
                                     <AccordionItem key={node.id} value={node.id}>
                                         <AccordionTrigger>
                                             <div className="text-left">

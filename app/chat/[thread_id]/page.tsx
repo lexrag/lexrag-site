@@ -55,6 +55,7 @@ export default function ChatPage() {
                 onOpenChange={setIsOpenGraphModal}
                 graphView={graphView}
                 currentRelevantContext={currentRelevantContext}
+                handleCurrentRelevantContext={setCurrentRelevantContext}
             />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
                 <div className="w-1/4 flex items-center justify-between">
