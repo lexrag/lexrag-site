@@ -63,31 +63,32 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                     <CardContent className="p-0 pt-4 px-2">
                         {panelView === 'card' && (
                             <Accordion type="multiple" className="w-full">
-                                {currentRelevantContext.nodes.map((node: any) => (
-                                    <AccordionItem key={node.id} value={node.id}>
-                                        <AccordionTrigger>
-                                            <div className="text-left">
-                                                <div className="font-semibold">{node.labels?.[0] ?? 'Node'}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {node.number && `№ ${node.number}`}{' '}
-                                                    {node.neutralCitation && `— ${node.neutralCitation}`}
+                                {currentRelevantContext &&
+                                    currentRelevantContext.nodes.map((node: any) => (
+                                        <AccordionItem key={node.id} value={node.id}>
+                                            <AccordionTrigger>
+                                                <div className="text-left">
+                                                    <div className="font-semibold">{node.labels?.[0] ?? 'Node'}</div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {node.number && `№ ${node.number}`}{' '}
+                                                        {node.neutralCitation && `— ${node.neutralCitation}`}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </AccordionTrigger>
-                                        <AccordionContent className="whitespace-pre-wrap">
-                                            {/* {node.date && (
+                                            </AccordionTrigger>
+                                            <AccordionContent className="whitespace-pre-wrap">
+                                                {/* {node.date && (
                                                 <div className="text-sm mb-2 text-muted-foreground">
                                                     Date: {new Date(node.date).toLocaleDateString()}
                                                 </div>
                                             )} */}
-                                            {node.semanticSection && (
-                                                <div className="text-sm mb-2 text-muted-foreground">
-                                                    Section: {node.semanticSection}
-                                                </div>
-                                            )}
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                ))}
+                                                {node.semanticSection && (
+                                                    <div className="text-sm mb-2 text-muted-foreground">
+                                                        Section: {node.semanticSection}
+                                                    </div>
+                                                )}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
                             </Accordion>
                         )}
 
