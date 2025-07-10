@@ -1,24 +1,30 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-import { useChat } from '@/api/chat/chatApi';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Copy, CopyCheck, Network } from 'lucide-react';
-import { Conversation } from '@/types/Conversation';
+import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import BouncingBall from './BouncingBall';
 
 interface ChatBoxProps {
-    socket: WebSocket;
-    setConversations: Dispatch<SetStateAction<Conversation[]>>;
+    messages: Message[];
+    isThinking: boolean;
+    currentResponseContent: string;
+    copiedMessageId: string | null;
+    sendMessage: (input: string, isNew: boolean) => void;
+    copyToClipboard: (messageId: string, text: string) => void;
+    handleCurrentRelevantContext: Dispatch<SetStateAction<any>>;
 }
 
-const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
-    const { messages, isThinking, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } = useChat({
-        websocket: socket,
-        setConversations,
-    });
-
+const ChatBox = ({
+    messages,
+    isThinking,
+    currentResponseContent,
+    copiedMessageId,
+    sendMessage,
+    copyToClipboard,
+    handleCurrentRelevantContext,
+}: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -94,7 +100,10 @@ const ChatBox = ({ socket, setConversations }: ChatBoxProps) => {
                                     </button>
                                     {msg.direction === 'incoming' && (
                                         <button className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary">
-                                            <Network className="size-4" />
+                                            <Network
+                                                className="size-4"
+                                                onClick={() => handleCurrentRelevantContext(msg.relevantContext)}
+                                            />
                                         </button>
                                     )}
                                 </div>

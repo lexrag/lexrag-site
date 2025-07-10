@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { ClockArrowDown, ClockArrowUp, Expand, Menu, MessageSquare, Network, Rows3 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,12 +20,22 @@ export default function ChatPage() {
     const pathname = usePathname();
     const router = useRouter();
     const { socket, conversations, setConversations } = useChatContext();
+    const { messages, isThinking, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } = useChat({
+        websocket: socket,
+        setConversations,
+    });
 
     const [rightPanelView, setRightPanelView] = useState<string>('card');
     const [graphView, setGraphView] = useState<string>('2d');
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
+    const [currentRelevantContext, setCurrentRelevantContext] = useState<any>();
+
+    useEffect(() => {
+        const message = [...messages].reverse().find(({ direction }) => direction === 'incoming');
+        setCurrentRelevantContext(message?.relevantContext);
+    }, [messages]);
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
@@ -39,7 +50,12 @@ export default function ChatPage() {
 
     return (
         <div className="flex flex-col h-screen w-full">
-            <ChatGraphModal open={isOpenGraphModal} onOpenChange={setIsOpenGraphModal} graphView={graphView} />
+            <ChatGraphModal
+                open={isOpenGraphModal}
+                onOpenChange={setIsOpenGraphModal}
+                graphView={graphView}
+                currentRelevantContext={currentRelevantContext}
+            />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
                 <div className="w-1/4 flex items-center justify-between">
                     <Tabs defaultValue="chats">
@@ -60,10 +76,18 @@ export default function ChatPage() {
                 <div className="w-1/4 flex items-center justify-start gap-2">
                     <Tabs value={rightPanelView} onValueChange={setRightPanelView}>
                         <TabsList className="w-fit grid grid-cols-2">
-                            <TabsTrigger value="card" className="text-[12px] py-1 px-2">
+                            <TabsTrigger
+                                value="card"
+                                disabled={pathname === '/chat/new'}
+                                className="text-[12px] py-1 px-2"
+                            >
                                 <Rows3 />
                             </TabsTrigger>
-                            <TabsTrigger value="graph" className="text-[12px] py-1 px-2">
+                            <TabsTrigger
+                                value="graph"
+                                disabled={pathname === '/chat/new'}
+                                className="text-[12px] py-1 px-2"
+                            >
                                 <Network />
                             </TabsTrigger>
                         </TabsList>
@@ -102,11 +126,23 @@ export default function ChatPage() {
 
                 <section className="flex-1 flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto">
-                        <ChatBox socket={socket} setConversations={setConversations} />
+                        <ChatBox
+                            messages={messages}
+                            isThinking={isThinking}
+                            currentResponseContent={currentResponseContent}
+                            copiedMessageId={copiedMessageId}
+                            sendMessage={sendMessage}
+                            copyToClipboard={copyToClipboard}
+                            handleCurrentRelevantContext={setCurrentRelevantContext}
+                        />
                     </div>
                 </section>
 
-                <ChatRightPanel panelView={rightPanelView} graphView={graphView} />
+                <ChatRightPanel
+                    currentRelevantContext={currentRelevantContext}
+                    panelView={rightPanelView}
+                    graphView={graphView}
+                />
             </main>
             <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
                 <div className="w-1/4" />

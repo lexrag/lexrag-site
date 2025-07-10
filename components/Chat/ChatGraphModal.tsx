@@ -11,9 +11,10 @@ interface ChatGraphModalProps {
     open: boolean;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
     graphView: string;
+    currentRelevantContext: any;
 }
 
-const ChatGraphModal = ({ open, onOpenChange, graphView }: ChatGraphModalProps) => {
+const ChatGraphModal = ({ open, onOpenChange, graphView, currentRelevantContext }: ChatGraphModalProps) => {
     const direction = useDirection();
 
     return (
@@ -29,10 +30,10 @@ const ChatGraphModal = ({ open, onOpenChange, graphView }: ChatGraphModalProps) 
                     </DialogHeader>
                     <DialogBody>
                         <TabsContent value="2d">
-                            <ChatGraph2D />
+                            <ChatGraph2D data={currentRelevantContext} />
                         </TabsContent>
                         <TabsContent value="3d">
-                            <ChatGraph3D />
+                            <ChatGraph3D data={currentRelevantContext} />
                         </TabsContent>
                     </DialogBody>
                 </Tabs>

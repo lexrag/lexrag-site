@@ -20,6 +20,7 @@ export const getConversationSnapshot = async (threadId: string) => {
             content: m.data.content,
             direction: m.type === 'human' ? 'outgoing' : 'incoming',
             html: await renderMessageMd(m.data.content),
+            relevantContext: m.relevant_context
         })),
     );
 };

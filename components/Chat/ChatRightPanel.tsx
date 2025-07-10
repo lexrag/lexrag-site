@@ -7,17 +7,23 @@ import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 interface ChatRightPanelProps {
+    currentRelevantContext: string;
     panelView: string;
     graphView: string;
 }
 
-const ChatRightPanel = ({ panelView, graphView }: ChatRightPanelProps) => {
+const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
+    const [selectedRelevantContext, setSelectedRelevantContext] = useState<any>();
 
     useEffect(() => {
         setRightPanelWidth(window.innerWidth * 0.25);
     }, []);
+
+    useEffect(() => {
+        setSelectedRelevantContext(null);
+    }, [currentRelevantContext, panelView, graphView]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -55,22 +61,76 @@ const ChatRightPanel = ({ panelView, graphView }: ChatRightPanelProps) => {
             <aside className="w-full overflow-y-auto pt-10">
                 <Card className="h-full rounded-none border-0 shadow-none">
                     <CardContent className="p-0 pt-4 px-2">
-                        {panelView === 'card' &&
-                            [1, 2, 3].map((item) => (
-                                <Accordion key={item} type="single" collapsible className="w-full lg:w-[75%]">
-                                    <AccordionItem value="reui-1">
-                                        <AccordionTrigger>What is ReUI?</AccordionTrigger>
-                                        <AccordionContent>
-                                            ReUI provides ready-to-use CRUD examples for developers.
+                        {panelView === 'card' && (
+                            <Accordion type="multiple" className="w-full">
+                                {currentRelevantContext?.nodes?.map((node) => (
+                                    <AccordionItem key={node.id} value={node.id}>
+                                        <AccordionTrigger>
+                                            <div className="text-left">
+                                                <div className="font-semibold">{node.labels?.[0] ?? 'Node'}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {node.number && `№ ${node.number}`}{' '}
+                                                    {node.neutralCitation && `— ${node.neutralCitation}`}
+                                                </div>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="whitespace-pre-wrap">
+                                            {/* {node.date && (
+                                                <div className="text-sm mb-2 text-muted-foreground">
+                                                    Date: {new Date(node.date).toLocaleDateString()}
+                                                </div>
+                                            )} */}
+                                            {node.semanticSection && (
+                                                <div className="text-sm mb-2 text-muted-foreground">
+                                                    Section: {node.semanticSection}
+                                                </div>
+                                            )}
                                         </AccordionContent>
                                     </AccordionItem>
-                                </Accordion>
-                            ))}
+                                ))}
+                            </Accordion>
+                        )}
+
                         {panelView === 'graph' && graphView === '2d' && (
-                            <ChatGraph2D height={window.innerHeight * 0.6} width={rightPanelWidth} />
+                            <ChatGraph2D
+                                height={window.innerHeight * 0.6}
+                                width={rightPanelWidth}
+                                data={currentRelevantContext}
+                                handleSelectedRelevantContext={setSelectedRelevantContext}
+                            />
                         )}
                         {panelView === 'graph' && graphView === '3d' && (
-                            <ChatGraph3D height={window.innerHeight * 0.6} width={rightPanelWidth} />
+                            <ChatGraph3D
+                                height={window.innerHeight * 0.6}
+                                width={rightPanelWidth}
+                                data={currentRelevantContext}
+                            />
+                        )}
+                        {panelView === 'graph' && !!selectedRelevantContext && (
+                            <Accordion type="multiple" className="w-full">
+                                <AccordionItem value={selectedRelevantContext.id} className="border-none">
+                                    <AccordionTrigger>
+                                        <div className="text-left">
+                                            <div className="font-semibold">
+                                                {selectedRelevantContext.labels?.[0] ?? 'Node'}
+                                            </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {selectedRelevantContext.number &&
+                                                    `№ ${selectedRelevantContext.number}`}{' '}
+                                                {selectedRelevantContext.neutralCitation &&
+                                                    `— ${selectedRelevantContext.neutralCitation}`}
+                                            </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="whitespace-pre-wrap">
+                                        {selectedRelevantContext.semanticSection && (
+                                            <div className="text-sm mb-2 text-muted-foreground">
+                                                Section: {selectedRelevantContext.semanticSection}
+                                            </div>
+                                        )}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
                         )}
                     </CardContent>
                 </Card>

@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { genRandomTree } from '@/utils/genRandomTree';
 import { useTheme } from 'next-themes';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
@@ -10,9 +9,11 @@ const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false 
 interface ChatGraph2DProps {
     height?: number;
     width?: number;
+    data: any;
+    handleSelectedRelevantContext: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraph2D = ({ height, width }: ChatGraph2DProps) => {
+const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -31,8 +32,6 @@ const ChatGraph2D = ({ height, width }: ChatGraph2DProps) => {
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
-    const data = useMemo(() => genRandomTree(300, true), []);
-
     return (
         <ForceGraph2D
             width={width || dimensions.width}
@@ -42,7 +41,8 @@ const ChatGraph2D = ({ height, width }: ChatGraph2DProps) => {
             nodeAutoColorBy="group"
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
-            nodeLabel={(node) => `${node.id}`}
+            nodeLabel={(node) => node.neutralCitation || `№ ${node.number}`}
+            onNodeClick={(node) => handleSelectedRelevantContext(node)}
         />
     );
 };
