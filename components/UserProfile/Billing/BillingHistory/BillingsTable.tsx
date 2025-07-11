@@ -1,50 +1,81 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getPaymentHistory } from '@/api/tariffs/getPaymentHistory';
+import { Loader2, Search } from 'lucide-react';
+import { BillingsTableProps } from '@/types/Billing';
+import { Payment } from '@/types/PlansTable';
 import { statusColor } from '@/types/StatusColor';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardFooter, CardHeader, CardTable } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import TablePagination from '@/components/UserProfile/components/TablePagination';
-import { BILLINGS } from '@/components/UserProfile/constants/BILLINGS';
+import BillingsTableBody from './components/BillingsTableBody';
+import BillingsTableHeader from './components/BillingsTableHeader';
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
+const STATUS_OPTIONS = Object.keys(statusColor);
+const DEFAULT_PAYMENT_METHODS = ['card', 'paypal', 'stripe'];
 
 const BILLING_COLUMNS = [
-    { key: 'billing', label: 'Billing', className: 'px-4 py-2', sortable: false },
-    { key: 'status', label: 'Status', className: 'px-4 py-2', sortable: false },
-    { key: 'date', label: 'Date', className: 'px-4 py-2', sortable: false },
-    { key: 'due_to', label: 'Due To', className: 'px-4 py-2', sortable: false },
-    { key: 'amount', label: 'Amount', className: 'px-4 py-2', sortable: false },
+    { key: 'id', label: 'Payment', className: 'w-1/4' },
+    { key: 'status', label: 'Status', className: 'w-1/4' },
+    { key: 'date', label: 'Date', className: 'w-1/4' },
+    { key: 'payment', label: 'Payment Method', className: 'w-1/4' },
+    { key: 'amount', label: 'Amount', className: 'w-1/4' },
+    { key: 'download', label: 'Download', className: 'w-1/4' },
 ];
 
-function formatDateMonth(dateStr: string) {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-}
-
 const BillingsTable = () => {
-    const [search, setSearch] = useState('');
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [payments, setPayments] = useState<Payment[]>([]);
     const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [status, setStatus] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [search, setSearch] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    const filteredBillings = useMemo(() => {
-        return BILLINGS.filter((billing) =>
-            [billing.status, billing.date, billing.amount].join(' ').toLowerCase().includes(search.toLowerCase()),
+    const fetchPayments = useCallback(async () => {
+        try {
+            setLoading(true);
+            const data = await getPaymentHistory({
+                page,
+                per_page: rowsPerPage,
+                status: status || undefined,
+                payment_method: paymentMethod || undefined,
+            });
+            setPayments(Array.isArray(data.payments) ? data.payments : []);
+            setTotalRows(data.total || 0);
+            setTotalPages(data.total_pages || 1);
+        } catch (e) {
+            setPayments([]);
+            setTotalRows(0);
+            setTotalPages(1);
+        } finally {
+            setLoading(false);
+        }
+    }, [page, rowsPerPage, status, paymentMethod]);
+
+    useEffect(() => {
+        fetchPayments();
+    }, [fetchPayments]);
+
+    const filteredPayments = useMemo(() => {
+        if (!search) return payments;
+        return payments.filter((p) =>
+            [p.status, p.created_at, p.amount, p.description, p.payment_method]
+                .join(' ')
+                .toLowerCase()
+                .includes(search.toLowerCase()),
         );
-    }, [search]);
+    }, [payments, search]);
 
-    const totalRows = filteredBillings.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-    const paginatedBillings = filteredBillings.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-
-    const handlePageChange = (newPage: number) => setPage(newPage);
-    const handleRowsPerPageChange = (value: string) => {
-        setRowsPerPage(Number(value));
-        setPage(1);
-    };
+    const paymentMethodOptions = useMemo(() => {
+        const methods = Array.from(new Set(payments.map((p) => p.payment_method).filter(Boolean)));
+        return methods.length > 0 ? methods : DEFAULT_PAYMENT_METHODS;
+    }, [payments]);
 
     return (
         <Card>
@@ -56,10 +87,7 @@ const BillingsTable = () => {
                             className="ps-9 w-40"
                             placeholder="Search invoices..."
                             value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1);
-                            }}
+                            onChange={(e) => setSearch(e.target.value)}
                             variant="md"
                         />
                     </div>
@@ -68,45 +96,33 @@ const BillingsTable = () => {
             <CardTable>
                 <Table className="min-w-[700px] rounded-lg border border-border bg-card shadow-xs">
                     <TableHeader>
-                        <TableRow>
-                            {BILLING_COLUMNS.map((col) => (
-                                <TableHead
-                                    key={col.key}
-                                    className={col.className + ' text-left font-medium text-muted-foreground border'}
-                                >
-                                    {col.label}
-                                </TableHead>
-                            ))}
-                        </TableRow>
+                        <BillingsTableHeader
+                            columns={BILLING_COLUMNS}
+                            statusOptions={STATUS_OPTIONS}
+                            paymentMethodOptions={paymentMethodOptions}
+                            status={status}
+                            paymentMethod={paymentMethod}
+                            onStatusChange={(val) => {
+                                setStatus(val);
+                                setPage(1);
+                            }}
+                            onPaymentMethodChange={(val) => {
+                                setPaymentMethod(val);
+                                setPage(1);
+                            }}
+                        />
                     </TableHeader>
-                    <TableBody>
-                        {paginatedBillings.length === 0 ? (
+                    {loading ? (
+                        <TableBody>
                             <TableRow>
-                                <TableCell
-                                    colSpan={BILLING_COLUMNS.length}
-                                    className="text-center text-muted-foreground border"
-                                >
-                                    No invoices found.
+                                <TableCell colSpan={BILLING_COLUMNS.length} className="py-12 text-center">
+                                    <Loader2 className="w-10 h-10 mx-auto animate-spin text-muted-foreground" />
                                 </TableCell>
                             </TableRow>
-                        ) : (
-                            paginatedBillings.map((billing, idx) => (
-                                <TableRow key={idx}>
-                                    <TableCell className="px-4 py-2 border">{billing.billing}</TableCell>
-                                    <TableCell className="px-4 py-2 border">
-                                        <Badge variant={statusColor[billing.status]} appearance="outline" size="md">
-                                            {billing.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-2 border">{formatDateMonth(billing.date)}</TableCell>
-                                    <TableCell className="px-4 py-2 border">
-                                        {billing.due_to ? formatDateMonth(billing.due_to) : '-'}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-2 border">{billing.amount}</TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
+                        </TableBody>
+                    ) : (
+                        <BillingsTableBody payments={filteredPayments} columns={BILLING_COLUMNS} />
+                    )}
                 </Table>
             </CardTable>
             <CardFooter>
@@ -116,8 +132,11 @@ const BillingsTable = () => {
                     rowsPerPage={rowsPerPage}
                     rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
                     totalRows={totalRows}
-                    onPageChange={handlePageChange}
-                    onRowsPerPageChange={handleRowsPerPageChange}
+                    onPageChange={setPage}
+                    onRowsPerPageChange={(val) => {
+                        setRowsPerPage(Number(val));
+                        setPage(1);
+                    }}
                 />
             </CardFooter>
         </Card>

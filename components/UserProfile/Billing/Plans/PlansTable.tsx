@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import FeatureRow from './FeatureRow';
 import PlansRow from './PlansRow';
 
-function PlansTable({ currentPlanId, onChangePlan }: PlansTableProps) {
+function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTableProps) {
     const [annual, setAnnual] = useState<boolean>(false);
     const [plans, setPlans] = useState<Plan[]>([]);
     const [features, setFeatures] = useState<Feature[]>([]);
@@ -50,8 +50,11 @@ function PlansTable({ currentPlanId, onChangePlan }: PlansTableProps) {
                             key={plan.id}
                             plan={plan}
                             idx={idx}
-                            currentPlanId={currentPlanId}
+                            currentPlanId={
+                                currentSubscription?.status === 'active' ? currentSubscription.tariff_id : null
+                            }
                             onChangePlan={onChangePlan}
+                            onCancelPlan={onCancelPlan}
                         />
                     ))}
                 </TableRow>

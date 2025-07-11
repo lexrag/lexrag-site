@@ -1,51 +1,101 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { cancelSubscription } from '@/api/tariffs/cancelSubsription';
+import { getCurrentSubscription } from '@/api/tariffs/getCurrentSubscription';
+import { formatDateMonth } from '@/utils/formatDate';
+import { FormattedNumber, IntlProvider } from 'react-intl';
+import { CurrentSubscription } from '@/types/CurrentSubscription';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import CancelPlanDialog from './Plans/CancelPlanDialog';
 
 const BillingPlan = () => {
-    const isFreePlan = true;
+    const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        (async () => {
+            const sub = await getCurrentSubscription();
+            if (sub.detail) {
+                setCurrentSubscription(null);
+            } else {
+                setCurrentSubscription(sub);
+            }
+        })();
+    }, []);
+
+    const handleConfirmCancelPlan = async () => {
+        setLoading(true);
+        await cancelSubscription(currentSubscription?.id ?? '');
+        setLoading(false);
+        setDialogOpen(false);
+        setCurrentSubscription(null);
+    };
 
     return (
-        <Card className="w-full">
-            <CardContent className="w-full">
-                <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
-                    <div className="flex flex-wrap items-center gap-5 justify-between">
-                        <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2.5">
-                                <h2 className="text-2xl font-semibold text-mono">Basic Plan</h2>
-                                <Badge variant="success" appearance="outline" size="md">
-                                    Monthly
-                                </Badge>
+        <IntlProvider locale="en-US">
+            <Card className="w-full">
+                <CardContent className="w-full">
+                    <div className="flex flex-col items-stretch gap-5 lg:gap-7.5">
+                        <div className="flex flex-wrap items-center gap-5 justify-between">
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2.5">
+                                    <h2 className="text-2xl font-semibold text-mono">
+                                        {currentSubscription?.tariff?.name} Plan
+                                    </h2>
+                                    <Badge variant="success" appearance="outline" size="md">
+                                        {currentSubscription?.tariff?.duration === 12 ? 'Yearly' : 'Monthly'}
+                                    </Badge>
+                                </div>
+                                <p className="text-sm text-secondary-foreground">
+                                    {currentSubscription?.tariff?.description}
+                                </p>
                             </div>
-                            <p className="text-sm text-secondary-foreground">
-                                Essential Features for Startups and Individuals
-                            </p>
+                            <div className="flex gap-2.5">
+                                {currentSubscription?.status !== 'canceled' ||
+                                    (!currentSubscription?.detail && (
+                                        <Button variant="secondary" onClick={() => setDialogOpen(true)}>
+                                            Cancel Plan
+                                        </Button>
+                                    ))}
+                                <Link href="/profile/billing/plans">
+                                    <Button>Upgrade Plan</Button>
+                                </Link>
+                            </div>
                         </div>
-                        <div className="flex gap-2.5">
-                            {!isFreePlan && <Button variant="secondary">Cancel Plan</Button>}
-                            <Link href="/profile/billing/plans">
-                                <Button>Upgrade Plan</Button>
-                            </Link>
+                        <div className="flex items-center flex-wrap gap-2 lg:gap-5 w-full">
+                            <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
+                                <span className="text-mono text-base leading-none font-medium">
+                                    <FormattedNumber
+                                        value={currentSubscription?.tariff?.price ?? 0}
+                                        style="currency"
+                                        currency="USD"
+                                    />
+                                </span>
+                                <span className="text-secondary-foreground text-sm">Next Bill Amount</span>
+                            </div>
+                            {currentSubscription && (
+                                <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
+                                    <span className="text-mono text-base leading-none font-medium">
+                                        {formatDateMonth(currentSubscription?.created_at ?? '')}
+                                    </span>
+                                    <span className="text-secondary-foreground text-sm">Next Billing Date</span>
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className="flex items-center flex-wrap gap-2 lg:gap-5 w-full">
-                        <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
-                            <span className="text-mono text-base leading-none font-medium">$769.00</span>
-                            <span className="text-secondary-foreground text-sm">Annual Total</span>
-                        </div>
-                        <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
-                            <span className="text-mono text-base leading-none font-medium">$69.00</span>
-                            <span className="text-secondary-foreground text-sm">Next Bill Amount</span>
-                        </div>
-                        <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
-                            <span className="text-mono text-base leading-none font-medium">23 Aug, 24</span>
-                            <span className="text-secondary-foreground text-sm">Next Billing Date</span>
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+                <CancelPlanDialog
+                    open={dialogOpen}
+                    onOpenChange={setDialogOpen}
+                    onCancel={handleConfirmCancelPlan}
+                    loading={loading}
+                />
+            </Card>
+        </IntlProvider>
     );
 };
 

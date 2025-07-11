@@ -1,24 +1,29 @@
 'use client';
 
-import { Billing } from '@/types/Billing';
-import { Table, TableBody } from '@/components/ui/table';
+import { Payment } from '@/types/PlansTable';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import PaymentRow from './PaymentRow';
 import PaymentsTableHeader from './PaymentsTableHeader';
 
 interface PaymentsTableProps {
-    billings: Billing[];
-    onDownload?: () => void;
+    payments: Payment[];
 }
 
-const PaymentsTable = ({ billings, onDownload }: PaymentsTableProps) => {
+const PaymentsTable = ({ payments }: PaymentsTableProps) => {
     return (
         <div className="relative w-full overflow-auto">
             <Table className="w-full caption-bottom text-foreground text-sm">
                 <PaymentsTableHeader />
                 <TableBody>
-                    {billings.slice(0, 3).map((billing) => (
-                        <PaymentRow key={billing.billing} billing={billing} onDownload={onDownload} />
-                    ))}
+                    {payments.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground border">
+                                No invoices found.
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        payments.map((payment) => <PaymentRow key={payment.id.toString()} payment={payment} />)
+                    )}
                 </TableBody>
             </Table>
         </div>
