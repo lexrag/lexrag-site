@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { LucideSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
@@ -23,9 +26,23 @@ const paymentMethods = [
         last4: '9012',
         expiry: '08/2025',
     },
+    {
+        cardholder: 'John Doe',
+        brandImage: '/media/icons/visa.svg',
+        last4: '1234',
+        expiry: '01/2025',
+    },
+    {
+        cardholder: 'Jane Smith',
+        brandImage: '/media/icons/visa.svg',
+        last4: '5678',
+        expiry: '03/2026',
+    },
 ];
 
 const PaymentMethods = () => {
+    const [expanded, setExpanded] = useState(false);
+    const visibleMethods = expanded ? paymentMethods : paymentMethods.slice(0, 3);
     return (
         <CardWrapper
             title="Payment Methods"
@@ -35,10 +52,10 @@ const PaymentMethods = () => {
                 </Button>
             }
         >
-            <div className="flex flex-col gap-4 p-4">
-                {paymentMethods.map((method, index) => (
+            <div className="flex flex-col gap-2 px-4 py-2">
+                {visibleMethods.map((method, index) => (
                     <PaymentMethod
-                        key={method.last4}
+                        key={method.last4 + index}
                         cardholder={method.cardholder}
                         brandImage={method.brandImage}
                         last4={method.last4}
@@ -48,7 +65,9 @@ const PaymentMethods = () => {
                 ))}
             </div>
             <CardFooter className="flex items-center px-5 min-h-14 border-t border-border justify-center">
-                <Button variant="link">View all payment methods</Button>
+                <Button variant="link" onClick={() => setExpanded((v) => !v)}>
+                    {expanded ? 'Hide payment methods' : 'View all payment methods'}
+                </Button>
             </CardFooter>
         </CardWrapper>
     );

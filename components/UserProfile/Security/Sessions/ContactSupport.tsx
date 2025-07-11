@@ -15,18 +15,20 @@ const ContactSupport = () => {
                         </p>
                     </div>
                     <Image
-                        className="dark:hidden max-h-[150px]"
+                        className="dark:hidden max-h-[150px] w-auto"
                         alt="image"
                         src="/media/illustrations/4.svg"
                         width={150}
                         height={150}
+                        priority
                     />
                     <Image
-                        className="hidden dark:block max-h-[150px]"
+                        className="hidden dark:block max-h-[150px] w-auto"
                         alt="image"
                         src="/media/illustrations/4-dark.svg"
                         width={150}
                         height={150}
+                        priority
                     />
                 </div>
             </CardContent>
