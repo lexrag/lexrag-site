@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { genHierarchicalTree } from '@/utils/genRandomTree';
 import { Card, CardContent } from '@/components/ui/card';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
@@ -53,6 +54,8 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
         };
     }, [isResizing]);
 
+    const data = useMemo(() => genHierarchicalTree(5, 3), []);
+
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative">
@@ -96,16 +99,12 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                             <ChatGraph2D
                                 height={window.innerHeight * 0.6}
                                 width={rightPanelWidth}
-                                data={currentRelevantContext}
+                                data={data}
                                 handleSelectedRelevantContext={setSelectedRelevantContext}
                             />
                         )}
                         {panelView === 'graph' && graphView === '3d' && (
-                            <ChatGraph3D
-                                height={window.innerHeight * 0.6}
-                                width={rightPanelWidth}
-                                data={currentRelevantContext}
-                            />
+                            <ChatGraph3D height={window.innerHeight * 0.6} width={rightPanelWidth} data={data} />
                         )}
                         {panelView === 'graph' && !!selectedRelevantContext && (
                             <Accordion type="multiple" className="w-full">
