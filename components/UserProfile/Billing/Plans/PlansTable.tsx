@@ -26,11 +26,13 @@ function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTa
             setPlans(mapTariffsToPlans(filteredTariffs));
             setFeatures(mapTariffsToFeatures(filteredTariffs));
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         setPlans(mapTariffsToPlans(tariffs.filter((tariff: Tariff) => tariff.duration === (annual ? 12 : 1))));
         setFeatures(mapTariffsToFeatures(tariffs.filter((tariff: Tariff) => tariff.duration === (annual ? 12 : 1))));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [annual]);
 
     return (

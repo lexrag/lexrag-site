@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getPaymentHistory } from '@/api/tariffs/getPaymentHistory';
 import { Loader2, Search } from 'lucide-react';
-import { BillingsTableProps } from '@/types/Billing';
 import { Payment } from '@/types/PlansTable';
 import { statusColor } from '@/types/StatusColor';
 import { Card, CardFooter, CardHeader, CardTable } from '@/components/ui/card';
@@ -49,7 +48,7 @@ const BillingsTable = () => {
             setPayments(Array.isArray(data.payments) ? data.payments : []);
             setTotalRows(data.total || 0);
             setTotalPages(data.total_pages || 1);
-        } catch (e) {
+        } catch {
             setPayments([]);
             setTotalRows(0);
             setTotalPages(1);
