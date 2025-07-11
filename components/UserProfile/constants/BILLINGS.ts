@@ -1,4 +1,11 @@
-import { Billing } from '@/types/Billing';
+// Billing type is not exported from '@/types/Billing', so we define it here
+export interface Billing {
+    billing: string;
+    status: string;
+    date: string;
+    due_to: string;
+    amount: string;
+}
 
 export const BILLINGS: Billing[] = [
     {
