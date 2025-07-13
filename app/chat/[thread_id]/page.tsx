@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { ClockArrowDown, ClockArrowUp, Expand, Menu, MessageSquare, Network, Rows3 } from 'lucide-react';
+import { zoomToFitGraph } from '@/events/zoom-to-fit';
+import { ClockArrowDown, ClockArrowUp, Expand, Fullscreen, Menu, MessageSquare, Network, Rows3 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
@@ -105,7 +106,14 @@ export default function ChatPage() {
                                     </TabsTrigger>
                                 </TabsList>
                             </Tabs>
-                            <Expand onClick={() => setIsOpenGraphModal(true)} />
+                            <Expand
+                                className="hover:text-primary cursor-pointer"
+                                onClick={() => setIsOpenGraphModal(true)}
+                            />
+                            <Fullscreen
+                                className="hover:text-primary cursor-pointer"
+                                onClick={() => zoomToFitGraph()}
+                            />
                         </>
                     )}
                 </div>

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { useTheme } from 'next-themes';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
@@ -16,6 +17,7 @@ interface ChatGraph2DProps {
 const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
+    const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [graphData, setGraphData] = useState(data);
 
@@ -34,6 +36,11 @@ const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: Cha
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current.zoomToFit(400));
+        return unsubscribe;
     }, []);
 
     const initializedData = useMemo(() => {
@@ -135,6 +142,7 @@ const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: Cha
 
     return (
         <ForceGraph2D
+            ref={graphRef}
             width={width || dimensions.width}
             height={height || dimensions.height}
             graphData={graphData}
