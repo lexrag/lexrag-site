@@ -15,12 +15,33 @@ export function genRandomTree(N = 300, reverse = false) {
     };
 }
 
-export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
-    const nodes = [];
-    const links = [];
+type TreeNode = {
+    id: number;
+    val: number;
+    number: number;
+    neutralCitation: string;
+    level: number;
+    collapsed: boolean;
+    childLinks: Link[];
+};
+
+type Link = {
+    source: number;
+    target: number;
+    color: string;
+};
+
+type TreeData = {
+    nodes: TreeNode[];
+    links: Link[];
+};
+
+export function genHierarchicalTree(levels: number = 4, childrenPerNode: number = 3): TreeData {
+    const nodes: TreeNode[] = [];
+    const links: Link[] = [];
     let nodeId = 0;
 
-    const createLevel = (parentId, currentLevel, maxLevels) => {
+    const createLevel = (parentId: number | null, currentLevel: number, maxLevels: number): void => {
         if (currentLevel >= maxLevels) return;
 
         const childrenCount = Math.floor(Math.random() * childrenPerNode) + 1;
@@ -28,7 +49,7 @@ export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
         for (let i = 0; i < childrenCount; i++) {
             const childId = nodeId++;
 
-            nodes.push({
+            const newNode: TreeNode = {
                 id: childId,
                 val: Math.random() * 5 + 1,
                 number: childId,
@@ -36,23 +57,24 @@ export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
                 level: currentLevel,
                 collapsed: false,
                 childLinks: [],
-            });
+            };
+
+            nodes.push(newNode);
 
             if (parentId !== null) {
-                links.push({
+                const newLink: Link = {
                     source: parentId,
                     target: childId,
                     color: '#007AFF',
-                });
+                };
+                links.push(newLink);
             }
 
-            // Рекурсивно створюємо дочірні рівні
             createLevel(childId, currentLevel + 1, maxLevels);
         }
     };
 
-    // Створюємо кореневий вузол
-    nodes.push({
+    const rootNode: TreeNode = {
         id: nodeId++,
         val: 10,
         number: 0,
@@ -60,10 +82,10 @@ export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
         level: 0,
         collapsed: false,
         childLinks: [],
-    });
+    };
 
-    // Створюємо дерево
-    createLevel(0, 1, levels);
+    nodes.push(rootNode);
+    createLevel(rootNode.id, 1, levels);
 
     return { nodes, links };
 }
