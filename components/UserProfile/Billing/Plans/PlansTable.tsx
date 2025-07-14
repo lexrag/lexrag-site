@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getTariffs } from '@/api/tariffs/getTariffs';
 import { mapTariffsToFeatures, mapTariffsToPlans } from '@/utils/mapPlans';
-import { Feature, Plan, PlansTableProps, Tariff } from '@/types/PlansTable';
+import { Feature, Plan, PlansTableProps, Tariff } from '@/types/PlansTable'; 
 import { Label } from '@/components/ui/label';
 import { Switch, SwitchWrapper } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
@@ -12,28 +12,31 @@ import PlansRow from './PlansRow';
 
 function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTableProps) {
     const [annual, setAnnual] = useState<boolean>(false);
-    const [plans, setPlans] = useState<Plan[]>([]);
-    const [features, setFeatures] = useState<Feature[]>([]);
     const [tariffs, setTariffs] = useState<Tariff[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
+            setLoading(true);
             const tariffs = await getTariffs();
-            const filteredTariffs = tariffs
-                .filter((tariff: Tariff) => tariff.duration === (annual ? 12 : 1))
-                .sort((a: Tariff, b: Tariff) => a.price - b.price);
-            setTariffs(filteredTariffs);
-            setPlans(mapTariffsToPlans(filteredTariffs));
-            setFeatures(mapTariffsToFeatures(filteredTariffs));
+            setTariffs(tariffs);
+            setLoading(false);
         })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        setPlans(mapTariffsToPlans(tariffs.filter((tariff: Tariff) => tariff.duration === (annual ? 12 : 1))));
-        setFeatures(mapTariffsToFeatures(tariffs.filter((tariff: Tariff) => tariff.duration === (annual ? 12 : 1))));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [annual]);
+    const filteredTariffs = useMemo(
+        () => tariffs.filter((tariff) => tariff.duration === (annual ? 12 : 1)).sort((a, b) => a.price - b.price),
+        [tariffs, annual]
+    );
+
+    const plans = useMemo(() => mapTariffsToPlans(filteredTariffs), [filteredTariffs]);
+    const features = useMemo(() => mapTariffsToFeatures(filteredTariffs), [filteredTariffs]);
+
+    if (loading) {
+        return (
+            <div className="py-12 text-center text-muted-foreground">Loading plans...</div>
+        );
+    }
 
     return (
         <Table className="w-full caption-bottom text-foreground text-sm table-fixed border-separate border-spacing-0 mt-3 min-w-4xl rounded-xl hover:bg-transparent">
@@ -57,6 +60,7 @@ function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTa
                             }
                             onChangePlan={onChangePlan}
                             onCancelPlan={onCancelPlan}
+                            annual={annual}
                         />
                     ))}
                 </TableRow>
