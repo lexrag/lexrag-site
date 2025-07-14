@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { cancelSubscription } from '@/api/tariffs/cancelSubsription';
 import { getCurrentSubscription } from '@/api/tariffs/getCurrentSubscription';
-import { formatDateMonth } from '@/utils/formatDate';
+import { getNextBillingDate } from '@/utils/getNextBillingDate';
 import { FormattedNumber, IntlProvider } from 'react-intl';
 import { CurrentSubscription } from '@/types/CurrentSubscription';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +80,7 @@ const BillingPlan = () => {
                             {currentSubscription && (
                                 <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
                                     <span className="text-mono text-base leading-none font-medium">
-                                        {formatDateMonth(currentSubscription?.created_at ?? '')}
+                                        {getNextBillingDate(currentSubscription?.created_at ?? '', currentSubscription?.tariff?.duration ?? 1)}
                                     </span>
                                     <span className="text-secondary-foreground text-sm">Next Billing Date</span>
                                 </div>
