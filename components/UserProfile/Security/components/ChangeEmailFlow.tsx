@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { getEmailChangeCode } from '@/api/auth/getEmailChangeCode';
 import { validatePassword } from '@/api/auth/validatePassword';
 import { verifyEmailChangeCode } from '@/api/auth/verifyEmailChangeCode';
-import { clearServerCache } from '@/utils/auth/decodeAccessToken';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useLogOut } from '@/hooks/use-log-out';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -26,7 +25,7 @@ const codeSchema = z.object({
 const CODE_TTL = 60;
 
 export default function ChangeEmailFlow() {
-    const router = useRouter();
+    const logOut = useLogOut();
     const [step, setStep] = useState(1);
     const [newEmail, setNewEmail] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -122,10 +121,7 @@ export default function ChangeEmailFlow() {
                 return;
             }
             toast.success('Email changed successfully');
-            localStorage.removeItem('resendDisabledUntil');
-            localStorage.removeItem('token');
-            clearServerCache('token');
-            router.push('/');
+            logOut();
         } catch (err) {
             if (err instanceof Error) {
                 toast.error(err.message);

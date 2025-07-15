@@ -2,7 +2,7 @@ import { DeviceTableHeaderCellProps } from '@/types/DeviceTable';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableHead } from '@/components/ui/table';
 import { getSortMenuItems } from '@/components/UserProfile/constants/MENU_ITEMS';
-import RecursiveDropdown from '../../../components/RecursiveDropdown';
+import RecursiveDropdown from './RecursiveDropdown';
 
 const DeviceTableHeaderCell = ({
     column,

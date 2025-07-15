@@ -19,6 +19,7 @@ const Questions = () => {
                         src="/media/illustrations/2.svg"
                         width={150}
                         height={150}
+                        priority
                     />
                     <Image
                         className="hidden dark:block max-h-[150px]"
@@ -26,6 +27,7 @@ const Questions = () => {
                         src="/media/illustrations/2-dark.svg"
                         width={150}
                         height={150}
+                        priority
                     />
                 </div>
             </CardContent>

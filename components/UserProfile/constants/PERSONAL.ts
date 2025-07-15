@@ -1,3 +1,5 @@
+import countries from 'i18n-iso-countries';
+
 export const GENDER_OPTIONS = [
     { value: 'Male', label: 'Male' },
     { value: 'Female', label: 'Female' },
@@ -7,24 +9,21 @@ export const GENDER_OPTIONS = [
 
 export const LANGUAGE_OPTIONS = [
     { value: 'en', label: 'English' },
-    { value: 'es', label: 'Spanish' },
-    { value: 'fr', label: 'French' },
     { value: 'de', label: 'German' },
-    { value: 'zh', label: 'Chinese' },
-    { value: 'hi', label: 'Hindi' },
+    { value: 'fr', label: 'French' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'it', label: 'Italian' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'nl', label: 'Dutch' },
+    { value: 'pl', label: 'Polish' },
+    { value: 'tr', label: 'Turkish' },
     { value: 'ar', label: 'Arabic' },
-    { value: 'ua', label: 'Ukrainian' },
+    { value: 'hi', label: 'Hindi' },
+    { value: 'ja', label: 'Japanese' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'zh', label: 'Chinese' },
 ];
 
-export const COUNTRY_OPTIONS = [
-    { value: 'pl', label: 'Poland' },
-    { value: 'us', label: 'United States' },
-    { value: 'uk', label: 'United Kingdom' },
-    { value: 'de', label: 'Germany' },
-    { value: 'fr', label: 'France' },
-    { value: 'es', label: 'Spain' },
-    { value: 'zh', label: 'China' },
-    { value: 'hi', label: 'India' },
-    { value: 'ar', label: 'Saudi Arabia' },
-    { value: 'ua', label: 'Ukraine' },
-];
+const countryCodes = Object.keys(countries.getNames('en'));
+const countryList = countryCodes.map((code) => ({ value: code, label: countries.getNames('en')[code] }));
+export const COUNTRY_OPTIONS = countryList.sort((a, b) => a.label.localeCompare(b.label));
