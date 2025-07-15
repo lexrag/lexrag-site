@@ -1,7 +1,7 @@
-import { IconType } from 'react-icons';
+import { LucideIcon } from 'lucide-react';
 
 export interface MenuItem {
-    icon: IconType;
+    icon: LucideIcon;
     label: string;
     onClick?: () => void;
     items?: MenuItem[];

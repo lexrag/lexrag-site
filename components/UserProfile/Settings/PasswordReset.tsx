@@ -18,6 +18,7 @@ const PasswordReset = () => {
         setSuccess(null);
         setError(null);
         form.reset();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const form = useForm<ResetPasswordSchemaType>({

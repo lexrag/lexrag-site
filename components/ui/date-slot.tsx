@@ -1,4 +1,3 @@
-import { generateTimeSlots } from '@/utils/generateTimeSlots';
 import { Button } from '@/components/ui/button';
 
 interface DateSlotProps {
@@ -6,6 +5,7 @@ interface DateSlotProps {
     onSelect: (slot: string) => void;
     disabledSlots?: string[];
     dayLabel?: string;
+    timeSlots: string[];
 }
 
 export default function DateSlot({
@@ -13,9 +13,8 @@ export default function DateSlot({
     onSelect,
     disabledSlots = [],
     dayLabel = 'Friday, 20',
+    timeSlots,
 }: DateSlotProps) {
-    const timeSlots = generateTimeSlots('09:00', '18:00');
-
     return (
         <div className="space-y-3">
             <div className="flex h-5 shrink-0 items-center px-3 sm:px-5 pt-4">

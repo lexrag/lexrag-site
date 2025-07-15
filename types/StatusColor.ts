@@ -1,7 +1,7 @@
 export const statusColor = {
-    Paid: 'success',
-    Pending: 'warning',
-    Failed: 'destructive',
+    succeeded: 'success',
+    pending: 'warning',
+    failed: 'destructive',
 } as const;
 
 export type Status = keyof typeof statusColor;

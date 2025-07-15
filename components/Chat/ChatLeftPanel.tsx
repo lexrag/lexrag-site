@@ -29,12 +29,11 @@ const ChatLeftPanel = ({ conversations, onDeleteConversation }: ChatLeftPanelPro
     const { user, setUser } = useUser();
 
     useEffect(() => {
-        const getMe = async () => {
+        (async () => {
             const user = await getMeClient();
             setUser(user);
-        };
-
-        getMe();
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const { setTheme, resolvedTheme } = useTheme();
