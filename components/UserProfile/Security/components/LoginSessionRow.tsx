@@ -3,21 +3,23 @@
 import React from 'react';
 import { LoginSession } from '@/types/Session';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { formatDistanceToNow } from 'date-fns';
 
 interface LoginSessionRowProps {
     session: LoginSession;
 }
 
 const LoginSessionRow = ({ session }: LoginSessionRowProps) => {
+    console.log(session);
     return (
-        <TableRow key={session.ip}>
+        <TableRow>
             <TableCell>
-                <span className="text-sm font-medium hover:text-primary">{session.ip}</span>
+                <span className="text-sm font-medium hover:text-primary">{session.ip_address}</span>
             </TableCell>
             <TableCell>
                 <span className="text-xs text-secondary-foreground">{session.device}</span>
             </TableCell>
-            <TableCell>{session.last_seen}</TableCell>
+            <TableCell>{formatDistanceToNow(new Date(session.last_seen), { addSuffix: true })}</TableCell>
         </TableRow>
     );
 };

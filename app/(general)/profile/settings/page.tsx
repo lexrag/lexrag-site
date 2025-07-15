@@ -1,4 +1,4 @@
-import { getUserInfoServer } from '@/api/auth/getUserInfoServer';
+import { getUserInfoServer } from '@/api/user/getUserInfoServer';
 import { User } from '@/types/User';
 import PageTitle from '@/components/Layout/PageTitle';
 import BillingPlan from '@/components/UserProfile/Billing/BillingPlan';
@@ -20,7 +20,7 @@ const SettingsPage = async () => {
                     <PersonalInfoCard currentUser={currentUser} />
                     <Other />
                     <BillingPlan />
-                    <Notifications />
+                    <Notifications currentUser={currentUser} />
                     <Security currentUser={currentUser} />
                     <LoginSessions />
                     <Legal />

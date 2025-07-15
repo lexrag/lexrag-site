@@ -1,4 +1,4 @@
-import getUserInfoServer from '@/api/auth/getUserInfoServer';
+import getUserInfoServer from '@/api/user/getUserInfoServer';
 import { User } from '@/types/User';
 import PageTitle from '@/components/Layout/PageTitle';
 import Other from '@/components/UserProfile/Other';

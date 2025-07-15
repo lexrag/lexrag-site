@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
-import { updatePhoneNumber } from '@/api/auth/updatePhoneNumber';
 import { formatDistanceToNow } from 'date-fns';
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 import { SquarePen } from 'lucide-react';
-import { toast } from 'sonner';
 import { User } from '@/types/User';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,9 +24,7 @@ interface AuthenticationProps {
 const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
     const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(currentUser?.phone_number || '');
-    const [prevPhoneNumber, setPrevPhoneNumber] = useState<string | null>(null);
     const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
         currentUser?.password_last_changed_at || null,
     );
@@ -54,27 +50,6 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
         const res = await getLinkedinAuthLink();
         if (res.success) {
             window.location.href = res.redirect_url;
-        }
-    };
-
-    const handlePhoneNumberSave = async (newPhoneNumber: string) => {
-        setPrevPhoneNumber(phoneNumber);
-        setPhoneNumber(newPhoneNumber);
-        try {
-            setLoading(true);
-            const res = await updatePhoneNumber(newPhoneNumber);
-            if (res.success) {
-                toast.success('Phone number updated');
-                setOpenPhoneNumber(false);
-            } else {
-                toast.error('Failed to update phone number');
-            }
-        } catch {
-            toast.error('Failed to update phone number');
-            setPhoneNumber(prevPhoneNumber || '');
-            setOpenPhoneNumber(false);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -155,8 +130,8 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 <ChangePhoneNumberFlow
                     open={openPhoneNumber}
                     onOpenChange={setOpenPhoneNumber}
-                    onSuccess={handlePhoneNumberSave}
-                    loading={loading}
+                    onSuccess={(newPhoneNumber) => setPhoneNumber(newPhoneNumber)}
+                    loading={false}
                     currentPhoneNumber={phoneNumber || ''}
                 />
             </Row>

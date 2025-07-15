@@ -6,28 +6,25 @@ import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import Row from '../components/Row';
 import DeleteAccount from './DeleteAccount';
+import { gdprEmailExport } from '@/api/user/gdprEmailExport';
+import { toast } from 'sonner';
 
 const acceptedDate = '2025-07-04';
 
 const Legal = () => {
     const [requested, setRequested] = useState(false);
-    // const [loading, setLoading] = useState(false);
-    // const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
-
-    // const handleDelete = async () => {
-    //     setLoading(true);
-    //     setTimeout(() => {
-    //         setLoading(false);
-    //         setDeleteAccountOpen(false);
-    //     }, 1000);
-    // };
-
+    const [loading, setLoading] = useState(false);
+    
     const handleRequest = async () => {
-        // setLoading(true);
-        setTimeout(() => {
+        setLoading(true);
+        const success = await gdprEmailExport();
+        setLoading(false);
+        if (success) {
             setRequested(true);
-            // setLoading(false);
-        }, 1000);
+            toast.success('GDPR data export requested. You will receive an email soon.');
+        } else {
+            toast.error('Failed to request GDPR data export.');
+        }
     };
 
     return (
@@ -39,10 +36,14 @@ const Legal = () => {
                 <Row
                     label="GDPR Data Export"
                     actionIcon={
-                        <Button variant="ghost" size="icon" onClick={handleRequest}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleRequest}
+                            disabled={requested || loading}
+                        >
                             <DownloadIcon
                                 className={`w-4 h-4 ${requested ? 'text-green-500' : ''}`}
-                                onClick={handleRequest}
                             />
                         </Button>
                     }
@@ -50,6 +51,8 @@ const Legal = () => {
                     <div className="flex items-center gap-2">
                         {requested ? (
                             <span className="text-xs text-muted-foreground">Export requested.</span>
+                        ) : loading ? (
+                            <span className="text-xs text-muted-foreground">Requesting...</span>
                         ) : (
                             <span className="text-xs text-muted-foreground">Request a data</span>
                         )}

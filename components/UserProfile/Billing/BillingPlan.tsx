@@ -19,7 +19,7 @@ const BillingPlan = () => {
     useEffect(() => {
         (async () => {
             const sub = await getCurrentSubscription();
-            if (sub.detail) {
+            if (sub.detail || sub.status === 'pending') {
                 setCurrentSubscription(null);
             } else {
                 setCurrentSubscription(sub);

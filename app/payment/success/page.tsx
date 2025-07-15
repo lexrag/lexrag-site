@@ -5,9 +5,19 @@ import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
+import { useEffect } from 'react';
 
 export default function SuccessPage() {
     const router = useRouter();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.push('/profile/billing/plans');
+        }, 2000);
+
+        return () => clearTimeout(timeout);
+    }, []);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
             <CardWrapper title="Payment Successful" className="max-w-md mx-auto mt-10">
@@ -29,13 +39,8 @@ export default function SuccessPage() {
                     <p className="text-center text-muted-foreground mb-6 max-w-xs">
                         Your payment was processed successfully. Thank you for your purchase!
                     </p>
-                    <Button
-                        variant="primary"
-                        size="lg"
-                        className="w-full"
-                        onClick={() => router.push('/profile/billing/plans')}
-                    >
-                        Go to Plans
+                    <Button variant="primary" size="lg" className="w-full" onClick={() => router.push('/profile')}>
+                        Go to Profile
                     </Button>
                 </div>
             </CardWrapper>

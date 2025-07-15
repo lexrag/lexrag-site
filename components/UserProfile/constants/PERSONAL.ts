@@ -11,20 +11,20 @@ export const GENDER_OPTIONS = [
 ];
 
 export const LANGUAGE_OPTIONS = [
-    { value: 'en', label: 'English' },
-    { value: 'de', label: 'German' },
-    { value: 'fr', label: 'French' },
-    { value: 'es', label: 'Spanish' },
-    { value: 'it', label: 'Italian' },
-    { value: 'pt', label: 'Portuguese' },
-    { value: 'nl', label: 'Dutch' },
-    { value: 'pl', label: 'Polish' },
-    { value: 'tr', label: 'Turkish' },
-    { value: 'ar', label: 'Arabic' },
-    { value: 'hi', label: 'Hindi' },
-    { value: 'ja', label: 'Japanese' },
-    { value: 'ko', label: 'Korean' },
-    { value: 'zh', label: 'Chinese' },
+    { value: 'EN', label: 'English' },
+    { value: 'DE', label: 'German' },
+    { value: 'FR', label: 'French' },
+    { value: 'ES', label: 'Spanish' },
+    { value: 'IT', label: 'Italian' },
+    { value: 'PT', label: 'Portuguese' },
+    { value: 'NL', label: 'Dutch' },
+    { value: 'PL', label: 'Polish' },
+    { value: 'TR', label: 'Turkish' },
+    { value: 'AR', label: 'Arabic' },
+    { value: 'HI', label: 'Hindi' },
+    { value: 'JA', label: 'Japanese' },
+    { value: 'KO', label: 'Korean' },
+    { value: 'ZH', label: 'Chinese' },
 ];
 
 const countryCodes = Object.keys(countries.getNames('en'));

@@ -5,21 +5,34 @@ import { CardContent } from '@/components/ui/card';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { NotificationMethod, User } from '@/types/User';
+import { updateUserNotifications } from '@/api/user/updateUserNotifications';
+import { toast } from 'sonner';
 
 const NOTIFICATION_METHODS = [
     { key: 'sms', label: 'SMS', description: 'Receive notifications via SMS' },
     { key: 'email', label: 'Email', description: 'Receive notifications via email' },
-    { key: 'push', label: 'Push Notifications', description: 'Receive notifications via push notifications' },
+    { key: 'push', label: 'Push', description: 'Receive notifications via push notifications' },
 ];
 
-const Nofications = () => {
-    const [active, setActive] = useState('sms');
+const Nofications = ({ currentUser }: { currentUser: User }) => {
+    const [active, setActive] = useState(currentUser.notifications);
+
+    const handleChange = async (value: NotificationMethod) => {
+        setActive(value);
+        const success = await updateUserNotifications(value);
+        if (success) {
+            toast.success('Notifications updated successfully');
+        } else {
+            toast.error('Failed to update notifications');
+        }
+    };
 
     return (
         <CardWrapper title="Notifications">
             <RadioGroup
                 value={active}
-                onValueChange={setActive}
+                onValueChange={(value) => handleChange(value as NotificationMethod)}
                 className="flex items-center justify-between flex-col gap-0"
                 aria-label="Notification Method"
             >

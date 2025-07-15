@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { updateUser } from '@/api/auth/updateUser';
+import { updateUser } from '@/api/user/updateUser';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { User } from '@/types/User';
