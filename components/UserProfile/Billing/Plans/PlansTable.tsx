@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { getTariffs } from '@/api/tariffs/getTariffs';
 import { mapTariffsToFeatures, mapTariffsToPlans } from '@/utils/mapPlans';
-import { Feature, Plan, PlansTableProps, Tariff } from '@/types/PlansTable'; 
+import { PlansTableProps, Tariff } from '@/types/PlansTable'; 
 import { Label } from '@/components/ui/label';
 import { Switch, SwitchWrapper } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';

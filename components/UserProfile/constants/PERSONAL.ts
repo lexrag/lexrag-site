@@ -1,4 +1,7 @@
-import countries from 'i18n-iso-countries';
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+
+countries.registerLocale(enLocale);
 
 export const GENDER_OPTIONS = [
     { value: 'Male', label: 'Male' },
@@ -25,5 +28,8 @@ export const LANGUAGE_OPTIONS = [
 ];
 
 const countryCodes = Object.keys(countries.getNames('en'));
-const countryList = countryCodes.map((code) => ({ value: code, label: countries.getNames('en')[code] }));
+const countryList = countryCodes.map((code) => ({
+  value: code,
+  label: countries.getNames('en')[code]
+}));
 export const COUNTRY_OPTIONS = countryList.sort((a, b) => a.label.localeCompare(b.label));
