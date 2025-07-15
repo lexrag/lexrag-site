@@ -16,7 +16,7 @@ export function genRandomTree(N = 300, reverse = false) {
 }
 
 export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
-    const nodes: Array<{
+    type Node = {
         id: number;
         val: number;
         number: number;
@@ -24,12 +24,14 @@ export function genHierarchicalTree(levels = 4, childrenPerNode = 3) {
         level: number;
         collapsed: boolean;
         childLinks: any[];
-    }> = [];
-    const links: Array<{
+    };
+    type Link = {
         source: number;
         target: number;
         color: string;
-    }> = [];
+    };
+    const nodes: Node[] = [];
+    const links: Link[] = [];
     let nodeId = 0;
 
     const createLevel = (parentId: number | null, currentLevel: number, maxLevels: number): void => {
