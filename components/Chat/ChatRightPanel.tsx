@@ -66,7 +66,7 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                     <CardContent className="p-0 pt-4 px-2">
                         {panelView === 'card' && (
                             <Accordion type="multiple" className="w-full">
-                                {currentRelevantContext &&
+                                {currentRelevantContext?.nodes &&
                                     currentRelevantContext.nodes.map((node: any) => (
                                         <AccordionItem key={node.id} value={node.id}>
                                             <AccordionTrigger>
