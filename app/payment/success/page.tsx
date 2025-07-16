@@ -1,18 +1,18 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
-import { useEffect } from 'react';
 
 export default function SuccessPage() {
     const router = useRouter();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            router.push('/profile/billing/plans');
+            router.push('/profile');
         }, 2000);
 
         return () => clearTimeout(timeout);
@@ -28,7 +28,15 @@ export default function SuccessPage() {
                             width={128}
                             src="/media/illustrations/1.svg"
                             alt="Success"
-                            className="mb-4"
+                            className="mb-4 dark:hidden"
+                            priority
+                        />
+                        <Image
+                            height={128}
+                            width={128}
+                            src="/media/illustrations/1.svg"
+                            alt="Success"
+                            className="hidden dark:block"
                             priority
                         />
                     </div>

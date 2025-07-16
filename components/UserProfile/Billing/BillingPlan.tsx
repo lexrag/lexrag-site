@@ -80,7 +80,10 @@ const BillingPlan = () => {
                             {currentSubscription && (
                                 <div className="grid grid-cols-1 content-between gap-1.5 border border-dashed border-input rounded-md px-3.5 py-2 min-w-24 max-w-auto">
                                     <span className="text-mono text-base leading-none font-medium">
-                                        {getNextBillingDate(currentSubscription?.created_at ?? '', currentSubscription?.tariff?.duration ?? 1)}
+                                        {getNextBillingDate(
+                                            currentSubscription?.created_at ?? '',
+                                            currentSubscription?.tariff?.duration ?? 1,
+                                        )}
                                     </span>
                                     <span className="text-secondary-foreground text-sm">Next Billing Date</span>
                                 </div>

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getTariffs } from '@/api/tariffs/getTariffs';
-import { mapTariffsToFeatures, mapTariffsToPlans } from '@/utils/mapPlans';
-import { PlansTableProps, Tariff } from '@/types/PlansTable'; 
+import { mapTariffsToFeatureRows } from '@/utils/mapPlans';
+import { FeatureRowData, PlansTableProps, Tariff, TariffFeature } from '@/types/PlansTable';
 import { Label } from '@/components/ui/label';
 import { Switch, SwitchWrapper } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
@@ -13,29 +13,32 @@ import PlansRow from './PlansRow';
 function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTableProps) {
     const [annual, setAnnual] = useState<boolean>(false);
     const [tariffs, setTariffs] = useState<Tariff[]>([]);
+    const [features, setFeatures] = useState<TariffFeature[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             setLoading(true);
-            const tariffs = await getTariffs();
-            setTariffs(tariffs);
+            // getTariffs now returns { tariffs, features }
+            const data = await getTariffs();
+            setTariffs(data.tariffs);
+            setFeatures(data.features);
             setLoading(false);
         })();
     }, []);
 
     const filteredTariffs = useMemo(
         () => tariffs.filter((tariff) => tariff.duration === (annual ? 12 : 1)).sort((a, b) => a.price - b.price),
-        [tariffs, annual]
+        [tariffs, annual],
     );
 
-    const plans = useMemo(() => mapTariffsToPlans(filteredTariffs), [filteredTariffs]);
-    const features = useMemo(() => mapTariffsToFeatures(filteredTariffs), [filteredTariffs]);
+    const featureRows: FeatureRowData[] = useMemo(
+        () => mapTariffsToFeatureRows(filteredTariffs, features),
+        [filteredTariffs, features],
+    );
 
     if (loading) {
-        return (
-            <div className="py-12 text-center text-muted-foreground">Loading plans...</div>
-        );
+        return <div className="py-12 text-center text-muted-foreground">Loading plans...</div>;
     }
 
     return (
@@ -50,7 +53,7 @@ function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTa
                             </SwitchWrapper>
                         </div>
                     </TableCell>
-                    {plans.map((plan, idx) => (
+                    {filteredTariffs.map((plan, idx) => (
                         <PlansRow
                             key={plan.id}
                             plan={plan}
@@ -64,7 +67,7 @@ function PlansTable({ currentSubscription, onChangePlan, onCancelPlan }: PlansTa
                         />
                     ))}
                 </TableRow>
-                {features.map((feature) => (
+                {featureRows.map((feature) => (
                     <FeatureRow key={feature.id} feature={feature} />
                 ))}
             </TableBody>

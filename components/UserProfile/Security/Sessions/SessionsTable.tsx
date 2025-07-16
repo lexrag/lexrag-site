@@ -13,6 +13,11 @@ import { formatDistanceToNow } from 'date-fns';
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
+export const getSessionStatus = (session: LoginSession) => {
+    if (session.is_current) return 'Current session';
+    return formatDistanceToNow(new Date(session.last_seen), { addSuffix: true });
+};
+
 const SESSION_COLUMNS = [
     { key: 'ip', label: 'IP', className: 'px-4 py-2', sortable: true },
     { key: 'device', label: 'Device', className: 'px-4 py-2', sortable: true },
@@ -106,7 +111,7 @@ const SessionsTable = () => {
                                 <TableRow key={idx}>
                                     <TableCell className="px-4 py-2">{session.ip_address}</TableCell>
                                     <TableCell className="px-4 py-2">{session.device}</TableCell>
-                                    <TableCell className="px-4 py-2">{formatDistanceToNow(new Date(session.last_seen), { addSuffix: true })}</TableCell>
+                                    <TableCell className="px-4 py-2">{getSessionStatus(session)}</TableCell>
                                 </TableRow>
                             ))
                         )}

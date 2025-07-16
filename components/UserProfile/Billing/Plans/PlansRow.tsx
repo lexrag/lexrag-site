@@ -4,12 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TableCell } from '@/components/ui/table';
 
-interface PlansRowPropsWithAnnual extends PlansRowProps {
-    annual?: boolean;
-}
-
-function PlansRow({ plan, idx, currentPlanId, onChangePlan, onCancelPlan, annual }: PlansRowPropsWithAnnual) {
-    const isCurrent = plan.id === currentPlanId?.toString();
+function PlansRow({ plan, idx, currentPlanId, onChangePlan, onCancelPlan, annual }: PlansRowProps) {
+    const isCurrent = plan.id.toString() === currentPlanId?.toString();
 
     return (
         <IntlProvider locale="en-US">
@@ -33,14 +29,12 @@ function PlansRow({ plan, idx, currentPlanId, onChangePlan, onCancelPlan, annual
                     <h4 className="text-2xl font-semibold leading-none">
                         <FormattedNumber value={plan.price} style="currency" currency="USD" />
                     </h4>
-                    <div className="text-secondary-foreground text-xs">
-                        {annual ? 'per year' : 'per month'}
-                    </div>
+                    <div className="text-secondary-foreground text-xs">{annual ? 'per year' : 'per month'}</div>
                 </div>
                 <Button
                     variant={isCurrent ? 'outline' : 'primary'}
                     className="w-full justify-center"
-                    onClick={() => (isCurrent ? onCancelPlan?.() : onChangePlan(plan.id))}
+                    onClick={() => (isCurrent ? onCancelPlan?.() : onChangePlan(plan.id.toString()))}
                 >
                     {isCurrent ? 'Cancel Plan' : 'Change Plan'}
                 </Button>
