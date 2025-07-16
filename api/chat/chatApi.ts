@@ -19,7 +19,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef('');
-    const relevantContextRef = useRef<any>(null);
+    const [status, setStatus] = useState<string | null>(null);
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -49,9 +49,12 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         const handleMessage = async (event: MessageEvent) => {
             const data = JSON.parse(event.data);
 
+            if (data.name === 'update_status') {
+                setStatus(data.params.update_status);
+            }
+
             if (data.name === 'relevant_context') {
-                console.log(data);
-                relevantContextRef.current = data.params.relevant_context;
+                // console.log(data);
             }
             if (data.type === 'event') {
                 await eventHandler(data, { setConversations });
@@ -75,13 +78,11 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                     html,
                     content: accumulatedContentRef.current,
                     direction: 'incoming',
-                    relevantContext: relevantContextRef.current,
                 };
 
                 setMessages((prev) => [...prev, message]);
                 setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
-                relevantContextRef.current = null;
             }
         };
 
@@ -130,6 +131,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     return {
         messages,
         isThinking,
+        status,
         currentResponseContent,
         sendMessage,
         copyToClipboard,

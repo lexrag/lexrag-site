@@ -1,19 +1,20 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { genHierarchicalTree } from '@/utils/genRandomTree';
+import { useEffect, useState } from 'react';
+import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 interface ChatRightPanelProps {
-    currentRelevantContext: any;
+    currentMessage: any;
     panelView: string;
+    graphLayers: GraphLayer[];
     graphView: string;
 }
 
-const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRightPanelProps) => {
+const ChatRightPanel = ({ currentMessage, panelView, graphLayers, graphView }: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [selectedRelevantContext, setSelectedRelevantContext] = useState<any>();
@@ -24,7 +25,7 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
 
     useEffect(() => {
         setSelectedRelevantContext(null);
-    }, [currentRelevantContext, panelView, graphView]);
+    }, [panelView, graphView]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -54,8 +55,6 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
         };
     }, [isResizing]);
 
-    const data = useMemo(() => genHierarchicalTree(5, 3), []);
-
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative">
@@ -66,8 +65,8 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                     <CardContent className="p-0 pt-4 px-2">
                         {panelView === 'card' && (
                             <Accordion type="multiple" className="w-full">
-                                {currentRelevantContext &&
-                                    currentRelevantContext.nodes.map((node: any) => (
+                                {currentMessage?.allRetrievedNodes &&
+                                    currentMessage.allRetrievedNodes.nodes.map((node: any) => (
                                         <AccordionItem key={node.id} value={node.id}>
                                             <AccordionTrigger>
                                                 <div className="text-left">
@@ -99,12 +98,17 @@ const ChatRightPanel = ({ currentRelevantContext, panelView, graphView }: ChatRi
                             <ChatGraph2D
                                 height={window.innerHeight * 0.6}
                                 width={rightPanelWidth}
-                                data={data}
-                                handleSelectedRelevantContext={setSelectedRelevantContext}
+                                layers={graphLayers}
+                                data={currentMessage}
                             />
                         )}
                         {panelView === 'graph' && graphView === '3d' && (
-                            <ChatGraph3D height={window.innerHeight * 0.6} width={rightPanelWidth} data={data} />
+                            <ChatGraph3D
+                                height={window.innerHeight * 0.6}
+                                width={rightPanelWidth}
+                                data={currentMessage}
+                                layers={graphLayers}
+                            />
                         )}
                         {panelView === 'graph' && !!selectedRelevantContext && (
                             <Accordion type="multiple" className="w-full">
