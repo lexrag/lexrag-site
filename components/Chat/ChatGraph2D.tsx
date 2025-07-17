@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
+import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer } from '@/types/Graph';
 
@@ -14,17 +15,18 @@ interface ChatGraph2DProps {
     width?: number;
     layers: GraphLayer[];
     data: GraphData;
+    handleCardData: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraph2D = ({ height, width, data, layers }: ChatGraph2DProps) => {
+const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
+    const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
     useEffect(() => {
-        console.log(data);
         const updateDimensions = () => {
             setDimensions({
                 width: window.innerWidth * 0.9 - 24,
@@ -38,8 +40,30 @@ const ChatGraph2D = ({ height, width, data, layers }: ChatGraph2DProps) => {
     }, []);
 
     useEffect(() => {
-        const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
-        return unsubscribe;
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            graphRef.current?.zoomToFit(400);
+            setHighlightedNodeId(null);
+        });
+
+        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
+            if (graphRef.current && payload.x !== undefined && payload.y !== undefined) {
+                graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
+                graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
+
+                if (payload.id) {
+                    setHighlightedNodeId(payload.id);
+
+                    setTimeout(() => {
+                        setHighlightedNodeId(null);
+                    }, 3000);
+                }
+            }
+        });
+
+        return () => {
+            unsubscribeZoomToFit();
+            unsubscribeZoomToNode();
+        };
     }, []);
 
     useEffect(() => {
@@ -134,12 +158,22 @@ const ChatGraph2D = ({ height, width, data, layers }: ChatGraph2DProps) => {
         };
     }, [layerDataMap, layers]);
 
+    useEffect(() => {
+        if (processedData) {
+            handleCardData(processedData);
+        }
+    }, [processedData]);
+
     const handleNodeClick = async (node: any) => {
         const data = await getConversationExpandNodes(node.id);
         console.log(data);
     };
 
     const getNodeColor = (node: any) => {
+        if (highlightedNodeId === node.id) {
+            return '#fbbf24';
+        }
+
         if (node.color) {
             return node.color;
         }
@@ -214,6 +248,7 @@ const ChatGraph2D = ({ height, width, data, layers }: ChatGraph2DProps) => {
             onNodeHover={handleNodeHover}
             onBackgroundClick={() => {
                 document.body.style.cursor = 'default';
+                setHighlightedNodeId(null);
             }}
         />
     );

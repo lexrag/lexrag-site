@@ -14,9 +14,10 @@ interface ChatGraphModalProps {
     graphView: string;
     graphLayers: GraphLayer[];
     data: GraphData;
+    handleCardData: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data }: ChatGraphModalProps) => {
+const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, handleCardData }: ChatGraphModalProps) => {
     const direction = useDirection();
 
     return (
@@ -32,7 +33,7 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data }: Ch
                     </DialogHeader>
                     <DialogBody>
                         <TabsContent value="2d">
-                            <ChatGraph2D data={data} layers={graphLayers} />
+                            <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} />
                         </TabsContent>
                         <TabsContent value="3d">
                             <ChatGraph3D data={data} layers={graphLayers} />
