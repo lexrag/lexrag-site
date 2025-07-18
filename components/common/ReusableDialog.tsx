@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 interface ReusableDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    title: string;
+    title?: string;
     children: ReactNode;
     footer?: ReactNode;
     className?: string;
@@ -29,7 +29,11 @@ const ReusableDialog = ({
                 onInteractOutside={(e) => e.preventDefault()}
             >
                 <DialogHeader className={headerClassName}>
-                    <DialogTitle className="text-xl font-medium text-mono mb-2">{title}</DialogTitle>
+                    {title ? (
+                        <DialogTitle className="text-xl font-medium text-mono mb-2">{title}</DialogTitle>
+                    ) : (
+                        <DialogTitle aria-hidden="true">&nbsp;</DialogTitle>
+                    )}
                 </DialogHeader>
                 <div className={contentClassName}>{children}</div>
                 {footer && <DialogFooter className="flex-row gap-2 justify-end">{footer}</DialogFooter>}

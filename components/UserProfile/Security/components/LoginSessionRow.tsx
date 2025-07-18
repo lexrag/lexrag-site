@@ -1,16 +1,15 @@
 'use client';
 
 import React from 'react';
+import { getSessionStatus } from '@/utils/getSessionStatus';
 import { LoginSession } from '@/types/Session';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { formatDistanceToNow } from 'date-fns';
 
 interface LoginSessionRowProps {
     session: LoginSession;
 }
 
 const LoginSessionRow = ({ session }: LoginSessionRowProps) => {
-    console.log(session);
     return (
         <TableRow>
             <TableCell>
@@ -19,7 +18,7 @@ const LoginSessionRow = ({ session }: LoginSessionRowProps) => {
             <TableCell>
                 <span className="text-xs text-secondary-foreground">{session.device}</span>
             </TableCell>
-            <TableCell>{formatDistanceToNow(new Date(session.last_seen), { addSuffix: true })}</TableCell>
+            <TableCell>{getSessionStatus(session)}</TableCell>
         </TableRow>
     );
 };

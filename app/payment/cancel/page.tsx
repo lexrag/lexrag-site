@@ -15,7 +15,7 @@ export default function CancelPage() {
             router.push('/profile/billing/plans');
         }, 2000);
         return () => clearTimeout(timeout);
-    }, []);
+    }, [router]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">

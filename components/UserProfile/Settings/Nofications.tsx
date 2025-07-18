@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { updateUserNotificationsMethod } from '@/api/user/updateUserNotificationsMethod';
+import { toast } from 'sonner';
+import { NotificationMethod, User } from '@/types/User';
 import { CardContent } from '@/components/ui/card';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { NotificationMethod, User } from '@/types/User';
-import { updateUserNotifications } from '@/api/user/updateUserNotifications';
-import { toast } from 'sonner';
 
 const NOTIFICATION_METHODS = [
     { key: 'sms', label: 'SMS', description: 'Receive notifications via SMS' },
@@ -16,11 +16,11 @@ const NOTIFICATION_METHODS = [
 ];
 
 const Nofications = ({ currentUser }: { currentUser: User }) => {
-    const [active, setActive] = useState(currentUser.notifications);
+    const [active, setActive] = useState(currentUser.notifications_method);
 
     const handleChange = async (value: NotificationMethod) => {
         setActive(value);
-        const success = await updateUserNotifications(value);
+        const success = await updateUserNotificationsMethod(value);
         if (success) {
             toast.success('Notifications updated successfully');
         } else {

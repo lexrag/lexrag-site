@@ -13,5 +13,5 @@ export function mapTariffsToFeatureRows(tariffs: Tariff[], features: TariffFeatu
         };
     });
     featureRows.sort((a, b) => b.count - a.count || a.originalIdx - b.originalIdx);
-    return featureRows.map(({ count, originalIdx, ...rest }) => rest);
+    return featureRows.map(({ ...rest }) => rest);
 }

@@ -1,22 +1,17 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { getSessions } from '@/api/user/getSessions';
+import { getSessionStatus } from '@/utils/getSessionStatus';
 import { Search } from 'lucide-react';
+import { LoginSession } from '@/types/Session';
 import { Card, CardFooter, CardHeader, CardTable } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import DeviceTableHeader from '../../components/TableHeader';
 import TablePagination from '../../components/TablePagination';
-import { getSessions } from '@/api/user/getSessions';
-import { LoginSession } from '@/types/Session';
-import { formatDistanceToNow } from 'date-fns';
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
-
-export const getSessionStatus = (session: LoginSession) => {
-    if (session.is_current) return 'Current session';
-    return formatDistanceToNow(new Date(session.last_seen), { addSuffix: true });
-};
 
 const SESSION_COLUMNS = [
     { key: 'ip', label: 'IP', className: 'px-4 py-2', sortable: true },
@@ -46,7 +41,10 @@ const SessionsTable = () => {
         if (!sessions) return [];
         if (!search) return sessions;
         return sessions.filter((session) =>
-            [session.ip_address, session.device, session.last_seen].join(' ').toLowerCase().includes(search.toLowerCase()),
+            [session.ip_address, session.device, session.last_seen]
+                .join(' ')
+                .toLowerCase()
+                .includes(search.toLowerCase()),
         );
     }, [sessions, search]);
 

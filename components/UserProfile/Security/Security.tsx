@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
+import { get2FAStatus } from '@/api/user/get2FAStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 import { SquarePen } from 'lucide-react';
@@ -16,6 +17,7 @@ import PasswordResetModal from '@/components/UserProfile/components/PasswordRese
 import Row from '@/components/UserProfile/components/Row';
 import ChangeEmailFlow from '@/components/UserProfile/Security/components/ChangeEmailFlow';
 import ChangePhoneNumberFlow from '@/components/UserProfile/Security/components/ChangePhoneNumberFlow';
+import TwoFactorFlow from './components/TwoFactorFlow';
 
 interface AuthenticationProps {
     currentUser: User;
@@ -29,6 +31,48 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
         currentUser?.password_last_changed_at || null,
     );
     const [open, setOpen] = useState(false);
+    const [open2FA, setOpen2FA] = useState(false);
+    const [twoFAStatus, setTwoFAStatus] = useState<'enabled' | 'setup' | 'not_set' | 'loading'>('loading');
+
+    useEffect(() => {
+        const fetch2FAStatus = async () => {
+            setTwoFAStatus('loading');
+            const res = await get2FAStatus();
+            if (res.success && res.data.is_enabled !== undefined && res.data.is_setup !== undefined) {
+                if (res.data.is_enabled === true) {
+                    setTwoFAStatus('enabled');
+                } else if (res.data.is_setup === true) {
+                    setTwoFAStatus('setup');
+                } else {
+                    setTwoFAStatus('not_set');
+                }
+            } else {
+                setTwoFAStatus('not_set');
+            }
+        };
+        fetch2FAStatus();
+    }, []);
+
+    const handle2FAClose = (open: boolean) => {
+        setOpen2FA(open);
+        if (!open) {
+            (async () => {
+                setTwoFAStatus('loading');
+                const res = await get2FAStatus();
+                if (res.success && res.data.is_enabled !== undefined && res.data.is_setup !== undefined) {
+                    if (res.data.is_enabled === true) {
+                        setTwoFAStatus('enabled');
+                    } else if (res.data.is_setup === true) {
+                        setTwoFAStatus('setup');
+                    } else {
+                        setTwoFAStatus('not_set');
+                    }
+                } else {
+                    setTwoFAStatus('not_set');
+                }
+            })();
+        }
+    };
 
     const phoneUtil = PhoneNumberUtil.getInstance();
     let formatted: string | null = null;
@@ -97,10 +141,34 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                     )}
                 </span>
             </Row>
-            <Row label="2FA">
-                <Badge variant="warning" appearance="outline">
-                    Not set
-                </Badge>
+            <Row
+                label="2FA"
+                actionIcon={
+                    <Button variant="ghost" size="icon" onClick={() => setOpen2FA(true)} aria-label="Manage 2FA">
+                        <SquarePen />
+                    </Button>
+                }
+            >
+                <span>
+                    {twoFAStatus === 'loading' ? (
+                        <Badge variant="secondary" appearance="outline">
+                            Loading...
+                        </Badge>
+                    ) : twoFAStatus === 'enabled' ? (
+                        <Badge variant="success" appearance="outline">
+                            Enabled
+                        </Badge>
+                    ) : twoFAStatus === 'setup' ? (
+                        <Badge variant="primary" appearance="outline">
+                            Setup, not enabled
+                        </Badge>
+                    ) : (
+                        <Badge variant="warning" appearance="outline">
+                            Not set
+                        </Badge>
+                    )}
+                </span>
+                <TwoFactorFlow open={open2FA} onOpenChange={handle2FAClose} />
             </Row>
             <Row label="Sign in">
                 <div className="flex items-center gap-2">
