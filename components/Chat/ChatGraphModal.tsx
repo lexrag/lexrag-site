@@ -2,6 +2,7 @@
 
 import React, { Dispatch, SetStateAction } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
+import { GraphData, GraphLayer } from '@/types/Graph';
 import DialogContent, { Dialog, DialogBody, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import ChatGraph2D from './ChatGraph2D';
@@ -11,17 +12,12 @@ interface ChatGraphModalProps {
     open: boolean;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
     graphView: string;
-    currentRelevantContext: any;
-    handleCurrentRelevantContext: Dispatch<SetStateAction<any>>;
+    graphLayers: GraphLayer[];
+    data: GraphData;
+    handleCardData: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraphModal = ({
-    open,
-    onOpenChange,
-    graphView,
-    currentRelevantContext,
-    handleCurrentRelevantContext,
-}: ChatGraphModalProps) => {
+const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, handleCardData }: ChatGraphModalProps) => {
     const direction = useDirection();
 
     return (
@@ -37,13 +33,10 @@ const ChatGraphModal = ({
                     </DialogHeader>
                     <DialogBody>
                         <TabsContent value="2d">
-                            <ChatGraph2D
-                                data={currentRelevantContext}
-                                handleSelectedRelevantContext={handleCurrentRelevantContext}
-                            />
+                            <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} />
                         </TabsContent>
                         <TabsContent value="3d">
-                            <ChatGraph3D data={currentRelevantContext} />
+                            <ChatGraph3D data={data} layers={graphLayers} />
                         </TabsContent>
                     </DialogBody>
                 </Tabs>

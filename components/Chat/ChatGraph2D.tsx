@@ -1,27 +1,30 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
+import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
+import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
+import { GraphData, GraphLayer } from '@/types/Graph';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
 interface ChatGraph2DProps {
     height?: number;
     width?: number;
-    data: any;
-    handleSelectedRelevantContext: Dispatch<SetStateAction<any>>;
+    layers: GraphLayer[];
+    data: GraphData;
+    handleCardData: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: ChatGraph2DProps) => {
+const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
+    const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-    const [graphData, setGraphData] = useState(data);
-
-    useEffect(() => {
-        setGraphData(data);
-    }, [data]);
+    const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
+    const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -36,123 +39,216 @@ const ChatGraph2D = ({ height, width, data, handleSelectedRelevantContext }: Cha
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
-    const initializedData = useMemo(() => {
-        if (!data || !data.nodes || !data.links) return { nodes: [], links: [] };
+    useEffect(() => {
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            graphRef.current?.zoomToFit(400);
+            setHighlightedNodeId(null);
+        });
 
-        const enhancedNodes = data.nodes.map((node: any) => ({
-            ...node,
-            collapsed: false,
-            childLinks: [],
-        }));
+        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
+            if (graphRef.current && payload.x !== undefined && payload.y !== undefined) {
+                graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
+                graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
 
-        const enhancedNodesById = Object.fromEntries(enhancedNodes.map((node: any) => [node.id, node]));
+                if (payload.id) {
+                    setHighlightedNodeId(payload.id);
 
-        const enhancedLinks = data.links.map((link: any) => ({
-            ...link,
-            source: typeof link.source === 'object' ? link.source.id : link.source,
-            target: typeof link.target === 'object' ? link.target.id : link.target,
-        }));
+                    setTimeout(() => {
+                        setHighlightedNodeId(null);
+                    }, 3000);
+                }
+            }
+        });
 
-        enhancedLinks.forEach((link: any) => {
-            if (enhancedNodesById[link.source]) {
-                enhancedNodesById[link.source].childLinks.push(link);
+        return () => {
+            unsubscribeZoomToFit();
+            unsubscribeZoomToNode();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!data) return;
+
+        const newLayerDataMap: Record<string, { nodes: any[]; links: any[] }> = {};
+
+        const dataKeyToLayerId: Record<string, string> = {
+            allRetrievedNodes: 'all_retrieved_nodes',
+            allRetrievedNodesWithNeighbors: 'all_retrieved_nodes_with_neighbors',
+            relevantRetrievedNodes: 'relevant_retrieved_nodes',
+            relevantContext: 'relevant_context',
+        };
+
+        Object.keys(data).forEach((dataKey) => {
+            const layerId = dataKeyToLayerId[dataKey];
+            const layerData = data[dataKey as keyof GraphData];
+
+            if (layerId && layerData) {
+                if (layerData.nodes && Array.isArray(layerData.nodes)) {
+                    const layerConfig = layers.find((l) => l.id === layerId);
+                    const nodesWithLayerColor = layerData.nodes.map((node: any) => ({
+                        ...node,
+                        layerColor: layerConfig?.color || '#d3d3d3',
+                        layerId: layerId,
+                    }));
+
+                    newLayerDataMap[layerId] = {
+                        nodes: nodesWithLayerColor,
+                        links: layerData.links || [],
+                    };
+                }
+            }
+        });
+
+        setLayerDataMap(newLayerDataMap);
+    }, [data, layers]);
+
+    const processedData = useMemo(() => {
+        const enabledLayers = layers.filter((layer) => layer.enabled);
+
+        if (enabledLayers.length === 0) {
+            return { nodes: [], links: [] };
+        }
+
+        const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
+
+        const allNodes = new Map();
+        const allLinks = new Map();
+
+        sortedEnabledLayers.forEach((layer) => {
+            const layerData = layerDataMap[layer.id];
+            if (!layerData) return;
+
+            layerData.nodes.forEach((node: any) => {
+                const existingNode = allNodes.get(node.id);
+                if (existingNode) {
+                    allNodes.set(node.id, {
+                        ...existingNode,
+                        ...node,
+                        color: node.layerColor || layer.color,
+                        layerId: layer.id,
+                        layerName: layer.name,
+                    });
+                } else {
+                    allNodes.set(node.id, {
+                        ...node,
+                        color: node.layerColor || layer.color,
+                        layerId: layer.id,
+                        layerName: layer.name,
+                    });
+                }
+            });
+
+            if (layerData.links) {
+                layerData.links.forEach((link: any) => {
+                    const linkKey = `${link.source}-${link.target}`;
+                    if (!allLinks.has(linkKey)) {
+                        allLinks.set(linkKey, {
+                            ...link,
+                            source: typeof link.source === 'object' ? link.source.id : link.source,
+                            target: typeof link.target === 'object' ? link.target.id : link.target,
+                        });
+                    }
+                });
             }
         });
 
         return {
-            nodes: enhancedNodes,
-            links: enhancedLinks,
+            nodes: Array.from(allNodes.values()),
+            links: Array.from(allLinks.values()),
         };
-    }, [data]);
-
-    const getPrunedTree = (fullData: any) => {
-        const visibleNodes: any[] = [];
-        const visibleLinks: any[] = [];
-        const visitedNodes = new Set();
-        const nodesById = Object.fromEntries(fullData.nodes.map((node: any) => [node.id, node]));
-
-        const traverseTree = (node: any) => {
-            if (visitedNodes.has(node.id)) return;
-            visitedNodes.add(node.id);
-            visibleNodes.push(node);
-            if (node.collapsed) return;
-            node.childLinks.forEach((link: any) => {
-                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                const targetNode = nodesById[targetId];
-                if (targetNode && !visitedNodes.has(targetNode.id)) {
-                    visibleLinks.push(link);
-                    traverseTree(targetNode);
-                }
-            });
-        };
-
-        const targetIds = new Set(
-            fullData.links.map((link: any) => (typeof link.target === 'object' ? link.target.id : link.target)),
-        );
-
-        const rootNodes = fullData.nodes.filter((node: any) => !targetIds.has(node.id));
-
-        if (rootNodes.length === 0) {
-            fullData.nodes.forEach((node: any) => {
-                if (!visitedNodes.has(node.id)) {
-                    traverseTree(node);
-                }
-            });
-        } else {
-            rootNodes.forEach(traverseTree);
-        }
-
-        return { nodes: visibleNodes, links: visibleLinks };
-    };
+    }, [layerDataMap, layers]);
 
     useEffect(() => {
-        const prunedData = getPrunedTree(initializedData);
-        setGraphData(prunedData);
-    }, [initializedData]);
-
-    const handleNodeClick = (node: any) => {
-        if (node.childLinks && node.childLinks.length > 0) {
-            node.collapsed = !node.collapsed;
-            setGraphData(getPrunedTree(initializedData));
+        if (processedData) {
+            handleCardData(processedData);
         }
-        handleSelectedRelevantContext(node);
+    }, [processedData]);
+
+    const handleNodeClick = async (node: any) => {
+        const data = await getConversationExpandNodes(node.id);
+        console.log(data);
     };
 
     const getNodeColor = (node: any) => {
-        if (!node.childLinks || node.childLinks.length === 0) {
-            return '#10b981';
+        if (highlightedNodeId === node.id) {
+            return '#fbbf24';
         }
-        return node.collapsed ? '#ef4444' : '#f59e0b';
+
+        if (node.color) {
+            return node.color;
+        }
+
+        if (node.labels && node.labels.includes('CaseLaw')) {
+            return '#ef4444'; // Red for case law
+        }
+        if (node.labels && node.labels.includes('Act')) {
+            return '#3b82f6'; // Blue for legislation
+        }
+        if (node.labels && node.labels.includes('Paragraph')) {
+            return '#10b981'; // Green for paragraphs
+        }
+        return '#6b7280'; // Gray for unknown types
+    };
+
+    const getNodeSize = (node: any) => {
+        if (node.labels && node.labels.includes('CaseLaw')) {
+            return 8;
+        }
+        if (node.labels && node.labels.includes('Act')) {
+            return 12;
+        }
+        if (node.labels && node.labels.includes('Paragraph')) {
+            return 6;
+        }
+        return 6;
     };
 
     const handleNodeHover = (node: any) => {
-        if (node && node.childLinks && node.childLinks.length > 0) {
-            document.body.style.cursor = 'pointer';
+        document.body.style.cursor = node ? 'pointer' : 'default';
+    };
+
+    const getLinkColor = () => {
+        return resolvedTheme === 'dark' ? '#374151' : '#9ca3af';
+    };
+
+    const getNodeLabel = (node: any) => {
+        let baseLabel = '';
+
+        if (node.labels && node.labels.includes('CaseLaw')) {
+            baseLabel = `${node.content}\n${node.neutralCitation || ''}`;
+        } else if (node.labels && node.labels.includes('Act')) {
+            baseLabel = node.content;
+        } else if (node.labels && node.labels.includes('Paragraph')) {
+            baseLabel = `¶${node.number}: ${node.content.substring(0, 100)}...`;
         } else {
-            document.body.style.cursor = 'default';
+            baseLabel = node.content || node.id;
         }
+
+        if (node.layerName) {
+            baseLabel += `\n[${node.layerName}]`;
+        }
+
+        return baseLabel;
     };
 
     return (
         <ForceGraph2D
+            ref={graphRef}
             width={width || dimensions.width}
             height={height || dimensions.height}
-            graphData={graphData}
+            graphData={processedData}
             backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
             nodeColor={getNodeColor}
+            nodeVal={getNodeSize}
+            linkColor={getLinkColor}
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
-            nodeLabel={(node) => {
-                const baseLabel = node.neutralCitation || `№ ${node.number}`;
-                if (node.childLinks && node.childLinks.length > 0) {
-                    return `${baseLabel} (${node.collapsed ? 'expand' : 'collapse'})`;
-                }
-                return baseLabel;
-            }}
+            nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
             onBackgroundClick={() => {
                 document.body.style.cursor = 'default';
+                setHighlightedNodeId(null);
             }}
         />
     );

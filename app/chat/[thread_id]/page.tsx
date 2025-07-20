@@ -5,7 +5,16 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { ClockArrowDown, ClockArrowUp, Expand, Menu, MessageSquare, Network, Rows3 } from 'lucide-react';
+import { zoomToFitGraph } from '@/events/zoom-to-fit';
+import { ClockArrowDown, ClockArrowUp, Expand, Fullscreen, Layers, Menu, MessageSquare } from 'lucide-react';
+import { CardData } from '@/types/Chat';
+import { GraphLayer } from '@/types/Graph';
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
@@ -20,21 +29,34 @@ export default function ChatPage() {
     const pathname = usePathname();
     const router = useRouter();
     const { socket, conversations, setConversations } = useChatContext();
-    const { messages, isThinking, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } = useChat({
-        websocket: socket,
-        setConversations,
-    });
+    const { messages, isThinking, status, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } =
+        useChat({
+            websocket: socket,
+            setConversations,
+        });
 
-    const [rightPanelView, setRightPanelView] = useState<string>('card');
     const [graphView, setGraphView] = useState<string>('2d');
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
-    const [currentRelevantContext, setCurrentRelevantContext] = useState<any>();
+    const [currentMessage, setCurrentMessage] = useState<any>();
+    const [graphLayers, setGraphLayers] = useState<GraphLayer[]>([
+        { id: 'all_retrieved_nodes', name: 'All Retrieved Nodes', enabled: true, color: '#d3d3d3', priority: 1 },
+        {
+            id: 'all_retrieved_nodes_with_neighbors',
+            name: 'With Neighbors',
+            enabled: true,
+            color: '#3b82f6',
+            priority: 2,
+        },
+        { id: 'relevant_retrieved_nodes', name: 'Relevant Nodes', enabled: true, color: '#10b981', priority: 3 },
+        { id: 'relevant_context', name: 'Relevant Context', enabled: true, color: '#ef4444', priority: 4 },
+    ]);
+    const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
 
     useEffect(() => {
         const message = [...messages].reverse().find(({ direction }) => direction === 'incoming');
-        setCurrentRelevantContext(message?.relevantContext);
+        setCurrentMessage(message);
     }, [messages]);
 
     const onDeleteConversation = async (threadId: string) => {
@@ -54,8 +76,9 @@ export default function ChatPage() {
                 open={isOpenGraphModal}
                 onOpenChange={setIsOpenGraphModal}
                 graphView={graphView}
-                currentRelevantContext={currentRelevantContext}
-                handleCurrentRelevantContext={setCurrentRelevantContext}
+                graphLayers={graphLayers}
+                data={currentMessage}
+                handleCardData={setCardData}
             />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
                 <div className="w-1/4 flex items-center justify-between">
@@ -75,39 +98,49 @@ export default function ChatPage() {
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
                 <div className="w-1/4 flex items-center justify-start gap-2">
-                    <Tabs value={rightPanelView} onValueChange={setRightPanelView}>
+                    <Tabs value={graphView} onValueChange={setGraphView}>
                         <TabsList className="w-fit grid grid-cols-2">
-                            <TabsTrigger
-                                value="card"
-                                disabled={pathname === '/chat/new'}
-                                className="text-[12px] py-1 px-2"
-                            >
-                                <Rows3 />
+                            <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                2D
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="graph"
-                                disabled={pathname === '/chat/new'}
-                                className="text-[12px] py-1 px-2"
-                            >
-                                <Network />
+                            <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                3D
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
-                    {rightPanelView === 'graph' && (
-                        <>
-                            <Tabs value={graphView} onValueChange={setGraphView}>
-                                <TabsList className="w-fit grid grid-cols-2">
-                                    <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
-                                        2D
-                                    </TabsTrigger>
-                                    <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
-                                        3D
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
-                            <Expand onClick={() => setIsOpenGraphModal(true)} />
-                        </>
-                    )}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Layers className="hover:text-primary cursor-pointer" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-48">
+                            {graphLayers.map(({ id, enabled, name }) => {
+                                const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
+                                const isLastEnabled = enabled && enabledLayersCount === 1;
+
+                                return (
+                                    <DropdownMenuCheckboxItem
+                                        key={id}
+                                        checked={enabled}
+                                        onSelect={(event) => event.preventDefault()}
+                                        onCheckedChange={(checked) => {
+                                            if (!checked && isLastEnabled) return;
+
+                                            setGraphLayers((prevLayers) =>
+                                                prevLayers.map((layer) =>
+                                                    layer.id === id ? { ...layer, enabled: checked } : layer,
+                                                ),
+                                            );
+                                        }}
+                                        disabled={isLastEnabled}
+                                    >
+                                        {name}
+                                    </DropdownMenuCheckboxItem>
+                                );
+                            })}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Expand className="hover:text-primary cursor-pointer" onClick={() => setIsOpenGraphModal(true)} />
+                    <Fullscreen className="hover:text-primary cursor-pointer" onClick={() => zoomToFitGraph()} />
                 </div>
             </header>
             <header className="w-full flex md:hidden items-center justify-between pt-2 px-2">
@@ -130,19 +163,22 @@ export default function ChatPage() {
                         <ChatBox
                             messages={messages}
                             isThinking={isThinking}
+                            status={status}
                             currentResponseContent={currentResponseContent}
                             copiedMessageId={copiedMessageId}
                             sendMessage={sendMessage}
                             copyToClipboard={copyToClipboard}
-                            handleCurrentRelevantContext={setCurrentRelevantContext}
+                            handleCurrentMessage={setCurrentMessage}
                         />
                     </div>
                 </section>
 
                 <ChatRightPanel
-                    currentRelevantContext={currentRelevantContext}
-                    panelView={rightPanelView}
+                    currentMessage={currentMessage}
+                    graphLayers={graphLayers}
                     graphView={graphView}
+                    cardData={cardData}
+                    handleCardData={setCardData}
                 />
             </main>
             <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
