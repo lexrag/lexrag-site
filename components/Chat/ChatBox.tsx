@@ -4,26 +4,28 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
-import BouncingBall from './BouncingBall';
+import { TypingAnimation } from '../magicui/typing-animation';
 
 interface ChatBoxProps {
     messages: Message[];
     isThinking: boolean;
+    status: string | null;
     currentResponseContent: string;
     copiedMessageId: string | null;
     sendMessage: (input: string, isNew: boolean) => void;
     copyToClipboard: (messageId: string, text: string) => void;
-    handleCurrentRelevantContext: Dispatch<SetStateAction<any>>;
+    handleCurrentMessage: Dispatch<SetStateAction<any>>;
 }
 
 const ChatBox = ({
     messages,
     isThinking,
+    status,
     currentResponseContent,
     copiedMessageId,
     sendMessage,
     copyToClipboard,
-    handleCurrentRelevantContext,
+    handleCurrentMessage,
 }: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
@@ -100,10 +102,7 @@ const ChatBox = ({
                                     </button>
                                     {msg.direction === 'incoming' && (
                                         <button className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary">
-                                            <Network
-                                                className="size-4"
-                                                onClick={() => handleCurrentRelevantContext(msg.relevantContext)}
-                                            />
+                                            <Network className="size-4" onClick={() => handleCurrentMessage(msg)} />
                                         </button>
                                     )}
                                 </div>
@@ -125,7 +124,7 @@ const ChatBox = ({
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
                                 <div className="p-5 rounded-lg text-gray-900 text-sm message-text">
-                                    <BouncingBall />
+                                    <TypingAnimation className="text-sm">{status || ''}</TypingAnimation>
                                 </div>
                             </div>
                         </div>
