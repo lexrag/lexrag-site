@@ -1,5 +1,6 @@
 export interface LoginSession {
-    ip: string;
+    ip_address: string;
     device: string;
     last_seen: string;
+    is_current: boolean;
 }

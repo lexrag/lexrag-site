@@ -1,17 +1,16 @@
-import PageTitle from '@/components/Layout/PageTitle';
+import getMeServer from '@/api/auth/getMeServer';
+import { User } from '@/types/User';
 import Legal from '@/components/UserProfile/Compliance/Legal';
 
-const CompliancePage = () => {
+const CompliancePage = async () => {
+    const currentUser: User = await getMeServer();
+
     return (
-        <section className="flex flex-col items-center justify-center bg-background">
-            <PageTitle />
+        <div className="flex flex-col w-full max-w-2xl gap-8 items-center justify-center px-4">
             <div className="flex flex-col w-full max-w-2xl gap-8 items-center justify-center px-4">
-                <div className="flex flex-col w-full max-w-2xl gap-8 items-center justify-center px-4">
-                    <Legal />
-                </div>
+                <Legal currentUser={currentUser} />
             </div>
-        </section>
+        </div>
     );
 };
-
 export default CompliancePage;

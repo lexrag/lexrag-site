@@ -1,12 +1,10 @@
 import { CurrentSubscription } from './CurrentSubscription';
 
-export interface Plan {
+export interface TariffFeature {
     id: string;
     name: string;
-    description?: string;
-    price: number;
-    isCurrent?: boolean;
-    button?: PlanButton;
+    lookup_key: string;
+    metadata: Record<string, any>;
 }
 
 export interface Tariff {
@@ -14,14 +12,12 @@ export interface Tariff {
     name: string;
     description: string;
     price: number;
-    storage: number;
-    team_members: number;
-    support_type: string;
-    analytics_type: string;
-    api_access: boolean;
-    mobile_app_access: boolean;
-    custom_domain: boolean;
     duration: number;
+    is_active: boolean;
+    features: TariffFeature[];
+    stripe_product_id: string;
+    stripe_price_id: string;
+    created_at: string;
 }
 
 export interface PlansTableProps {
@@ -30,22 +26,23 @@ export interface PlansTableProps {
     onCancelPlan?: () => void;
 }
 
-export interface Feature {
+export interface FeatureRowData {
     id: string;
     label: string;
-    values: (string | React.ReactNode)[];
+    values: boolean[]; // true if plan has this feature, false otherwise
 }
 
 export interface FeatureRowProps {
-    feature: Feature;
+    feature: FeatureRowData;
 }
 
 export interface PlansRowProps {
-    plan: Plan;
+    plan: Tariff;
     idx: number;
     currentPlanId: string | null;
     onChangePlan: (planId: string) => void;
     onCancelPlan?: () => void;
+    annual?: boolean;
 }
 
 export interface PlanButton {

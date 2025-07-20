@@ -8,7 +8,7 @@ function FeatureRow({ feature }: FeatureRowProps) {
             <TableCell className="p-4 align-middle border-s border-b px-5 py-3.5 border">
                 <div className="text-mono text-sm leading-none font-medium">{feature.label}</div>
             </TableCell>
-            {feature.values.map((value: string | React.ReactNode, idx: number) => (
+            {feature.values.map((enabled, idx) => (
                 <TableCell
                     key={idx}
                     className={
@@ -17,14 +17,10 @@ function FeatureRow({ feature }: FeatureRowProps) {
                         (idx === feature.values.length - 1 ? ' border-e' : '')
                     }
                 >
-                    {typeof value === 'boolean' ? (
-                        value ? (
-                            <Check className="text-green-500 text-lg" />
-                        ) : (
-                            <X className="text-red-500 text-lg" />
-                        )
+                    {enabled ? (
+                        <Check className="text-green-500 text-lg mx-auto" />
                     ) : (
-                        value
+                        <X className="text-red-500 text-lg mx-auto" />
                     )}
                 </TableCell>
             ))}

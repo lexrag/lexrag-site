@@ -14,6 +14,8 @@ export interface User {
     password_last_changed_at: string;
     created_at: string;
     updated_at: string;
+    notifications_method: NotificationMethod;
+    is_notifications_enabled: boolean;
 }
 
 export interface UpdateUserParams {
@@ -26,3 +28,5 @@ export interface UpdateUserParams {
     language?: string;
     country?: string;
 }
+
+export type NotificationMethod = 'email' | 'sms' | 'push';

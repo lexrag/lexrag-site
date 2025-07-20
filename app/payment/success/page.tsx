@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
@@ -8,6 +9,16 @@ import CardWrapper from '@/components/ui/card-wrapper';
 
 export default function SuccessPage() {
     const router = useRouter();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.push('/profile');
+        }, 2000);
+
+        return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
             <CardWrapper title="Payment Successful" className="max-w-md mx-auto mt-10">
@@ -18,7 +29,15 @@ export default function SuccessPage() {
                             width={128}
                             src="/media/illustrations/1.svg"
                             alt="Success"
-                            className="mb-4"
+                            className="mb-4 dark:hidden"
+                            priority
+                        />
+                        <Image
+                            height={128}
+                            width={128}
+                            src="/media/illustrations/1.svg"
+                            alt="Success"
+                            className="hidden dark:block"
                             priority
                         />
                     </div>
@@ -29,13 +48,8 @@ export default function SuccessPage() {
                     <p className="text-center text-muted-foreground mb-6 max-w-xs">
                         Your payment was processed successfully. Thank you for your purchase!
                     </p>
-                    <Button
-                        variant="primary"
-                        size="lg"
-                        className="w-full"
-                        onClick={() => router.push('/profile/billing/plans')}
-                    >
-                        Go to Plans
+                    <Button variant="primary" size="lg" className="w-full" onClick={() => router.push('/profile')}>
+                        Go to Profile
                     </Button>
                 </div>
             </CardWrapper>

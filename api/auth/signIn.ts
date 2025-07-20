@@ -3,9 +3,10 @@ import { setSession } from '@/utils/auth/setSession';
 interface SignInParams {
     email: string;
     password: string;
+    otp_code?: string;
 }
 
-export const signIn = async (params: SignInParams): Promise<{ success: boolean; error?: string }> => {
+export const signIn = async (params: SignInParams): Promise<{ success: boolean; error?: string; status?: number }> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin`, {
         method: 'POST',
         body: JSON.stringify(params),
@@ -20,12 +21,12 @@ export const signIn = async (params: SignInParams): Promise<{ success: boolean; 
         const token = data.access_token;
         localStorage.setItem('token', token);
         await setSession(token);
-        return { success: true };
+        return { success: true, status: response.status };
     }
 
     if (data?.detail) {
-        return { success: false, error: data.detail || 'Authentication failed' };
+        return { success: false, error: data.detail || 'Authentication failed', status: response.status };
     } else {
-        return { success: false, error: 'Network error' };
+        return { success: false, error: 'Network error', status: response.status };
     }
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
@@ -8,6 +9,14 @@ import CardWrapper from '@/components/ui/card-wrapper';
 
 export default function CancelPage() {
     const router = useRouter();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.push('/profile/billing/plans');
+        }, 2000);
+        return () => clearTimeout(timeout);
+    }, [router]);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
             <CardWrapper title="Payment Canceled" className="max-w-md mx-auto mt-10">
@@ -18,7 +27,15 @@ export default function CancelPage() {
                             width={128}
                             src="/media/illustrations/2.svg"
                             alt="Cancel"
-                            className="mb-4"
+                            className="mb-4 dark:hidden"
+                            priority
+                        />
+                        <Image
+                            height={128}
+                            width={128}
+                            src="/media/illustrations/2-dark.svg"
+                            alt="Cancel"
+                            className="mb-4 hidden dark:block"
                             priority
                         />
                     </div>
