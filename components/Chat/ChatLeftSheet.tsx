@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useDirection } from '@radix-ui/react-direction';
 import { ClockArrowDown, ClockArrowUp, MessageSquare, MessageSquarePlus, Trash2 } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
-import { useLogOut } from '@/hooks/use-log-out';
+
 import { useUser } from '@/providers/user-provider';
 import ChatSettingsSheetMenu from '@/components/Chat/ChatSettingsSheetMenu';
 import ProfileBar from '@/components/Chat/ProfileBar';
@@ -19,14 +19,15 @@ interface ChatLeftSheetProps {
     handleOpen: Dispatch<SetStateAction<boolean>>;
     conversations: Conversation[];
     handleDeleteConversation: (threadId: string) => void;
+    activeTab: string;
+    onTabChange: (tab: string) => void;
 }
 
-const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversation }: ChatLeftSheetProps) => {
+const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversation, activeTab, onTabChange }: ChatLeftSheetProps) => {
     const direction = useDirection();
-    const [activeTab, setActiveTab] = useState<'chats' | 'settings' | '1' | '2'>('chats');
+    const [showSettings, setShowSettings] = useState(false);
 
     const { user } = useUser();
-    const logOut = useLogOut();
 
     return (
         <Sheet open={isOpen} onOpenChange={handleOpen}>
@@ -36,27 +37,24 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                     <CardHeader className="border-none">
                         <Tabs
                             value={activeTab}
-                            onValueChange={(v) => setActiveTab(v as 'chats' | 'settings' | '1' | '2')}
+                            onValueChange={onTabChange}
                         >
                             <TabsList className="w-fit grid grid-cols-3 mt-2">
                                 <TabsTrigger
                                     value="chats"
                                     className="text-[12px] py-1 px-2"
-                                    onClick={() => setActiveTab('chats')}
                                 >
                                     <MessageSquare />
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="1"
                                     className="text-[12px] py-1 px-2"
-                                    onClick={() => setActiveTab('1')}
                                 >
                                     <ClockArrowDown />
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="2"
                                     className="text-[12px] py-1 px-2"
-                                    onClick={() => setActiveTab('2')}
                                 >
                                     <ClockArrowUp />
                                 </TabsTrigger>
@@ -71,12 +69,11 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-2 p-0 relative min-h-[200px]">
-                        <ChatSettingsSheetMenu open={activeTab === 'settings'} />
-                        <div
-                            className={`transition-opacity duration-300 ${activeTab === 'settings' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-                        >
-                            {activeTab === 'chats' &&
-                                conversations.map(({ thread_id, title }) => (
+                        {showSettings ? (
+                            <ChatSettingsSheetMenu open={true} />
+                        ) : (
+                            <div>
+                                {conversations.map(({ thread_id, title }) => (
                                     <Link
                                         key={thread_id}
                                         className="flex items-center justify-between py-2 px-3 border-b border-dashed last:border-none text-sm over:bg-muted cursor-pointer rounded-md transition-colors"
@@ -89,14 +86,14 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                                         />
                                     </Link>
                                 ))}
-                        </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
-                <ProfileBar
-                    user={user}
-                    mode={activeTab === 'settings' ? 'settings' : 'default'}
-                    onSettings={() => setActiveTab('settings')}
-                    onLogOut={logOut}
+                <ProfileBar 
+                    user={user} 
+                    showSettings={showSettings}
+                    onToggleSettings={() => setShowSettings(!showSettings)}
                 />
             </SheetContent>
         </Sheet>

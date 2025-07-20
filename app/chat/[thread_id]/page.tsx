@@ -40,6 +40,7 @@ export default function ChatPage() {
     const [isOpenRightSheet, setIsOpenRightSheet] = useState<boolean>(false);
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
     const [currentMessage, setCurrentMessage] = useState<any>();
+    const [activeLeftTab, setActiveLeftTab] = useState<string>('chats');
     const [graphLayers, setGraphLayers] = useState<GraphLayer[]>([
         { id: 'all_retrieved_nodes', name: 'All Retrieved Nodes', enabled: true, color: '#d3d3d3', priority: 1 },
         {
@@ -82,19 +83,19 @@ export default function ChatPage() {
             />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
                 <div className="w-1/4 flex items-center justify-between">
-                    <Tabs defaultValue="chats">
-                        <TabsList className="w-fit grid grid-cols-3">
-                            <TabsTrigger value="chats" className="text-[12px] py-1 px-2">
-                                <MessageSquare />
-                            </TabsTrigger>
-                            <TabsTrigger value="1" className="text-[12px] py-1 px-2">
-                                <ClockArrowDown />
-                            </TabsTrigger>
-                            <TabsTrigger value="2" className="text-[12px] py-1 px-2">
-                                <ClockArrowUp />
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+                                            <Tabs value={activeLeftTab} onValueChange={setActiveLeftTab}>
+                            <TabsList className="w-fit grid grid-cols-3">
+                                <TabsTrigger value="chats" className="text-[12px] py-1 px-2">
+                                    <MessageSquare />
+                                </TabsTrigger>
+                                <TabsTrigger value="1" className="text-[12px] py-1 px-2">
+                                    <ClockArrowDown />
+                                </TabsTrigger>
+                                <TabsTrigger value="2" className="text-[12px] py-1 px-2">
+                                    <ClockArrowUp />
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
                 <div className="w-1/4 flex items-center justify-start gap-2">
@@ -153,10 +154,12 @@ export default function ChatPage() {
                 handleOpen={setIsOpenLeftSheet}
                 conversations={conversations}
                 handleDeleteConversation={onDeleteConversation}
+                activeTab={activeLeftTab}
+                onTabChange={setActiveLeftTab}
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
             <main className="flex flex-1 overflow-hidden pb-4 z-40">
-                <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} />
+                <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeTab={activeLeftTab} onTabChange={setActiveLeftTab} />
 
                 <section className="flex-1 flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto">
