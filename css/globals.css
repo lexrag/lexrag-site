@@ -57,15 +57,10 @@
   
   /* TODO: make sure this is not too big */
   /* Better touch targets */
-  button, [role="button"] {
+  button:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]), 
+  [role="button"]:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]) {
     min-height: 44px;
     min-width: 44px;
-  }
-  
-  /* Smaller switch for mobile */
-  [data-slot="switch"] {
-    min-height: unset !important;
-    min-width: unset !important;
   }
   
   /* Prevent viewport issues on mobile */
