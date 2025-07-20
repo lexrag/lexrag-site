@@ -3,15 +3,21 @@
 import { useState } from 'react';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
-import { FaRegEdit } from 'react-icons/fa';
+import { updatePhoneNumber } from '@/api/auth/updatePhoneNumber';
+import { formatDistanceToNow } from 'date-fns';
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
+import { SquarePen } from 'lucide-react';
+import { toast } from 'sonner';
 import { User } from '@/types/User';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Icons } from '@/components/common/icons';
+import ReusableDialog from '@/components/common/ReusableDialog';
 import PasswordResetModal from '@/components/UserProfile/components/PasswordResetModal';
 import Row from '@/components/UserProfile/components/Row';
-import EditEmailDialog from '@/components/UserProfile/Security/components/EditEmailDialog';
+import ChangeEmailFlow from '@/components/UserProfile/Security/components/ChangeEmailFlow';
+import ChangePhoneNumberFlow from '@/components/UserProfile/Security/components/ChangePhoneNumberFlow';
 
 interface AuthenticationProps {
     currentUser: User;
@@ -19,7 +25,24 @@ interface AuthenticationProps {
 
 const Authentication = ({ currentUser }: AuthenticationProps) => {
     const [resetOpen, setResetOpen] = useState(false);
+    const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState(currentUser?.phone_number || '');
+    const [prevPhoneNumber, setPrevPhoneNumber] = useState<string | null>(null);
+    const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
+        currentUser?.password_last_changed_at || null,
+    );
     const [open, setOpen] = useState(false);
+
+    const phoneUtil = PhoneNumberUtil.getInstance();
+    let formatted: string | null = null;
+    if (phoneNumber) {
+        try {
+            formatted = phoneUtil.format(phoneUtil.parse(phoneNumber), PhoneNumberFormat.INTERNATIONAL);
+        } catch {
+            formatted = null;
+        }
+    }
 
     const handleGoogleAuth = async () => {
         const res = await getGoogleAuthLink();
@@ -34,40 +57,77 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
         }
     };
 
+    const handlePhoneNumberSave = async (newPhoneNumber: string) => {
+        setPrevPhoneNumber(phoneNumber);
+        setPhoneNumber(newPhoneNumber);
+        try {
+            setLoading(true);
+            const res = await updatePhoneNumber(newPhoneNumber);
+            if (res.success) {
+                toast.success('Phone number updated');
+                setOpenPhoneNumber(false);
+            } else {
+                toast.error('Failed to update phone number');
+            }
+        } catch {
+            toast.error('Failed to update phone number');
+            setPhoneNumber(prevPhoneNumber || '');
+            setOpenPhoneNumber(false);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <CardWrapper title="Security">
             <Row
                 label="Email"
                 actionIcon={
                     <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label="Edit Email">
-                        <FaRegEdit />
+                        <SquarePen />
                     </Button>
                 }
             >
                 <span>{currentUser.email}</span>
             </Row>
-            <EditEmailDialog
+            <ReusableDialog
                 open={open}
                 onOpenChange={setOpen}
-                onSave={() => {}}
-                loading={false}
-                currentEmail={currentUser.email}
-            />
-            <Row label="Phone Number" actionIcon={<FaRegEdit />}>
+                title="Change Email"
+                headerClassName="mb-0"
+                footer={null}
+            >
+                <ChangeEmailFlow />
+            </ReusableDialog>
+            <Row
+                label="Phone Number"
+                actionIcon={
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setOpenPhoneNumber(true)}
+                        aria-label="Edit Phone Number"
+                    >
+                        <SquarePen />
+                    </Button>
+                }
+            >
                 <span>
-                    {currentUser.phone_number || (
+                    {phoneNumber && formatted ? (
+                        formatted
+                    ) : (
                         <Badge variant="warning" appearance="outline">
                             Not set
                         </Badge>
                     )}
                 </span>
             </Row>
-            <Row label="2FA" actionIcon={<FaRegEdit />}>
+            <Row label="2FA">
                 <Badge variant="warning" appearance="outline">
                     Not set
                 </Badge>
             </Row>
-            <Row label="Sign in" actionIcon={<FaRegEdit />}>
+            <Row label="Sign in">
                 <div className="flex items-center gap-2">
                     <Icons.googleColorful className="size-5 cursor-pointer" onClick={handleGoogleAuth} />
                     <Icons.linkedinColorfull className="size-5 cursor-pointer" onClick={handleLinkedinAuth} />
@@ -77,12 +137,28 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
                 label="Password"
                 actionIcon={
                     <Button variant="ghost" size="icon" onClick={() => setResetOpen(true)} aria-label="Reset Password">
-                        <FaRegEdit />
+                        <SquarePen />
                     </Button>
                 }
             >
-                <span>Password last changed 2 months ago</span>
-                <PasswordResetModal open={resetOpen} onOpenChange={setResetOpen} />
+                <span>
+                    {passwordLastChangedAt
+                        ? `Password last changed ${formatDistanceToNow(new Date(passwordLastChangedAt), { addSuffix: true })}`
+                        : 'Password never changed'}
+                </span>
+                <PasswordResetModal
+                    open={resetOpen}
+                    onOpenChange={setResetOpen}
+                    onSuccess={() => setPasswordLastChangedAt(new Date().toISOString())}
+                />
+
+                <ChangePhoneNumberFlow
+                    open={openPhoneNumber}
+                    onOpenChange={setOpenPhoneNumber}
+                    onSuccess={handlePhoneNumberSave}
+                    loading={loading}
+                    currentPhoneNumber={phoneNumber || ''}
+                />
             </Row>
         </CardWrapper>
     );

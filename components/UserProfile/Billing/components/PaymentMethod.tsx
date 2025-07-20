@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { SquarePen, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,11 +25,9 @@ const PaymentMethod = ({
     return (
         <div className="flex items-center justify-between border border-border rounded-xl gap-2 px-4 py-4 bg-secondary-clarity w-full">
             <div className="flex items-center gap-3.5">
-                <img className="w-10 shrink-0" alt={cardholder + ' card'} src={brandImage} />
+                <Image width={40} height={24} alt={cardholder + ' card'} src={brandImage} className="w-10 shrink-0" />
                 <div className="flex flex-col">
-                    <a className="text-sm font-medium text-mono hover:text-primary-active mb-px" href="#">
-                        {cardholder}
-                    </a>
+                    <span className="text-sm font-medium text-mono hover:text-primary-active mb-px">{cardholder}</span>
                     <span className="text-sm text-secondary-foreground">
                         Ending {last4} Expires on {expiry}
                     </span>

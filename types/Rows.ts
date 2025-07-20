@@ -18,6 +18,7 @@ export interface AvatarRowProps {
     contentClassName?: string;
     children?: React.ReactNode;
     className?: string;
+    onUpload?: (url: string) => void;
 }
 
 export interface RowProps {

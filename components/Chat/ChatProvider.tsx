@@ -91,6 +91,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
             if (socket) socket.close();
             if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

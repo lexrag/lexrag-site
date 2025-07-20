@@ -1,13 +1,13 @@
 // Needed only for testing
 export function genRandomTree(N = 300, reverse = false) {
     return {
-        nodes: [...Array(N).keys()].map((i) => ({
+        nodes: [...Array(N).keys()].map((i: number) => ({
             id: i,
             val: Math.random() * 5 + 1,
         })),
         links: [...Array(N).keys()]
-            .filter((id) => id)
-            .map((id) => ({
+            .filter((id: number) => id)
+            .map((id: number) => ({
                 [reverse ? 'target' : 'source']: id,
                 [reverse ? 'source' : 'target']: Math.round(Math.random() * (id - 1)),
                 color: '#007AFF',

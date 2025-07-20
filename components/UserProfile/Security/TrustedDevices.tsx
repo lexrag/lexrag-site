@@ -12,10 +12,10 @@ import { TrustedDeviceRow } from './components/SessionRow';
 
 const TrustedDevices = () => (
     <CardWrapper title="Trusted Devices" headerActions={<RecursiveDropdown items={MENU_ITEMS_TRUSTED_DEVICES} />}>
-        <div className="grow kt-scrollable-x-auto p-0">
-            <div className="kt-scrollable-auto">
+        <div className="grow p-0">
+            <div>
                 <div className="relative w-full overflow-auto">
-                    <Table className="w-full caption-bottom align-middle text-secondary-foreground font-medium text-sm">
+                    <Table className="w-full align-middle text-secondary-foreground font-medium text-sm">
                         <TableBody>
                             {DEVICES.slice(0, 3).map((device, idx) => (
                                 <TrustedDeviceRow key={idx} device={device} />
