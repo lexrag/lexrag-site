@@ -8,15 +8,17 @@ import { Switch } from '@/components/ui/switch';
 import Row from './components/Row';
 
 const BasicSettingsCard = ({ currentUser }: { currentUser: User }) => {
-    if (!currentUser || typeof currentUser.is_notifications_enabled === 'undefined') {
-        return null;
-    }
     const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(currentUser.is_notifications_enabled);
     const [isNotificationsEnabledLoading, setIsNotificationsEnabledLoading] = useState(false);
 
+    if (!currentUser || typeof currentUser.is_notifications_enabled === 'undefined') {
+        return null;
+    }
+
     const handleNotificationsChange = async (checked: boolean) => {
         setIsNotificationsEnabledLoading(true);
-        const response = await updateUserNotifications(checked);
+        // const response = await updateUserNotifications(checked);
+        await updateUserNotifications(checked);
         setIsNotificationsEnabled(checked);
         setIsNotificationsEnabledLoading(false);
     };

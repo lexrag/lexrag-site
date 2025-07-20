@@ -35,7 +35,7 @@ const ChatGraph3D = ({ height, width, data, layers }: ChatGraph3DProps) => {
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
-    }, []);
+    }, [data]);
 
     useEffect(() => {
         const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));

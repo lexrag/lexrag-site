@@ -3,7 +3,7 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Link from 'next/link';
 import { useDirection } from '@radix-ui/react-direction';
-import { ClockArrowDown, ClockArrowUp, LogOut, MessageSquare, MessageSquarePlus, Settings, Trash2 } from 'lucide-react';
+import { ClockArrowDown, ClockArrowUp, MessageSquare, MessageSquarePlus, Trash2 } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
 import { useLogOut } from '@/hooks/use-log-out';
 import { useUser } from '@/providers/user-provider';

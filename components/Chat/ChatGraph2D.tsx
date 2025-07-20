@@ -162,7 +162,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         if (processedData) {
             handleCardData(processedData);
         }
-    }, [processedData]);
+    }, [processedData, handleCardData]);
 
     const handleNodeClick = async (node: any) => {
         const data = await getConversationExpandNodes(node.id);
