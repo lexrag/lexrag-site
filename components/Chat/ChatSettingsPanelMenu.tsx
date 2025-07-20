@@ -47,7 +47,7 @@ export default function ChatSettingsPanelMenu() {
                     )}
                     <span>{resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
                     <div className="ml-auto">
-                        <Switch size="sm" checked={resolvedTheme === 'dark'} onCheckedChange={handleThemeToggle} />
+                        <Switch size="xs" shape="square" checked={resolvedTheme === 'dark'} onCheckedChange={handleThemeToggle} />
                     </div>
                 </div>
             </div>

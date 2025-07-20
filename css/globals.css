@@ -55,10 +55,17 @@
     overflow-x: hidden;
   }
   
+  /* TODO: make sure this is not too big */
   /* Better touch targets */
   button, [role="button"] {
     min-height: 44px;
     min-width: 44px;
+  }
+  
+  /* Smaller switch for mobile */
+  [data-slot="switch"] {
+    min-height: unset !important;
+    min-width: unset !important;
   }
   
   /* Prevent viewport issues on mobile */
