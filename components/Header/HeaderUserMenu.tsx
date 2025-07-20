@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Moon, UserRound } from 'lucide-react';
+import { Moon, Sun, UserRound } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { User } from '@/types/User';
 import { useLogOut } from '@/hooks/use-log-out';
@@ -68,8 +68,12 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
                 <DropdownMenuItem asChild className="rounded-none" onSelect={(event) => event.preventDefault()}>
                     <div className="w-full px-4 py-2 flex items-center justify-between" onClick={handleThemeToggle}>
                         <span className="flex items-center gap-2">
-                            <Moon />
-                            Dark mode
+                            {resolvedTheme === 'dark' ? (
+                                <Sun />
+                            ) : (
+                                <Moon />
+                            )}
+                            {resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode'}
                         </span>
                         <Switch size="sm" checked={resolvedTheme === 'dark'} />
                     </div>

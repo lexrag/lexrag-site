@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { LogOut, Settings } from 'lucide-react';
 import { User } from '@/types/User';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { useLogOut } from '@/hooks/use-log-out';
 
@@ -13,16 +13,27 @@ interface ProfileBarProps {
 
 const ProfileBar = ({ user, showSettings, onToggleSettings }: ProfileBarProps) => {
     const logOut = useLogOut();
+    const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        const savedAvatar = localStorage.getItem('avatarImage');
+        if (savedAvatar) {
+            setAvatarUrl(savedAvatar);
+        } else {
+            setAvatarUrl(undefined);
+        }
+    }, []);
 
     return (
         <div
-            className="w-full px-4 py-4 flex items-center gap-3 border-t bg-background"
+            className="w-full px-4 py-4 flex items-center gap-3 bg-background"
             style={{ height: 80 }}
         >
-            <Avatar>
+            <Avatar className="cursor-pointer" onClick={onToggleSettings}>
+                <AvatarImage alt={`${user?.first_name} ${user?.last_name}`} src={avatarUrl} />
                 <AvatarFallback>{user?.first_name?.[0] || '?'}</AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 cursor-pointer" onClick={onToggleSettings}>
                 <div className="font-semibold truncate">
                     {user?.first_name} {user?.last_name}
                 </div>

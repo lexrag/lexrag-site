@@ -9,6 +9,7 @@ import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { ClockArrowDown, ClockArrowUp, Expand, Fullscreen, Layers, Menu, MessageSquare } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
+import { useViewportHeight } from '@/hooks/use-viewport-height';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -29,6 +30,7 @@ export default function ChatPage() {
     const pathname = usePathname();
     const router = useRouter();
     const { socket, conversations, setConversations } = useChatContext();
+    useViewportHeight();
     const { messages, isThinking, status, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } =
         useChat({
             websocket: socket,
@@ -72,7 +74,7 @@ export default function ChatPage() {
     if (!socket) return null;
 
     return (
-        <div className="flex flex-col h-screen w-full">
+        <div className="flex flex-col h-[calc(100*var(--vh,1vh))] w-full max-h-[calc(100*var(--vh,1vh))] overflow-hidden">
             <ChatGraphModal
                 open={isOpenGraphModal}
                 onOpenChange={setIsOpenGraphModal}
@@ -144,7 +146,7 @@ export default function ChatPage() {
                     <Fullscreen className="hover:text-primary cursor-pointer" onClick={() => zoomToFitGraph()} />
                 </div>
             </header>
-            <header className="w-full flex md:hidden items-center justify-between pt-2 px-2">
+            <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-2 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
                 <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
@@ -158,11 +160,11 @@ export default function ChatPage() {
                 onTabChange={setActiveLeftTab}
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
-            <main className="flex flex-1 overflow-hidden pb-4 z-40">
+            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-12 min-h-0">
                 <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeTab={activeLeftTab} onTabChange={setActiveLeftTab} />
 
-                <section className="flex-1 flex flex-col overflow-hidden">
-                    <div className="flex-1 overflow-y-auto">
+                <section className="flex-1 flex flex-col overflow-hidden min-h-0">
+                    <div className="flex-1 overflow-y-auto min-h-0">
                         <ChatBox
                             messages={messages}
                             isThinking={isThinking}

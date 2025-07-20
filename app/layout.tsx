@@ -5,7 +5,7 @@ import { TooltipsProvider } from '@/providers/tooltips-provider';
 import { Toaster } from '@/components/ui/sonner';
 import '@/css/globals.css';
 import '@/components/keenicons/assets/styles.css';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { UserProvider } from '@/providers/user-provider';
@@ -19,10 +19,18 @@ export const metadata: Metadata = {
     },
 };
 
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover',
+};
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html className="h-full" suppressHydrationWarning>
-            <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background overflow-hidden', inter.className)}>
                 <QueryProvider>
                     <ThemeProvider>
                         <TooltipsProvider>

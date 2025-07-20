@@ -37,9 +37,9 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
     };
 
     return (
-        <div className="flex flex-col w-full mt-2 p-3 rounded-md border bg-background border-border hover:shadow-lg transition-shadow min-h-[72px]">
+        <div className="flex flex-col w-full mt-2 md:p-3 p-2 rounded-md border bg-background border-border hover:shadow-lg transition-shadow min-h-[72px] md:min-h-[72px] min-h-[60px] flex-shrink-0">
             <textarea
-                className="flex-1 w-full p-3 bg-transparent text-foreground 
+                className="flex-1 w-full md:p-3 p-2 bg-transparent text-foreground 
                    focus:ring-0 focus:outline-none overflow-y-auto resize-none 
                    h-[50px] placeholder:text-muted-foreground"
                 value={input}
@@ -47,6 +47,10 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 rows={1}
+                style={{ fontSize: '16px' }}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="sentences"
             />
 
             <ChatTextAreaBottomMenu

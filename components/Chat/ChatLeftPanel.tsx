@@ -27,23 +27,19 @@ const ChatLeftPanel = ({ conversations, onDeleteConversation, activeTab, onTabCh
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Сбрасываем настройки при переключении табов
     useEffect(() => {
         if (activeTab !== 'none') {
             setShowSettings(false);
         }
     }, [activeTab]);
 
-    // Деактивируем таб при открытии настроек
     const handleToggleSettings = () => {
         const newShowSettings = !showSettings;
         setShowSettings(newShowSettings);
         
-        // Если открываем настройки, деактивируем все табы
         if (newShowSettings) {
             onTabChange('none');
         } else {
-            // Если закрываем настройки, возвращаемся к табу chats
             onTabChange('chats');
         }
     };

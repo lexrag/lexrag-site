@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useDirection } from '@radix-ui/react-direction';
 import { ClockArrowDown, ClockArrowUp, MessageSquare, MessageSquarePlus, Trash2 } from 'lucide-react';
@@ -28,6 +28,23 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
     const [showSettings, setShowSettings] = useState(false);
 
     const { user } = useUser();
+
+    useEffect(() => {
+        if (activeTab !== 'none') {
+            setShowSettings(false);
+        }
+    }, [activeTab]);
+
+    const handleToggleSettings = () => {
+        const newShowSettings = !showSettings;
+        setShowSettings(newShowSettings);
+        
+        if (newShowSettings) {
+            onTabChange('none');
+        } else {
+            onTabChange('chats');
+        }
+    };
 
     return (
         <Sheet open={isOpen} onOpenChange={handleOpen}>
@@ -93,7 +110,7 @@ const ChatLeftSheet = ({ isOpen, handleOpen, conversations, handleDeleteConversa
                 <ProfileBar 
                     user={user} 
                     showSettings={showSettings}
-                    onToggleSettings={() => setShowSettings(!showSettings)}
+                    onToggleSettings={handleToggleSettings}
                 />
             </SheetContent>
         </Sheet>

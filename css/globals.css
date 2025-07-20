@@ -16,3 +16,68 @@
 
 /* 5. Scoped shadcn/magicui theme */
 @import './themes/shadcn-theme.css';
+
+/* 6. Mobile viewport height support */
+:root {
+  --vh: 1vh;
+}
+
+/* Mobile viewport height fix */
+@supports (height: 100dvh) {
+  :root {
+    --vh: 1dvh;
+  }
+}
+
+/* Fallback for older browsers */
+@supports not (height: 100dvh) {
+  :root {
+    --vh: 1vh;
+  }
+}
+
+/* Safe area support */
+@supports (padding: max(0px)) {
+  :root {
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 7. Mobile-specific styles */
+@media (max-width: 768px) {
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Better touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent viewport issues on mobile */
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+    /* Better scrolling on mobile */
+  .scrollable {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent mobile keyboard issues */
+  .chat-input-container {
+    position: sticky;
+    bottom: 0;
+    background: var(--background);
+    z-index: 10;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

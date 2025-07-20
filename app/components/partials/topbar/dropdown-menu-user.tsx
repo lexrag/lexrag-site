@@ -8,6 +8,7 @@ import {
     FileText,
     Globe,
     Moon,
+    Sun,
     Settings,
     Shield,
     User,
@@ -186,10 +187,10 @@ export function DropdownMenuUser({ trigger }: { trigger: ReactNode }) {
 
                 {/* Footer */}
                 <DropdownMenuItem className="flex items-center gap-2" onSelect={(event) => event.preventDefault()}>
-                    <Moon />
+                    {theme === 'dark' ? <Sun /> : <Moon />}
                     <div className="flex items-center gap-2 justify-between grow">
-                        Dark Mode
-                        <Switch size="sm" checked={theme === 'dark'} onCheckedChange={handleThemeToggle} />
+                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        <Switch size="sm" shape="square" checked={theme === 'dark'} onCheckedChange={handleThemeToggle} />
                     </div>
                 </DropdownMenuItem>
                 <div className="p-2 mt-1">

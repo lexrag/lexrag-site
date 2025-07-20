@@ -23,10 +23,10 @@ const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
 
     return (
         <div className="flex items-center justify-between border-gray-200 dark:border-gray-600">
-            <div className="flex space-x-1 mt-2">
+            <div className="flex md:space-x-1 space-x-0.5 md:mt-2 mt-1">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Settings2 className="size-6 cursor-pointer" />
+                        <Settings2 className="size-6 md:size-6 size-5 cursor-pointer" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" side="top" align="start">
                         <DropdownMenuLabel>Setting</DropdownMenuLabel>
@@ -45,7 +45,7 @@ const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
                 </DropdownMenu>
             </div>
 
-            <SendHorizontal className="size-6 cursor-pointer" onClick={handleSendButtonClick} />
+            <SendHorizontal className="size-6 md:size-6 size-5 cursor-pointer" onClick={handleSendButtonClick} />
         </div>
     );
 };
