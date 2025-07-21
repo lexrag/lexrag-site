@@ -36,7 +36,7 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                             <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} />
                         </TabsContent>
                         <TabsContent value="3d">
-                            <ChatGraph3D data={data} layers={graphLayers} />
+                            <ChatGraph3D data={data} layers={graphLayers} handleCardData={handleCardData} />
                         </TabsContent>
                     </DialogBody>
                 </Tabs>

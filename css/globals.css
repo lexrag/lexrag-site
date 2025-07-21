@@ -69,16 +69,16 @@
   }
   
     /* Better scrolling on mobile */
-  .scrollable {
+  /* .scrollable {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-  }
+  } */
   
   /* Ensure proper scrolling for chat containers */
-  .overflow-y-auto {
+  /* .overflow-y-auto {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-  }
+  } */
   
   /* Prevent mobile keyboard issues */
   .chat-input-container {
