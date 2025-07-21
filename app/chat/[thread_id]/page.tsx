@@ -92,19 +92,19 @@ export default function ChatPage() {
             />
             <header className="absolute top-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent z-50 pt-2 px-3">
                 <div className="w-1/4 flex items-center justify-between">
-                                            <Tabs value={activeLeftTab} onValueChange={setActiveLeftTab}>
-                            <TabsList className="w-fit grid grid-cols-3">
-                                <TabsTrigger value="chats" className="text-[12px] py-1 px-2">
-                                    <MessageSquare />
-                                </TabsTrigger>
-                                <TabsTrigger value="1" className="text-[12px] py-1 px-2">
-                                    <ClockArrowDown />
-                                </TabsTrigger>
-                                <TabsTrigger value="2" className="text-[12px] py-1 px-2">
-                                    <ClockArrowUp />
-                                </TabsTrigger>
-                            </TabsList>
-                        </Tabs>
+                    <Tabs value={activeLeftTab} onValueChange={setActiveLeftTab}>
+                        <TabsList className="w-fit grid grid-cols-3">
+                            <TabsTrigger value="chats" className="text-[12px] py-1 px-2">
+                                <MessageSquare />
+                            </TabsTrigger>
+                            <TabsTrigger value="1" className="text-[12px] py-1 px-2">
+                                <ClockArrowDown />
+                            </TabsTrigger>
+                            <TabsTrigger value="2" className="text-[12px] py-1 px-2">
+                                <ClockArrowUp />
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
                     <MegaMenu isHomePage={pathname === '/'} />
                 </div>
                 <div className="w-1/4 flex items-center justify-start gap-2">
@@ -168,7 +168,12 @@ export default function ChatPage() {
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
             <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
-                <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeTab={activeLeftTab} onTabChange={setActiveLeftTab} />
+                <ChatLeftPanel
+                    conversations={conversations}
+                    onDeleteConversation={onDeleteConversation}
+                    activeTab={activeLeftTab}
+                    onTabChange={setActiveLeftTab}
+                />
 
                 <section className="flex-1 flex flex-col overflow-hidden min-h-0">
                     <div className="flex-1 overflow-y-auto min-h-0">
@@ -193,7 +198,7 @@ export default function ChatPage() {
                     handleCardData={setCardData}
                 />
             </main>
-            
+
             {/* Fixed chat input for mobile */}
             <div className="md:hidden chat-input-container">
                 <ChatTextArea
@@ -204,7 +209,7 @@ export default function ChatPage() {
                     toggleMsgType={toggleMsgType}
                 />
             </div>
-            
+
             <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
                 <div className="w-1/4" />
                 <div className="w-1/4 flex justify-start">

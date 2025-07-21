@@ -5,19 +5,18 @@ import { gdprEmailExport } from '@/api/user/gdprEmailExport';
 import { format } from 'date-fns';
 import { DownloadIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { User } from '@/types/User';
+import { useUser } from '@/providers/user-provider';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import Row from '../components/Row';
 import DeleteAccount from './DeleteAccount';
 
-interface LegalProps {
-    currentUser: User;
-}
-
-const Legal = ({ currentUser }: LegalProps) => {
+const Legal = () => {
+    const { user: currentUser } = useUser();
     const [requested, setRequested] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    if (!currentUser) return null;
 
     const handleRequest = async () => {
         setLoading(true);

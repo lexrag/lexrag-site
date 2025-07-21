@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { updateUserNotificationsMethod } from '@/api/user/updateUserNotificationsMethod';
 import { toast } from 'sonner';
-import { NotificationMethod, User } from '@/types/User';
+import { NotificationMethod } from '@/types/User';
+import { useUser } from '@/providers/user-provider';
 import { CardContent } from '@/components/ui/card';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Label } from '@/components/ui/label';
@@ -15,8 +16,10 @@ const NOTIFICATION_METHODS = [
     { key: 'push', label: 'Push', description: 'Receive notifications via push notifications' },
 ];
 
-const Nofications = ({ currentUser }: { currentUser: User }) => {
-    const [active, setActive] = useState(currentUser.notifications_method);
+const Nofications = () => {
+    const { user } = useUser();
+    const [active, setActive] = useState(user?.notifications_method ?? 'email');
+    if (!user) return null;
 
     const handleChange = async (value: NotificationMethod) => {
         setActive(value);

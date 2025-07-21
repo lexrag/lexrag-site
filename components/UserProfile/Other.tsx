@@ -2,22 +2,21 @@
 
 import { useState } from 'react';
 import { updateUserNotifications } from '@/api/user/updateUserNotifications';
-import { User } from '@/types/User';
+import { useUser } from '@/providers/user-provider';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Switch } from '@/components/ui/switch';
 import Row from './components/Row';
 
-const BasicSettingsCard = ({ currentUser }: { currentUser: User }) => {
-    const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(currentUser.is_notifications_enabled);
+const BasicSettingsCard = () => {
+    const { user } = useUser();
+    const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(user?.is_notifications_enabled ?? false);
     const [isNotificationsEnabledLoading, setIsNotificationsEnabledLoading] = useState(false);
-
-    if (!currentUser || typeof currentUser.is_notifications_enabled === 'undefined') {
+    if (!user || typeof user.is_notifications_enabled === 'undefined') {
         return null;
     }
 
     const handleNotificationsChange = async (checked: boolean) => {
         setIsNotificationsEnabledLoading(true);
-        // const response = await updateUserNotifications(checked);
         await updateUserNotifications(checked);
         setIsNotificationsEnabled(checked);
         setIsNotificationsEnabledLoading(false);

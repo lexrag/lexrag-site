@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { updateUser } from '@/api/user/updateUser';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { User } from '@/types/User';
+import { useUser } from '@/providers/user-provider';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import InputRow from '@/components/UserProfile/components/InputRow';
@@ -26,23 +26,20 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
-interface PersonalInfoCardProps {
-    currentUser: User;
-}
-
-const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
+const PersonalInfoCard = () => {
+    const { user: currentUser } = useUser();
     const [isProcessing, setIsProcessing] = useState(false);
     const [prevState, setPrevState] = useState<PersonalInfoFormData | null>(null);
-    const [firstName, setFirstName] = useState(currentUser.first_name || '');
-    const [lastName, setLastName] = useState(currentUser.last_name || '');
+    const [firstName, setFirstName] = useState(currentUser?.first_name || '');
+    const [lastName, setLastName] = useState(currentUser?.last_name || '');
     const [birthday, setBirthday] = useState(
-        currentUser.birthday
+        currentUser?.birthday
             ? new Date(currentUser.birthday).toISOString().slice(0, 10)
             : new Date().toISOString().slice(0, 10),
     );
-    const [gender, setGender] = useState(currentUser.gender || '');
-    const [country, setCountry] = useState(currentUser.country || '');
-    const [language, setLanguage] = useState(currentUser.language || '');
+    const [gender, setGender] = useState(currentUser?.gender || '');
+    const [country, setCountry] = useState(currentUser?.country || '');
+    const [language, setLanguage] = useState(currentUser?.language || '');
     const [calendarMonth, setCalendarMonth] = useState(birthday ? new Date(birthday) : new Date());
 
     useEffect(() => {
@@ -50,6 +47,8 @@ const PersonalInfoCard = ({ currentUser }: PersonalInfoCardProps) => {
             setCalendarMonth(new Date(birthday));
         }
     }, [birthday]);
+
+    if (!currentUser) return null;
 
     const handleSave = async () => {
         const previous = {

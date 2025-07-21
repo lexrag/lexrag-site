@@ -30,7 +30,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html className="h-full" suppressHydrationWarning>
-            <body className={cn('antialiased flex h-full text-base text-foreground bg-background overflow-hidden', inter.className)}>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
                 <QueryProvider>
                     <ThemeProvider>
                         <TooltipsProvider>
