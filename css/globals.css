@@ -89,10 +89,9 @@
     background: var(--background);
     z-index: 50;
     padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid var(--border);
     margin: 0;
     border-radius: 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   }
   
   /* Ensure input stays above keyboard */

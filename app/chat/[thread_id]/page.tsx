@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
@@ -18,7 +18,7 @@ import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
-import ChatTextArea from '@/components/Chat/ChatTextArea';
+import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
@@ -38,6 +38,7 @@ export default function ChatPage() {
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
     const [currentMessage, setCurrentMessage] = useState<any>();
     const [activeLeftTab, setActiveLeftTab] = useState<string>('chats');
+
     const [graphLayers, setGraphLayers] = useState<GraphLayer[]>([
         { id: 'all_retrieved_nodes', name: 'All Retrieved Nodes', enabled: true, color: '#d3d3d3', priority: 1 },
         {
@@ -72,6 +73,8 @@ export default function ChatPage() {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
+
+
     if (!socket) return null;
 
     return (
@@ -97,7 +100,18 @@ export default function ChatPage() {
                 activeLeftTab={activeLeftTab}
                 setActiveLeftTab={setActiveLeftTab}
             />
-            <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} graphView={graphView} setGraphView={setGraphView} graphLayers={graphLayers} setGraphLayers={setGraphLayers} setIsOpenGraphModal={setIsOpenGraphModal} />
+            <ChatRightSheet 
+                isOpen={isOpenRightSheet} 
+                handleOpen={setIsOpenRightSheet} 
+                graphView={graphView} 
+                setGraphView={setGraphView} 
+                graphLayers={graphLayers} 
+                setGraphLayers={setGraphLayers} 
+                setIsOpenGraphModal={setIsOpenGraphModal}
+                currentMessage={currentMessage}
+                cardData={cardData}
+                handleCardData={setCardData}
+            />
             <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeLeftTab={activeLeftTab} setActiveLeftTab={setActiveLeftTab} />
 
@@ -128,33 +142,14 @@ export default function ChatPage() {
                 />
             </main>
             
-            {/* Fixed chat input for mobile */}
-            <div className="md:hidden chat-input-container">
-                <ChatTextArea
-                    input={input}
-                    setInput={setInput}
-                    sendMessage={sendMessage}
-                    activeMsgType={activeMsgType}
-                    toggleMsgType={toggleMsgType}
-                />
-            </div>
-            
-            <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
-                <div className="w-1/4" />
-                <div className="w-1/4 flex justify-start">
-                    <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
-                        <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
-                            Company
-                        </Link>
-                        <Link
-                            href={'/terms-and-conditions'}
-                            className="text-gray-600 dark:text-gray-300 hover:text-primary"
-                        >
-                            Legal Docs
-                        </Link>
-                    </nav>
-                </div>
-            </footer>
+            {/* Mobile chat input with keyboard attachment */}
+            <ChatTextAreaMobile
+                input={input}
+                setInput={setInput}
+                sendMessage={sendMessage}
+                activeMsgType={activeMsgType}
+                toggleMsgType={toggleMsgType}
+            />
         </div>
     );
 }
