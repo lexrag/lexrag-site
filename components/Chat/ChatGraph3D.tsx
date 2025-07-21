@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
@@ -14,9 +14,10 @@ interface ChatGraph3DProps {
     width?: number;
     layers: GraphLayer[];
     data: GraphData;
+    handleCardData: Dispatch<SetStateAction<any>>;
 }
 
-const ChatGraph3D = ({ height, width, data, layers }: ChatGraph3DProps) => {
+const ChatGraph3D = ({ height, width, data, layers, handleCardData }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
@@ -133,6 +134,12 @@ const ChatGraph3D = ({ height, width, data, layers }: ChatGraph3DProps) => {
             links: Array.from(allLinks.values()),
         };
     }, [layerDataMap, layers]);
+
+    useEffect(() => {
+        if (processedData) {
+            handleCardData(processedData);
+        }
+    }, [processedData, handleCardData]);
 
     const handleNodeClick = async (node: any) => {
         const data = await getConversationExpandNodes(node.id);

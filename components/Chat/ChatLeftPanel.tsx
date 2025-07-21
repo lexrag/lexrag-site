@@ -4,19 +4,20 @@ import { useEffect, useState } from 'react';
 import { getMeClient } from '@/api/auth/getMeClient';
 import { Conversation } from '@/types/Conversation';
 import { useUser } from '@/providers/user-provider';
-import ChatConversations from '@/components/Chat/ChatConversations';
-import ChatSettingsPanelMenu from '@/components/Chat/ChatSettingsPanelMenu';
-import ProfileBar from '@/components/Chat/ProfileBar';
+import { ChatSidebarHeader } from './ChatSidebarHeader';
+import { ChatSidebarMenu } from './ChatSidebarMenu';
+import { ChatSidebarFooter } from './ChatSidebarFooter';
+
 
 interface ChatLeftPanelProps {
     conversations: Conversation[];
     onDeleteConversation: (threadId: string) => void;
-    activeTab: string;
-    onTabChange: (tab: string) => void;
+    activeLeftTab: string;
+    setActiveLeftTab: (tab: string) => void;
 }
 
-const ChatLeftPanel = ({ conversations, onDeleteConversation, activeTab, onTabChange }: ChatLeftPanelProps) => {
-    const { setUser, user } = useUser();
+const ChatLeftPanel = ({ conversations, onDeleteConversation, activeLeftTab, setActiveLeftTab }: ChatLeftPanelProps) => {
+    const { setUser } = useUser();
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
@@ -28,36 +29,49 @@ const ChatLeftPanel = ({ conversations, onDeleteConversation, activeTab, onTabCh
     }, []);
 
     useEffect(() => {
-        if (activeTab !== 'none') {
+        if (activeLeftTab !== 'none') {
             setShowSettings(false);
         }
-    }, [activeTab]);
+    }, [activeLeftTab]);
 
     const handleToggleSettings = () => {
         const newShowSettings = !showSettings;
         setShowSettings(newShowSettings);
         
         if (newShowSettings) {
-            onTabChange('none');
+            setActiveLeftTab('none');
         } else {
-            onTabChange('chats');
+            setActiveLeftTab('chats');
         }
     };
 
     return (
-        <aside className="h-full w-1/4 hidden md:flex flex-col overflow-y-auto pt-10">
-            <div className="flex-1 overflow-y-auto">
-                {showSettings ? (
-                    <ChatSettingsPanelMenu />
-                ) : (
-                    <ChatConversations conversations={conversations} onDeleteConversation={onDeleteConversation} />
-                )}
+        <aside className="h-full w-1/4 hidden md:flex flex-col">
+            <div className="w-full flex flex-col h-full">
+                {/* Header with tabs - sticky */}
+                <div className="flex items-center justify-between p-3 bg-background sticky top-0 z-10">
+                    <ChatSidebarHeader 
+                        activeTab={activeLeftTab}
+                        onTabChange={setActiveLeftTab}
+                        isHomePage={false}
+                    />
+                </div>
+                
+                {/* Content area */}
+                <div className="flex-1">
+                    <ChatSidebarMenu 
+                        conversations={conversations}
+                        onDeleteConversation={onDeleteConversation}
+                        showSettings={showSettings}
+                    />
+                </div>
+                
+                {/* Footer */}
+                <ChatSidebarFooter 
+                    showSettings={showSettings}
+                    onToggleSettings={handleToggleSettings}
+                />
             </div>
-            <ProfileBar 
-                user={user} 
-                showSettings={showSettings}
-                onToggleSettings={handleToggleSettings}
-            />
         </aside>
     );
 };
