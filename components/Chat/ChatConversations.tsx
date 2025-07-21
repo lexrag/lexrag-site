@@ -22,20 +22,37 @@ const ChatConversations = ({ conversations, onDeleteConversation }: ChatConversa
                     </Link>
                 </div>
             </CardHeader>
-            <CardContent className="p-3 space-y-2">
-                {conversations.map(({ thread_id, title }) => (
-                    <Link
-                        key={thread_id}
-                        className="flex items-center justify-between py-2 px-3 text-sm hover:bg-muted cursor-pointer rounded-md transition-colors"
-                        href={`/chat/${thread_id}`}
-                    >
-                        <span className="truncate w-[calc(100%-30px)]">{title}</span>
-                        <Trash2
-                            className="size-4 text-muted-foreground hover:text-destructive transition-colors"
-                            onClick={() => onDeleteConversation(thread_id)}
-                        />
-                    </Link>
-                ))}
+            <CardContent className="p-3">
+                <div className="max-h-80 overflow-y-auto">
+                    <ul className="space-y-2">
+                        {conversations.map(({ thread_id, title }) => (
+                            <li
+                                key={thread_id}
+                                className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
+                            >
+                                <Link
+                                    className="text-sm text-gray-800 truncate max-w-[85%]"
+                                    href={`/chat/${thread_id}`}
+                                >
+                                    {title}
+                                </Link>
+                                <div
+                                    className="hidden group-hover:block"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onDeleteConversation(thread_id);
+                                    }}
+                                >
+                                    <Trash2
+                                        size={16}
+                                        className="text-muted-foreground hover:text-destructive transition"
+                                    />
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </CardContent>
         </Card>
     );
