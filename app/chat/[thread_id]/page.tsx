@@ -24,6 +24,7 @@ import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
+import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
@@ -56,6 +57,8 @@ export default function ChatPage() {
         { id: 'relevant_context', name: 'Relevant Context', enabled: true, color: '#ef4444', priority: 4 },
     ]);
     const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
+    const [input, setInput] = useState<string>('');
+    const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
 
     useEffect(() => {
         const message = [...messages].reverse().find(({ direction }) => direction === 'incoming');
@@ -69,6 +72,10 @@ export default function ChatPage() {
         if (pathname.includes(threadId)) {
             router.replace('/chat/new');
         }
+    };
+
+    const toggleMsgType = (type: string) => {
+        setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
     if (!socket) return null;
@@ -146,7 +153,7 @@ export default function ChatPage() {
                     <Fullscreen className="hover:text-primary cursor-pointer" onClick={() => zoomToFitGraph()} />
                 </div>
             </header>
-            <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-2 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+            <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
                 <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
@@ -160,7 +167,7 @@ export default function ChatPage() {
                 onTabChange={setActiveLeftTab}
             />
             <ChatRightSheet isOpen={isOpenRightSheet} handleOpen={setIsOpenRightSheet} />
-            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-12 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeTab={activeLeftTab} onTabChange={setActiveLeftTab} />
 
                 <section className="flex-1 flex flex-col overflow-hidden min-h-0">
@@ -186,6 +193,18 @@ export default function ChatPage() {
                     handleCardData={setCardData}
                 />
             </main>
+            
+            {/* Fixed chat input for mobile */}
+            <div className="md:hidden chat-input-container">
+                <ChatTextArea
+                    input={input}
+                    setInput={setInput}
+                    sendMessage={sendMessage}
+                    activeMsgType={activeMsgType}
+                    toggleMsgType={toggleMsgType}
+                />
+            </div>
+            
             <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
                 <div className="w-1/4" />
                 <div className="w-1/4 flex justify-start">

@@ -57,29 +57,49 @@
   
   /* TODO: make sure this is not too big */
   /* Better touch targets */
-  button:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]), 
+  /* button:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]), 
   [role="button"]:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]) {
     min-height: 44px;
     min-width: 44px;
-  }
+  } */
   
   /* Prevent viewport issues on mobile */
   html, body {
     height: 100%;
-    overflow: hidden;
   }
   
     /* Better scrolling on mobile */
   .scrollable {
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Ensure proper scrolling for chat containers */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   
   /* Prevent mobile keyboard issues */
   .chat-input-container {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     background: var(--background);
-    z-index: 10;
+    z-index: 50;
     padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Ensure input stays above keyboard */
+  @media (max-height: 600px) {
+    .chat-input-container {
+      position: fixed;
+      bottom: 0;
+    }
   }
 }

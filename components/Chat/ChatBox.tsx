@@ -55,7 +55,7 @@ const ChatBox = ({
 
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto px-4 md:px-4 px-2 min-h-0">
-            <div className="scrollable flex-1 overflow-y-auto space-y-2 pb-4 min-h-0">
+            <div className="scrollable flex-1 overflow-y-auto space-y-2 pb-4 md:pb-4 pb-20 min-h-0">
                 <div className="flex flex-col">
                     {messages.map((msg, i) => (
                         <div
@@ -134,7 +134,8 @@ const ChatBox = ({
                 </div>
             </div>
 
-            <div className="mt-2 md:mt-2 mt-1 flex-shrink-0 chat-input-container">
+            {/* Desktop chat input */}
+            <div className="hidden md:block mt-2 flex-shrink-0">
                 <ChatTextArea
                     input={input}
                     setInput={setInput}
