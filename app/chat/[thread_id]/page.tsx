@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
@@ -16,7 +16,7 @@ import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
-import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
+import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
@@ -71,8 +71,6 @@ export default function ChatPage() {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
-
-
     if (!socket) return null;
 
     return (
@@ -106,6 +104,9 @@ export default function ChatPage() {
                 graphLayers={graphLayers}
                 setGraphLayers={setGraphLayers}
                 setIsOpenGraphModal={setIsOpenGraphModal}
+                currentMessage={currentMessage}
+                cardData={cardData}
+                handleCardData={setCardData}
             />
             <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel
