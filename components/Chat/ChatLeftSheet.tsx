@@ -49,7 +49,7 @@ const ChatLeftSheet = ({
                                 conversations={conversations}
                                 onDeleteConversation={handleDeleteConversation}
                                 showSettings={showSettings}
-                                className="max-h-[calc(100vh-8rem)]"
+                                className="max-h-[calc(100vh-8.5rem)]"
                             />
                         </div>
 

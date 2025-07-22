@@ -50,7 +50,7 @@ const ChatLeftPanel = ({
                         conversations={conversations}
                         onDeleteConversation={onDeleteConversation}
                         showSettings={showSettings}
-                        className={showSettings ? 'max-h-[calc(100vh-12.5rem)]' : 'max-h-[calc(100vh-8.5rem)]'}
+                        className={showSettings ? 'max-h-[calc(100vh-13rem)]' : 'max-h-[calc(100vh-8.5rem)]'}
                     />
                 </div>
 
