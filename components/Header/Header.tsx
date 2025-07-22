@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import HeaderCornerMenu from '@/components/Header/HeaderCornerMenu';
 import { MegaMenu } from './MegaMenu';
 
 interface HeaderProps {

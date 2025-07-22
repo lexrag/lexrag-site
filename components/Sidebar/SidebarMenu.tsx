@@ -3,7 +3,6 @@ import {
     History,
     Home,
     MessageSquare,
-    MessageSquarePlus,
     ReceiptText,
     Settings,
     Shield,

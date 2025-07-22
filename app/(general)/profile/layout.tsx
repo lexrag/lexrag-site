@@ -21,6 +21,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                 setUser(user);
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
