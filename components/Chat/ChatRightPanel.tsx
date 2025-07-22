@@ -113,9 +113,9 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
             </div>
             <aside className="w-full flex flex-col overflow-hidden">
                 <Card className="flex-1 rounded-none border-0 shadow-none overflow-hidden">
-                    <CardContent className="p-0 relative">
-                        {/* Graph content - full area */}
-                        <div className="w-full h-full relative overflow-hidden">
+                    <CardContent className="p-0 relative flex flex-col h-full">
+                        {/* Graph content - 50% height */}
+                        <div className="w-full h-1/2 relative overflow-hidden">
                             {graphView === '2d' && (
                                 <ChatGraph2D
                                     height={window.innerHeight * 0.5}
@@ -135,10 +135,78 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                 />
                             )}
 
+                            {/* Menu overlay on graph */}
+                            <div className="absolute top-3 left-3 right-3 z-10">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Tabs value={graphView} onValueChange={setGraphView}>
+                                            <TabsList className="w-fit grid grid-cols-2">
+                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                                    2D
+                                                </TabsTrigger>
+                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                                    3D
+                                                </TabsTrigger>
+                                            </TabsList>
+                                        </Tabs>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                                                    <Layers className="h-4 w-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-48">
+                                                {graphLayers.map(({ id, enabled, name }) => {
+                                                    const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
+                                                    const isLastEnabled = enabled && enabledLayersCount === 1;
+
+                                                    return (
+                                                        <DropdownMenuCheckboxItem
+                                                            key={id}
+                                                            checked={enabled}
+                                                            onSelect={(event) => event.preventDefault()}
+                                                            onCheckedChange={(checked) => {
+                                                                if (!checked && isLastEnabled) return;
+
+                                                                setGraphLayers((prevLayers) =>
+                                                                    prevLayers.map((layer) =>
+                                                                        layer.id === id ? { ...layer, enabled: checked } : layer,
+                                                                    ),
+                                                                );
+                                                            }}
+                                                            disabled={isLastEnabled}
+                                                        >
+                                                            {name}
+                                                        </DropdownMenuCheckboxItem>
+                                                    );
+                                                })}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <div className="flex items-center gap-1">
+                                            <div 
+                                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                onClick={() => setIsOpenGraphModal(true)}
+                                            >
+                                                <Expand className="h-4 w-4" />
+                                            </div>
+                                            <div 
+                                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                onClick={() => zoomToFitGraph()}
+                                                title="Zoom to Fit Graph"
+                                            >
+                                                <Fullscreen className="h-4 w-4" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Accordion with padding - 50% height */}
+                        <div className="flex-1 px-3 py-2 overflow-hidden">
                             <Accordion
                                 type="multiple"
-                                className="w-full flex-none overflow-y-auto"
-                                style={{ height: '50%' }}
+                                className="w-full h-full overflow-y-auto"
                             >
                                 {cardData.nodes.map((node: any) => {
                                     const linkedNodes = nodeConnections[node.id] || [];
@@ -153,7 +221,6 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             <AccordionTrigger>
                                                 <div
                                                     className="text-left flex items-center gap-2 w-full"
-                                                    // onClick={() => zoomToNodeGraph({ x: node.x, y: node.y })}
                                                 >
                                                     {node.layerColor && (
                                                         <div
@@ -237,174 +304,6 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                 })}
                             </Accordion>
                         </div>
-
-                        {/* Menu overlay on graph */}
-                        <div className="absolute top-3 left-3 right-3 z-10">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Tabs value={graphView} onValueChange={setGraphView}>
-                                        <TabsList className="w-fit grid grid-cols-2">
-                                            <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
-                                                2D
-                                            </TabsTrigger>
-                                            <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
-                                                3D
-                                            </TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <div className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
-                                                <Layers className="h-4 w-4" />
-                                            </div>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-48">
-                                            {graphLayers.map(({ id, enabled, name }) => {
-                                                const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
-                                                const isLastEnabled = enabled && enabledLayersCount === 1;
-
-                                                return (
-                                                    <DropdownMenuCheckboxItem
-                                                        key={id}
-                                                        checked={enabled}
-                                                        onSelect={(event) => event.preventDefault()}
-                                                        onCheckedChange={(checked) => {
-                                                            if (!checked && isLastEnabled) return;
-
-                                                            setGraphLayers((prevLayers) =>
-                                                                prevLayers.map((layer) =>
-                                                                    layer.id === id ? { ...layer, enabled: checked } : layer,
-                                                                ),
-                                                            );
-                                                        }}
-                                                        disabled={isLastEnabled}
-                                                    >
-                                                        {name}
-                                                    </DropdownMenuCheckboxItem>
-                                                );
-                                            })}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                    <div className="flex items-center gap-1">
-                                        <div 
-                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                            onClick={() => setIsOpenGraphModal(true)}
-                                        >
-                                            <Expand className="h-4 w-4" />
-                                        </div>
-                                        <div 
-                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                            onClick={() => zoomToFitGraph()}
-                                            title="Zoom to Fit Graph"
-                                        >
-                                            <Fullscreen className="h-4 w-4" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <Accordion
-                            type="multiple"
-                            className="w-full flex-none overflow-y-auto"
-                            style={{ height: '50%' }}
-                        >
-                            {cardData.nodes.map((node: any) => {
-                                const linkedNodes = nodeConnections[node.id] || [];
-                                const hasLinkedNodes = linkedNodes.length > 0;
-
-                                return (
-                                    <AccordionItem
-                                        key={node.id}
-                                        value={node.id}
-                                        className="transition-all duration-300"
-                                    >
-                                        <AccordionTrigger>
-                                            <div
-                                                className="text-left flex items-center gap-2 w-full"
-                                                // onClick={() => zoomToNodeGraph({ x: node.x, y: node.y })}
-                                            >
-                                                {node.layerColor && (
-                                                    <div
-                                                        className="w-3 h-3 rounded-full flex-shrink-0"
-                                                        style={{ backgroundColor: node.layerColor }}
-                                                    />
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="font-semibold">
-                                                            {node.labels?.[0] ?? 'Node'}
-                                                        </div>
-                                                        {hasLinkedNodes && (
-                                                            <div className="flex items-center gap-1">
-                                                                <Link className="w-4 h-4 text-blue-500" />
-                                                                <span className="text-sm text-blue-500">
-                                                                    {linkedNodes.length}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {node.number && `№ ${node.number}`}{' '}
-                                                        {node.neutralCitation && `— ${node.neutralCitation}`}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </AccordionTrigger>
-                                        <AccordionContent className="whitespace-pre-wrap">
-                                            <div className="mb-4">{node.content}</div>
-
-                                            {hasLinkedNodes && (
-                                                <div className="border-t pt-4">
-                                                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-                                                        <Link className="w-4 h-4" />
-                                                        Related Nodes ({linkedNodes.length})
-                                                    </h4>
-                                                    <div className="space-y-2">
-                                                        {linkedNodes.map((linkedNode) => (
-                                                            <div
-                                                                key={linkedNode.id}
-                                                                className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                                                                onClick={() => {
-                                                                    zoomToNodeGraph({
-                                                                        id: linkedNode.id,
-                                                                        x: linkedNode.x,
-                                                                        y: linkedNode.y,
-                                                                    });
-                                                                }}
-                                                            >
-                                                                {linkedNode.layerColor && (
-                                                                    <div
-                                                                        className="w-2 h-2 rounded-full flex-shrink-0"
-                                                                        style={{
-                                                                            backgroundColor: linkedNode.layerColor,
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="font-medium text-sm truncate">
-                                                                        {linkedNode.labels?.[0] ?? 'Node'}
-                                                                    </div>
-                                                                    <div className="text-xs text-muted-foreground truncate">
-                                                                        {linkedNode.neutralCitation ||
-                                                                            (linkedNode.content &&
-                                                                            linkedNode.content.length > 100
-                                                                                ? linkedNode.content.substring(0, 100) +
-                                                                                  '...'
-                                                                                : linkedNode.content)}
-                                                                    </div>
-                                                                </div>
-                                                                <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                );
-                            })}
-                        </Accordion>
                     </CardContent>
                 </Card>
             </aside>
