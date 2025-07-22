@@ -2,8 +2,8 @@
 
 import { Conversation } from '@/types/Conversation';
 import { cn } from '@/lib/utils';
-import ChatSettingsMenu from '@/components/Chat/ChatSettingsMenu';
-import { ChatItem } from './ChatItem';
+import { ChatItem } from '@/components/Chat/ChatItem';
+import { SidebarMenu } from '@/components/Sidebar/SidebarMenu';
 
 interface ChatSidebarMenuProps {
     conversations: Conversation[];
@@ -21,7 +21,7 @@ export function ChatSidebarMenu({
     return (
         <div className={cn('flex flex-col min-h-0', className)}>
             {showSettings ? (
-                <ChatSettingsMenu />
+                <SidebarMenu />
             ) : (
                 <div className="flex-1 min-h-0 overflow-y-auto">
                     <ul>

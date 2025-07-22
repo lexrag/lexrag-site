@@ -40,7 +40,7 @@ const ChatLeftPanel = ({
         <aside className="h-full w-1/4 hidden md:flex flex-col">
             <div className="w-full flex flex-col h-full">
                 {/* Header with tabs - sticky */}
-                <div className="flex items-center justify-between p-3 bg-background sticky top-0 z-10">
+                <div className="flex items-center justify-between p-3 pb-1 bg-background sticky top-0 z-10">
                     <ChatSidebarPanelHeader activeTab={activeLeftTab} setActiveTab={setActiveLeftTab} />
                 </div>
 

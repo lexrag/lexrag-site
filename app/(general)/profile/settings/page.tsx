@@ -8,7 +8,7 @@ import Notifications from '@/components/UserProfile/Settings/Nofications';
 
 const SettingsPage = () => {
     return (
-        <div className="flex flex-col w-full max-w-3xl gap-8 items-center justify-center px-4">
+        <div className="flex flex-col w-full max-w-5xl gap-8 items-center justify-center">
             <PersonalInfoCard />
             <Other />
             <BillingPlan />
