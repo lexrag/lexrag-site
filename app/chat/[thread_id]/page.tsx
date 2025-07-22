@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
@@ -16,7 +17,8 @@ import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
-import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
+import ChatTextArea from '@/components/Chat/ChatTextArea';
+// import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
@@ -106,6 +108,9 @@ export default function ChatPage() {
                 graphLayers={graphLayers}
                 setGraphLayers={setGraphLayers}
                 setIsOpenGraphModal={setIsOpenGraphModal}
+                currentMessage={currentMessage}
+                cardData={cardData}
+                handleCardData={setCardData}
             />
             <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel

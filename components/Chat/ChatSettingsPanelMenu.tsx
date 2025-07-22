@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
-import { Switch } from '@/components/ui/switch';
+// import { Switch } from '@/components/ui/switch';
 import { ChatMenuItem } from '@/components/Chat/ChatMenuItem';
 import { MENU_ITEMS } from '@/components/Chat/MENU_ITEMS';
 
