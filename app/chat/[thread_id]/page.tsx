@@ -5,12 +5,10 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
-
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
-
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
 import ChatLeftPanel from '@/components/Chat/ChatLeftPanel';
@@ -100,20 +98,22 @@ export default function ChatPage() {
                 activeLeftTab={activeLeftTab}
                 setActiveLeftTab={setActiveLeftTab}
             />
-            <ChatRightSheet 
-                isOpen={isOpenRightSheet} 
-                handleOpen={setIsOpenRightSheet} 
-                graphView={graphView} 
-                setGraphView={setGraphView} 
-                graphLayers={graphLayers} 
-                setGraphLayers={setGraphLayers} 
+            <ChatRightSheet
+                isOpen={isOpenRightSheet}
+                handleOpen={setIsOpenRightSheet}
+                graphView={graphView}
+                setGraphView={setGraphView}
+                graphLayers={graphLayers}
+                setGraphLayers={setGraphLayers}
                 setIsOpenGraphModal={setIsOpenGraphModal}
-                currentMessage={currentMessage}
-                cardData={cardData}
-                handleCardData={setCardData}
             />
             <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
-                <ChatLeftPanel conversations={conversations} onDeleteConversation={onDeleteConversation} activeLeftTab={activeLeftTab} setActiveLeftTab={setActiveLeftTab} />
+                <ChatLeftPanel
+                    conversations={conversations}
+                    onDeleteConversation={onDeleteConversation}
+                    activeLeftTab={activeLeftTab}
+                    setActiveLeftTab={setActiveLeftTab}
+                />
 
                 <section className="flex-1 flex flex-col overflow-hidden min-h-0">
                     <div className="flex-1 overflow-y-auto min-h-0">
@@ -141,15 +141,34 @@ export default function ChatPage() {
                     setIsOpenGraphModal={setIsOpenGraphModal}
                 />
             </main>
-            
-            {/* Mobile chat input with keyboard attachment */}
-            <ChatTextAreaMobile
-                input={input}
-                setInput={setInput}
-                sendMessage={sendMessage}
-                activeMsgType={activeMsgType}
-                toggleMsgType={toggleMsgType}
-            />
+
+            {/* Fixed chat input for mobile */}
+            <div className="md:hidden chat-input-container">
+                <ChatTextArea
+                    input={input}
+                    setInput={setInput}
+                    sendMessage={sendMessage}
+                    activeMsgType={activeMsgType}
+                    toggleMsgType={toggleMsgType}
+                />
+            </div>
+
+            <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
+                <div className="w-1/4" />
+                <div className="w-1/4 flex justify-start">
+                    <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
+                        <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                            Company
+                        </Link>
+                        <Link
+                            href={'/terms-and-conditions'}
+                            className="text-gray-600 dark:text-gray-300 hover:text-primary"
+                        >
+                            Legal Docs
+                        </Link>
+                    </nav>
+                </div>
+            </footer>
         </div>
     );
 }

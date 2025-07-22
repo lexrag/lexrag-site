@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { ChatMenuItem } from '@/components/Chat/ChatMenuItem';
 import { MENU_ITEMS } from '@/components/Chat/MENU_ITEMS';
-import { cn } from '@/lib/utils';
 
 export default function ChatSettingsPanelMenu() {
     const { setTheme, resolvedTheme } = useTheme();
@@ -22,7 +22,7 @@ export default function ChatSettingsPanelMenu() {
 
     return (
         <div className="flex flex-col justify-between h-full">
-            <div className="flex flex-col gap-1 pt-5 pb-2">
+            <div className="flex flex-col gap-1 pb-2">
                 {MENU_ITEMS.map((item) => (
                     <ChatMenuItem
                         key={item.name}
@@ -33,22 +33,14 @@ export default function ChatSettingsPanelMenu() {
                 ))}
             </div>
             <div className="px-3 pt-2">
-                <div 
+                <div
                     className={cn(
                         'flex flex-row items-center gap-3 px-3 py-3 rounded-md hover:bg-accent/50 text-base cursor-pointer',
-                        '[&_svg]:text-muted-foreground hover:[&_svg]:text-primary'
                     )}
                     onClick={handleThemeToggle}
                 >
-                    {resolvedTheme === 'dark' ? (
-                        <Sun className="h-5 w-5" />
-                    ) : (
-                        <Moon className="h-5 w-5" />
-                    )}
+                    {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                     <span>{resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-                    <div className="ml-auto">
-                        <Switch size="sm" checked={resolvedTheme === 'dark'} onCheckedChange={handleThemeToggle} />
-                    </div>
                 </div>
             </div>
         </div>

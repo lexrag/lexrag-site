@@ -7,7 +7,7 @@ import { get2FAStatus } from '@/api/user/get2FAStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 import { SquarePen } from 'lucide-react';
-import { User } from '@/types/User';
+import { useUser } from '@/providers/user-provider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
@@ -19,11 +19,8 @@ import ChangeEmailFlow from '@/components/UserProfile/Security/components/Change
 import ChangePhoneNumberFlow from '@/components/UserProfile/Security/components/ChangePhoneNumberFlow';
 import TwoFactorFlow from './components/TwoFactorFlow';
 
-interface AuthenticationProps {
-    currentUser: User;
-}
-
-const Authentication = ({ currentUser }: AuthenticationProps) => {
+const Authentication = () => {
+    const { user: currentUser } = useUser();
     const [resetOpen, setResetOpen] = useState(false);
     const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(currentUser?.phone_number || '');
@@ -96,6 +93,8 @@ const Authentication = ({ currentUser }: AuthenticationProps) => {
             window.location.href = res.redirect_url;
         }
     };
+
+    if (!currentUser) return null;
 
     return (
         <CardWrapper title="Security">

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Trash2 } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
-
 import ChatSettingsPanelMenu from '@/components/Chat/ChatSettingsPanelMenu';
 
 interface ChatSidebarMenuProps {
@@ -18,25 +17,37 @@ export function ChatSidebarMenu({ conversations, onDeleteConversation, showSetti
             {showSettings ? (
                 <ChatSettingsPanelMenu />
             ) : (
-                <div className="p-3">
-                    {conversations.map(({ thread_id, title }) => (
-                        <Link
-                            key={thread_id}
-                            className="flex items-center justify-between py-2 px-3 border-b border-dashed last:border-none text-sm hover:bg-muted cursor-pointer rounded-md transition-colors"
-                            href={`/chat/${thread_id}`}
-                        >
-                            <span className="truncate w-[calc(100%-30px)]">{title}</span>
-                            <Trash2
-                                className="size-5 text-muted-foreground hover:text-destructive transition-colors"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onDeleteConversation(thread_id);
-                                }}
-                            />
-                        </Link>
-                    ))}
+                <div className="max-h-80 overflow-y-auto">
+                    <ul>
+                        {conversations.map(({ thread_id, title }) => (
+                            <li
+                                key={thread_id}
+                                className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
+                            >
+                                <Link
+                                    className="text-sm text-gray-800 truncate max-w-[85%]"
+                                    href={`/chat/${thread_id}`}
+                                >
+                                    {title || 'New chat'}
+                                </Link>
+                                <div
+                                    className="hidden group-hover:block"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onDeleteConversation(thread_id);
+                                    }}
+                                >
+                                    <Trash2
+                                        size={16}
+                                        className="text-muted-foreground hover:text-destructive transition"
+                                    />
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             )}
         </div>
     );
-} 
+}
