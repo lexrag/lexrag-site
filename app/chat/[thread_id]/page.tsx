@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
@@ -73,8 +72,6 @@ export default function ChatPage() {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
-
-
     if (!socket) return null;
 
     return (
@@ -112,7 +109,7 @@ export default function ChatPage() {
                 cardData={cardData}
                 handleCardData={setCardData}
             />
-            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}
