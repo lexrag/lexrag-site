@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
@@ -16,6 +16,7 @@ import ChatLeftSheet from '@/components/Chat/ChatLeftSheet';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
+import ChatTextArea from '@/components/Chat/ChatTextArea';
 import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
 import { MegaMenu } from '@/components/Header/MegaMenu';
 
@@ -70,8 +71,6 @@ export default function ChatPage() {
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
-
-
 
     if (!socket) return null;
 
