@@ -104,7 +104,7 @@ export default function ChatPage() {
                 setGraphLayers={setGraphLayers}
                 setIsOpenGraphModal={setIsOpenGraphModal}
             />
-            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}
