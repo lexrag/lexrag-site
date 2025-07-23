@@ -14,11 +14,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Logo } from './Logo';
 
-interface MegaMenuProps {
-    isHomePage: boolean;
-}
-
-export function MegaMenu({ isHomePage }: MegaMenuProps) {
+export function MegaMenu() {
     const pathname = usePathname();
     const { hasActiveChild } = useMenu(pathname);
     const myAccountItem = MENU_MEGA[2];
@@ -36,11 +32,9 @@ export function MegaMenu({ isHomePage }: MegaMenuProps) {
             <NavigationMenuList className="gap-0">
                 <NavigationMenuItem>
                     <NavigationMenuTrigger
-                        className={cn(linkClass)}
+                        className={cn(linkClass, 'relative')}
                         data-active={hasActiveChild(myAccountItem.children) || undefined}
-                    >
-                        <Logo isHomePage={isHomePage} />
-                    </NavigationMenuTrigger>
+                    ></NavigationMenuTrigger>
                     <NavigationMenuContent className="p-0">
                         <MegaMenuSubAccount items={MENU_MEGA} />
                     </NavigationMenuContent>

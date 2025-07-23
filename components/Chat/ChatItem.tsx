@@ -20,7 +20,6 @@ export function ChatItem({ thread_id, title, onDeleteConversation }: ChatItemPro
                 className="md:hidden block group-hover:block"
                 onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     onDeleteConversation(thread_id);
                 }}
             >

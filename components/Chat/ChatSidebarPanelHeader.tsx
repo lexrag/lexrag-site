@@ -18,7 +18,7 @@ export function ChatSidebarPanelHeader({ activeTab, setActiveTab }: ChatSidebarP
         <div className="w-full">
             <div className="flex items-center justify-between gap-2 mb-3">
                 <Link href="/" className="ps-3">
-                    <Logo isHomePage={false} />
+                    <Logo />
                 </Link>
                 <ChatViewTabs activeTab={activeTab} onTabChange={setActiveTab} isSettings={false} />
             </div>

@@ -7,7 +7,7 @@ import { get2FAStatus } from '@/api/user/get2FAStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 import { SquarePen } from 'lucide-react';
-import { useUser } from '@/providers/user-provider';
+import { User } from '@/types/User';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
@@ -19,13 +19,12 @@ import ChangeEmailFlow from '@/components/UserProfile/Security/components/Change
 import ChangePhoneNumberFlow from '@/components/UserProfile/Security/components/ChangePhoneNumberFlow';
 import TwoFactorFlow from './components/TwoFactorFlow';
 
-const Authentication = () => {
-    const { user: currentUser } = useUser();
+const Authentication = ({ user }: { user: User }) => {
     const [resetOpen, setResetOpen] = useState(false);
     const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState(currentUser?.phone_number || '');
+    const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || '');
     const [passwordLastChangedAt, setPasswordLastChangedAt] = useState<string | null>(
-        currentUser?.password_last_changed_at || null,
+        user?.password_last_changed_at || null,
     );
     const [open, setOpen] = useState(false);
     const [open2FA, setOpen2FA] = useState(false);
@@ -94,8 +93,6 @@ const Authentication = () => {
         }
     };
 
-    if (!currentUser) return null;
-
     return (
         <CardWrapper title="Security">
             <Row
@@ -106,7 +103,7 @@ const Authentication = () => {
                     </Button>
                 }
             >
-                <span>{currentUser.email}</span>
+                <span>{user.email}</span>
             </Row>
             <ReusableDialog
                 open={open}
