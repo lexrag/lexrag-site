@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { decrypt } from '@/utils/auth/decodeAccessToken';
 
-const protectedRoutes = ['/dashboard', '/chat', '/profile'];
+const protectedRoutes = ['/dashboard', '/chat', '/profile', '/evaluator'];
 const publicRoutes = ['/', '/auth/signin', '/auth/signup', '/features'];
 
 const middleware = async (req: NextRequest) => {

@@ -50,6 +50,20 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         const handleMessage = async (event: MessageEvent) => {
             const data = JSON.parse(event.data);
 
+            if (data.name === 'evaluator_message') {
+                const direction = data.message === "ai" ? "incoming" : "outgoing";
+                const html = await renderMessageMd(data.message);
+
+                const message: Message = {
+                    ...data,
+                    html,
+                    content: data.message,
+                    direction: direction,
+                };
+
+                setMessages((prev) => [...prev, message]);
+            }
+
             if (data.name === 'update_status') {
                 setStatus(data.params.update_status);
             }
@@ -57,6 +71,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             if (data.name === 'relevant_context') {
                 // console.log(data);
             }
+
             if (data.type === 'event') {
                 await eventHandler(data, { setConversations });
             }
