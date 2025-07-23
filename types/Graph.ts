@@ -12,3 +12,12 @@ export interface GraphData {
     relevant_retrieved_nodes?: any;
     relevant_context?: any;
 }
+
+export interface GraphNodePosition {
+    x: number;
+    y: number;
+    vx?: number;
+    vy?: number;
+    fx?: number;
+    fy?: number;
+}
