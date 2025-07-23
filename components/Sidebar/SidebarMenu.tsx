@@ -10,6 +10,7 @@ interface SidebarMenuProps {
 }
 
 export function SidebarMenu({ collapsed = false, onOpenMobileChange }: SidebarMenuProps) {
+    const itemPaddingClass = collapsed ? 'pl-0.5 pr-2' : 'px-2';
     return (
         <nav className="px-2 pb-2">
             <ul className="flex flex-col gap-2">
@@ -24,12 +25,13 @@ export function SidebarMenu({ collapsed = false, onOpenMobileChange }: SidebarMe
                                     label={item.label}
                                     collapsed={collapsed}
                                     onOpenMobileChange={onOpenMobileChange}
+                                    className={itemPaddingClass}
                                 />
                             ) : null,
                         )}
                     </SidebarMenuGroup>
                 ))}
-                <SidebarThemeSwitch collapsed={collapsed} />
+                <SidebarThemeSwitch collapsed={collapsed} className={itemPaddingClass} />
             </ul>
         </nav>
     );

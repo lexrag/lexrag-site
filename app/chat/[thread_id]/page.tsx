@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
-import { Menu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
+import { Button } from '@/components/ui/button';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
 import ChatLeftPanel from '@/components/Chat/ChatLeftPanel';
@@ -17,6 +18,7 @@ import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
+import { SidebarMenu } from '@/components/Sidebar/SidebarMenu';
 
 export default function ChatPage() {
     const pathname = usePathname();
@@ -35,6 +37,7 @@ export default function ChatPage() {
     const [isOpenGraphModal, setIsOpenGraphModal] = useState<boolean>(false);
     const [currentMessage, setCurrentMessage] = useState<any>();
     const [activeLeftTab, setActiveLeftTab] = useState<string>('chats');
+    const [iconSidebarOpen, setIconSidebarOpen] = useState(false);
 
     const [graphLayers, setGraphLayers] = useState<GraphLayer[]>([
         { id: 'all_retrieved_nodes', name: 'All Retrieved Nodes', enabled: true, color: '#d3d3d3', priority: 1 },
@@ -106,7 +109,29 @@ export default function ChatPage() {
                 cardData={cardData}
                 handleCardData={setCardData}
             />
-            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
+                <div
+                    className={`hidden md:block fixed z-50 top-0 left-0 h-full transition-all duration-300 ${iconSidebarOpen ? 'w-48 bg-background/95 shadow-lg border-r border-border' : 'w-14 bg-background/80 border-r border-border'} group`}
+                    style={{ minHeight: '100vh' }}
+                >
+                    <div className={`flex items-center ${iconSidebarOpen ? 'justify-end' : 'justify-center'} p-2`}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={iconSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+                            onClick={() => setIconSidebarOpen((prev) => !prev)}
+                        >
+                            {iconSidebarOpen ? <ChevronLeft className="size-5" /> : <ChevronRight className="size-5" />}
+                        </Button>
+                    </div>
+                    <SidebarMenu collapsed={!iconSidebarOpen} />
+                </div>
+
+                <div
+                    className="hidden md:block"
+                    style={{ width: iconSidebarOpen ? 192 : 56, transition: 'width 0.3s' }}
+                />
+
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}

@@ -24,7 +24,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                     />
                 </div>
 
-                <main className="flex-1 min-h-screen w-full flex justify-center">
+                <main className="flex-1 min-h-screen w-full flex justify-center mt-20">
                     <motion.div
                         className="w-full max-w-5xl px-4"
                         animate={{

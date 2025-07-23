@@ -55,10 +55,7 @@ const ChatLeftPanel = ({
                 </div>
 
                 {/* Footer */}
-                <ChatSidebarPanelFooter
-                    showSettings={showSettings}
-                    onToggleSettings={() => setActiveLeftTab('settings')}
-                />
+                <ChatSidebarPanelFooter />
             </div>
         </aside>
     );

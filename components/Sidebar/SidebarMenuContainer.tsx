@@ -53,10 +53,9 @@ export const SidebarMenuContainer: React.FC<SidebarMenuContainerProps> = ({
         <motion.aside
             animate={{ width: isCollapsed ? 60 : 260 }}
             transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-            className="h-[calc(100vh-82px)] min-w-0 bg-background border-r flex flex-col z-30 fixed top-[82px] left-0"
-            style={{ overflow: 'hidden' }}
+            className="h-[calc(100vh-82px)] min-w-0 bg-background border-r flex flex-col z-30 fixed left-0 overflow-hidden top-[82px]"
         >
-            <div className="flex items-center justify-end p-2">
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-end'} p-2`}>
                 <Button
                     variant="ghost"
                     size="icon"

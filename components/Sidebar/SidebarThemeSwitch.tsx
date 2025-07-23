@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils';
 
 interface SidebarThemeSwitchProps {
     collapsed?: boolean;
+    className?: string;
 }
 
-export function SidebarThemeSwitch({ collapsed = false }: SidebarThemeSwitchProps) {
+export function SidebarThemeSwitch({ collapsed = false, className }: SidebarThemeSwitchProps) {
     const { setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -21,12 +22,20 @@ export function SidebarThemeSwitch({ collapsed = false }: SidebarThemeSwitchProp
     if (!mounted) return null;
 
     return (
-        <li className="relative">
+        <li className="relative min-w-0">
             <button
                 type="button"
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 className={cn(
-                    'peer/menu-button ring-default active:bg-state-soft active:text-default data-[active=true]:bg-state-soft data-[active=true]:text-default data-[state=open]:hover:bg-state-soft data-[state=open]:hover:text-default outline-hidden group-has-data-[sidebar=menu-action]/menu-item:pr-8 w-full overflow-hidden rounded-md p-2 text-left transition-colors focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-accent/50 hover:text-default h-8 text-sm flex items-center gap-2 py-2',
+                    'flex items-center w-full py-2 h-[4.1vh] rounded-md overflow-hidden',
+                    className,
+                    'text-sm text-left',
+                    'transition-colors focus-visible:ring-2 outline-hidden',
+                    'hover:bg-accent/50 hover:text-foreground',
+                    'active:bg-accent/50 active:text-foreground',
+                    'data-[active=true]:bg-accent/50 data-[active=true]:text-foreground data-[active=true]:font-medium',
+                    'data-[state=open]:hover:bg-accent/50 data-[state=open]:hover:text-foreground',
+                    'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
                 )}
                 title={collapsed ? (resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode') : undefined}
             >
@@ -35,8 +44,8 @@ export function SidebarThemeSwitch({ collapsed = false }: SidebarThemeSwitchProp
                 </span>
                 <motion.span
                     animate={collapsed ? { opacity: 0, x: -16 } : { opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: collapsed ? 0 : 0.2 }}
-                    className="truncate text-sm"
+                    transition={{ duration: 0.2, delay: 0 }}
+                    className="truncate text-sm ml-2"
                     style={{
                         display: 'inline-block',
                         whiteSpace: 'nowrap',

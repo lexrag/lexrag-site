@@ -23,7 +23,7 @@ export default function FeaturesLayout({ children }: { children: React.ReactNode
                         onCollapseChange={setCollapsed}
                     />
                 </div>
-                <main className="flex-1 min-h-screen w-full flex justify-center">
+                <main className="flex-1 min-h-screen w-full flex justify-center mt-20">
                     <motion.div
                         className="w-full"
                         animate={{
