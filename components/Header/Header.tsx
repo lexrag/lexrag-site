@@ -24,7 +24,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden mr-2"
+                    className="lg:hidden mr-2"
                     aria-label="Open menu"
                     onClick={onOpenSidebar}
                 >

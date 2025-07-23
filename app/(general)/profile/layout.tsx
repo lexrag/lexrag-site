@@ -28,7 +28,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                     <motion.div
                         className="w-full max-w-5xl px-4"
                         animate={{
-                            marginLeft: isMobile ? 0 : collapsed ? 0 : 260,
+                            marginLeft: isMobile ? 0 : collapsed ? 60 : 260,
                         }}
                         transition={{ type: 'tween', duration: 0.35 }}
                     >

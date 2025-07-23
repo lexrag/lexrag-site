@@ -17,7 +17,6 @@ import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
-import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
     const pathname = usePathname();

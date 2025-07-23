@@ -12,7 +12,6 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Logo } from './Logo';
 
 export function MegaMenu() {
     const pathname = usePathname();

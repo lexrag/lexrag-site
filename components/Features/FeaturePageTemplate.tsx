@@ -6,7 +6,6 @@ import FeatureParams from '@/components/Features/FeatureParams';
 import { combinedFeaturesData, FeatureData } from '@/components/Features/FeaturesData';
 import ProductFeatures from '@/components/Features/FeaturesGrid';
 import InstructionCard from '@/components/Features/InstructionCard';
-import PageTitle from '@/components/Layout/PageTitle';
 
 const FeaturePageTemplate = () => {
     const pathname = usePathname();
