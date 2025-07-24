@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ArrowRight, Expand, Fullscreen, Layers, Link } from 'lucide-react';
+import { Expand, Fullscreen, Layers } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -42,8 +42,8 @@ const ChatRightPanel = ({
     console.log(cardData);
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
+    const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
-    // Function to extract group key from node ID
     const getGroupKey = (nodeId: string) => {
         if (nodeId.includes('lawnet.com/openlaw/cases/citation/')) {
             // Extract case code: everything before the # symbol
@@ -62,23 +62,38 @@ const ChatRightPanel = ({
         return nodeId;
     };
 
-    // Function to get group display name
-    const getGroupDisplayName = (groupKey: string, nodes: any[]) => {
-        const firstNode = nodes[0];
+    // const truncateText = (text: string, maxWords: number = 5) => {
+    //     if (!text) return text;
 
-        if (firstNode.id.includes('lawnet.com')) {
-            // For case law, use the case title if available
-            return firstNode.neutralCitation || groupKey;
-        } else if (firstNode.id.includes('sso.agc.gov.sg')) {
-            // For legislation, use the content or a formatted name
-            return firstNode.content || groupKey;
+    //     const words = text.split(' ');
+    //     if (words.length <= maxWords) {
+    //         return text;
+    //     }
+
+    //     return words.slice(0, maxWords).join(' ') + '...';
+    // };
+
+    const getGroupDisplayName = (groupKey: string, nodes: any[]) => {
+        // First, try to find a CaseLaw node (main case node)
+        const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
+        if (caseNode) {
+            return caseNode.content;
+            // return truncateText(caseNode.content, 5);
         }
 
-        // For custom nodes, use the first node's label or content
+        // For legislation nodes
+        const firstNode = nodes[0];
+        if (firstNode.id.includes('sso.agc.gov.sg')) {
+            return firstNode.content || groupKey;
+            // return truncateText(firstNode.content || groupKey, 5);
+        }
+
+        // For other custom nodes
         return firstNode.labels?.[0] || firstNode.content || groupKey;
+        // return truncateText(firstNode.labels?.[0] || firstNode.content || groupKey, 5);
     };
 
-    // Group nodes by their group keys
+    // Group nodes by their group keys and filter out unwanted nodes
     const groupedNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
             return {};
@@ -87,6 +102,11 @@ const ChatRightPanel = ({
         const groups: { [key: string]: any[] } = {};
 
         cardData.nodes.forEach((node) => {
+            // Skip PartOfTheLegislation nodes
+            if (node.labels?.includes('PartOfTheLegislation')) {
+                return;
+            }
+
             const groupKey = getGroupKey(node.id);
             if (!groups[groupKey]) {
                 groups[groupKey] = [];
@@ -94,49 +114,35 @@ const ChatRightPanel = ({
             groups[groupKey].push(node);
         });
 
-        return groups;
-    }, [cardData.nodes]);
-
-    const nodeConnections = useMemo(() => {
-        const connections: { [key: string]: any[] } = {};
-
-        if (!cardData.links || !cardData.nodes || cardData.links.length === 0) {
-            return connections;
-        }
-
-        cardData.links.forEach((link) => {
-            let sourceId, targetId;
-
-            if (link.source && typeof link.source === 'object') {
-                sourceId = link.source.id;
-            } else if (typeof link.source === 'string') {
-                sourceId = link.source;
-            }
-
-            if (link.target && typeof link.target === 'object') {
-                targetId = link.target.id;
-            } else if (typeof link.target === 'string') {
-                targetId = link.target;
-            }
-
-            if (!sourceId || !targetId) return;
-
-            if (!connections[sourceId]) connections[sourceId] = [];
-            if (!connections[targetId]) connections[targetId] = [];
-
-            const targetNode = cardData.nodes.find((n) => n.id === targetId);
-            const sourceNode = cardData.nodes.find((n) => n.id === sourceId);
-
-            if (targetNode && !connections[sourceId].some((n) => n.id === targetId)) {
-                connections[sourceId].push(targetNode);
-            }
-            if (sourceNode && !connections[targetId].some((n) => n.id === sourceId)) {
-                connections[targetId].push(sourceNode);
+        // Filter out CaseLaw nodes from being displayed as individual items
+        // but keep them in the group for title extraction
+        Object.keys(groups).forEach((groupKey) => {
+            const filteredNodes = groups[groupKey].filter((node) => !node.labels?.includes('CaseLaw'));
+            if (filteredNodes.length > 0) {
+                groups[groupKey] = filteredNodes;
+            } else {
+                // If only CaseLaw node exists, keep the group but with empty nodes array
+                groups[groupKey] = [];
             }
         });
 
-        return connections;
-    }, [cardData.links, cardData.nodes]);
+        return groups;
+    }, [cardData.nodes]);
+
+    const handleGroupClick = (groupKey: string) => {
+        setSelectedItem(selectedItem === groupKey ? null : groupKey);
+    };
+
+    const handleNodeClick = (nodeId: string, node: any) => {
+        setSelectedItem(nodeId);
+        if (node.x !== undefined && node.y !== undefined) {
+            zoomToNodeGraph({
+                id: nodeId,
+                x: node.x,
+                y: node.y,
+            });
+        }
+    };
 
     useEffect(() => {
         setRightPanelWidth(window.innerWidth * 0.25);
@@ -169,17 +175,6 @@ const ChatRightPanel = ({
             document.body.style.cursor = '';
         };
     }, [isResizing]);
-
-    const truncateText = (text: string, maxWords: number = 5) => {
-        if (!text) return text;
-
-        const words = text.split(' ');
-        if (words.length <= maxWords) {
-            return text;
-        }
-
-        return words.slice(0, maxWords).join(' ') + '...';
-    };
 
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
@@ -285,48 +280,71 @@ const ChatRightPanel = ({
                         <div className="flex-1 px-3 py-2 overflow-hidden">
                             <Accordion type="multiple" className="w-full h-full overflow-y-auto">
                                 {Object.entries(groupedNodes).map(([groupKey, nodes]) => {
-                                    const groupDisplayName = getGroupDisplayName(groupKey, nodes);
-                                    const totalLinkedNodes = nodes.reduce((acc, node) => {
-                                        return acc + (nodeConnections[node.id] || []).length;
-                                    }, 0);
+                                    const allGroupNodes =
+                                        cardData.nodes?.filter(
+                                            (node) =>
+                                                !node.labels?.includes('PartOfTheLegislation') &&
+                                                getGroupKey(node.id) === groupKey,
+                                        ) || [];
+
+                                    const groupDisplayName = getGroupDisplayName(groupKey, allGroupNodes);
+
+                                    if (
+                                        nodes.length === 0 &&
+                                        !allGroupNodes.some((node) => node.labels?.includes('CaseLaw'))
+                                    ) {
+                                        return null;
+                                    }
 
                                     return (
                                         <AccordionItem
                                             key={groupKey}
                                             value={groupKey}
-                                            className="transition-all duration-300"
+                                            // className={`transition-all duration-300 ${
+                                            //     selectedItem === groupKey
+                                            //         ? 'border-l-2 border-l-primary bg-primary/5'
+                                            //         : 'hover:bg-muted/30'
+                                            // }`}
                                         >
-                                            <AccordionTrigger>
+                                            <AccordionTrigger
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleGroupClick(groupKey);
+                                                }}
+                                                className="hover:no-underline"
+                                            >
                                                 <div className="text-left flex items-center gap-2 w-full">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="font-semibold">
-                                                                {truncateText(groupDisplayName)}
-                                                            </div>
+                                                            <div className="font-semibold">{groupDisplayName}</div>
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-sm text-muted-foreground">
                                                                     ({nodes.length} node{nodes.length !== 1 ? 's' : ''})
                                                                 </span>
-                                                                {totalLinkedNodes > 0 && (
-                                                                    <>
-                                                                        <Link className="w-4 h-4 text-blue-500" />
-                                                                        <span className="text-sm text-blue-500">
-                                                                            {totalLinkedNodes}
-                                                                        </span>
-                                                                    </>
-                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-4">
-                                                {nodes.map((node: any) => {
-                                                    const linkedNodes = nodeConnections[node.id] || [];
-                                                    const hasLinkedNodes = linkedNodes.length > 0;
-
-                                                    return (
-                                                        <div key={node.id} className="border-l-2 border-muted pl-4">
+                                                {nodes.length === 0 ? (
+                                                    <div className="text-sm text-muted-foreground italic">
+                                                        No detailed nodes available
+                                                    </div>
+                                                ) : (
+                                                    nodes.map((node: any) => (
+                                                        <div
+                                                            key={node.id}
+                                                            className={`border-l-2 border-muted pl-4 cursor-pointer transition-all duration-200 ${
+                                                                selectedItem === node.id
+                                                                    ? 'bg-primary/10 border-l-primary shadow-sm'
+                                                                    : 'hover:bg-muted/20 hover:border-l-muted-foreground/50'
+                                                            }`}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleNodeClick(node.id, node);
+                                                            }}
+                                                        >
                                                             <div className="flex items-start gap-2 mb-2">
                                                                 {node.layerColor && (
                                                                     <div
@@ -339,14 +357,6 @@ const ChatRightPanel = ({
                                                                         <div className="font-medium text-sm">
                                                                             {node.labels?.[0] ?? 'Node'}
                                                                         </div>
-                                                                        {hasLinkedNodes && (
-                                                                            <div className="flex items-center gap-1">
-                                                                                <Link className="w-3 h-3 text-blue-500" />
-                                                                                <span className="text-xs text-blue-500">
-                                                                                    {linkedNodes.length}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
                                                                     </div>
                                                                     <div className="text-xs text-muted-foreground mb-2">
                                                                         {node.number && `№ ${node.number}`}{' '}
@@ -356,60 +366,11 @@ const ChatRightPanel = ({
                                                                     <div className="text-sm whitespace-pre-wrap mb-3">
                                                                         {node.content}
                                                                     </div>
-
-                                                                    {hasLinkedNodes && (
-                                                                        <div className="border-t pt-3 mt-3">
-                                                                            <h5 className="font-medium text-xs mb-2 flex items-center gap-1">
-                                                                                <Link className="w-3 h-3" />
-                                                                                Related ({linkedNodes.length})
-                                                                            </h5>
-                                                                            <div className="space-y-1">
-                                                                                {linkedNodes.map((linkedNode) => (
-                                                                                    <div
-                                                                                        key={linkedNode.id}
-                                                                                        className="flex items-center gap-2 p-2 bg-muted/30 rounded text-xs hover:bg-muted/50 transition-colors cursor-pointer"
-                                                                                        onClick={() => {
-                                                                                            zoomToNodeGraph({
-                                                                                                id: linkedNode.id,
-                                                                                                x: linkedNode.x,
-                                                                                                y: linkedNode.y,
-                                                                                            });
-                                                                                        }}
-                                                                                    >
-                                                                                        {linkedNode.layerColor && (
-                                                                                            <div
-                                                                                                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                                                                                                style={{
-                                                                                                    backgroundColor:
-                                                                                                        linkedNode.layerColor,
-                                                                                                }}
-                                                                                            />
-                                                                                        )}
-                                                                                        <div className="flex-1 min-w-0">
-                                                                                            <div className="font-medium truncate">
-                                                                                                {linkedNode
-                                                                                                    .labels?.[0] ??
-                                                                                                    'Node'}
-                                                                                            </div>
-                                                                                            {linkedNode.neutralCitation && (
-                                                                                                <div className="text-muted-foreground truncate">
-                                                                                                    {
-                                                                                                        linkedNode.neutralCitation
-                                                                                                    }
-                                                                                                </div>
-                                                                                            )}
-                                                                                        </div>
-                                                                                        <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    );
-                                                })}
+                                                    ))
+                                                )}
                                             </AccordionContent>
                                         </AccordionItem>
                                     );
