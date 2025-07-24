@@ -1,19 +1,19 @@
 'use client';
 
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
-import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
-import { ArrowRight, Link, Layers, Expand, Fullscreen } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { zoomToNodeGraph } from '@/events/zoom-to-node';
+import { ArrowRight, Expand, Fullscreen, Layers, Link } from 'lucide-react';
+import { CardData } from '@/types/Chat';
+import { GraphLayer } from '@/types/Graph';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CardData } from '@/types/Chat';
-import { GraphLayer } from '@/types/Graph';
-import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -29,9 +29,73 @@ interface ChatRightPanelProps {
     setIsOpenGraphModal: (open: boolean) => void;
 }
 
-const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData, graphView, setGraphView, handleCardData, setIsOpenGraphModal }: ChatRightPanelProps) => {
+const ChatRightPanel = ({
+    currentMessage,
+    graphLayers,
+    setGraphLayers,
+    cardData,
+    graphView,
+    setGraphView,
+    handleCardData,
+    setIsOpenGraphModal,
+}: ChatRightPanelProps) => {
+    console.log(cardData);
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
+
+    // Function to extract group key from node ID
+    const getGroupKey = (nodeId: string) => {
+        if (nodeId.includes('lawnet.com/openlaw/cases/citation/')) {
+            // Extract case code: everything before the # symbol
+            const match = nodeId.match(/cases\/citation\/([^#]+)/);
+            return match ? decodeURIComponent(match[1]) : nodeId;
+        } else if (nodeId.includes('sso.agc.gov.sg/Act/')) {
+            // Extract act code: everything after /Act/
+            const match = nodeId.match(/\/Act\/([^?]+)/);
+            return match ? match[1] : nodeId;
+        } else if (nodeId.includes('sso.agc.gov.sg/SL/')) {
+            // Extract subsidiary legislation code: everything after /SL/ until ?
+            const match = nodeId.match(/\/SL\/([^?]+)/);
+            return match ? match[1] : nodeId;
+        }
+        // For custom nodes, return the full ID as group key
+        return nodeId;
+    };
+
+    // Function to get group display name
+    const getGroupDisplayName = (groupKey: string, nodes: any[]) => {
+        const firstNode = nodes[0];
+
+        if (firstNode.id.includes('lawnet.com')) {
+            // For case law, use the case title if available
+            return firstNode.neutralCitation || groupKey;
+        } else if (firstNode.id.includes('sso.agc.gov.sg')) {
+            // For legislation, use the content or a formatted name
+            return firstNode.content || groupKey;
+        }
+
+        // For custom nodes, use the first node's label or content
+        return firstNode.labels?.[0] || firstNode.content || groupKey;
+    };
+
+    // Group nodes by their group keys
+    const groupedNodes = useMemo(() => {
+        if (!cardData.nodes || cardData.nodes.length === 0) {
+            return {};
+        }
+
+        const groups: { [key: string]: any[] } = {};
+
+        cardData.nodes.forEach((node) => {
+            const groupKey = getGroupKey(node.id);
+            if (!groups[groupKey]) {
+                groups[groupKey] = [];
+            }
+            groups[groupKey].push(node);
+        });
+
+        return groups;
+    }, [cardData.nodes]);
 
     const nodeConnections = useMemo(() => {
         const connections: { [key: string]: any[] } = {};
@@ -106,6 +170,17 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
         };
     }, [isResizing]);
 
+    const truncateText = (text: string, maxWords: number = 5) => {
+        if (!text) return text;
+
+        const words = text.split(' ');
+        if (words.length <= maxWords) {
+            return text;
+        }
+
+        return words.slice(0, maxWords).join(' ') + '...';
+    };
+
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
@@ -157,7 +232,9 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="w-48">
                                                 {graphLayers.map(({ id, enabled, name }) => {
-                                                    const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
+                                                    const enabledLayersCount = graphLayers.filter(
+                                                        (layer) => layer.enabled,
+                                                    ).length;
                                                     const isLastEnabled = enabled && enabledLayersCount === 1;
 
                                                     return (
@@ -170,7 +247,9 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
 
                                                                 setGraphLayers((prevLayers) =>
                                                                     prevLayers.map((layer) =>
-                                                                        layer.id === id ? { ...layer, enabled: checked } : layer,
+                                                                        layer.id === id
+                                                                            ? { ...layer, enabled: checked }
+                                                                            : layer,
                                                                     ),
                                                                 );
                                                             }}
@@ -183,13 +262,13 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="flex items-center gap-1">
-                                            <div 
+                                            <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => setIsOpenGraphModal(true)}
                                             >
                                                 <Expand className="h-4 w-4" />
                                             </div>
-                                            <div 
+                                            <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => zoomToFitGraph()}
                                                 title="Zoom to Fit Graph"
@@ -204,100 +283,133 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
 
                         {/* Accordion with padding - 50% height */}
                         <div className="flex-1 px-3 py-2 overflow-hidden">
-                            <Accordion
-                                type="multiple"
-                                className="w-full h-full overflow-y-auto"
-                            >
-                                {cardData.nodes.map((node: any) => {
-                                    const linkedNodes = nodeConnections[node.id] || [];
-                                    const hasLinkedNodes = linkedNodes.length > 0;
+                            <Accordion type="multiple" className="w-full h-full overflow-y-auto">
+                                {Object.entries(groupedNodes).map(([groupKey, nodes]) => {
+                                    const groupDisplayName = getGroupDisplayName(groupKey, nodes);
+                                    const totalLinkedNodes = nodes.reduce((acc, node) => {
+                                        return acc + (nodeConnections[node.id] || []).length;
+                                    }, 0);
 
                                     return (
                                         <AccordionItem
-                                            key={node.id}
-                                            value={node.id}
+                                            key={groupKey}
+                                            value={groupKey}
                                             className="transition-all duration-300"
                                         >
                                             <AccordionTrigger>
-                                                <div
-                                                    className="text-left flex items-center gap-2 w-full"
-                                                >
-                                                    {node.layerColor && (
-                                                        <div
-                                                            className="w-3 h-3 rounded-full flex-shrink-0"
-                                                            style={{ backgroundColor: node.layerColor }}
-                                                        />
-                                                    )}
+                                                <div className="text-left flex items-center gap-2 w-full">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
                                                             <div className="font-semibold">
-                                                                {node.labels?.[0] ?? 'Node'}
+                                                                {truncateText(groupDisplayName)}
                                                             </div>
-                                                            {hasLinkedNodes && (
-                                                                <div className="flex items-center gap-1">
-                                                                    <Link className="w-4 h-4 text-blue-500" />
-                                                                    <span className="text-sm text-blue-500">
-                                                                        {linkedNodes.length}
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {node.number && `№ ${node.number}`}{' '}
-                                                            {node.neutralCitation && `— ${node.neutralCitation}`}
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-sm text-muted-foreground">
+                                                                    ({nodes.length} node{nodes.length !== 1 ? 's' : ''})
+                                                                </span>
+                                                                {totalLinkedNodes > 0 && (
+                                                                    <>
+                                                                        <Link className="w-4 h-4 text-blue-500" />
+                                                                        <span className="text-sm text-blue-500">
+                                                                            {totalLinkedNodes}
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </AccordionTrigger>
-                                            <AccordionContent className="whitespace-pre-wrap">
-                                                <div className="mb-4">{node.content}</div>
+                                            <AccordionContent className="space-y-4">
+                                                {nodes.map((node: any) => {
+                                                    const linkedNodes = nodeConnections[node.id] || [];
+                                                    const hasLinkedNodes = linkedNodes.length > 0;
 
-                                                {hasLinkedNodes && (
-                                                    <div className="border-t pt-4">
-                                                        <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-                                                            <Link className="w-4 h-4" />
-                                                            Related Nodes ({linkedNodes.length})
-                                                        </h4>
-                                                        <div className="space-y-2">
-                                                            {linkedNodes.map((linkedNode) => (
-                                                                <div
-                                                                    key={linkedNode.id}
-                                                                    className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                                                                    onClick={() => {
-                                                                        zoomToNodeGraph({
-                                                                            id: linkedNode.id,
-                                                                            x: linkedNode.x,
-                                                                            y: linkedNode.y,
-                                                                        });
-                                                                    }}
-                                                                >
-                                                                    {linkedNode.layerColor && (
-                                                                        <div
-                                                                            className="w-2 h-2 rounded-full flex-shrink-0"
-                                                                            style={{
-                                                                                backgroundColor: linkedNode.layerColor,
-                                                                            }}
-                                                                        />
-                                                                    )}
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="font-medium text-sm truncate">
-                                                                            {linkedNode.labels?.[0] ?? 'Node'}
+                                                    return (
+                                                        <div key={node.id} className="border-l-2 border-muted pl-4">
+                                                            <div className="flex items-start gap-2 mb-2">
+                                                                {node.layerColor && (
+                                                                    <div
+                                                                        className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
+                                                                        style={{ backgroundColor: node.layerColor }}
+                                                                    />
+                                                                )}
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <div className="font-medium text-sm">
+                                                                            {node.labels?.[0] ?? 'Node'}
                                                                         </div>
-                                                                        <div className="text-xs text-muted-foreground truncate">
-                                                                            {linkedNode.neutralCitation ||
-                                                                                (linkedNode.content &&
-                                                                                linkedNode.content.length > 100
-                                                                                    ? linkedNode.content.substring(0, 100) +
-                                                                                      '...'
-                                                                                    : linkedNode.content)}
-                                                                        </div>
+                                                                        {hasLinkedNodes && (
+                                                                            <div className="flex items-center gap-1">
+                                                                                <Link className="w-3 h-3 text-blue-500" />
+                                                                                <span className="text-xs text-blue-500">
+                                                                                    {linkedNodes.length}
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                    <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                                                    <div className="text-xs text-muted-foreground mb-2">
+                                                                        {node.number && `№ ${node.number}`}{' '}
+                                                                        {node.neutralCitation &&
+                                                                            `— ${node.neutralCitation}`}
+                                                                    </div>
+                                                                    <div className="text-sm whitespace-pre-wrap mb-3">
+                                                                        {node.content}
+                                                                    </div>
+
+                                                                    {hasLinkedNodes && (
+                                                                        <div className="border-t pt-3 mt-3">
+                                                                            <h5 className="font-medium text-xs mb-2 flex items-center gap-1">
+                                                                                <Link className="w-3 h-3" />
+                                                                                Related ({linkedNodes.length})
+                                                                            </h5>
+                                                                            <div className="space-y-1">
+                                                                                {linkedNodes.map((linkedNode) => (
+                                                                                    <div
+                                                                                        key={linkedNode.id}
+                                                                                        className="flex items-center gap-2 p-2 bg-muted/30 rounded text-xs hover:bg-muted/50 transition-colors cursor-pointer"
+                                                                                        onClick={() => {
+                                                                                            zoomToNodeGraph({
+                                                                                                id: linkedNode.id,
+                                                                                                x: linkedNode.x,
+                                                                                                y: linkedNode.y,
+                                                                                            });
+                                                                                        }}
+                                                                                    >
+                                                                                        {linkedNode.layerColor && (
+                                                                                            <div
+                                                                                                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                                                                                style={{
+                                                                                                    backgroundColor:
+                                                                                                        linkedNode.layerColor,
+                                                                                                }}
+                                                                                            />
+                                                                                        )}
+                                                                                        <div className="flex-1 min-w-0">
+                                                                                            <div className="font-medium truncate">
+                                                                                                {linkedNode
+                                                                                                    .labels?.[0] ??
+                                                                                                    'Node'}
+                                                                                            </div>
+                                                                                            {linkedNode.neutralCitation && (
+                                                                                                <div className="text-muted-foreground truncate">
+                                                                                                    {
+                                                                                                        linkedNode.neutralCitation
+                                                                                                    }
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
-                                                            ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    );
+                                                })}
                                             </AccordionContent>
                                         </AccordionItem>
                                     );

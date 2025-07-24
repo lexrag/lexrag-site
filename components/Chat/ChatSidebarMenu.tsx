@@ -20,16 +20,14 @@ export function ChatSidebarMenu({ conversations, onDeleteConversation, showSetti
                 <div className="max-h-80 overflow-y-auto">
                     <ul>
                         {conversations.map(({ thread_id, title }) => (
-                            <li
+                            <Link
                                 key={thread_id}
                                 className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
+                                href={`/chat/${thread_id}`}
                             >
-                                <Link
-                                    className="text-sm text-gray-800 truncate max-w-[85%]"
-                                    href={`/chat/${thread_id}`}
-                                >
+                                <span className="text-sm text-gray-800 truncate max-w-[85%]">
                                     {title || 'New chat'}
-                                </Link>
+                                </span>
                                 <div
                                     className="hidden group-hover:block"
                                     onClick={(e) => {
@@ -43,7 +41,7 @@ export function ChatSidebarMenu({ conversations, onDeleteConversation, showSetti
                                         className="text-muted-foreground hover:text-destructive transition"
                                     />
                                 </div>
-                            </li>
+                            </Link>
                         ))}
                     </ul>
                 </div>

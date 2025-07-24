@@ -5,6 +5,7 @@ import { getConversationSnapshot } from '@/api/chat/getConversationSnapshot';
 import renderMessageMd from '@/utils/renderMessageMd';
 import { v4 as uuidv4 } from 'uuid';
 import { Conversation } from '@/types/Conversation';
+import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
 
@@ -19,6 +20,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef('');
+    const graphDataRef = useRef<GraphData | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
@@ -54,8 +56,16 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                 setStatus(data.params.update_status);
             }
 
-            if (data.name === 'relevant_context') {
-                // console.log(data);
+            if (
+                data.name === 'relevant_retrieved_nodes' ||
+                data.name === 'all_retrieved_nodes' ||
+                data.name === 'all_retrieved_nodes_with_neighbors' ||
+                data.name === 'relevant_context'
+            ) {
+                graphDataRef.current = {
+                    ...graphDataRef.current,
+                    ...data.params,
+                };
             }
             if (data.type === 'event') {
                 await eventHandler(data, { setConversations });
@@ -73,12 +83,15 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
 
             if (data.type === MessageTypes.stop) {
                 const html = await renderMessageMd(accumulatedContentRef.current);
-
                 const message: Message = {
                     ...data,
                     html,
                     content: accumulatedContentRef.current,
                     direction: 'incoming',
+                    relevantContext: graphDataRef.current?.relevant_context,
+                    allRetrievedNodes: graphDataRef.current?.all_retrieved_nodes,
+                    allRetrievedNodesWithNeighbors: graphDataRef.current?.all_retrieved_nodes_with_neighbors,
+                    relevantRetrievedNodes: graphDataRef.current?.relevant_retrieved_nodes,
                 };
 
                 setMessages((prev) => [...prev, message]);
