@@ -50,6 +50,7 @@ const ChatLeftSheet = ({
                                 onDeleteConversation={handleDeleteConversation}
                                 showSettings={showSettings}
                                 className="max-h-[calc(100vh-8.5rem)]"
+                                isSidebarOpen={isOpen}
                             />
                         </div>
 

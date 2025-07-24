@@ -13,7 +13,6 @@ interface SidebarMenuItemProps {
     disabled?: boolean;
     collapsed?: boolean;
     onOpenMobileChange?: (open: boolean) => void;
-    className?: string;
 }
 
 export function SidebarMenuItem({
@@ -23,7 +22,6 @@ export function SidebarMenuItem({
     disabled,
     collapsed = false,
     onOpenMobileChange,
-    className,
 }: SidebarMenuItemProps) {
     const pathname = usePathname();
     const isActive = pathname === href;
@@ -45,38 +43,25 @@ export function SidebarMenuItem({
                             aria-disabled={disabled}
                             tabIndex={disabled ? -1 : 0}
                             className={cn(
-                                // Layout & responsiveness
-                                'flex items-center w-full py-2 h-[4.1vh] rounded-md overflow-hidden',
-                                className,
-                                // Typography
+                                'flex items-center w-full px-1 h-[4.1vh] rounded-md overflow-hidden',
                                 'text-sm text-left',
-                                // State & interaction
                                 'transition-colors focus-visible:ring-2 outline-hidden',
                                 'hover:bg-accent/50 hover:text-foreground',
                                 'active:bg-accent/50 active:text-foreground',
-                                // Data attributes
                                 'data-[active=true]:bg-accent/50 data-[active=true]:text-foreground data-[active=true]:font-medium',
                                 'data-[state=open]:hover:bg-accent/50 data-[state=open]:hover:text-foreground',
-                                // Disabled
                                 'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
-                                // завжди justify-start
                             )}
                             title={undefined}
                             onClick={handleClick}
                         >
-                            <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 32 }}>
-                                <Icon className="size-5" />
+                            <span className="flex-shrink-0 flex items-center justify-center w-8">
+                                <Icon className="size-5 text-center" />
                             </span>
                             <motion.span
                                 animate={{ opacity: 0, x: -16 }}
                                 transition={{ duration: 0.2, delay: 0 }}
-                                className="truncate text-sm ml-2"
-                                style={{
-                                    display: 'inline-block',
-                                    whiteSpace: 'nowrap',
-                                    verticalAlign: 'middle',
-                                    pointerEvents: 'none',
-                                }}
+                                className="truncate text-sm ml-2 inline-block no-underline pointer-events-none "
                             >
                                 {label}
                             </motion.span>
@@ -91,37 +76,25 @@ export function SidebarMenuItem({
                     aria-disabled={disabled}
                     tabIndex={disabled ? -1 : 0}
                     className={cn(
-                        // Layout & responsiveness
-                        'flex items-center w-full py-2 h-[4.1vh] rounded-md overflow-hidden',
-                        className,
-                        // Typography
+                        'flex items-center w-full h-[4.1vh] rounded-md overflow-hidden px-1',
                         'text-sm text-left',
-                        // State & interaction
                         'transition-colors focus-visible:ring-2 outline-hidden',
                         'hover:bg-accent/50 hover:text-foreground',
                         'active:bg-accent/50 active:text-foreground',
-                        // Data attributes
                         'data-[active=true]:bg-accent/50 data-[active=true]:text-foreground data-[active=true]:font-medium',
                         'data-[state=open]:hover:bg-accent/50 data-[state=open]:hover:text-foreground',
-                        // Disabled
                         'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
                     )}
                     title={undefined}
                     onClick={handleClick}
                 >
-                    <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 32 }}>
-                        <Icon className="size-5" />
+                    <span className="flex-shrink-0 flex items-center justify-center w-8">
+                        <Icon className="size-5 text-center" />
                     </span>
                     <motion.span
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.2, delay: 0.2 }}
-                        className="truncate text-sm ml-2"
-                        style={{
-                            display: 'inline-block',
-                            whiteSpace: 'nowrap',
-                            verticalAlign: 'middle',
-                            pointerEvents: 'auto',
-                        }}
+                        className="truncate text-sm ml-2 inline-block no-underline pointer-events-auto"
                     >
                         {label}
                     </motion.span>

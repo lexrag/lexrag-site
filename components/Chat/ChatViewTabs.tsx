@@ -10,19 +10,19 @@ interface ChatViewTabsProps {
 export default function ChatViewTabs({ activeTab, onTabChange, isSettings }: ChatViewTabsProps) {
     return (
         <Tabs value={activeTab} onValueChange={onTabChange}>
-            <TabsList className="flex items-center w-full py-2">
-                <TabsTrigger value="chats" className="flex-1 min-w-0">
-                    <MessageSquare className="h-6 w-6 mx-auto" />
+            <TabsList className="flex items-center w-full py-1 md:py-2 gap-2 md:gap-1">
+                <TabsTrigger value="chats" className="flex-1 min-w-0 p-2 md:p-1">
+                    <MessageSquare className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
                 </TabsTrigger>
-                <TabsTrigger value="new" className="flex-1 min-w-0">
-                    <ClockArrowDown className="h-6 w-6 mx-auto" />
+                <TabsTrigger value="new" className="flex-1 min-w-0 p-2 md:p-1">
+                    <ClockArrowDown className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
                 </TabsTrigger>
-                <TabsTrigger value="old" className="flex-1 min-w-0">
-                    <ClockArrowUp className="h-6 w-6 mx-auto" />
+                <TabsTrigger value="old" className="flex-1 min-w-0 p-2 md:p-1">
+                    <ClockArrowUp className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
                 </TabsTrigger>
                 {isSettings && (
-                    <TabsTrigger value="settings" className="flex-1 min-w-0">
-                        <Settings className="h-6 w-6 mx-auto" />
+                    <TabsTrigger value="settings" className="flex-1 min-w-0 p-2 md:p-1">
+                        <Settings className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
                     </TabsTrigger>
                 )}
             </TabsList>
