@@ -6,7 +6,7 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphNodePosition } from '@/types/Graph';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -22,6 +22,8 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
+    const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
+
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
@@ -65,6 +67,25 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             unsubscribeZoomToNode();
         };
     }, []);
+
+    const saveNodePosition = (node: any) => {
+        if (node && node.x !== undefined && node.y !== undefined) {
+            nodePositionsRef.current[node.id] = {
+                x: node.x,
+                y: node.y,
+                vx: node.vx,
+                vy: node.vy,
+                fx: node.fx,
+                fy: node.fy,
+            };
+        }
+    };
+
+    const handleEngineStop = () => {
+        processedData.nodes.forEach((node) => {
+            saveNodePosition(node);
+        });
+    };
 
     useEffect(() => {
         if (!data) return;
@@ -120,22 +141,35 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
 
             layerData.nodes.forEach((node: any) => {
                 const existingNode = allNodes.get(node.id);
+
+                let nodeData = {
+                    ...node,
+                    color: node.layerColor || layer.color,
+                    layerId: layer.id,
+                    layerName: layer.name,
+                };
+
                 if (existingNode) {
-                    allNodes.set(node.id, {
+                    nodeData = {
                         ...existingNode,
-                        ...node,
-                        color: node.layerColor || layer.color,
-                        layerId: layer.id,
-                        layerName: layer.name,
-                    });
-                } else {
-                    allNodes.set(node.id, {
-                        ...node,
-                        color: node.layerColor || layer.color,
-                        layerId: layer.id,
-                        layerName: layer.name,
-                    });
+                        ...nodeData,
+                    };
                 }
+
+                const savedPosition = nodePositionsRef.current[node.id];
+                if (savedPosition) {
+                    nodeData = {
+                        ...nodeData,
+                        x: savedPosition.x,
+                        y: savedPosition.y,
+                        vx: savedPosition.vx,
+                        vy: savedPosition.vy,
+                        fx: savedPosition.fx,
+                        fy: savedPosition.fy,
+                    };
+                }
+
+                allNodes.set(node.id, nodeData);
             });
 
             if (layerData.links) {
@@ -231,6 +265,12 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         return baseLabel;
     };
 
+    // useEffect(() => {
+    //     if (graphRef.current) {
+    //         graphRef.current.d3Force('charge')?.strength(-100);
+    //     }
+    // }, [processedData]);
+
     return (
         <ForceGraph2D
             ref={graphRef}
@@ -246,10 +286,14 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
+            onNodeDragEnd={saveNodePosition}
+            onEngineStop={handleEngineStop}
             onBackgroundClick={() => {
                 document.body.style.cursor = 'default';
                 setHighlightedNodeId(null);
             }}
+            cooldownTicks={100}
+            cooldownTime={15000}
         />
     );
 };

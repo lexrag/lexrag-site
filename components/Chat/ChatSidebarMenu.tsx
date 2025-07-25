@@ -21,6 +21,7 @@ export function ChatSidebarMenu({
     isSidebarOpen,
 }: ChatSidebarMenuProps) {
     return (
+
         <div className={cn('relative flex flex-row min-h-0 h-full', className)}>
             <div
                 className={cn(
