@@ -46,7 +46,7 @@ const ProductFeatures = ({
     const visibleFeats = combinedFeaturesData.filter((feat) => feat.key !== currentPage);
 
     return (
-        <div className="relative pb-20">
+        <div className="relative pb-4">
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{

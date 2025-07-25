@@ -6,7 +6,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import Header from '@/components/Header/Header';
 import SidebarMenuContainer from '@/components/Sidebar/SidebarMenuContainer';
 
-export default function ProfileLayout({ children }: { children: React.ReactNode }) {
+export default function FeaturesLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
     const isMobile = useIsMobile();
@@ -15,7 +15,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
         <section className="flex flex-col w-full items-center justify-center">
             <Header onOpenSidebar={() => setSidebarOpen(true)} />
             <div className="flex flex-row w-full relative">
-                <div className="hidden md:block h-screen">
+                <div className="h-screen hidden md:block">
                     <SidebarMenuContainer
                         isOpenMobile={sidebarOpen}
                         onOpenMobileChange={setSidebarOpen}
@@ -23,10 +23,9 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                         onCollapseChange={setCollapsed}
                     />
                 </div>
-
                 <main className="flex-1 min-h-screen w-full flex justify-center mt-20">
                     <motion.div
-                        className="w-full max-w-5xl px-4"
+                        className="w-full"
                         animate={{
                             marginLeft: isMobile ? 0 : collapsed ? 60 : 260,
                         }}

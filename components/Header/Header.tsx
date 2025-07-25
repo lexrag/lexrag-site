@@ -1,10 +1,10 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { MegaMenu } from './MegaMenu';
+import HeaderCornerMenu from './HeaderCornerMenu';
+import { Logo } from './Logo';
 
 interface HeaderProps {
     className?: string;
@@ -12,8 +12,6 @@ interface HeaderProps {
 }
 
 const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
-    const pathname = usePathname();
-
     return (
         <header
             className={cn(
@@ -22,16 +20,19 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                 className,
             )}
         >
-            <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden mr-2"
-                aria-label="Open menu"
-                onClick={onOpenSidebar}
-            >
-                <Menu className="size-6" />
-            </Button>
-            <MegaMenu isHomePage={pathname === '/'} />
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden mr-2"
+                    aria-label="Open menu"
+                    onClick={onOpenSidebar}
+                >
+                    <Menu className="size-6" />
+                </Button>
+                <Logo />
+            </div>
+            <HeaderCornerMenu />
         </header>
     );
 };

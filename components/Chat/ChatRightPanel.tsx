@@ -1,19 +1,19 @@
 'use client';
 
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
-import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
-import { ArrowRight, Link, Layers, Expand, Fullscreen } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { zoomToNodeGraph } from '@/events/zoom-to-node';
+import { ArrowRight, Expand, Fullscreen, Layers, Link } from 'lucide-react';
+import { CardData } from '@/types/Chat';
+import { GraphLayer } from '@/types/Graph';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CardData } from '@/types/Chat';
-import { GraphLayer } from '@/types/Graph';
-import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -29,7 +29,16 @@ interface ChatRightPanelProps {
     setIsOpenGraphModal: (open: boolean) => void;
 }
 
-const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData, graphView, setGraphView, handleCardData, setIsOpenGraphModal }: ChatRightPanelProps) => {
+const ChatRightPanel = ({
+    currentMessage,
+    graphLayers,
+    setGraphLayers,
+    cardData,
+    graphView,
+    setGraphView,
+    handleCardData,
+    setIsOpenGraphModal,
+}: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
 
@@ -107,7 +116,7 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
     }, [isResizing]);
 
     return (
-        <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
+        <div className={`hidden md:flex h-full w-[${rightPanelWidth}px]`}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
                 <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer" />
             </div>
@@ -157,7 +166,9 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="w-48">
                                                 {graphLayers.map(({ id, enabled, name }) => {
-                                                    const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
+                                                    const enabledLayersCount = graphLayers.filter(
+                                                        (layer) => layer.enabled,
+                                                    ).length;
                                                     const isLastEnabled = enabled && enabledLayersCount === 1;
 
                                                     return (
@@ -170,7 +181,9 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
 
                                                                 setGraphLayers((prevLayers) =>
                                                                     prevLayers.map((layer) =>
-                                                                        layer.id === id ? { ...layer, enabled: checked } : layer,
+                                                                        layer.id === id
+                                                                            ? { ...layer, enabled: checked }
+                                                                            : layer,
                                                                     ),
                                                                 );
                                                             }}
@@ -183,13 +196,13 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="flex items-center gap-1">
-                                            <div 
+                                            <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => setIsOpenGraphModal(true)}
                                             >
                                                 <Expand className="h-4 w-4" />
                                             </div>
-                                            <div 
+                                            <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => zoomToFitGraph()}
                                                 title="Zoom to Fit Graph"
@@ -204,10 +217,7 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
 
                         {/* Accordion with padding - 50% height */}
                         <div className="flex-1 px-3 py-2 overflow-hidden">
-                            <Accordion
-                                type="multiple"
-                                className="w-full h-full overflow-y-auto"
-                            >
+                            <Accordion type="multiple" className="w-full h-full overflow-y-auto">
                                 {cardData.nodes.map((node: any) => {
                                     const linkedNodes = nodeConnections[node.id] || [];
                                     const hasLinkedNodes = linkedNodes.length > 0;
@@ -219,9 +229,7 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                             className="transition-all duration-300"
                                         >
                                             <AccordionTrigger>
-                                                <div
-                                                    className="text-left flex items-center gap-2 w-full"
-                                                >
+                                                <div className="text-left flex items-center gap-2 w-full">
                                                     {node.layerColor && (
                                                         <div
                                                             className="w-3 h-3 rounded-full flex-shrink-0"
@@ -287,8 +295,10 @@ const ChatRightPanel = ({ currentMessage, graphLayers, setGraphLayers, cardData,
                                                                             {linkedNode.neutralCitation ||
                                                                                 (linkedNode.content &&
                                                                                 linkedNode.content.length > 100
-                                                                                    ? linkedNode.content.substring(0, 100) +
-                                                                                      '...'
+                                                                                    ? linkedNode.content.substring(
+                                                                                          0,
+                                                                                          100,
+                                                                                      ) + '...'
                                                                                     : linkedNode.content)}
                                                                         </div>
                                                                     </div>

@@ -10,15 +10,13 @@ const HeaderTabs = () => {
     const pathname = usePathname();
     const [activeTab, setActiveTab] = useState('');
 
-    const isHomePage = pathname === '/';
-
     useEffect(() => {
         setActiveTab(pathname);
     }, [pathname]);
 
     return (
         <div className="flex items-center justify-between w-full h-20">
-            <MegaMenu isHomePage={isHomePage} />
+            <MegaMenu />
 
             <nav className="flex items-center gap-10 flex-1 justify-center h-full">
                 {tabs.map((tab) => {

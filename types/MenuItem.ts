@@ -6,3 +6,15 @@ export interface MenuItem {
     onClick?: () => void;
     items?: MenuItem[];
 }
+
+export interface SidebarMenuItem {
+    href: string;
+    Icon: LucideIcon;
+    label: string;
+    isThemeSwitch?: boolean;
+}
+
+export interface SidebarMenuGroup {
+    group: string;
+    items: SidebarMenuItem[];
+}

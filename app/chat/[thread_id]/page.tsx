@@ -17,8 +17,6 @@ import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
-// import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
-import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
     const pathname = usePathname();
@@ -86,7 +84,6 @@ export default function ChatPage() {
             />
             <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
-                <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
             </header>
             <ChatLeftSheet
@@ -109,7 +106,7 @@ export default function ChatPage() {
                 cardData={cardData}
                 handleCardData={setCardData}
             />
-            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}

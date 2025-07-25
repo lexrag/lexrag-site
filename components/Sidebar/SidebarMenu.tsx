@@ -1,43 +1,51 @@
-import {
-    CreditCard,
-    History,
-    Home,
-    MessageSquare,
-    ReceiptText,
-    Settings,
-    Shield,
-    ShieldCheck,
-    Sparkles,
-    User,
-} from 'lucide-react';
+import React from 'react';
+import { MENU_SIDEBAR_ITEMS } from '@/config/menu.config';
 import { SidebarMenuGroup } from './SidebarMenuGroup';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { SidebarThemeSwitch } from './SidebarThemeSwitch';
 
-export function SidebarMenu() {
+interface SidebarMenuProps {
+    collapsed?: boolean;
+    onOpenMobileChange?: (open: boolean) => void;
+    noGroups?: boolean;
+}
+
+export function SidebarMenu({ collapsed = false, onOpenMobileChange, noGroups = false }: SidebarMenuProps) {
     return (
-        <nav className="px-2 pb-2">
+        <nav className="px-2 pb-2 pt-1">
             <ul className="flex flex-col gap-2">
-                <SidebarMenuGroup label="Home">
-                    <SidebarMenuItem href="/" Icon={Home} label="Home" />
-                    <SidebarMenuItem href="/features" Icon={Sparkles} label="Features" />
-                    <SidebarMenuItem href="/chat/new" Icon={MessageSquare} label="Chat" />
-                </SidebarMenuGroup>
-                <SidebarMenuGroup label="Profile">
-                    <SidebarMenuItem href="/profile" Icon={User} label="Profile" />
-                    <SidebarMenuItem href="/profile/security" Icon={Shield} label="Security" />
-                    <SidebarMenuItem href="/profile/security/sessions" Icon={History} label="Sessions" />
-                    <SidebarMenuItem href="/profile/compliance" Icon={ShieldCheck} label="Compliance" />
-                </SidebarMenuGroup>
-                <SidebarMenuGroup label="Invoices">
-                    <SidebarMenuItem href="/profile/billing" Icon={CreditCard} label="Billing" />
-                    <SidebarMenuItem href="/profile/billing/plans" Icon={ReceiptText} label="Plans" />
-                    <SidebarMenuItem href="/profile/billing/history" Icon={History} label="Payments" />
-                </SidebarMenuGroup>
-                <SidebarMenuGroup label="Settings">
-                    <SidebarMenuItem href="/profile/settings" Icon={Settings} label="Settings" />
-                    <SidebarThemeSwitch />
-                </SidebarMenuGroup>
+                {noGroups
+                    ? MENU_SIDEBAR_ITEMS.flatMap((group) =>
+                          group.items.map((item) =>
+                              item.href ? (
+                                  <SidebarMenuItem
+                                      key={item.href}
+                                      href={item.href}
+                                      Icon={item.Icon}
+                                      label={item.label}
+                                      collapsed={collapsed}
+                                      onOpenMobileChange={onOpenMobileChange}
+                                  />
+                              ) : null,
+                          ),
+                      )
+                    : MENU_SIDEBAR_ITEMS.map((group) => (
+                          <SidebarMenuGroup key={group.group} label={group.group} collapsed={collapsed}>
+                              {group.items.map((item) =>
+                                  item.href ? (
+                                      <SidebarMenuItem
+                                          key={item.href}
+                                          href={item.href}
+                                          Icon={item.Icon}
+                                          label={item.label}
+                                          collapsed={collapsed}
+                                          onOpenMobileChange={onOpenMobileChange}
+                                      />
+                                  ) : null,
+                              )}
+                          </SidebarMenuGroup>
+                      ))}
+                <SidebarThemeSwitch collapsed={collapsed} />
             </ul>
         </nav>
     );

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageSquarePlus, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageSquarePlus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ChatViewTabs from '@/components/Chat/ChatViewTabs';
 import { Logo } from '@/components/Header/Logo';
@@ -9,17 +10,34 @@ import { Logo } from '@/components/Header/Logo';
 interface ChatSidebarPanelHeaderProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
+    isSidebarOpen: boolean;
+    onSidebarToggle: () => void;
 }
 
-export function ChatSidebarPanelHeader({ activeTab, setActiveTab }: ChatSidebarPanelHeaderProps) {
+export function ChatSidebarPanelHeader({
+    activeTab,
+    setActiveTab,
+    isSidebarOpen,
+    onSidebarToggle,
+}: ChatSidebarPanelHeaderProps) {
     const handleInputChange = () => {};
 
     return (
-        <div className="w-full">
+        <div className="w-full sticky top-0 z-[120] bg-background">
             <div className="flex items-center justify-between gap-2 mb-3">
-                <Link href="/" className="ps-3">
-                    <Logo isHomePage={false} />
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+                        onClick={onSidebarToggle}
+                    >
+                        {isSidebarOpen ? <ChevronLeft className="size-5" /> : <ChevronRight className="size-5" />}
+                    </Button>
+                    <Link href="/" className="ps-1">
+                        <Logo />
+                    </Link>
+                </div>
                 <ChatViewTabs activeTab={activeTab} onTabChange={setActiveTab} isSettings={false} />
             </div>
 
