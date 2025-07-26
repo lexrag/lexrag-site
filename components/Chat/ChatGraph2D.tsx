@@ -28,6 +28,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
+    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
+
     useEffect(() => {
         const updateDimensions = () => {
             setDimensions({
@@ -96,6 +100,85 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
+    const getAllDescendants = (nodeId: string): Set<string> => {
+        const descendants = new Set<string>();
+        const visited = new Set<string>();
+        const queue = [nodeId];
+
+        while (queue.length > 0) {
+            const currentNodeId = queue.shift()!;
+
+            if (visited.has(currentNodeId)) {
+                continue;
+            }
+
+            visited.add(currentNodeId);
+            const children = nodeHierarchy[currentNodeId];
+
+            if (children && children.size > 0) {
+                children.forEach((childId) => {
+                    if (!visited.has(childId) && !descendants.has(childId)) {
+                        descendants.add(childId);
+                        queue.push(childId);
+                    }
+                });
+            }
+        }
+
+        return descendants;
+    };
+
+    const removeNodeDescendants = (nodeId: string) => {
+        console.log('Removing descendants for:', nodeId);
+
+        try {
+            const descendantsToRemove = getAllDescendants(nodeId);
+            console.log('Descendants to remove:', descendantsToRemove.size, Array.from(descendantsToRemove));
+
+            setExpandedNodes((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(nodeId);
+                descendantsToRemove.forEach((id) => newSet.delete(id));
+                return newSet;
+            });
+
+            setExpandedData((prev) => {
+                return {
+                    nodes: prev.nodes.filter((node) => !descendantsToRemove.has(node.id)),
+                    links: prev.links.filter((link) => {
+                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                        return !descendantsToRemove.has(sourceId) && !descendantsToRemove.has(targetId);
+                    }),
+                };
+            });
+
+            setNodeHierarchy((prev) => {
+                const newHierarchy = { ...prev };
+ 
+                descendantsToRemove.forEach((id) => {
+                    delete newHierarchy[id];
+                });
+
+                delete newHierarchy[nodeId];
+
+                Object.keys(newHierarchy).forEach((parentId) => {
+                    if (newHierarchy[parentId]) {
+                        descendantsToRemove.forEach((descendantId) => {
+                            newHierarchy[parentId].delete(descendantId);
+                        });
+                    }
+                });
+
+                return newHierarchy;
+            });
+
+            console.log('Successfully removed descendants');
+        } catch (error) {
+            console.error('Error removing descendants:', error);
+        }
+    };
+
     const processedData = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
@@ -159,11 +242,55 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             }
         });
 
+        expandedData.nodes.forEach((node: any) => {
+            const existingNode = allNodes.get(node.id);
+
+            let nodeData = {
+                ...node,
+                color: node.layerColor || '#d3d3d3',
+                layerId: 'expanded',
+                layerName: 'Expanded',
+            };
+
+            if (existingNode) {
+                nodeData = {
+                    ...existingNode,
+                    ...nodeData,
+                };
+            }
+
+            const savedPosition = nodePositionsRef.current[node.id];
+            if (savedPosition) {
+                nodeData = {
+                    ...nodeData,
+                    x: savedPosition.x,
+                    y: savedPosition.y,
+                    vx: savedPosition.vx,
+                    vy: savedPosition.vy,
+                    fx: savedPosition.fx,
+                    fy: savedPosition.fy,
+                };
+            }
+
+            allNodes.set(node.id, nodeData);
+        });
+
+        expandedData.links.forEach((link: any) => {
+            const linkKey = `${link.source}-${link.target}`;
+            if (!allLinks.has(linkKey)) {
+                allLinks.set(linkKey, {
+                    ...link,
+                    source: typeof link.source === 'object' ? link.source.id : link.source,
+                    target: typeof link.target === 'object' ? link.target.id : link.target,
+                });
+            }
+        });
+
         return {
             nodes: Array.from(allNodes.values()),
             links: Array.from(allLinks.values()),
         };
-    }, [layerDataMap, layers]);
+    }, [layerDataMap, layers, expandedData]);
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
@@ -230,8 +357,57 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     }, [processedData]);
 
     const handleNodeClick = async (node: any) => {
-        const data = await getConversationExpandNodes(node.id);
-        console.log(data);
+        if (!node || !node.id) return;
+
+        console.log('Node clicked:', node.id, 'Currently expanded:', expandedNodes.has(node.id));
+
+        try {
+            if (expandedNodes.has(node.id)) {
+                console.log('Collapsing node:', node.id);
+                removeNodeDescendants(node.id);
+            } else {
+                console.log('Expanding node:', node.id);
+                const response = await getConversationExpandNodes(node.id);
+                console.log('Expand response:', response);
+
+                if (response && response.neighbors && response.neighbors.nodes && response.neighbors.nodes.length > 0) {
+                    const newNodes = response.neighbors.nodes;
+                    const newLinks = response.neighbors.links || [];
+
+                    console.log('Adding nodes:', newNodes.length, 'Adding links:', newLinks.length);
+
+                    const existingNodeIds = new Set([
+                        ...processedData.nodes.map((n) => n.id),
+                        ...expandedData.nodes.map((n) => n.id),
+                    ]);
+
+                    const filteredNewNodes = newNodes.filter((n: any) => !existingNodeIds.has(n.id));
+
+                    if (filteredNewNodes.length > 0) {
+                        setExpandedData((prev) => ({
+                            nodes: [...prev.nodes, ...filteredNewNodes],
+                            links: [...prev.links, ...newLinks],
+                        }));
+
+                        setExpandedNodes((prev) => new Set([...prev, node.id]));
+
+                        setNodeHierarchy((prev) => ({
+                            ...prev,
+                            [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
+                        }));
+
+                        console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
+                    } else {
+                        console.log('No new nodes to add (all already exist)');
+                        setExpandedNodes((prev) => new Set([...prev, node.id]));
+                    }
+                } else {
+                    console.log('No children found for node:', node.id);
+                }
+            }
+        } catch (error) {
+            console.error('Error expanding/collapsing node:', error);
+        }
     };
 
     const getNodeColor = (node: any) => {
@@ -293,6 +469,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             baseLabel += `\n[${node.layerName}]`;
         }
 
+        if (expandedNodes.has(node.id)) {
+            baseLabel += '\n[Expanded]';
+        }
+
         return baseLabel;
     };
 
@@ -309,7 +489,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
             nodeLabel={getNodeLabel}
-            onNodeClick={handleNodeClick}
+            onNodeRightClick={handleNodeClick}
             onNodeHover={handleNodeHover}
             onNodeDragEnd={saveNodePosition}
             onEngineStop={handleEngineStop}

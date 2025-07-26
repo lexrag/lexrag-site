@@ -39,7 +39,6 @@ const ChatRightPanel = ({
     handleCardData,
     setIsOpenGraphModal,
 }: ChatRightPanelProps) => {
-    console.log(cardData);
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
