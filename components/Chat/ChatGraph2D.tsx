@@ -41,33 +41,6 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
-    useEffect(() => {
-        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
-            graphRef.current?.zoomToFit(400);
-            setHighlightedNodeId(null);
-        });
-
-        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
-            if (graphRef.current && payload.x !== undefined && payload.y !== undefined) {
-                graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
-                graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
-
-                if (payload.id) {
-                    setHighlightedNodeId(payload.id);
-
-                    setTimeout(() => {
-                        setHighlightedNodeId(null);
-                    }, 3000);
-                }
-            }
-        });
-
-        return () => {
-            unsubscribeZoomToFit();
-            unsubscribeZoomToNode();
-        };
-    }, []);
-
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
             nodePositionsRef.current[node.id] = {
@@ -193,10 +166,68 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     }, [layerDataMap, layers]);
 
     useEffect(() => {
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            graphRef.current?.zoomToFit(300);
+            setHighlightedNodeId(null);
+        });
+
+        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
+            if (!graphRef.current) return;
+
+            if (!payload.x || !payload.y) {
+                const targetNode = processedData.nodes.find((node) => node.id === payload.id);
+                if (!targetNode) return;
+
+                payload.x = targetNode.x;
+                payload.y = targetNode.y;
+            }
+
+            graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
+            graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
+
+            if (payload.id) {
+                setHighlightedNodeId(payload.id);
+
+                setTimeout(() => {
+                    setHighlightedNodeId(null);
+                }, 3000);
+            }
+        });
+
+        return () => {
+            unsubscribeZoomToFit();
+            unsubscribeZoomToNode();
+        };
+    }, [processedData]);
+
+    useEffect(() => {
         if (processedData) {
             handleCardData(processedData);
         }
     }, [processedData, handleCardData]);
+
+    useEffect(() => {
+        if (graphRef.current && processedData.nodes.length > 0) {
+            const fg = graphRef.current;
+
+            const linkForce = fg.d3Force('link');
+
+            if (linkForce) {
+                linkForce.distance(100).strength(0.3);
+            }
+
+            const chargeForce = fg.d3Force('charge');
+            if (chargeForce) {
+                chargeForce.strength(-200).distanceMax(200);
+            }
+
+            fg.d3ReheatSimulation();
+
+            setTimeout(() => {
+                fg.zoomToFit(300);
+            }, 500);
+        }
+    }, [processedData]);
 
     const handleNodeClick = async (node: any) => {
         const data = await getConversationExpandNodes(node.id);
@@ -264,12 +295,6 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
 
         return baseLabel;
     };
-
-    // useEffect(() => {
-    //     if (graphRef.current) {
-    //         graphRef.current.d3Force('charge')?.strength(-100);
-    //     }
-    // }, [processedData]);
 
     return (
         <ForceGraph2D
