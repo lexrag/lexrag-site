@@ -20,7 +20,12 @@ export const useChatContext = () => {
     return context;
 };
 
-const ChatProvider = ({ children }: { children: ReactNode }) => {
+interface ChatProviderProps {
+    mode: "chat" | "evaluator";
+    children: ReactNode;
+}
+
+const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const reconnectAttempts = useRef(0);
@@ -54,7 +59,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
             const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL!;
             const protocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
             const host = new URL(baseUrl).host;
-            const wsUrl = `${protocol}://${host}/ws/chat?token=${token}`;
+            const wsUrl = `${protocol}://${host}/ws/${mode}?token=${token}`;
 
             const ws = new WebSocket(wsUrl);
             setSocket(ws);
