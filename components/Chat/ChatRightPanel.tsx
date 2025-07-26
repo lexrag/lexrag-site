@@ -65,7 +65,44 @@ const ChatRightPanel = ({
         return nodeId;
     };
 
+    const parentNodes = useMemo(() => {
+        if (!cardData.nodes || cardData.nodes.length === 0) {
+            return {};
+        }
+
+        const parents: { [key: string]: any } = {};
+
+        cardData.nodes.forEach((node) => {
+            if (node.labels?.includes('Act') || node.labels?.includes('CaseLaw')) {
+                const groupKey = getGroupKey(node.id);
+                parents[groupKey] = node;
+            }
+        });
+
+        return parents;
+    }, [cardData.nodes]);
+
     const getGroupInfo = (groupKey: string, nodes: any[]) => {
+        const parentNode = parentNodes[groupKey];
+
+        if (parentNode) {
+            if (parentNode.labels?.includes('CaseLaw')) {
+                return {
+                    displayName: parentNode.content || groupKey,
+                    type: 'case',
+                    citation: parentNode.neutralCitation,
+                    date: parentNode.date,
+                };
+            } else if (parentNode.labels?.includes('Act')) {
+                return {
+                    displayName: parentNode.content || groupKey,
+                    type: 'act',
+                    citation: null,
+                    date: parentNode.date,
+                };
+            }
+        }
+
         const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
         if (caseNode) {
             return {
@@ -137,27 +174,40 @@ const ChatRightPanel = ({
         }
 
         const groups: { [key: string]: any[] } = {};
+        const parentNodes: { [key: string]: any } = {};
 
         cardData.nodes.forEach((node) => {
-            if (node.labels?.includes('PartOfTheLegislation') && !node.id.includes('/SL/')) {
-                return;
-            }
-
             const groupKey = getGroupKey(node.id);
+
             if (!groups[groupKey]) {
                 groups[groupKey] = [];
+                parentNodes[groupKey] = null;
             }
-            groups[groupKey].push(node);
+
+            if (node.labels?.includes('Act') || node.labels?.includes('CaseLaw')) {
+                parentNodes[groupKey] = node;
+            } else {
+                if (node.labels?.includes('PartOfTheLegislation')) {
+                    if (node.id.includes('?') || node.id.includes('#') || node.id.includes('/SL/')) {
+                        groups[groupKey].push(node);
+                    }
+                } else {
+                    groups[groupKey].push(node);
+                }
+            }
         });
 
+        const filteredGroups: { [key: string]: any[] } = {};
         Object.keys(groups).forEach((groupKey) => {
-            const filteredNodes = groups[groupKey].filter(
-                (node) => !node.labels?.includes('CaseLaw') && !node.labels?.includes('Act'),
-            );
-            groups[groupKey] = filteredNodes;
+            const hasParent = parentNodes[groupKey] !== null;
+            const hasChildren = groups[groupKey].length > 0;
+
+            if (hasParent || hasChildren) {
+                filteredGroups[groupKey] = groups[groupKey];
+            }
         });
 
-        return groups;
+        return filteredGroups;
     }, [cardData.nodes]);
 
     const handleGroupClick = (groupKey: string) => {
