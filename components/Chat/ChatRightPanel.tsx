@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { ChevronDown, ChevronUp, Expand, Fullscreen, Layers } from 'lucide-react';
@@ -69,14 +69,14 @@ const ChatRightPanel = ({
         return nodeId;
     };
 
-    const findGroupByNodeId = (nodeId: string) => {
+    const findGroupByNodeId = useCallback((nodeId: string) => {
         if (!cardData.nodes) return null;
 
         const node = cardData.nodes.find((n) => n.id === nodeId);
         if (!node) return null;
 
         return getGroupKey(node.id);
-    };
+    }, [cardData.nodes]);
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
@@ -116,7 +116,7 @@ const ChatRightPanel = ({
         };
 
         scrollToCard();
-    }, [scrollToCardId, cardData.nodes]);
+    }, [scrollToCardId, cardData.nodes, findGroupByNodeId]);
 
     const parentNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
@@ -386,6 +386,7 @@ const ChatRightPanel = ({
                                     data={currentMessage}
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
 

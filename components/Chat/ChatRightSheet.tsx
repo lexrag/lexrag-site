@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
 import { ArrowRight, Link, Layers, Expand, Fullscreen, X } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/card';
@@ -45,6 +45,8 @@ const ChatRightSheet = ({
     cardData,
     handleCardData
 }: ChatRightSheetProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const direction = useDirection();
 
     const nodeConnections = useMemo(() => {
@@ -171,19 +173,21 @@ const ChatRightSheet = ({
                             {graphView === '2d' && (
                                 <ChatGraph2D
                                     height={window.innerHeight * 0.5}
-                                    width={window.innerWidth * 0.8}
+                                    width={window.innerWidth * 1}
                                     layers={graphLayers}
                                     data={currentMessage}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
                             {graphView === '3d' && (
                                 <ChatGraph3D
                                     height={window.innerHeight * 0.5}
-                                    width={window.innerWidth * 0.8}
+                                    width={window.innerWidth * 1}
                                     data={currentMessage}
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
                         </div>
