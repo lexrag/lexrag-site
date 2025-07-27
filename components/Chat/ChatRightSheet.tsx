@@ -173,7 +173,7 @@ const ChatRightSheet = ({
                             {graphView === '2d' && (
                                 <ChatGraph2D
                                     height={window.innerHeight * 0.5}
-                                    width={window.innerWidth * 1}
+                                    width={window.innerWidth * 0.8}
                                     layers={graphLayers}
                                     data={currentMessage}
                                     handleCardData={handleCardData}
@@ -183,7 +183,7 @@ const ChatRightSheet = ({
                             {graphView === '3d' && (
                                 <ChatGraph3D
                                     height={window.innerHeight * 0.5}
-                                    width={window.innerWidth}
+                                    width={window.innerWidth * 0.8}
                                     data={currentMessage}
                                     layers={graphLayers}
                                     handleCardData={handleCardData}

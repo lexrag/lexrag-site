@@ -34,16 +34,21 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
     useEffect(() => {
         console.log(data);
         const updateDimensions = () => {
+            const effectiveWidth = width || window.innerWidth * 0.9 - 24;
+            const effectiveHeight = height || window.innerHeight * 0.9 - 24;
+            
             setDimensions({
-                width: window.innerWidth * 0.9 - 24,
-                height: window.innerHeight * 0.9 - 24,
+                width: effectiveWidth,
+                height: effectiveHeight,
             });
         };
 
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
-    }, [data]);
+    }, [data, width, height]);
+
+
 
     useEffect(() => {
         const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
