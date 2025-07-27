@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { ChevronDown, ChevronUp, Expand, Fullscreen, Layers } from 'lucide-react';
@@ -44,6 +44,11 @@ const ChatRightPanel = ({
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
+    const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
+
+    const nodeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
     const getGroupKey = (nodeId: string) => {
         if (nodeId.includes('lawnet.com/openlaw/cases/citation/')) {
@@ -63,6 +68,55 @@ const ChatRightPanel = ({
         }
         return nodeId;
     };
+
+    const findGroupByNodeId = (nodeId: string) => {
+        if (!cardData.nodes) return null;
+
+        const node = cardData.nodes.find((n) => n.id === nodeId);
+        if (!node) return null;
+
+        return getGroupKey(node.id);
+    };
+
+    useEffect(() => {
+        if (!scrollToCardId || !cardData.nodes) return;
+
+        const scrollToCard = async () => {
+            const groupKey = findGroupByNodeId(scrollToCardId);
+            if (!groupKey) return;
+
+            setOpenAccordionItems((prev) => {
+                if (!prev.includes(groupKey)) {
+                    return [...prev, groupKey];
+                }
+                return prev;
+            });
+
+            setSelectedItem(scrollToCardId);
+            setSelectedGroup(groupKey);
+
+            setTimeout(() => {
+                const targetElement = nodeRefs.current[scrollToCardId];
+                if (targetElement && accordionContainerRef.current) {
+                    const containerRect = accordionContainerRef.current.getBoundingClientRect();
+                    const targetRect = targetElement.getBoundingClientRect();
+
+                    const scrollTop =
+                        accordionContainerRef.current.scrollTop +
+                        (targetRect.top - containerRect.top) -
+                        containerRect.height / 2 +
+                        targetRect.height / 2;
+
+                    accordionContainerRef.current.scrollTo({
+                        top: scrollTop,
+                        behavior: 'smooth',
+                    });
+                }
+            }, 100);
+        };
+
+        scrollToCard();
+    }, [scrollToCardId, cardData.nodes]);
 
     const parentNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
@@ -322,6 +376,7 @@ const ChatRightPanel = ({
                                     layers={graphLayers}
                                     data={currentMessage}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -425,7 +480,13 @@ const ChatRightPanel = ({
                                     </div>
                                 </div>
 
-                                <Accordion type="multiple" className="w-full h-full overflow-y-auto pb-6">
+                                <Accordion
+                                    type="multiple"
+                                    className="w-full h-full overflow-y-auto pb-6"
+                                    value={openAccordionItems}
+                                    onValueChange={setOpenAccordionItems}
+                                    ref={accordionContainerRef}
+                                >
                                     {Object.entries(groupedNodes).map(([groupKey, nodes]) => {
                                         const allGroupNodes =
                                             cardData.nodes?.filter((node) => {
@@ -550,6 +611,9 @@ const ChatRightPanel = ({
                                                             return (
                                                                 <div
                                                                     key={node.id}
+                                                                    ref={(el) => {
+                                                                        nodeRefs.current[node.id] = el;
+                                                                    }}
                                                                     className={`border-l-2 pl-4 cursor-pointer transition-all duration-200 ${
                                                                         selectedItem === node.id
                                                                             ? 'bg-primary/15 border-l-primary shadow-sm scale-[1.02]'

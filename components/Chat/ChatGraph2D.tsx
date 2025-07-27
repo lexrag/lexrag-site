@@ -16,9 +16,10 @@ interface ChatGraph2DProps {
     layers: GraphLayer[];
     data: GraphData;
     handleCardData: Dispatch<SetStateAction<any>>;
+    handleScrollToCardId: Dispatch<SetStateAction<string>>;
 }
 
-const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2DProps) => {
+const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScrollToCardId }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
@@ -158,7 +159,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
 
             setNodeHierarchy((prev) => {
                 const newHierarchy = { ...prev };
- 
+
                 descendantsToRemove.forEach((id) => {
                     delete newHierarchy[id];
                 });
@@ -383,6 +384,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
 
         // Single click - select node
         console.log('Node selected:', node.id);
+        handleScrollToCardId(node.id);
 
         // Clear any existing timer
         if (clickTimer) {
@@ -428,12 +430,17 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
-                setLoadingNodes(prev => new Set([...prev, node.id]));
-                
+                setLoadingNodes((prev) => new Set([...prev, node.id]));
+
                 const response = await getConversationExpandNodes(node.id);
                 console.log('Expand response:', response);
 
-                if (response && response.neighbors && Array.isArray(response.neighbors) && response.neighbors.length > 0) {
+                if (
+                    response &&
+                    response.neighbors &&
+                    Array.isArray(response.neighbors) &&
+                    response.neighbors.length > 0
+                ) {
                     const newNodes = response.neighbors;
                     const newLinks = response.links || [];
 
@@ -473,7 +480,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         } catch (error) {
             console.error('Error expanding/collapsing node:', error);
         } finally {
-            setLoadingNodes(prev => {
+            setLoadingNodes((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(node.id);
                 return newSet;
@@ -483,45 +490,139 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
 
     const getNodeColor = (node: any) => {
         if (highlightedNodeId === node.id) {
-            return '#fbbf24';
+            return '#fbbf24'; // Gold for highlighted
         }
 
-        // Show loading state
         if (loadingNodes.has(node.id)) {
             return '#f59e0b'; // Orange for loading
         }
 
-        if (node.color) {
+        if (node.color && (!node.labels || node.labels.length === 0)) {
             return node.color;
         }
 
-        if (node.labels && node.labels.includes('CaseLaw')) {
-            return '#ef4444'; // Red for case law
+        if (node.labels) {
+            if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
+                return '#dc2626'; // Red for case/lawsuit
+            }
+
+            if (node.labels.includes('Paragraph')) {
+                return '#eab308'; // Yellow for paragraphs
+            }
+
+            if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
+                return '#16a34a'; // Green for court
+            }
+
+            if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
+                return '#ef4444'; // Lighter red for judge
+            }
+
+            if (
+                node.labels.includes('Party') ||
+                node.labels.includes('Plaintiff') ||
+                node.labels.includes('Defendant') ||
+                node.labels.includes('Appellant') ||
+                node.labels.includes('Respondent')
+            ) {
+                return '#06b6d4'; // Cyan for parties
+            }
+
+            if (
+                node.labels.includes('Act') ||
+                node.labels.includes('Law') ||
+                node.labels.includes('Statute') ||
+                node.labels.includes('Legislation')
+            ) {
+                return '#2563eb'; // Blue for legislation
+            }
+
+            if (
+                node.labels.includes('Regulation') ||
+                node.labels.includes('Order') ||
+                node.labels.includes('Decree') ||
+                node.labels.includes('Resolution')
+            ) {
+                return '#7c3aed'; // Purple for regulations
+            }
+
+            if (node.labels.includes('Article') || node.labels.includes('Section')) {
+                return '#4f46e5'; // Indigo for articles
+            }
+
+            if (node.labels.includes('Citation') || node.labels.includes('Reference')) {
+                return '#ec4899'; // Pink for citations
+            }
+
+            if (node.labels.includes('Document') || node.labels.includes('Filing')) {
+                return '#a3a3a3'; // Gray for documents
+            }
         }
-        if (node.labels && node.labels.includes('Act')) {
-            return '#3b82f6'; // Blue for legislation
-        }
-        if (node.labels && node.labels.includes('Paragraph')) {
-            return '#10b981'; // Green for paragraphs
-        }
+
         return '#6b7280'; // Gray for unknown types
     };
 
     const getNodeSize = (node: any) => {
-        // Make loading nodes slightly larger
         if (loadingNodes.has(node.id)) {
             return 8;
         }
 
-        if (node.labels && node.labels.includes('CaseLaw')) {
-            return 8;
+        if (node.labels) {
+            if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
+                return 12; // Large for cases
+            }
+
+            if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
+                return 10; // Large for courts
+            }
+
+            if (
+                node.labels.includes('Act') ||
+                node.labels.includes('Law') ||
+                node.labels.includes('Statute') ||
+                node.labels.includes('Legislation')
+            ) {
+                return 8; // Medium for legislation
+            }
+
+            if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
+                return 7; // Medium for judges
+            }
+
+            if (
+                node.labels.includes('Party') ||
+                node.labels.includes('Plaintiff') ||
+                node.labels.includes('Defendant') ||
+                node.labels.includes('Appellant') ||
+                node.labels.includes('Respondent')
+            ) {
+                return 5; // Small for parties
+            }
+
+            // Маленькие узлы - параграфы
+            if (node.labels.includes('Paragraph')) {
+                return 6; // Small for paragraphs
+            }
+
+            if (
+                node.labels.includes('Regulation') ||
+                node.labels.includes('Order') ||
+                node.labels.includes('Decree') ||
+                node.labels.includes('Resolution')
+            ) {
+                return 7; // Medium for regulations
+            }
+
+            if (
+                node.labels.includes('Article') ||
+                node.labels.includes('Section') ||
+                node.labels.includes('Citation') ||
+                node.labels.includes('Reference')
+            ) {
+                return 5; // Small for articles/citations
+            }
         }
-        if (node.labels && node.labels.includes('Act')) {
-            return 12;
-        }
-        if (node.labels && node.labels.includes('Paragraph')) {
-            return 6;
-        }
+
         return 6;
     };
 
