@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
@@ -53,6 +54,28 @@ const ChatBox = ({
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
+    // TODO: test version - finish the implementation
+    const handleMessageClick = (event: React.MouseEvent, msg: Message) => {
+        event.preventDefault();
+
+        const target = event.target as HTMLElement;
+        const href = target.getAttribute('href');
+        console.log(href);
+        console.log(msg);
+
+        function decodeExceptSpace(url: string): string {
+            return url.replace(/%[0-9A-F]{2}/gi, (match) => {
+                return match.toUpperCase() === '%20' ? '%20' : decodeURIComponent(match);
+            });
+        }
+
+        if (target.tagName === 'A' && !!href) {
+            const id = decodeExceptSpace(href);
+
+            zoomToNodeGraph({ id });
+        }
+    };
+
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto px-4 md:px-4 px-2 min-h-0">
             <div className="scrollable flex-1 overflow-y-auto space-y-2 pb-4 md:pb-4 pb-20 min-h-0">
@@ -76,6 +99,7 @@ const ChatBox = ({
                                             : 'bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white'
                                     }`}
                                     dangerouslySetInnerHTML={{ __html: msg.html ?? '' }}
+                                    onClick={(e) => handleMessageClick(e, msg)}
                                 ></div>
                                 <div
                                     className={`flex space-x-2 transition-opacity duration-250 pt-1 md:pt-1 pt-0.5 ${
@@ -102,7 +126,10 @@ const ChatBox = ({
                                     </button>
                                     {msg.direction === 'incoming' && (
                                         <button className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary">
-                                            <Network className="size-4 md:size-4 size-3" onClick={() => handleCurrentMessage(msg)} />
+                                            <Network
+                                                className="size-4 md:size-4 size-3"
+                                                onClick={() => handleCurrentMessage(msg)}
+                                            />
                                         </button>
                                     )}
                                 </div>

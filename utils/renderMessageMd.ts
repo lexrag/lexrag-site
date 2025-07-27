@@ -1,12 +1,34 @@
+import rehypeRaw from 'rehype-raw';
+import rehypeStringify from 'rehype-stringify';
 import { remark } from 'remark';
-import html from 'remark-html';
+import remarkRehype from 'remark-rehype';
+import { visit } from 'unist-util-visit';
+
+const addAttributesToLinks = () => {
+    return (tree: any) => {
+        visit(tree, 'element', (node) => {
+            if (node.tagName === 'a') {
+                node.properties = {
+                    ...node.properties,
+                    style: 'color: blue; text-decoration: underline;',
+                };
+            }
+        });
+    };
+};
 
 const renderMessageMd = async (content: string) => {
     try {
-        const processedContent = await remark().use(html).process(content);
+        const processedContent = await remark()
+            .use(remarkRehype, { allowDangerousHtml: true })
+            .use(rehypeRaw)
+            .use(addAttributesToLinks)
+            .use(rehypeStringify)
+            .process(content);
+
         return processedContent.toString();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
+        console.log(e);
         return content;
     }
 };

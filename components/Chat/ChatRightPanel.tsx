@@ -1,9 +1,9 @@
 'use client';
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { Expand, Fullscreen, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, Expand, Fullscreen, Layers } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,102 +39,241 @@ const ChatRightPanel = ({
     handleCardData,
     setIsOpenGraphModal,
 }: ChatRightPanelProps) => {
-    console.log(cardData)
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+    const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
+    const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
+
+    const nodeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
     const getGroupKey = (nodeId: string) => {
         if (nodeId.includes('lawnet.com/openlaw/cases/citation/')) {
-            // Extract case code: everything before the # symbol
             const match = nodeId.match(/cases\/citation\/([^#]+)/);
             return match ? decodeURIComponent(match[1]) : nodeId;
         } else if (nodeId.includes('sso.agc.gov.sg/Act/')) {
-            // Extract act code: everything after /Act/
             const match = nodeId.match(/\/Act\/([^?]+)/);
             return match ? match[1] : nodeId;
         } else if (nodeId.includes('sso.agc.gov.sg/SL/')) {
-            // Extract subsidiary legislation code: everything after /SL/ until ?
             const match = nodeId.match(/\/SL\/([^?]+)/);
-            return match ? match[1] : nodeId;
+            if (match) {
+                const slCode = match[1];
+                const baseActMatch = slCode.match(/^([^-]+)/);
+                return baseActMatch ? baseActMatch[1] : slCode;
+            }
+            return nodeId;
         }
-        // For custom nodes, return the full ID as group key
         return nodeId;
     };
 
-    // const truncateText = (text: string, maxWords: number = 5) => {
-    //     if (!text) return text;
+    const findGroupByNodeId = useCallback((nodeId: string) => {
+        if (!cardData.nodes) return null;
 
-    //     const words = text.split(' ');
-    //     if (words.length <= maxWords) {
-    //         return text;
-    //     }
+        const node = cardData.nodes.find((n) => n.id === nodeId);
+        if (!node) return null;
 
-    //     return words.slice(0, maxWords).join(' ') + '...';
-    // };
+        return getGroupKey(node.id);
+    }, [cardData.nodes]);
 
-    const getGroupDisplayName = (groupKey: string, nodes: any[]) => {
-        // First, try to find a CaseLaw node (main case node)
+    useEffect(() => {
+        if (!scrollToCardId || !cardData.nodes) return;
+
+        const scrollToCard = async () => {
+            const groupKey = findGroupByNodeId(scrollToCardId);
+            if (!groupKey) return;
+
+            setOpenAccordionItems((prev) => {
+                if (!prev.includes(groupKey)) {
+                    return [...prev, groupKey];
+                }
+                return prev;
+            });
+
+            setSelectedItem(scrollToCardId);
+            setSelectedGroup(groupKey);
+
+            setTimeout(() => {
+                const targetElement = nodeRefs.current[scrollToCardId];
+                if (targetElement && accordionContainerRef.current) {
+                    const containerRect = accordionContainerRef.current.getBoundingClientRect();
+                    const targetRect = targetElement.getBoundingClientRect();
+
+                    const scrollTop =
+                        accordionContainerRef.current.scrollTop +
+                        (targetRect.top - containerRect.top) -
+                        containerRect.height / 2 +
+                        targetRect.height / 2;
+
+                    accordionContainerRef.current.scrollTo({
+                        top: scrollTop,
+                        behavior: 'smooth',
+                    });
+                }
+            }, 100);
+        };
+
+        scrollToCard();
+    }, [scrollToCardId, cardData.nodes, findGroupByNodeId]);
+
+    const parentNodes = useMemo(() => {
+        if (!cardData.nodes || cardData.nodes.length === 0) {
+            return {};
+        }
+
+        const parents: { [key: string]: any } = {};
+
+        cardData.nodes.forEach((node) => {
+            if (node.labels?.includes('Act') || node.labels?.includes('CaseLaw')) {
+                const groupKey = getGroupKey(node.id);
+                parents[groupKey] = node;
+            }
+        });
+
+        return parents;
+    }, [cardData.nodes]);
+
+    const getGroupInfo = (groupKey: string, nodes: any[]) => {
+        const parentNode = parentNodes[groupKey];
+
+        if (parentNode) {
+            if (parentNode.labels?.includes('CaseLaw')) {
+                return {
+                    displayName: parentNode.content || groupKey,
+                    type: 'case',
+                    citation: parentNode.neutralCitation,
+                    date: parentNode.date,
+                };
+            } else if (parentNode.labels?.includes('Act')) {
+                return {
+                    displayName: parentNode.content || groupKey,
+                    type: 'act',
+                    citation: null,
+                    date: parentNode.date,
+                };
+            }
+        }
+
         const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
         if (caseNode) {
-            return caseNode.content;
-            // return truncateText(caseNode.content, 5);
+            return {
+                displayName: caseNode.content || groupKey,
+                type: 'case',
+                citation: caseNode.neutralCitation,
+                date: caseNode.date,
+            };
         }
 
-        // For legislation nodes
+        const actNode = nodes.find((node) => node.labels?.includes('Act'));
+        if (actNode) {
+            return {
+                displayName: actNode.content || groupKey,
+                type: 'act',
+                citation: null,
+                date: actNode.date,
+            };
+        }
+
         const firstNode = nodes[0];
-        if (firstNode.id.includes('sso.agc.gov.sg')) {
-            return firstNode.content || groupKey;
-            // return truncateText(firstNode.content || groupKey, 5);
+        if (firstNode && firstNode.id.includes('sso.agc.gov.sg')) {
+            let type = 'custom';
+            let displayName = firstNode.content || groupKey;
+
+            const hasActNode = nodes.some((node) => node.id.includes('/Act/'));
+            const hasSLNode = nodes.some((node) => node.id.includes('/SL/'));
+
+            if (hasActNode || hasSLNode) {
+                type = 'act';
+
+                const actNodeInGroup = nodes.find((node) => node.id.includes('/Act/'));
+                if (actNodeInGroup) {
+                    displayName = actNodeInGroup.content || `Act ${groupKey}`;
+                } else if (firstNode.id.includes('/SL/')) {
+                    displayName =
+                        firstNode.content?.replace('Regulations', 'Act').replace(/\s+\d{4}$/, ' 2021') ||
+                        `Act ${groupKey}`;
+                }
+            }
+
+            return {
+                displayName,
+                type,
+                citation: null,
+                date: firstNode.date || null,
+            };
         }
 
-        // For other custom nodes
-        return firstNode.labels?.[0] || firstNode.content || groupKey;
-        // return truncateText(firstNode.labels?.[0] || firstNode.content || groupKey, 5);
+        return {
+            displayName: firstNode?.labels?.[0] || firstNode?.content || groupKey,
+            type: 'custom',
+            citation: null,
+            date: null,
+        };
     };
 
-    // Group nodes by their group keys and filter out unwanted nodes
+    const getParagraphNumber = (nodeId: string) => {
+        if (nodeId.includes('#[')) {
+            const match = nodeId.match(/#\[(\d+)\]/);
+            return match ? match[1] : null;
+        }
+        return null;
+    };
+
     const groupedNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
             return {};
         }
 
         const groups: { [key: string]: any[] } = {};
+        const parentNodes: { [key: string]: any } = {};
 
         cardData.nodes.forEach((node) => {
-            // Skip PartOfTheLegislation nodes
-            if (node.labels?.includes('PartOfTheLegislation')) {
-                return;
-            }
-
             const groupKey = getGroupKey(node.id);
+
             if (!groups[groupKey]) {
                 groups[groupKey] = [];
+                parentNodes[groupKey] = null;
             }
-            groups[groupKey].push(node);
-        });
 
-        // Filter out CaseLaw nodes from being displayed as individual items
-        // but keep them in the group for title extraction
-        Object.keys(groups).forEach((groupKey) => {
-            const filteredNodes = groups[groupKey].filter((node) => !node.labels?.includes('CaseLaw'));
-            if (filteredNodes.length > 0) {
-                groups[groupKey] = filteredNodes;
+            if (node.labels?.includes('Act') || node.labels?.includes('CaseLaw')) {
+                parentNodes[groupKey] = node;
             } else {
-                // If only CaseLaw node exists, keep the group but with empty nodes array
-                groups[groupKey] = [];
+                if (node.labels?.includes('PartOfTheLegislation')) {
+                    if (node.id.includes('?') || node.id.includes('#') || node.id.includes('/SL/')) {
+                        groups[groupKey].push(node);
+                    }
+                } else {
+                    groups[groupKey].push(node);
+                }
             }
         });
 
-        return groups;
+        const filteredGroups: { [key: string]: any[] } = {};
+        Object.keys(groups).forEach((groupKey) => {
+            const hasParent = parentNodes[groupKey] !== null;
+            const hasChildren = groups[groupKey].length > 0;
+
+            if (hasParent || hasChildren) {
+                filteredGroups[groupKey] = groups[groupKey];
+            }
+        });
+
+        return filteredGroups;
     }, [cardData.nodes]);
 
     const handleGroupClick = (groupKey: string) => {
-        setSelectedItem(selectedItem === groupKey ? null : groupKey);
+        const isCurrentlySelected = selectedItem === groupKey;
+        setSelectedItem(isCurrentlySelected ? null : groupKey);
+        setSelectedGroup(isCurrentlySelected ? null : groupKey);
     };
 
     const handleNodeClick = (nodeId: string, node: any) => {
+        const nodeGroupKey = getGroupKey(node.id);
         setSelectedItem(nodeId);
+        setSelectedGroup(nodeGroupKey);
+
         if (node.x !== undefined && node.y !== undefined) {
             zoomToNodeGraph({
                 id: nodeId,
@@ -142,6 +281,47 @@ const ChatRightPanel = ({
                 y: node.y,
             });
         }
+    };
+
+    const getNodeDisplayInfo = (node: any) => {
+        const paragraphNum = getParagraphNumber(node.id);
+        let title = node.labels?.[0] || 'Node';
+
+        if (paragraphNum) {
+            title = `Paragraph ${paragraphNum}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+            title = node.heading ? `${node.heading}` : `Regulation ${node.legalPath || ''}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+            title = 'Subsidiary Legislation';
+        } else if (node.labels?.includes('PartOfTheLegislation')) {
+            title = node.legalPath || node.labels?.[0] || 'Section';
+        }
+
+        let subtitle = null;
+        const subtitleParts = [];
+
+        if (node.number) {
+            subtitleParts.push(`№ ${node.number}`);
+        }
+
+        if (node.score !== undefined) {
+            subtitleParts.push(`Score: ${node.score.toFixed(3)}`);
+        }
+
+        if (subtitleParts.length > 0) {
+            subtitle = subtitleParts.join(' • ');
+        }
+
+        return {
+            title,
+            subtitle,
+            citation: node.neutralCitation || null,
+            content: node.content || '',
+        };
+    };
+
+    const toggleGraphVisibility = () => {
+        setIsGraphCollapsed(!isGraphCollapsed);
     };
 
     useEffect(() => {
@@ -184,8 +364,11 @@ const ChatRightPanel = ({
             <aside className="w-full flex flex-col overflow-hidden">
                 <Card className="flex-1 rounded-none border-0 shadow-none overflow-hidden">
                     <CardContent className="p-0 relative flex flex-col h-full">
-                        {/* Graph content - 50% height */}
-                        <div className="w-full h-1/2 relative overflow-hidden">
+                        <div
+                            className={`w-full relative overflow-hidden transition-all duration-300 ${
+                                isGraphCollapsed ? 'h-0 opacity-0' : 'h-1/2 opacity-100'
+                            }`}
+                        >
                             {graphView === '2d' && (
                                 <ChatGraph2D
                                     height={window.innerHeight * 0.5}
@@ -193,6 +376,7 @@ const ChatRightPanel = ({
                                     layers={graphLayers}
                                     data={currentMessage}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -202,10 +386,10 @@ const ChatRightPanel = ({
                                     data={currentMessage}
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
+                                    handleScrollToCardId={setScrollToCardId}
                                 />
                             )}
 
-                            {/* Menu overlay on graph */}
                             <div className="absolute top-3 left-3 right-3 z-10">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -276,107 +460,223 @@ const ChatRightPanel = ({
                             </div>
                         </div>
 
-                        {/* Accordion with padding - 50% height */}
-                        <div className="flex-1 px-3 py-2 overflow-hidden">
-                            <Accordion type="multiple" className="w-full h-full overflow-y-auto">
-                                {Object.entries(groupedNodes).map(([groupKey, nodes]) => {
-                                    const allGroupNodes =
-                                        cardData.nodes?.filter(
-                                            (node) =>
-                                                !node.labels?.includes('PartOfTheLegislation') &&
-                                                getGroupKey(node.id) === groupKey,
-                                        ) || [];
+                        {!!currentMessage && (
+                            <div
+                                className={`px-3 py-2 overflow-hidden transition-all duration-300 ${
+                                    isGraphCollapsed ? 'flex-1' : 'flex-1'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                                    <h3 className="font-semibold text-sm text-muted-foreground">Legal Documents</h3>
+                                    <div
+                                        className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                        onClick={toggleGraphVisibility}
+                                        title={isGraphCollapsed ? 'Show Graph' : 'Hide Graph'}
+                                    >
+                                        {isGraphCollapsed ? (
+                                            <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronUp className="h-4 w-4" />
+                                        )}
+                                    </div>
+                                </div>
 
-                                    const groupDisplayName = getGroupDisplayName(groupKey, allGroupNodes);
+                                <Accordion
+                                    type="multiple"
+                                    className="w-full h-full overflow-y-auto pb-6"
+                                    value={openAccordionItems}
+                                    onValueChange={setOpenAccordionItems}
+                                    ref={accordionContainerRef}
+                                >
+                                    {Object.entries(groupedNodes).map(([groupKey, nodes]) => {
+                                        const allGroupNodes =
+                                            cardData.nodes?.filter((node) => {
+                                                if (node.labels?.includes('PartOfTheLegislation')) return false;
 
-                                    if (
-                                        nodes.length === 0 &&
-                                        !allGroupNodes.some((node) => node.labels?.includes('CaseLaw'))
-                                    ) {
-                                        return null;
-                                    }
+                                                if (getGroupKey(node.id) !== groupKey) return false;
 
-                                    return (
-                                        <AccordionItem
-                                            key={groupKey}
-                                            value={groupKey}
-                                            // className={`transition-all duration-300 ${
-                                            //     selectedItem === groupKey
-                                            //         ? 'border-l-2 border-l-primary bg-primary/5'
-                                            //         : 'hover:bg-muted/30'
-                                            // }`}
-                                        >
-                                            <AccordionTrigger
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleGroupClick(groupKey);
-                                                }}
-                                                className="hover:no-underline"
+                                                const hasQueryOrFragment =
+                                                    node.id.includes('?') || node.id.includes('#');
+                                                if (
+                                                    !hasQueryOrFragment &&
+                                                    (node.id.includes('/Act/') || node.id.includes('/SL/'))
+                                                ) {
+                                                    return (
+                                                        node.labels?.includes('Act') || node.labels?.includes('CaseLaw')
+                                                    );
+                                                }
+
+                                                return true;
+                                            }) || [];
+
+                                        const groupInfo = getGroupInfo(groupKey, allGroupNodes);
+
+                                        if (groupInfo.type === 'custom') {
+                                            return null;
+                                        }
+
+                                        if (
+                                            nodes.length === 0 &&
+                                            !allGroupNodes.some(
+                                                (node) =>
+                                                    node.labels?.includes('CaseLaw') || node.labels?.includes('Act'),
+                                            )
+                                        ) {
+                                            return null;
+                                        }
+
+                                        const getTypeBadgeColor = (type: string) => {
+                                            switch (type) {
+                                                case 'case':
+                                                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                                                case 'act':
+                                                    return 'bg-green-100 text-green-800 border-green-200';
+                                                case 'subsidiary':
+                                                    return 'bg-orange-100 text-orange-800 border-orange-200';
+                                                default:
+                                                    return 'bg-gray-100 text-gray-800 border-gray-200';
+                                            }
+                                        };
+
+                                        const getTypeLabel = (type: string) => {
+                                            switch (type) {
+                                                case 'case':
+                                                    return 'Case';
+                                                case 'act':
+                                                    return 'Act';
+                                                case 'subsidiary':
+                                                    return 'SL';
+                                                default:
+                                                    return 'Custom';
+                                            }
+                                        };
+
+                                        return (
+                                            <AccordionItem
+                                                key={groupKey}
+                                                value={groupKey}
+                                                className={`transition-all duration-300 ${
+                                                    selectedItem === groupKey
+                                                        ? 'border-l-2 border-l-primary bg-primary/10'
+                                                        : selectedGroup === groupKey
+                                                          ? 'border-l-2 border-l-primary/70 bg-primary/5'
+                                                          : 'hover:bg-muted/30'
+                                                }`}
                                             >
-                                                <div className="text-left flex items-center gap-2 w-full">
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="font-semibold">{groupDisplayName}</div>
-                                                            <div className="flex items-center gap-1">
+                                                <AccordionTrigger
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleGroupClick(groupKey);
+                                                    }}
+                                                    className="hover:no-underline"
+                                                >
+                                                    <div className="text-left flex items-center gap-2 w-full">
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span
+                                                                    className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getTypeBadgeColor(groupInfo.type)}`}
+                                                                >
+                                                                    {getTypeLabel(groupInfo.type)}
+                                                                </span>
                                                                 <span className="text-sm text-muted-foreground">
                                                                     ({nodes.length} node{nodes.length !== 1 ? 's' : ''})
                                                                 </span>
                                                             </div>
+                                                            <div
+                                                                className={`font-semibold transition-colors ${
+                                                                    selectedItem === groupKey
+                                                                        ? 'text-primary'
+                                                                        : selectedGroup === groupKey
+                                                                          ? 'text-primary/80'
+                                                                          : ''
+                                                                }`}
+                                                            >
+                                                                {groupInfo.displayName}
+                                                            </div>
+                                                            {groupInfo.citation && (
+                                                                <div className="text-xs text-muted-foreground mt-1">
+                                                                    {groupInfo.citation}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </AccordionTrigger>
-                                            <AccordionContent className="space-y-4">
-                                                {nodes.length === 0 ? (
-                                                    <div className="text-sm text-muted-foreground italic">
-                                                        No detailed nodes available
-                                                    </div>
-                                                ) : (
-                                                    nodes.map((node: any) => (
-                                                        <div
-                                                            key={node.id}
-                                                            className={`border-l-2 border-muted pl-4 cursor-pointer transition-all duration-200 ${
-                                                                selectedItem === node.id
-                                                                    ? 'bg-primary/10 border-l-primary shadow-sm'
-                                                                    : 'hover:bg-muted/20 hover:border-l-muted-foreground/50'
-                                                            }`}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleNodeClick(node.id, node);
-                                                            }}
-                                                        >
-                                                            <div className="flex items-start gap-2 mb-2">
-                                                                {node.layerColor && (
-                                                                    <div
-                                                                        className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
-                                                                        style={{ backgroundColor: node.layerColor }}
-                                                                    />
-                                                                )}
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-center gap-2 mb-1">
-                                                                        <div className="font-medium text-sm">
-                                                                            {node.labels?.[0] ?? 'Node'}
+                                                </AccordionTrigger>
+                                                <AccordionContent className="space-y-3">
+                                                    {nodes.length === 0 ? (
+                                                        <div className="text-sm text-muted-foreground italic">
+                                                            No detailed nodes available
+                                                        </div>
+                                                    ) : (
+                                                        nodes.map((node: any) => {
+                                                            const nodeInfo = getNodeDisplayInfo(node);
+                                                            return (
+                                                                <div
+                                                                    key={node.id}
+                                                                    ref={(el) => {
+                                                                        nodeRefs.current[node.id] = el;
+                                                                    }}
+                                                                    className={`border-l-2 pl-4 cursor-pointer transition-all duration-200 ${
+                                                                        selectedItem === node.id
+                                                                            ? 'bg-primary/15 border-l-primary shadow-sm scale-[1.02]'
+                                                                            : 'border-muted hover:bg-muted/20 hover:border-l-muted-foreground/50'
+                                                                    }`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleNodeClick(node.id, node);
+                                                                    }}
+                                                                >
+                                                                    <div className="flex items-start gap-2 mb-2">
+                                                                        {node.layerColor && (
+                                                                            <div
+                                                                                className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
+                                                                                style={{
+                                                                                    backgroundColor: node.layerColor,
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="flex items-center gap-2 mb-1">
+                                                                                <div
+                                                                                    className={`font-medium text-sm transition-colors ${
+                                                                                        selectedItem === node.id
+                                                                                            ? 'text-primary'
+                                                                                            : ''
+                                                                                    }`}
+                                                                                >
+                                                                                    {nodeInfo.title}
+                                                                                </div>
+                                                                            </div>
+                                                                            {(nodeInfo.subtitle ||
+                                                                                nodeInfo.citation) && (
+                                                                                <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
+                                                                                    {nodeInfo.subtitle && (
+                                                                                        <span>{nodeInfo.subtitle}</span>
+                                                                                    )}
+                                                                                    {nodeInfo.citation && (
+                                                                                        <span>
+                                                                                            — {nodeInfo.citation}
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            )}
+                                                                            {nodeInfo.content && (
+                                                                                <div className="text-sm whitespace-pre-wrap mb-3">
+                                                                                    {nodeInfo.content}
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     </div>
-                                                                    <div className="text-xs text-muted-foreground mb-2">
-                                                                        {node.number && `№ ${node.number}`}{' '}
-                                                                        {node.neutralCitation &&
-                                                                            `— ${node.neutralCitation}`}
-                                                                    </div>
-                                                                    <div className="text-sm whitespace-pre-wrap mb-3">
-                                                                        {node.content}
-                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                )}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    );
-                                })}
-                            </Accordion>
-                        </div>
+                                                            );
+                                                        })
+                                                    )}
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        );
+                                    })}
+                                </Accordion>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </aside>

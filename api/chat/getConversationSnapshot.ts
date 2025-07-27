@@ -14,6 +14,8 @@ export const getConversationSnapshot = async (threadId: string) => {
         return [];
     }
 
+    // const mock = `\n\n[LINK](https://www.lawnet.com/openlaw/cases/citation/[1990]%20SGHC%2051#[97])`;
+
     return await Promise.all(
         data.messages.map(async (m: any) => ({
             id: uuidv4(),
@@ -23,7 +25,7 @@ export const getConversationSnapshot = async (threadId: string) => {
             relevantContext: m.relevant_context,
             allRetrievedNodes: m.all_retrieved_nodes,
             allRetrievedNodesWithNeighbors: m.all_retrieved_nodes_with_neighbors,
-            relevantRetrievedNodes: m.relevant_retrieved_nodes
+            relevantRetrievedNodes: m.relevant_retrieved_nodes,
         })),
     );
 };

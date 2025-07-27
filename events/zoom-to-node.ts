@@ -2,8 +2,8 @@ const ZOOM_TO_NODE_GRAPH_EVENT = 'ZOOM_TO_NODE_GRAPH_EVENT';
 
 interface ZoomToNodePayload {
     id: string;
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
     zoomLevel?: number;
     duration?: number;
 }

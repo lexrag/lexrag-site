@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
 import { GraphData, GraphLayer } from '@/types/Graph';
 import DialogContent, { Dialog, DialogBody, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -19,6 +19,8 @@ interface ChatGraphModalProps {
 
 const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, handleCardData }: ChatGraphModalProps) => {
     const direction = useDirection();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,10 +35,10 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                     </DialogHeader>
                     <DialogBody>
                         <TabsContent value="2d">
-                            <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} />
+                            <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} handleScrollToCardId={setScrollToCardId} />
                         </TabsContent>
                         <TabsContent value="3d">
-                            <ChatGraph3D data={data} layers={graphLayers} handleCardData={handleCardData} />
+                            <ChatGraph3D data={data} layers={graphLayers} handleCardData={handleCardData} handleScrollToCardId={setScrollToCardId} />
                         </TabsContent>
                     </DialogBody>
                 </Tabs>
