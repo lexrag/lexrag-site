@@ -13,7 +13,8 @@ export const getConversationExpandNodes = async (nodeId: string) => {
     const data = await response.json();
 
     if (!response.ok) {
-        return [];
+        console.error('Error expanding nodes:', response.status, data);
+        return { neighbors: [], links: [] };
     }
 
     return data;

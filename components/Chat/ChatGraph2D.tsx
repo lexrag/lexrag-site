@@ -31,6 +31,9 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
+    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+    const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
+    const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -327,6 +330,15 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         };
     }, [processedData]);
 
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (clickTimer) {
+                clearTimeout(clickTimer);
+            }
+        };
+    }, [clickTimer]);
+
     useEffect(() => {
         if (processedData) {
             handleCardData(processedData);
@@ -356,10 +368,59 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
         }
     }, [processedData]);
 
-    const handleNodeClick = async (node: any) => {
+    const handleNodeClick = (node: any) => {
         if (!node || !node.id) return;
 
-        console.log('Node clicked:', node.id, 'Currently expanded:', expandedNodes.has(node.id));
+        // Check if this is a double click
+        if (lastClickedNode === node.id && clickTimer) {
+            // Double click detected - expand/collapse node
+            clearTimeout(clickTimer);
+            setClickTimer(null);
+            setLastClickedNode(null);
+            handleNodeDoubleClick(node);
+            return;
+        }
+
+        // Single click - select node
+        console.log('Node selected:', node.id);
+
+        // Clear any existing timer
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+        }
+
+        // Set timer for potential double click
+        const timer = setTimeout(() => {
+            // Single click confirmed - select node
+            if (node.x !== undefined && node.y !== undefined) {
+                graphRef.current?.centerAt(node.x, node.y, 1000);
+                graphRef.current?.zoom(1.5, 1000);
+            }
+
+            setHighlightedNodeId(node.id);
+
+            setTimeout(() => {
+                setHighlightedNodeId(null);
+            }, 3000);
+
+            setClickTimer(null);
+            setLastClickedNode(null);
+        }, 300); // 300ms delay to detect double click
+
+        setClickTimer(timer);
+        setLastClickedNode(node.id);
+    };
+
+    const handleNodeDoubleClick = async (node: any) => {
+        if (!node || !node.id) return;
+
+        console.log('Node double-clicked:', node.id, 'Currently expanded:', expandedNodes.has(node.id));
+
+        // Prevent clicking on already loading nodes
+        if (loadingNodes.has(node.id)) {
+            console.log('Node is currently loading, ignoring double-click');
+            return;
+        }
 
         try {
             if (expandedNodes.has(node.id)) {
@@ -367,12 +428,14 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
+                setLoadingNodes(prev => new Set([...prev, node.id]));
+                
                 const response = await getConversationExpandNodes(node.id);
                 console.log('Expand response:', response);
 
-                if (response && response.neighbors && response.neighbors.nodes && response.neighbors.nodes.length > 0) {
-                    const newNodes = response.neighbors.nodes;
-                    const newLinks = response.neighbors.links || [];
+                if (response && response.neighbors && Array.isArray(response.neighbors) && response.neighbors.length > 0) {
+                    const newNodes = response.neighbors;
+                    const newLinks = response.links || [];
 
                     console.log('Adding nodes:', newNodes.length, 'Adding links:', newLinks.length);
 
@@ -403,16 +466,29 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
                     }
                 } else {
                     console.log('No children found for node:', node.id);
+                    // Mark node as expanded even if no children to prevent repeated API calls
+                    setExpandedNodes((prev) => new Set([...prev, node.id]));
                 }
             }
         } catch (error) {
             console.error('Error expanding/collapsing node:', error);
+        } finally {
+            setLoadingNodes(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(node.id);
+                return newSet;
+            });
         }
     };
 
     const getNodeColor = (node: any) => {
         if (highlightedNodeId === node.id) {
             return '#fbbf24';
+        }
+
+        // Show loading state
+        if (loadingNodes.has(node.id)) {
+            return '#f59e0b'; // Orange for loading
         }
 
         if (node.color) {
@@ -432,6 +508,11 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     };
 
     const getNodeSize = (node: any) => {
+        // Make loading nodes slightly larger
+        if (loadingNodes.has(node.id)) {
+            return 8;
+        }
+
         if (node.labels && node.labels.includes('CaseLaw')) {
             return 8;
         }
@@ -445,7 +526,18 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
     };
 
     const handleNodeHover = (node: any) => {
-        document.body.style.cursor = node ? 'pointer' : 'default';
+        if (node && loadingNodes.has(node.id)) {
+            document.body.style.cursor = 'wait';
+        } else if (node) {
+            document.body.style.cursor = 'pointer';
+        } else {
+            document.body.style.cursor = 'default';
+        }
+    };
+
+    const handleBackgroundClick = () => {
+        document.body.style.cursor = 'default';
+        setHighlightedNodeId(null);
     };
 
     const getLinkColor = () => {
@@ -473,6 +565,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             baseLabel += '\n[Expanded]';
         }
 
+        if (loadingNodes.has(node.id)) {
+            baseLabel += '\n[Loading...]';
+        }
+
         return baseLabel;
     };
 
@@ -489,14 +585,11 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData }: ChatGraph2
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
             nodeLabel={getNodeLabel}
-            onNodeRightClick={handleNodeClick}
+            onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
             onNodeDragEnd={saveNodePosition}
             onEngineStop={handleEngineStop}
-            onBackgroundClick={() => {
-                document.body.style.cursor = 'default';
-                setHighlightedNodeId(null);
-            }}
+            onBackgroundClick={handleBackgroundClick}
             cooldownTicks={100}
             cooldownTime={15000}
         />
