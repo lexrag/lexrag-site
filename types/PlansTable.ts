@@ -54,9 +54,9 @@ export interface PlanButton {
 export interface Payment {
     id: number;
     amount: number;
-    currency: string;
-    status: string;
-    payment_method: string;
+    currency: string | null;
+    status: string | null;
+    payment_method: string | null;
     invoice_pdf_url: string;
     invoice_hosted_url: string;
     description: string;

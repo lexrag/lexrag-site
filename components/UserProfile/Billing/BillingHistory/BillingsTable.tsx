@@ -72,7 +72,7 @@ const BillingsTable = () => {
     }, [payments, search]);
 
     const paymentMethodOptions = useMemo(() => {
-        const methods = Array.from(new Set(payments.map((p) => p.payment_method).filter(Boolean)));
+        const methods = Array.from(new Set(payments.map((p) => p.payment_method).filter(Boolean) as string[]));
         return methods.length > 0 ? methods : DEFAULT_PAYMENT_METHODS;
     }, [payments]);
 
