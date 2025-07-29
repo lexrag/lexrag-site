@@ -46,7 +46,9 @@ const ChatRightSheet = ({
     handleCardData,
 }: ChatRightSheetProps) => {
     const direction = useDirection();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -105,17 +107,20 @@ const ChatRightSheet = ({
                             <div className="flex items-center gap-2">
                                 <Tabs value={graphView} onValueChange={setGraphView}>
                                     <TabsList className="w-fit grid grid-cols-2">
-                                        <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                        <TabsTrigger value="2d" className="text-[12px] py-1 px-2" title="Switch to 2D Graph View">
                                             2D
                                         </TabsTrigger>
-                                        <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                        <TabsTrigger value="3d" className="text-[12px] py-1 px-2" title="Switch to 3D Graph View">
                                             3D
                                         </TabsTrigger>
                                     </TabsList>
                                 </Tabs>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                                        <div 
+                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                            title="Toggle Graph Layers"
+                                        >
                                             <Layers className="h-4 w-4" />
                                         </div>
                                     </DropdownMenuTrigger>
@@ -150,12 +155,14 @@ const ChatRightSheet = ({
                                         <div 
                                             className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                             onClick={() => setIsOpenGraphModal(true)}
+                                            title="Expand Graph to Full Screen"
                                         >
                                             <Expand className="h-4 w-4" />
                                         </div>
                                         <div 
                                             className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                             onClick={() => zoomToFitGraph()}
+                                            title="Zoom to Fit All Nodes"
                                         >
                                             <Fullscreen className="h-4 w-4" />
                                         </div>

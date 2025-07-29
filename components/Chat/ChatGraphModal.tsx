@@ -21,6 +21,7 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
     const direction = useDirection();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -35,8 +36,8 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                     <DialogHeader className="flex-row items-center gap-2">
                         <DialogTitle className="sr-only">Chat Graph Modal</DialogTitle>
                         <TabsList className="grid w-fit grid-cols-2">
-                            <TabsTrigger value="2d">2D</TabsTrigger>
-                            <TabsTrigger value="3d">3D</TabsTrigger>
+                            <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
+                            <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
                         </TabsList>
                     </DialogHeader>
                     <DialogBody>

@@ -399,7 +399,10 @@ const ChatRightPanel = ({
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
-                <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer" />
+                <div 
+                    className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer"
+                    title="Drag to Resize Panel"
+                />
             </div>
             <aside className="w-full flex flex-col overflow-hidden">
                 <Card className="flex-1 rounded-none border-0 shadow-none overflow-hidden">
@@ -452,17 +455,20 @@ const ChatRightPanel = ({
                                     <div className="flex items-center gap-2">
                                         <Tabs value={graphView} onValueChange={setGraphView}>
                                             <TabsList className="w-fit grid grid-cols-2">
-                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2" title="Switch to 2D Graph View">
                                                     2D
                                                 </TabsTrigger>
-                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2" title="Switch to 3D Graph View">
                                                     3D
                                                 </TabsTrigger>
                                             </TabsList>
                                         </Tabs>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                                                <div 
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                    title="Toggle Graph Layers"
+                                                >
                                                     <Layers className="h-4 w-4" />
                                                 </div>
                                             </DropdownMenuTrigger>
@@ -514,13 +520,14 @@ const ChatRightPanel = ({
                                             <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => setIsOpenGraphModal(true)}
+                                                title="Expand Graph to Full Screen"
                                             >
                                                 <Expand className="h-4 w-4" />
                                             </div>
                                             <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => zoomToFitGraph()}
-                                                title="Zoom to Fit Graph"
+                                                title="Zoom to Fit All Nodes"
                                             >
                                                 <Fullscreen className="h-4 w-4" />
                                             </div>
@@ -541,7 +548,7 @@ const ChatRightPanel = ({
                                     <div
                                         className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                         onClick={toggleGraphVisibility}
-                                        title={isGraphCollapsed ? 'Show Graph' : 'Hide Graph'}
+                                        title={isGraphCollapsed ? 'Show Graph Panel' : 'Hide Graph Panel'}
                                     >
                                         {isGraphCollapsed ? (
                                             <ChevronDown className="h-4 w-4" />
@@ -643,6 +650,7 @@ const ChatRightPanel = ({
                                                                 e.stopPropagation();
                                                                 handleGroupClick(groupKey);
                                                             }}
+                                                            title={`Click to select and zoom to ${groupInfo.displayName}`}
                                                         >
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <span
@@ -696,6 +704,7 @@ const ChatRightPanel = ({
                                                                         e.stopPropagation();
                                                                         handleNodeClick(node.id, node);
                                                                     }}
+                                                                    title={`Click to select and zoom to ${nodeInfo.title}`}
                                                                 >
                                                                     <div className="flex items-start gap-2 mb-2">
                                                                         {node.layerColor && (
