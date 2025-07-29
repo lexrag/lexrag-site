@@ -21,6 +21,7 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
     const direction = useDirection();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,7 +39,13 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                             <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} handleScrollToCardId={setScrollToCardId} />
                         </TabsContent>
                         <TabsContent value="3d">
-                            <ChatGraph3D data={data} layers={graphLayers} handleCardData={handleCardData} handleScrollToCardId={setScrollToCardId} />
+                            <ChatGraph3D 
+                                data={data} 
+                                layers={graphLayers} 
+                                handleCardData={handleCardData} 
+                                handleScrollToCardId={setScrollToCardId}
+                                isOrbitEnabled={isOrbitEnabled}
+                            />
                         </TabsContent>
                     </DialogBody>
                 </Tabs>

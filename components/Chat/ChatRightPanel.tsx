@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ChevronDown, ChevronUp, Expand, Fullscreen, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, Expand, Fullscreen, Globe, Layers } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -46,6 +46,7 @@ const ChatRightPanel = ({
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
@@ -419,6 +420,7 @@ const ChatRightPanel = ({
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    isOrbitEnabled={isOrbitEnabled}
                                 />
                             )}
 
@@ -473,6 +475,19 @@ const ChatRightPanel = ({
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="flex items-center gap-1">
+                                            {graphView === '3d' && (
+                                                <div
+                                                    onClick={() => setIsOrbitEnabled(!isOrbitEnabled)}
+                                                    className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer ${
+                                                        isOrbitEnabled
+                                                            ? 'bg-primary text-primary-foreground border-primary'
+                                                            : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                                                    }`}
+                                                    title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
+                                                >
+                                                    <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
+                                                </div>
+                                            )}
                                             <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => setIsOpenGraphModal(true)}

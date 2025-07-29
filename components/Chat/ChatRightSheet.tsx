@@ -33,21 +33,21 @@ interface ChatRightSheetProps {
     handleCardData: Dispatch<SetStateAction<CardData>>;
 }
 
-const ChatRightSheet = ({ 
-    isOpen, 
-    handleOpen, 
-    graphView, 
-    setGraphView, 
-    graphLayers, 
-    setGraphLayers, 
+const ChatRightSheet = ({
+    isOpen,
+    handleOpen,
+    graphView,
+    setGraphView,
+    graphLayers,
+    setGraphLayers,
     setIsOpenGraphModal,
     currentMessage,
     cardData,
-    handleCardData
+    handleCardData,
 }: ChatRightSheetProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const direction = useDirection();
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     const nodeConnections = useMemo(() => {
         const connections: { [key: string]: any[] } = {};
@@ -188,6 +188,7 @@ const ChatRightSheet = ({
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    isOrbitEnabled={isOrbitEnabled}
                                 />
                             )}
                         </div>

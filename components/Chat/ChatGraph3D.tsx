@@ -16,9 +16,18 @@ interface ChatGraph3DProps {
     data: GraphData;
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId?: Dispatch<SetStateAction<string>>;
+    isOrbitEnabled?: boolean;
 }
 
-const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScrollToCardId }: ChatGraph3DProps) => {
+const ChatGraph3D = ({
+    height,
+    width,
+    data,
+    layers,
+    handleCardData,
+    handleScrollToCardId,
+    isOrbitEnabled: externalIsOrbitEnabled,
+}: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
@@ -31,6 +40,10 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+    const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const orbitAngleRef = useRef<number>(0);
+
+    const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
     useEffect(() => {
         console.log(data);
@@ -49,6 +62,54 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
     useEffect(() => {
         const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
         return unsubscribe;
+    }, []);
+
+    useEffect(() => {
+        if (orbitIntervalRef.current) {
+            clearInterval(orbitIntervalRef.current);
+            orbitIntervalRef.current = null;
+        }
+
+        if (!isOrbitEnabled) {
+            return;
+        }
+
+        const waitForGraph = () => {
+            if (!graphRef.current) {
+                setTimeout(waitForGraph, 100);
+                return;
+            }
+
+            const distance = 1400;
+
+            orbitIntervalRef.current = setInterval(() => {
+                if (graphRef.current) {
+                    graphRef.current.cameraPosition({
+                        x: distance * Math.sin(orbitAngleRef.current),
+                        z: distance * Math.cos(orbitAngleRef.current),
+                    });
+                    orbitAngleRef.current += Math.PI / 300;
+                }
+            }, 10);
+        };
+
+        waitForGraph();
+
+        return () => {
+            if (orbitIntervalRef.current) {
+                clearInterval(orbitIntervalRef.current);
+                orbitIntervalRef.current = null;
+            }
+        };
+    }, [isOrbitEnabled]);
+
+    useEffect(() => {
+        return () => {
+            if (orbitIntervalRef.current) {
+                clearInterval(orbitIntervalRef.current);
+                orbitIntervalRef.current = null;
+            }
+        };
     }, []);
 
     const getAllDescendants = (nodeId: string): Set<string> => {
