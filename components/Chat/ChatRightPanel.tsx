@@ -47,7 +47,7 @@ const ChatRightPanel = ({
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
 
-    const nodeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
     const getGroupKey = (nodeId: string) => {
@@ -69,14 +69,19 @@ const ChatRightPanel = ({
         return nodeId;
     };
 
-    const findGroupByNodeId = useCallback((nodeId: string) => {
-        if (!cardData.nodes) return null;
+    const findGroupByNodeId = useCallback(
+        (nodeId: string) => {
+            if (!cardData.nodes) return null;
 
-        const node = cardData.nodes.find((n) => n.id === nodeId);
-        if (!node) return null;
+            const node = cardData.nodes.find((n) => n.id === nodeId);
+            if (!node) return null;
 
-        return getGroupKey(node.id);
-    }, [cardData.nodes]);
+            return getGroupKey(node.id);
+        },
+        [cardData.nodes],
+    );
+
+    const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
@@ -96,7 +101,13 @@ const ChatRightPanel = ({
             setSelectedGroup(groupKey);
 
             setTimeout(() => {
-                const targetElement = nodeRefs.current[scrollToCardId];
+                let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
+
+                if (!targetElement) {
+                    targetElement =
+                        accordionTriggerRefs.current[scrollToCardId] || accordionTriggerRefs.current[groupKey];
+                }
+
                 if (targetElement && accordionContainerRef.current) {
                     const containerRect = accordionContainerRef.current.getBoundingClientRect();
                     const targetRect = targetElement.getBoundingClientRect();
@@ -267,12 +278,24 @@ const ChatRightPanel = ({
         const isCurrentlySelected = selectedItem === groupKey;
         setSelectedItem(isCurrentlySelected ? null : groupKey);
         setSelectedGroup(isCurrentlySelected ? null : groupKey);
+
+        if (!isCurrentlySelected) {
+            setScrollToCardId(groupKey);
+        }
     };
 
     const handleNodeClick = (nodeId: string, node: any) => {
         const nodeGroupKey = getGroupKey(node.id);
         setSelectedItem(nodeId);
         setSelectedGroup(nodeGroupKey);
+
+        const isParentNode = node.labels?.includes('Act') || node.labels?.includes('CaseLaw');
+
+        if (isParentNode) {
+            setScrollToCardId(nodeGroupKey);
+        } else {
+            setScrollToCardId(nodeId);
+        }
 
         if (node.x !== undefined && node.y !== undefined) {
             zoomToNodeGraph({
@@ -564,6 +587,9 @@ const ChatRightPanel = ({
                                                 }`}
                                             >
                                                 <AccordionTrigger
+                                                    ref={(el) => {
+                                                        accordionTriggerRefs.current[groupKey] = el;
+                                                    }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleGroupClick(groupKey);
