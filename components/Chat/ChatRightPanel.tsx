@@ -281,6 +281,15 @@ const ChatRightPanel = ({
 
         if (!isCurrentlySelected) {
             setScrollToCardId(groupKey);
+
+            const parentNode = parentNodes[groupKey];
+            if (parentNode && parentNode.x !== undefined && parentNode.y !== undefined) {
+                zoomToNodeGraph({
+                    id: parentNode.id,
+                    x: parentNode.x,
+                    y: parentNode.y,
+                });
+            }
         }
     };
 
