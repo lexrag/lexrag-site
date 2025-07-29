@@ -17,6 +17,15 @@ interface ChatGraph3DProps {
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId?: Dispatch<SetStateAction<string>>;
     isOrbitEnabled?: boolean;
+
+    expandedNodes: Set<string>;
+    setExpandedNodes: Dispatch<SetStateAction<Set<string>>>;
+    nodeHierarchy: Record<string, Set<string>>;
+    setNodeHierarchy: Dispatch<SetStateAction<Record<string, Set<string>>>>;
+    expandedData: { nodes: any[]; links: any[] };
+    setExpandedData: Dispatch<SetStateAction<{ nodes: any[]; links: any[] }>>;
+    loadingNodes: Set<string>;
+    setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
 }
 
 const ChatGraph3D = ({
@@ -27,16 +36,20 @@ const ChatGraph3D = ({
     handleCardData,
     handleScrollToCardId,
     isOrbitEnabled: externalIsOrbitEnabled,
+    expandedNodes,
+    setExpandedNodes,
+    nodeHierarchy,
+    setNodeHierarchy,
+    expandedData,
+    setExpandedData,
+    loadingNodes,
+    setLoadingNodes,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
-    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
-    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
-    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);

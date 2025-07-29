@@ -23,6 +23,11 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
+    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
+    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-fit" dir={direction}>
@@ -36,7 +41,20 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                     </DialogHeader>
                     <DialogBody>
                         <TabsContent value="2d">
-                            <ChatGraph2D data={data} layers={graphLayers} handleCardData={handleCardData} handleScrollToCardId={setScrollToCardId} />
+                            <ChatGraph2D 
+                                data={data} 
+                                layers={graphLayers} 
+                                handleCardData={handleCardData} 
+                                handleScrollToCardId={setScrollToCardId}
+                                expandedNodes={expandedNodes}
+                                setExpandedNodes={setExpandedNodes}
+                                nodeHierarchy={nodeHierarchy}
+                                setNodeHierarchy={setNodeHierarchy}
+                                expandedData={expandedData}
+                                setExpandedData={setExpandedData}
+                                loadingNodes={loadingNodes}
+                                setLoadingNodes={setLoadingNodes}
+                            />
                         </TabsContent>
                         <TabsContent value="3d">
                             <ChatGraph3D 
@@ -45,6 +63,14 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, graphLayers, data, hand
                                 handleCardData={handleCardData} 
                                 handleScrollToCardId={setScrollToCardId}
                                 isOrbitEnabled={isOrbitEnabled}
+                                expandedNodes={expandedNodes}
+                                setExpandedNodes={setExpandedNodes}
+                                nodeHierarchy={nodeHierarchy}
+                                setNodeHierarchy={setNodeHierarchy}
+                                expandedData={expandedData}
+                                setExpandedData={setExpandedData}
+                                loadingNodes={loadingNodes}
+                                setLoadingNodes={setLoadingNodes}
                             />
                         </TabsContent>
                     </DialogBody>

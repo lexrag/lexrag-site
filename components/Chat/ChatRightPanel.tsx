@@ -48,6 +48,11 @@ const ChatRightPanel = ({
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
+    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
+    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -412,6 +417,14 @@ const ChatRightPanel = ({
                                     data={currentMessage}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    expandedNodes={expandedNodes}
+                                    setExpandedNodes={setExpandedNodes}
+                                    nodeHierarchy={nodeHierarchy}
+                                    setNodeHierarchy={setNodeHierarchy}
+                                    expandedData={expandedData}
+                                    setExpandedData={setExpandedData}
+                                    loadingNodes={loadingNodes}
+                                    setLoadingNodes={setLoadingNodes}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -423,6 +436,14 @@ const ChatRightPanel = ({
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
                                     isOrbitEnabled={isOrbitEnabled}
+                                    expandedNodes={expandedNodes}
+                                    setExpandedNodes={setExpandedNodes}
+                                    nodeHierarchy={nodeHierarchy}
+                                    setNodeHierarchy={setNodeHierarchy}
+                                    expandedData={expandedData}
+                                    setExpandedData={setExpandedData}
+                                    loadingNodes={loadingNodes}
+                                    setLoadingNodes={setLoadingNodes}
                                 />
                             )}
 
