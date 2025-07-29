@@ -44,9 +44,9 @@ export function ChatSidebarPanelHeader({
             <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 size-4" />
                 <Input placeholder="Search conversations" onChange={handleInputChange} className="pl-9 pr-9" value="" />
-                <Link href="/chat/new" className="absolute right-3 top-1/2 -translate-y-1/2">
+                <button onClick={() => window.location.replace("/chat/new")} className="absolute right-3 top-1/2 -translate-y-1/2">
                     <MessageSquarePlus className="size-4 text-muted-foreground hover:text-primary" />
-                </Link>
+                </button>
             </div>
         </div>
     );

@@ -9,13 +9,14 @@ interface ChatItemProps {
 
 export function ChatItem({ thread_id, title, onDeleteConversation }: ChatItemProps) {
     return (
-        <li
+        <Link
+            href={`/chat/${thread_id}`}
             key={thread_id}
             className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
         >
-            <Link className="text-sm text-gray-800 truncate max-w-[85%]" href={`/chat/${thread_id}`}>
+            <p className="text-sm text-gray-800 truncate max-w-[85%]">
                 {title || 'New chat'}
-            </Link>
+            </p>
             <div
                 className="md:hidden block group-hover:block"
                 onClick={(e) => {
@@ -25,6 +26,6 @@ export function ChatItem({ thread_id, title, onDeleteConversation }: ChatItemPro
             >
                 <Trash2 size={16} className="text-muted-foreground hover:text-destructive transition" />
             </div>
-        </li>
+        </Link>
     );
 }

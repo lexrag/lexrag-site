@@ -462,7 +462,7 @@ const ChatRightPanel = ({
                             </div>
                         </div>
 
-                        {!!currentMessage && (
+                        {(!!currentMessage && Object.entries(groupedNodes).length > 0)  && (
                             <div
                                 className={`px-3 py-2 overflow-hidden transition-all duration-300 ${
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
@@ -152,22 +151,6 @@ export default function ChatPage() {
                 />
             </div>
 
-            <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
-                <div className="w-1/4" />
-                <div className="w-1/4 flex justify-start">
-                    <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
-                        <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
-                            Company
-                        </Link>
-                        <Link
-                            href={'/terms-and-conditions'}
-                            className="text-gray-600 dark:text-gray-300 hover:text-primary"
-                        >
-                            Legal Docs
-                        </Link>
-                    </nav>
-                </div>
-            </footer>
         </div>
     );
 }
