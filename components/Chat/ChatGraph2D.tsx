@@ -358,7 +358,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
             const linkForce = fg.d3Force('link');
 
             if (linkForce) {
-                linkForce.distance(100).strength(0.3);
+                linkForce.distance(100).strength(0.1);
             }
 
             const chargeForce = fg.d3Force('charge');
@@ -495,7 +495,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
 
     const getNodeColor = (node: any) => {
         if (highlightedNodeId === node.id) {
-            return '#fbbf24'; // Gold for highlighted
+            return '#00ffff'; // Сyan for highlighted
         }
 
         if (loadingNodes.has(node.id)) {

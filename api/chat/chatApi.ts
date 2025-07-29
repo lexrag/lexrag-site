@@ -23,6 +23,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const currentResponseRef = useRef(currentResponseContent);
     const accumulatedContentRef = useRef('');
     const graphDataRef = useRef<GraphData | null>(null);
+    const [currentGraphData, setCurrentGraphData] = useState<GraphData | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
@@ -64,6 +65,22 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                 data.name === 'all_retrieved_nodes_with_neighbors' ||
                 data.name === 'relevant_context'
             ) {
+                const [key] = Object.keys(data.params);
+
+                const keyMap = {
+                    relevant_retrieved_nodes: 'relevantRetrievedNodes',
+                    all_retrieved_nodes: 'allRetrievedNodes',
+                    all_retrieved_nodes_with_neighbors: 'allRetrievedNodesWithNeighbors',
+                    relevant_context: 'relevantContext',
+                } as any;
+
+                const mappedKey = keyMap[key];
+
+                setCurrentGraphData((prevState) => ({
+                    ...prevState || {},
+                    [mappedKey]: data.params[key],
+                }));
+
                 graphDataRef.current = {
                     ...graphDataRef.current,
                     ...data.params,
@@ -171,5 +188,6 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         copyToClipboard,
         copiedMessageId,
         bottomRef,
+        currentGraphData,
     };
 };

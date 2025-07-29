@@ -22,11 +22,19 @@ export default function ChatPage() {
     const router = useRouter();
     const { socket, conversations, setConversations } = useChatContext();
     useViewportHeight();
-    const { messages, isThinking, status, sendMessage, currentResponseContent, copyToClipboard, copiedMessageId } =
-        useChat({
-            websocket: socket,
-            setConversations,
-        });
+    const {
+        messages,
+        isThinking,
+        status,
+        sendMessage,
+        currentResponseContent,
+        copyToClipboard,
+        copiedMessageId,
+        currentGraphData,
+    } = useChat({
+        websocket: socket,
+        setConversations,
+    });
 
     const [graphView, setGraphView] = useState<string>('2d');
     const [isOpenLeftSheet, setIsOpenLeftSheet] = useState<boolean>(false);
@@ -52,9 +60,14 @@ export default function ChatPage() {
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
 
     useEffect(() => {
+        if (!!currentGraphData) {
+            setCurrentMessage(currentGraphData);
+            return;
+        }
+
         const message = [...messages].reverse().find(({ direction }) => direction === 'incoming');
         setCurrentMessage(message);
-    }, [messages]);
+    }, [messages, currentGraphData]);
 
     const onDeleteConversation = async (threadId: string) => {
         await deleteConversation(threadId);
