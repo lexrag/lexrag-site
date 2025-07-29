@@ -77,6 +77,7 @@ export default function ChatPage() {
                 open={isOpenGraphModal}
                 onOpenChange={setIsOpenGraphModal}
                 graphView={graphView}
+                setGraphView={setGraphView}
                 graphLayers={graphLayers}
                 data={currentMessage}
                 handleCardData={setCardData}
