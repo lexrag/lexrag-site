@@ -102,7 +102,13 @@ const PersonalInfoCard = ({ user }: { user: User }) => {
 
     return (
         <CardWrapper title="Personal Information">
-            <AvatarRow label="Photo">150x150px JPEG, PNG Image</AvatarRow>
+            <AvatarRow 
+                label="Photo" 
+                userId={user.id.toString()}
+                userName={user.first_name}
+            >
+                150x150px JPEG, PNG Image
+            </AvatarRow>
             <InputRow label="First Name" value={firstName} id="first_name" onChange={setFirstName} />
             <InputRow label="Last Name" value={lastName} id="last_name" onChange={setLastName} />
             <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 p-4">

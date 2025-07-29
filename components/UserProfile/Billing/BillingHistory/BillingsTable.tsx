@@ -48,7 +48,8 @@ const BillingsTable = () => {
             setPayments(Array.isArray(data.payments) ? data.payments : []);
             setTotalRows(data.total || 0);
             setTotalPages(data.total_pages || 1);
-        } catch {
+        } catch (error) {
+            console.error('Error fetching payments:', error);
             setPayments([]);
             setTotalRows(0);
             setTotalPages(1);

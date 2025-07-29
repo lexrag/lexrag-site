@@ -10,30 +10,79 @@ import { CurrentSubscription } from '@/types/CurrentSubscription';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import CancelPlanDialog from './Plans/CancelPlanDialog';
 
 const BillingPlan = () => {
     const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         (async () => {
-            const sub = await getCurrentSubscription();
-            if (sub.detail || sub.status === 'pending') {
+            try {
+                setIsLoadingSubscription(true);
+                setError(null);
+                const sub = await getCurrentSubscription();
+                
+                // Проверяем, есть ли ошибка в ответе (detail обычно содержит сообщение об ошибке)
+                if (sub.detail && typeof sub.detail === 'string' && sub.detail.includes('error')) {
+                    setCurrentSubscription(null);
+                } else if (sub.status === 'pending') {
+                    setCurrentSubscription(null);
+                } else {
+                    // Если есть данные подписки, устанавливаем их
+                    setCurrentSubscription(sub);
+                }
+            } catch (err) {
+                console.error('Error fetching subscription:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load subscription');
                 setCurrentSubscription(null);
-            } else {
-                setCurrentSubscription(sub);
+            } finally {
+                setIsLoadingSubscription(false);
             }
         })();
     }, []);
 
     const handleConfirmCancelPlan = async () => {
         setLoading(true);
-        await cancelSubscription(currentSubscription?.id ?? '');
-        setLoading(false);
-        setDialogOpen(false);
-        setCurrentSubscription(null);
+        try {
+            await cancelSubscription();
+            setDialogOpen(false);
+            setCurrentSubscription(null);
+        } catch (err) {
+            console.error('Error canceling subscription:', err);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (isLoadingSubscription) {
+        return (
+            <Card className="w-full">
+                <CardContent className="w-full">
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span className="ml-2">Loading subscription...</span>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (error) {
+        return (
+            <Card className="w-full">
+                <CardContent className="w-full">
+                    <div className="flex items-center justify-center py-8 text-red-500">
+                        <span>Error: {error}</span>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <IntlProvider locale="en-US">
@@ -44,14 +93,16 @@ const BillingPlan = () => {
                             <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-2.5">
                                     <h2 className="text-2xl font-semibold text-mono">
-                                        {currentSubscription?.tariff?.name} Plan
+                                        {currentSubscription?.tariff?.name || 'No Plan'} Plan
                                     </h2>
-                                    <Badge variant="success" appearance="outline" size="md">
-                                        {currentSubscription?.tariff?.duration === 12 ? 'Yearly' : 'Monthly'}
-                                    </Badge>
+                                    {currentSubscription?.tariff && (
+                                        <Badge variant="success" appearance="outline" size="md">
+                                            {currentSubscription?.tariff?.duration === 12 ? 'Yearly' : 'Monthly'}
+                                        </Badge>
+                                    )}
                                 </div>
                                 <p className="text-sm text-secondary-foreground">
-                                    {currentSubscription?.tariff?.description}
+                                    {currentSubscription?.tariff?.description || 'No active subscription'}
                                 </p>
                             </div>
                             <div className="flex gap-2.5">

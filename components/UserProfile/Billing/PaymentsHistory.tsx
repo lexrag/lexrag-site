@@ -13,16 +13,25 @@ import PaymentsTable from './components/PaymentsTable';
 const PaymentsHistory = () => {
     const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         (async () => {
-            setLoading(true);
-            const data = await getPaymentHistory({
-                page: 1,
-                per_page: 3,
-            });
-            setPayments(Array.isArray(data.payments) ? data.payments : []);
-            setLoading(false);
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await getPaymentHistory({
+                    page: 1,
+                    per_page: 3,
+                });
+                setPayments(Array.isArray(data.payments) ? data.payments : []);
+            } catch (err) {
+                console.error('Error fetching payment history:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load payment history');
+                setPayments([]);
+            } finally {
+                setLoading(false);
+            }
         })();
     }, []);
 
@@ -31,6 +40,10 @@ const PaymentsHistory = () => {
             {loading ? (
                 <div className="py-8 flex items-center justify-center text-muted-foreground">
                     <Loader2 className="w-10 h-10 animate-spin" />
+                </div>
+            ) : error ? (
+                <div className="py-8 flex items-center justify-center text-red-500">
+                    <span>Error: {error}</span>
                 </div>
             ) : (
                 <PaymentsTable payments={payments} />

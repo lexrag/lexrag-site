@@ -4,7 +4,7 @@ export const enable2FA = async (otp_code: string) => {
         return { success: false, error: 'No token' };
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/twofactor/enable`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/2fa/enable`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,

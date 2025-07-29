@@ -5,7 +5,7 @@ export const downloadUserPhoto = async () => {
         return null;
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-avatars/download`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/avatar/`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,

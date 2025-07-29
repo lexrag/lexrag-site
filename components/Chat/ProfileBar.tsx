@@ -16,14 +16,16 @@ const ProfileBar = ({ user }: ProfileBarProps) => {
 
     const router = useRouter();
 
+    const avatarKey = user?.id ? `avatarImage_${user.id.toString()}` : 'avatarImage';
+
     useEffect(() => {
-        const savedAvatar = localStorage.getItem('avatarImage');
+        const savedAvatar = localStorage.getItem(avatarKey);
         if (savedAvatar) {
             setAvatarUrl(savedAvatar);
         } else {
             setAvatarUrl(undefined);
         }
-    }, []);
+    }, [avatarKey]);
 
     return (
         <div

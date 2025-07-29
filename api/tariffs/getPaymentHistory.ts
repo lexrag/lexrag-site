@@ -31,13 +31,26 @@ export const getPaymentHistory = async ({
     if (start_date) params.append('start_date', start_date);
     if (end_date) params.append('end_date', end_date);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/payment-history/?${params.toString()}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/payments/?${params.toString()}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-    const data = await response.json();
-    return data;
+        console.log('Payment history response status:', response.status);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Payment history data:', data);
+        
+        return data;
+    } catch (error) {
+        console.error('Error fetching payment history:', error);
+        throw error;
+    }
 };
