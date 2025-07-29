@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import { getMeClient } from '@/api/auth/getMeClient';
 import { Conversation } from '@/types/Conversation';
 import { useUser } from '@/providers/user-provider';
-import { ChatSidebarHeader } from './ChatSidebarHeader';
 import { ChatSidebarMenu } from './ChatSidebarMenu';
-import { ChatSidebarFooter } from './ChatSidebarFooter';
-
+import { ChatSidebarPanelFooter } from './ChatSidebarPanelFooter';
+import { ChatSidebarPanelHeader } from './ChatSidebarPanelHeader';
 
 interface ChatLeftPanelProps {
     conversations: Conversation[];
@@ -16,9 +15,14 @@ interface ChatLeftPanelProps {
     setActiveLeftTab: (tab: string) => void;
 }
 
-const ChatLeftPanel = ({ conversations, onDeleteConversation, activeLeftTab, setActiveLeftTab }: ChatLeftPanelProps) => {
+const ChatLeftPanel = ({
+    conversations,
+    onDeleteConversation,
+    activeLeftTab,
+    setActiveLeftTab,
+}: ChatLeftPanelProps) => {
     const { setUser } = useUser();
-    const [showSettings, setShowSettings] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -28,49 +32,28 @@ const ChatLeftPanel = ({ conversations, onDeleteConversation, activeLeftTab, set
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        if (activeLeftTab !== 'none') {
-            setShowSettings(false);
-        }
-    }, [activeLeftTab]);
-
-    const handleToggleSettings = () => {
-        const newShowSettings = !showSettings;
-        setShowSettings(newShowSettings);
-        
-        if (newShowSettings) {
-            setActiveLeftTab('none');
-        } else {
-            setActiveLeftTab('chats');
-        }
-    };
-
     return (
-        <aside className="h-full w-1/4 hidden md:flex flex-col">
+        <aside className="h-full w-1/4 hidden md:flex flex-col border-r">
             <div className="w-full flex flex-col h-full">
-                {/* Header with tabs - sticky */}
-                <div className="flex items-center justify-between p-3 bg-background sticky top-0 z-10">
-                    <ChatSidebarHeader 
+                <div className="flex items-center justify-between p-3 pb-1 bg-background sticky top-0 z-10">
+                    <ChatSidebarPanelHeader
                         activeTab={activeLeftTab}
-                        onTabChange={setActiveLeftTab}
-                        isHomePage={false}
+                        setActiveTab={setActiveLeftTab}
+                        isSidebarOpen={isSidebarOpen}
+                        onSidebarToggle={() => setIsSidebarOpen((prev) => !prev)}
                     />
                 </div>
-                
-                {/* Content area */}
+
                 <div className="flex-1">
-                    <ChatSidebarMenu 
+                    <ChatSidebarMenu
                         conversations={conversations}
                         onDeleteConversation={onDeleteConversation}
-                        showSettings={showSettings}
+                        showSettings={false}
+                        isSidebarOpen={isSidebarOpen}
                     />
                 </div>
-                
-                {/* Footer */}
-                <ChatSidebarFooter 
-                    showSettings={showSettings}
-                    onToggleSettings={handleToggleSettings}
-                />
+
+                <ChatSidebarPanelFooter />
             </div>
         </aside>
     );

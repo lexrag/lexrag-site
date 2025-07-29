@@ -6,7 +6,7 @@ export const updateUserPhoto = async (photo: FormData) => {
     }
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-avatars/delete`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/avatar/`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -20,7 +20,7 @@ export const updateUserPhoto = async (photo: FormData) => {
         console.error(error);
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-avatars/upload`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/avatar/`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,

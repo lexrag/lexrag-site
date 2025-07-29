@@ -5,18 +5,20 @@ export const createSubscription = async (tariff_id: string) => {
         throw new Error('No token found');
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/subscriptions/create`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/subscriptions/`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            tariff_id,
-        }),
+        body: JSON.stringify({ tariff_id }),
     });
 
-    const data = await response.json();
+    const responseData = await response.json();
 
-    return data;
+    if (response.ok) {
+        return responseData;
+    }
+
+    throw new Error(responseData.detail || 'Failed to create subscription');
 };

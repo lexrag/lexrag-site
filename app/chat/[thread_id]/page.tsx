@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { usePathname, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
@@ -18,8 +16,6 @@ import { useChatContext } from '@/components/Chat/ChatProvider';
 import ChatRightPanel from '@/components/Chat/ChatRightPanel';
 import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
-// import ChatTextAreaMobile from '@/components/Chat/ChatTextAreaMobile';
-import { MegaMenu } from '@/components/Header/MegaMenu';
 
 export default function ChatPage() {
     const pathname = usePathname();
@@ -73,8 +69,6 @@ export default function ChatPage() {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
 
-
-
     if (!socket) return null;
 
     return (
@@ -89,7 +83,6 @@ export default function ChatPage() {
             />
             <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />
-                <MegaMenu isHomePage={pathname === '/'} />
                 <Menu className="size-6" onClick={() => setIsOpenRightSheet((prevState) => !prevState)} />
             </header>
             <ChatLeftSheet
@@ -112,7 +105,7 @@ export default function ChatPage() {
                 cardData={cardData}
                 handleCardData={setCardData}
             />
-            <main className="flex flex-1 overflow-hidden pb-4 z-40 md:pt-0 pt-2 min-h-0">
+            <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}
@@ -158,22 +151,6 @@ export default function ChatPage() {
                 />
             </div>
 
-            <footer className="absolute bottom-0 left-0 w-full hidden md:flex items-center justify-between bg-transparent py-4">
-                <div className="w-1/4" />
-                <div className="w-1/4 flex justify-start">
-                    <nav className="flex order-1 md:order-2 gap-4 font-normal text-2sm">
-                        <Link href="/company" className="text-gray-600 dark:text-gray-300 hover:text-primary">
-                            Company
-                        </Link>
-                        <Link
-                            href={'/terms-and-conditions'}
-                            className="text-gray-600 dark:text-gray-300 hover:text-primary"
-                        >
-                            Legal Docs
-                        </Link>
-                    </nav>
-                </div>
-            </footer>
         </div>
     );
 }

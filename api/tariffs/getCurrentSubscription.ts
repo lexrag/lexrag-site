@@ -5,14 +5,18 @@ export const getCurrentSubscription = async () => {
         throw new Error('No token found');
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/subscriptions/any`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/subscriptions/any`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-    const data = await response.json();
-
-    return data;
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error in getCurrentSubscription:', error);
+        throw error;
+    }
 };

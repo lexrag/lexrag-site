@@ -6,7 +6,7 @@ export const deleteUserPhoto = async () => {
     }
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-avatars/delete`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/avatar/`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`,

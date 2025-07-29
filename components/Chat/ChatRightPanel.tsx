@@ -361,6 +361,8 @@ const ChatRightPanel = ({
         setRightPanelWidth(window.innerWidth * 0.25);
     }, []);
 
+
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!isResizing) return;
@@ -507,7 +509,7 @@ const ChatRightPanel = ({
                             </div>
                         </div>
 
-                        {!!currentMessage && (
+                        {(!!currentMessage && Object.entries(groupedNodes).length > 0)  && (
                             <div
                                 className={`px-3 py-2 overflow-hidden transition-all duration-300 ${
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'
@@ -611,17 +613,16 @@ const ChatRightPanel = ({
                                                 }`}
                                             >
                                                 <AccordionTrigger
-                                                    ref={(el) => {
-                                                        accordionTriggerRefs.current[groupKey] = el;
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleGroupClick(groupKey);
-                                                    }}
                                                     className="hover:no-underline"
                                                 >
                                                     <div className="text-left flex items-center gap-2 w-full">
-                                                        <div className="flex-1 min-w-0">
+                                                        <div 
+                                                            className="flex-1 min-w-0 cursor-pointer"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleGroupClick(groupKey);
+                                                            }}
+                                                        >
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <span
                                                                     className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getTypeBadgeColor(groupInfo.type)}`}

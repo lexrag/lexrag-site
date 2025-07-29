@@ -41,13 +41,12 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
             <textarea
                 className="flex-1 w-full md:p-3 p-2 bg-transparent text-foreground 
                    focus:ring-0 focus:outline-none overflow-y-auto resize-none 
-                   h-[50px] placeholder:text-muted-foreground"
+                   h-[50px] placeholder:text-muted-foreground text-[16px]"
                 value={input}
                 onChange={handleTextAreaChange}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 rows={1}
-                style={{ fontSize: '16px' }}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="sentences"

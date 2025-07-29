@@ -14,6 +14,7 @@ import {
     Code,
     Codepen,
     Coffee,
+    CreditCard,
     File as DocumentIcon,
     Euro,
     Eye,
@@ -26,6 +27,8 @@ import {
     Grid,
     Heart,
     HelpCircle,
+    History,
+    Home,
     Kanban,
     Key,
     Layout,
@@ -36,22 +39,27 @@ import {
     Network,
     Users as PeopleIcon,
     Plug,
+    ReceiptText,
     ScrollText,
     Settings,
     Share2,
     Shield,
+    ShieldCheck,
     ShieldUser,
     ShoppingCart,
+    Sparkles,
     SquareMousePointer,
     Star,
     Theater,
     TrendingUp,
+    User,
     UserCheck,
     UserCircle,
     Users,
     Briefcase as WorkIcon,
     Zap,
 } from 'lucide-react';
+import { type SidebarMenuGroup } from '@/types/MenuItem';
 import { type MenuConfig } from './types';
 
 export const MENU_SIDEBAR: MenuConfig = [
@@ -385,6 +393,38 @@ export const MENU_SIDEBAR: MenuConfig = [
     { title: 'Store - Services', icon: Codepen, disabled: true },
     { title: 'AI Promt', icon: Theater, disabled: true },
     { title: 'Invoice Generator', icon: ScrollText, disabled: true },
+];
+
+export const MENU_SIDEBAR_ITEMS: SidebarMenuGroup[] = [
+    {
+        group: 'Home',
+        items: [
+            { href: '/', Icon: Home, label: 'Home' },
+            { href: '/features', Icon: Sparkles, label: 'Features' },
+            { href: '/chat/new', Icon: MessageSquare, label: 'Chat' },
+        ],
+    },
+    {
+        group: 'Profile',
+        items: [
+            { href: '/profile', Icon: User, label: 'Profile' },
+            { href: '/profile/security', Icon: Shield, label: 'Security' },
+            { href: '/profile/security/sessions', Icon: History, label: 'Sessions' },
+            { href: '/profile/compliance', Icon: ShieldCheck, label: 'Compliance' },
+        ],
+    },
+    {
+        group: 'Invoices',
+        items: [
+            { href: '/profile/billing', Icon: CreditCard, label: 'Billing' },
+            { href: '/profile/billing/plans', Icon: ReceiptText, label: 'Plans' },
+            { href: '/profile/billing/history', Icon: History, label: 'Payments' },
+        ],
+    },
+    {
+        group: 'Settings',
+        items: [{ href: '/profile/settings', Icon: Settings, label: 'Settings' }],
+    },
 ];
 
 export const MENU_SIDEBAR_CUSTOM: MenuConfig = [

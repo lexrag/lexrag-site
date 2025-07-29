@@ -4,7 +4,7 @@ export const delete2FA = async () => {
         return { success: false, error: 'No token' };
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/twofactor/two-factor`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/2fa/`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,

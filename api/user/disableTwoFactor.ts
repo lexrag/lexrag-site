@@ -4,7 +4,7 @@ export const disableTwoFactor = async () => {
         return { success: false, error: 'No token' };
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/twofactor/disable  `, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/2fa/disable`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,

@@ -43,7 +43,7 @@ const BillingsTableBody = ({ payments, columns }: BillingsTableBodyProps) => (
                             <FormattedNumber
                                 value={payment.amount / 100}
                                 style="currency"
-                                currency={payment.currency.toUpperCase()}
+                                currency={payment.currency?.toUpperCase() || 'USD'}
                             />
                         </TableCell>
                         <TableCell className="px-4 py-2 flex items-center justify-center border border-b-0">

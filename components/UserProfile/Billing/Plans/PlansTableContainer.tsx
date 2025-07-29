@@ -19,48 +19,67 @@ const PlansTableContainer = () => {
 
     useEffect(() => {
         (async () => {
-            const sub = await getCurrentSubscription();
-            setCurrentSubscription(sub);
+            try {
+                const sub = await getCurrentSubscription();
+                setCurrentSubscription(sub);
+            } catch (error) {
+                console.error('Error fetching current subscription:', error);
+                setCurrentSubscription(null);
+            }
         })();
     }, []);
 
     const handleChangePlan = async (newTariffId: string) => {
         if (!currentSubscription) return;
-        if (currentSubscription.status === 'pending') {
-            setLoading(true);
-            await cancelSubscription(currentSubscription.id);
-            const res = await createSubscription(newTariffId);
+        
+        try {
+            if (currentSubscription.status === 'pending') {
+                setLoading(true);
+                await cancelSubscription();
+                const res = await createSubscription(newTariffId);
+                setLoading(false);
+                if (res.checkout_url) window.location.href = res.checkout_url;
+                else toast.error('Failed to create subscription');
+                return;
+            }
+            if (currentSubscription.status === 'active') {
+                setNextTariffId(newTariffId);
+                setDialogType('change');
+                setDialogOpen(true);
+            }
+            if (currentSubscription.status === 'canceled' || currentSubscription.detail) {
+                setLoading(true);
+                const res = await createSubscription(newTariffId);
+                setLoading(false);
+                if (res.checkout_url) window.location.href = res.checkout_url;
+                else toast.error('Failed to create subscription');
+                return;
+            }
+        } catch (error) {
+            console.error('Error changing plan:', error);
+            toast.error('Failed to change plan');
             setLoading(false);
-            if (res.checkout_url) window.location.href = res.checkout_url;
-            else toast.error('Failed to create subscription');
-            return;
-        }
-        if (currentSubscription.status === 'active') {
-            setNextTariffId(newTariffId);
-            setDialogType('change');
-            setDialogOpen(true);
-        }
-        if (currentSubscription.status === 'canceled' || currentSubscription.detail) {
-            setLoading(true);
-            const res = await createSubscription(newTariffId);
-            setLoading(false);
-            if (res.checkout_url) window.location.href = res.checkout_url;
-            else toast.error('Failed to create subscription');
-            return;
         }
     };
 
     const handleConfirmChangePlan = async () => {
         if (!currentSubscription || !nextTariffId) return;
-        setLoading(true);
-        await cancelSubscription(currentSubscription.id);
-        const res = await createSubscription(nextTariffId);
-        setLoading(false);
-        setDialogOpen(false);
-        setNextTariffId(null);
-        setDialogType(null);
-        if (res.checkout_url) window.location.href = res.checkout_url;
-        else toast.error('Failed to create subscription');
+        
+        try {
+            setLoading(true);
+            await cancelSubscription();
+            const res = await createSubscription(nextTariffId);
+            setLoading(false);
+            setDialogOpen(false);
+            setNextTariffId(null);
+            setDialogType(null);
+            if (res.checkout_url) window.location.href = res.checkout_url;
+            else toast.error('Failed to create subscription');
+        } catch (error) {
+            console.error('Error confirming plan change:', error);
+            toast.error('Failed to change plan');
+            setLoading(false);
+        }
     };
 
     const handleCancelOnlyPlan = () => {
@@ -70,13 +89,20 @@ const PlansTableContainer = () => {
 
     const handleConfirmCancelOnlyPlan = async () => {
         if (!currentSubscription) return;
-        setLoading(true);
-        await cancelSubscription(currentSubscription.id);
-        setCurrentSubscription(null);
-        setLoading(false);
-        setDialogOpen(false);
-        setDialogType(null);
-        toast.success('Subscription cancelled');
+        
+        try {
+            setLoading(true);
+            await cancelSubscription();
+            setCurrentSubscription(null);
+            setLoading(false);
+            setDialogOpen(false);
+            setDialogType(null);
+            toast.success('Subscription cancelled');
+        } catch (error) {
+            console.error('Error canceling plan:', error);
+            toast.error('Failed to cancel subscription');
+            setLoading(false);
+        }
     };
 
     return (

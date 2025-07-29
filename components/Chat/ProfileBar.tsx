@@ -1,63 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import { LogOut, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { LogOut } from 'lucide-react';
 import { User } from '@/types/User';
+import { useLogOut } from '@/hooks/use-log-out';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
-import { useLogOut } from '@/hooks/use-log-out';
 
 interface ProfileBarProps {
     user: User | null;
-    showSettings: boolean;
-    onToggleSettings: () => void;
 }
 
-const ProfileBar = ({ user, showSettings, onToggleSettings }: ProfileBarProps) => {
+const ProfileBar = ({ user }: ProfileBarProps) => {
     const logOut = useLogOut();
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
+    const router = useRouter();
+
+    const avatarKey = user?.id ? `avatarImage_${user.id.toString()}` : 'avatarImage';
+
     useEffect(() => {
-        const savedAvatar = localStorage.getItem('avatarImage');
+        const savedAvatar = localStorage.getItem(avatarKey);
         if (savedAvatar) {
             setAvatarUrl(savedAvatar);
         } else {
             setAvatarUrl(undefined);
         }
-    }, []);
+    }, [avatarKey]);
 
     return (
         <div
-            className="w-full px-4 py-4 flex items-center gap-3 bg-background"
-            style={{ height: 80 }}
+            className="w-full px-4 pt-2 flex items-center gap-3 bg-background border-t h-[80px] cursor-pointer"
+            onClick={() => {
+                router.push('/profile');
+            }}
         >
-            <Avatar className="cursor-pointer" onClick={onToggleSettings}>
+            <Avatar className="cursor-pointer">
                 <AvatarImage alt={`${user?.first_name} ${user?.last_name}`} src={avatarUrl} />
                 <AvatarFallback>{user?.first_name?.[0] || '?'}</AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0 cursor-pointer" onClick={onToggleSettings}>
+            <div className="flex-1 min-w-0 cursor-pointer">
                 <div className="font-semibold truncate">
                     {user?.first_name} {user?.last_name}
                 </div>
                 <div className="text-xs truncate">{user?.email}</div>
             </div>
-            {!showSettings ? (
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="ml-2" 
-                    onClick={onToggleSettings}
-                >
-                    <Settings className="h-5 w-5" />
-                </Button>
-            ) : (
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="ml-2" 
-                    onClick={logOut}
-                >
-                    <LogOut className="h-5 w-5" />
-                </Button>
-            )}
+
+            <Button variant="ghost" size="icon" className="ml-2" onClick={logOut}>
+                <LogOut className="h-5 w-5" />
+            </Button>
         </div>
     );
 };

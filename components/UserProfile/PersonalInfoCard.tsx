@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { updateUser } from '@/api/user/updateUser';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { useUser } from '@/providers/user-provider';
+import { User } from '@/types/User';
 import CardWrapper from '@/components/ui/card-wrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import InputRow from '@/components/UserProfile/components/InputRow';
@@ -26,8 +26,7 @@ const personalInfoSchema = z.object({
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
-const PersonalInfoCard = () => {
-    const { user } = useUser();
+const PersonalInfoCard = ({ user }: { user: User }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [prevState, setPrevState] = useState<PersonalInfoFormData | null>(null);
     const [firstName, setFirstName] = useState(user?.first_name || '');
@@ -45,8 +44,6 @@ const PersonalInfoCard = () => {
             setCalendarMonth(new Date(birthday));
         }
     }, [birthday]);
-
-    if (!user) return null;
 
     const handleSave = async () => {
         const previous = {
@@ -105,7 +102,13 @@ const PersonalInfoCard = () => {
 
     return (
         <CardWrapper title="Personal Information">
-            <AvatarRow label="Photo">150x150px JPEG, PNG Image</AvatarRow>
+            <AvatarRow 
+                label="Photo" 
+                userId={user.id.toString()}
+                userName={user.first_name}
+            >
+                150x150px JPEG, PNG Image
+            </AvatarRow>
             <InputRow label="First Name" value={firstName} id="first_name" onChange={setFirstName} />
             <InputRow label="Last Name" value={lastName} id="last_name" onChange={setLastName} />
             <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 p-4">

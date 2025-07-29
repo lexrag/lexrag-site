@@ -5,18 +5,15 @@ import { gdprEmailExport } from '@/api/user/gdprEmailExport';
 import { format } from 'date-fns';
 import { DownloadIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { useUser } from '@/providers/user-provider';
+import { User } from '@/types/User';
 import { Button } from '@/components/ui/button';
 import CardWrapper from '@/components/ui/card-wrapper';
 import Row from '../components/Row';
 import DeleteAccount from './DeleteAccount';
 
-const Legal = () => {
-    const { user: currentUser } = useUser();
+const Legal = ({ user }: { user: User }) => {
     const [requested, setRequested] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    if (!currentUser) return null;
 
     const handleRequest = async () => {
         setLoading(true);
@@ -35,7 +32,7 @@ const Legal = () => {
             <div>
                 <Row label="Accepted Terms" actionIcon={null}>
                     <span className="text-muted-foreground text-xs">
-                        {currentUser?.created_at ? format(new Date(currentUser.created_at), 'dd/MM/yyyy') : '—'}
+                        {user?.created_at ? format(new Date(user.created_at), 'dd/MM/yyyy') : '—'}
                     </span>
                 </Row>
                 <Row

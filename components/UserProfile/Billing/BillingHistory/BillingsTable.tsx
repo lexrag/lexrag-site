@@ -48,7 +48,8 @@ const BillingsTable = () => {
             setPayments(Array.isArray(data.payments) ? data.payments : []);
             setTotalRows(data.total || 0);
             setTotalPages(data.total_pages || 1);
-        } catch {
+        } catch (error) {
+            console.error('Error fetching payments:', error);
             setPayments([]);
             setTotalRows(0);
             setTotalPages(1);
@@ -72,7 +73,7 @@ const BillingsTable = () => {
     }, [payments, search]);
 
     const paymentMethodOptions = useMemo(() => {
-        const methods = Array.from(new Set(payments.map((p) => p.payment_method).filter(Boolean)));
+        const methods = Array.from(new Set(payments.map((p) => p.payment_method).filter(Boolean) as string[]));
         return methods.length > 0 ? methods : DEFAULT_PAYMENT_METHODS;
     }, [payments]);
 

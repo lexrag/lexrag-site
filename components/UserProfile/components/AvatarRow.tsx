@@ -14,19 +14,30 @@ const AvatarRow = ({
     children,
     className,
     onUpload,
-}: AvatarRowProps) => {
+    userId,
+    userName,
+}: AvatarRowProps & { userId?: string; userName?: string }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+    const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
     const [isUploading, setIsUploading] = useState(false);
 
-    useEffect(() => {
-        const savedAvatar = localStorage.getItem('avatarImage');
-        if (savedAvatar) {
-            setPreviewUrl(savedAvatar);
-        } else {
-            setPreviewUrl(undefined);
+    const avatarKey = userId ? `avatarImage_${userId}` : 'avatarImage';
+
+    const getInitials = () => {
+        if (userName) {
+            return userName.charAt(0).toUpperCase();
         }
-    }, []);
+        return '?';
+    };
+
+    useEffect(() => {
+        const savedAvatar = localStorage.getItem(avatarKey);
+        if (savedAvatar) {
+            setAvatarUrl(savedAvatar);
+        } else {
+            setAvatarUrl(undefined);
+        }
+    }, [avatarKey]);
 
     const handleAvatarClick = () => {
         fileInputRef.current?.click();
@@ -38,19 +49,18 @@ const AvatarRow = ({
         setIsUploading(true);
         try {
             const localUrl = URL.createObjectURL(file);
-            setPreviewUrl(localUrl);
+            setAvatarUrl(localUrl);
 
             const formData = new FormData();
             formData.append('file', file);
 
             const response = await updateUserPhoto(formData);
             if (!response?.success) throw new Error('Failed to upload image');
-            setPreviewUrl(response.data.file_url);
             if (onUpload) onUpload(response.data.file_url);
             toast.success('Profile photo updated!');
             await saveAvatarToLocalStorage();
         } catch (err) {
-            setPreviewUrl(undefined);
+            setAvatarUrl(undefined);
             toast.error((err as Error).message || 'Failed to upload image');
         } finally {
             setIsUploading(false);
@@ -66,8 +76,8 @@ const AvatarRow = ({
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const base64data = reader.result as string;
-                    localStorage.setItem('avatarImage', base64data);
-                    setPreviewUrl(base64data);
+                    localStorage.setItem(avatarKey, base64data);
+                    setAvatarUrl(base64data);
                 };
                 reader.readAsDataURL(blob);
             } catch {
@@ -89,8 +99,8 @@ const AvatarRow = ({
                             className="relative border-2 border-green-500 rounded-full overflow-hidden size-16 cursor-pointer"
                             onClick={handleAvatarClick}
                         >
-                            <AvatarImage alt="avatar" src={previewUrl || undefined} />
-                            <AvatarFallback>V</AvatarFallback>
+                            <AvatarImage alt="avatar" src={avatarUrl || undefined} />
+                            <AvatarFallback>{getInitials()}</AvatarFallback>
                             <div className="flex items-center justify-center cursor-pointer h-5 left-0 right-0 bottom-0 bg-black/25 absolute">
                                 {isUploading ? (
                                     <Loader2 className="animate-spin text-muted-foreground w-4 h-4" />

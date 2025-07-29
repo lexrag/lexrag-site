@@ -1,3 +1,4 @@
+import { getMeServer } from '@/api/auth/getMeServer';
 import BillingPlan from '@/components/UserProfile/Billing/BillingPlan';
 import Legal from '@/components/UserProfile/Compliance/Legal';
 import Other from '@/components/UserProfile/Other';
@@ -6,16 +7,18 @@ import LoginSessions from '@/components/UserProfile/Security/LoginSessions';
 import Security from '@/components/UserProfile/Security/Security';
 import Notifications from '@/components/UserProfile/Settings/Nofications';
 
-const SettingsPage = () => {
+const SettingsPage = async () => {
+    const user = await getMeServer();
+
     return (
-        <div className="flex flex-col w-full max-w-3xl gap-8 items-center justify-center px-4">
-            <PersonalInfoCard />
+        <div className="flex flex-col w-full max-w-5xl gap-8 items-center justify-center">
+            <PersonalInfoCard user={user} />
             <Other />
             <BillingPlan />
             <Notifications />
-            <Security />
+            <Security user={user} />
             <LoginSessions />
-            <Legal />
+            <Legal user={user} />
         </div>
     );
 };

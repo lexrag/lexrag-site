@@ -5,7 +5,7 @@ export const get2FAStatus = async () => {
         return { success: false, error: 'No token' };
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/twofactor/status`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/2fa/status`, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

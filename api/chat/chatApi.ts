@@ -8,10 +8,12 @@ import { Conversation } from '@/types/Conversation';
 import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
+import { EvaluatorRun } from '@/types/EvaluatorRun';
 
 interface UseChatArgs {
     websocket: WebSocket | null;
     setConversations?: React.Dispatch<React.SetStateAction<Conversation[]>>;
+    setEvaluatorRun?: React.Dispatch<React.SetStateAction<EvaluatorRun>>;
 }
 
 export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
@@ -47,7 +49,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     }, [messages, currentResponseContent]);
 
     useEffect(() => {
-        if (!websocket || !pathname.startsWith('/chat')) return;
+        if (!websocket || (!pathname.startsWith('/chat') && !pathname.startsWith("/evaluator"))) return;
 
         const handleMessage = async (event: MessageEvent) => {
             const data = JSON.parse(event.data);
@@ -67,6 +69,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                     ...data.params,
                 };
             }
+
             if (data.type === 'event') {
                 await eventHandler(data, { setConversations });
             }
@@ -98,11 +101,28 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                 setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
             }
+
+            if (data.name === 'evaluator') {
+                if (data.service_message.type === "message") {
+                    const message = data.service_message.message
+                    const direction = message.role === "ai" ? "incoming" : "outgoing";
+                    const html = await renderMessageMd(message.content);
+
+                    const newMessage: Message = {
+                        html,
+                        id: uuidv4(),
+                        content: message.content,
+                        direction: direction,
+                    };
+
+                    setMessages((prev) => [...prev, newMessage]);
+                }
+            }
         };
 
         websocket.onmessage = handleMessage;
 
-        if (threadId !== 'new') {
+        if (threadId !== 'new' && pathname.startsWith('/chat')) {
             getConversationSnapshot(threadId as string).then(setMessages);
         }
 

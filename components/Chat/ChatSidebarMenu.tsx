@@ -1,51 +1,59 @@
 'use client';
 
-import Link from 'next/link';
-import { Trash2 } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
-import ChatSettingsPanelMenu from '@/components/Chat/ChatSettingsPanelMenu';
+import { cn } from '@/lib/utils';
+import { ChatItem } from '@/components/Chat/ChatItem';
+import { SidebarMenu } from '@/components/Sidebar/SidebarMenu';
 
 interface ChatSidebarMenuProps {
     conversations: Conversation[];
     onDeleteConversation: (threadId: string) => void;
     showSettings: boolean;
+    className?: string;
+    isSidebarOpen: boolean;
 }
 
-export function ChatSidebarMenu({ conversations, onDeleteConversation, showSettings }: ChatSidebarMenuProps) {
+export function ChatSidebarMenu({
+    conversations,
+    onDeleteConversation,
+    showSettings,
+    className,
+    isSidebarOpen,
+}: ChatSidebarMenuProps) {
     return (
-        <div className="kt-scrollable-y-auto grow max-h-[calc(100vh-11.5rem)]">
-            {showSettings ? (
-                <ChatSettingsPanelMenu />
-            ) : (
-                <div className="max-h-80 overflow-y-auto">
-                    <ul>
-                        {conversations.map(({ thread_id, title }) => (
-                            <Link
-                                key={thread_id}
-                                className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
-                                href={`/chat/${thread_id}`}
-                            >
-                                <span className="text-sm text-gray-800 truncate max-w-[85%]">
-                                    {title || 'New chat'}
-                                </span>
-                                <div
-                                    className="hidden group-hover:block"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        onDeleteConversation(thread_id);
-                                    }}
-                                >
-                                    <Trash2
-                                        size={16}
-                                        className="text-muted-foreground hover:text-destructive transition"
-                                    />
-                                </div>
-                            </Link>
-                        ))}
-                    </ul>
-                </div>
-            )}
+
+        <div className={cn('relative flex flex-row min-h-0 h-full', className)}>
+            <div
+                className={cn(
+                    'transition-all duration-300 group hidden md:block bg-background border-r absolute left-0 top-0 z-[50] h-full',
+                    isSidebarOpen ? 'w-[25vw] min-w-[192px]' : 'w-14 min-w-14',
+                )}
+            >
+                <SidebarMenu collapsed={!isSidebarOpen} noGroups />
+            </div>
+            <div
+                className={cn(
+                    `flex flex-col flex-1 min-h-0 transition-all duration-300 min-w-0`,
+                    isSidebarOpen ? 'md:pl-[25vw]' : 'md:pl-14',
+                )}
+            >
+                {showSettings ? (
+                    <SidebarMenu noGroups />
+                ) : (
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                        <ul>
+                            {conversations.map(({ thread_id, title }) => (
+                                <ChatItem
+                                    key={thread_id}
+                                    thread_id={thread_id}
+                                    title={title}
+                                    onDeleteConversation={onDeleteConversation}
+                                />
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

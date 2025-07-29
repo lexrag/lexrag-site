@@ -34,7 +34,7 @@ const PaymentRow = ({ payment }: PaymentRowProps) => {
                     <FormattedNumber
                         value={payment.amount / 100}
                         style="currency"
-                        currency={payment.currency.toUpperCase()}
+                        currency={payment.currency?.toUpperCase() || 'USD'}
                         minimumFractionDigits={2}
                         maximumFractionDigits={2}
                     />

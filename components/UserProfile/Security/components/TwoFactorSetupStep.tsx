@@ -20,8 +20,7 @@ const TwoFactorSetupStep: React.FC<TwoFactorSetupStepProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Open in authenticator app"
-                    style={{ cursor: 'pointer', display: 'inline-block' }}
-                    title="Відкрити в OTP-додатку"
+                    className="cursor-pointer inline-block"
                 >
                     <QRCode value={setupData.opt_url} size={160} />
                 </a>

@@ -38,16 +38,21 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
 
     useEffect(() => {
         const updateDimensions = () => {
+            const effectiveWidth = width || window.innerWidth * 0.9 - 24;
+            const effectiveHeight = height || window.innerHeight * 0.9 - 24;
+            
             setDimensions({
-                width: window.innerWidth * 0.9 - 24,
-                height: window.innerHeight * 0.9 - 24,
+                width: effectiveWidth,
+                height: effectiveHeight,
             });
         };
 
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
-    }, []);
+    }, [width, height]);
+
+
 
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
