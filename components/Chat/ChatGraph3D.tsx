@@ -25,6 +25,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
@@ -49,6 +50,85 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
         return unsubscribe;
     }, []);
+
+    const getAllDescendants = (nodeId: string): Set<string> => {
+        const descendants = new Set<string>();
+        const visited = new Set<string>();
+        const queue = [nodeId];
+
+        while (queue.length > 0) {
+            const currentNodeId = queue.shift()!;
+
+            if (visited.has(currentNodeId)) {
+                continue;
+            }
+
+            visited.add(currentNodeId);
+            const children = nodeHierarchy[currentNodeId];
+
+            if (children && children.size > 0) {
+                children.forEach((childId) => {
+                    if (!visited.has(childId) && !descendants.has(childId)) {
+                        descendants.add(childId);
+                        queue.push(childId);
+                    }
+                });
+            }
+        }
+
+        return descendants;
+    };
+
+    const removeNodeDescendants = (nodeId: string) => {
+        console.log('Removing descendants for:', nodeId);
+
+        try {
+            const descendantsToRemove = getAllDescendants(nodeId);
+            console.log('Descendants to remove:', descendantsToRemove.size, Array.from(descendantsToRemove));
+
+            setExpandedNodes((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(nodeId);
+                descendantsToRemove.forEach((id) => newSet.delete(id));
+                return newSet;
+            });
+
+            setExpandedData((prev) => {
+                return {
+                    nodes: prev.nodes.filter((node) => !descendantsToRemove.has(node.id)),
+                    links: prev.links.filter((link) => {
+                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                        return !descendantsToRemove.has(sourceId) && !descendantsToRemove.has(targetId);
+                    }),
+                };
+            });
+
+            setNodeHierarchy((prev) => {
+                const newHierarchy = { ...prev };
+
+                descendantsToRemove.forEach((id) => {
+                    delete newHierarchy[id];
+                });
+
+                delete newHierarchy[nodeId];
+
+                Object.keys(newHierarchy).forEach((parentId) => {
+                    if (newHierarchy[parentId]) {
+                        descendantsToRemove.forEach((descendantId) => {
+                            newHierarchy[parentId].delete(descendantId);
+                        });
+                    }
+                });
+
+                return newHierarchy;
+            });
+
+            console.log('Successfully removed descendants');
+        } catch (error) {
+            console.error('Error removing descendants:', error);
+        }
+    };
 
     useEffect(() => {
         if (!data) return;
@@ -178,9 +258,11 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         const fg = graphRef.current;
         if (!fg || !fg.d3Force) return;
 
-        fg.d3Force('charge')?.strength(-10);
-        fg.d3Force('link')?.distance(100);
-        fg.d3Force('center')?.strength(0.1);
+        fg.d3Force('charge')?.strength(-8);
+        fg.d3Force('link')?.distance(90);
+        fg.d3Force('center')?.strength(0.08);
+
+        fg.d3Force('collide')?.radius(15).strength(0.4);
     };
 
     useEffect(() => {
@@ -269,8 +351,8 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
 
         try {
             if (expandedNodes.has(node.id)) {
-                console.log('Node already expanded:', node.id);
-                return;
+                console.log('Collapsing node:', node.id);
+                removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
                 setLoadingNodes((prev) => new Set([...prev, node.id]));
@@ -297,12 +379,61 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
                     const filteredNewNodes = newNodes.filter((n: any) => !existingNodeIds.has(n.id));
 
                     if (filteredNewNodes.length > 0) {
+                        const parentNode = processedData.nodes.find((n) => n.id === node.id);
+                        const positionedNodes = filteredNewNodes.map((newNode: any, index: number) => {
+                            if (
+                                parentNode &&
+                                parentNode.x !== undefined &&
+                                parentNode.y !== undefined &&
+                                parentNode.z !== undefined
+                            ) {
+                                const angle = (index / filteredNewNodes.length) * 2 * Math.PI;
+                                const radius = 50;
+
+                                return {
+                                    ...newNode,
+                                    x: parentNode.x + radius * Math.cos(angle),
+                                    y: parentNode.y + radius * Math.sin(angle),
+                                    z: parentNode.z + (Math.random() - 0.5) * 20,
+                                    fx: parentNode.x + radius * Math.cos(angle),
+                                    fy: parentNode.y + radius * Math.sin(angle),
+                                    fz: parentNode.z + (Math.random() - 0.5) * 20,
+                                };
+                            }
+                            return newNode;
+                        });
+
                         setExpandedData((prev) => ({
-                            nodes: [...prev.nodes, ...filteredNewNodes],
+                            nodes: [...prev.nodes, ...positionedNodes],
                             links: [...prev.links, ...newLinks],
                         }));
 
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
+
+                        setNodeHierarchy((prev) => ({
+                            ...prev,
+                            [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
+                        }));
+
+                        setTimeout(() => {
+                            graphRef.current?.zoomToFit(800);
+                        }, 500);
+
+                        setTimeout(() => {
+                            setExpandedData((prev) => ({
+                                nodes: prev.nodes.map((n) => {
+                                    if (positionedNodes.some((pn: any) => pn.id === n.id)) {
+                                        const newNode = { ...n };
+                                        delete newNode.fx;
+                                        delete newNode.fy;
+                                        delete newNode.fz;
+                                        return newNode;
+                                    }
+                                    return n;
+                                }),
+                                links: prev.links,
+                            }));
+                        }, 1000);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
@@ -316,7 +447,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
                 }
             }
         } catch (error) {
-            console.error('Error expanding node:', error);
+            console.error('Error expanding/collapsing node:', error);
         } finally {
             setLoadingNodes((prev) => {
                 const newSet = new Set(prev);
@@ -527,6 +658,10 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
             onBackgroundClick={handleBackgroundClick}
+            cooldownTicks={100}
+            cooldownTime={15000}
+            enableNodeDrag={true}
+            enableNavigationControls={true}
         />
     );
 };
