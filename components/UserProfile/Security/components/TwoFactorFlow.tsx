@@ -80,8 +80,8 @@ export default function TwoFactorFlow({ open, onOpenChange, onSuccess }: TwoFact
         setError(null);
         const res = await setTwoFactor();
         setLoading(false);
-        if (res.success && res.data.opt_url && res.data.recovery_passphrase) {
-            setSetupData({ opt_url: res.data.opt_url, recovery_passphrase: res.data.recovery_passphrase });
+        if (res.success && res.data.otp_url && res.data.recovery_passphrase) {
+            setSetupData({ opt_url: res.data.otp_url, recovery_passphrase: res.data.recovery_passphrase });
             setStep('setup');
         } else {
             setError(res.error || 'Failed to start 2FA setup');
@@ -139,8 +139,8 @@ export default function TwoFactorFlow({ open, onOpenChange, onSuccess }: TwoFact
         }
         const setRes = await setTwoFactor();
         setLoading(false);
-        if (setRes.success && setRes.data.opt_url && setRes.data.recovery_passphrase) {
-            setSetupData({ opt_url: setRes.data.opt_url, recovery_passphrase: setRes.data.recovery_passphrase });
+        if (setRes.success && setRes.data.otp_url && setRes.data.recovery_passphrase) {
+            setSetupData({ opt_url: setRes.data.otp_url, recovery_passphrase: setRes.data.recovery_passphrase });
             setStep('setup');
             fetchStatus();
         } else {
