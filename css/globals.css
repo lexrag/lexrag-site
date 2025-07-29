@@ -102,3 +102,12 @@
     }
   }
 }
+
+.message-text .message-link {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+.dark .message-text .message-link {
+  color: #60a5fa;
+}

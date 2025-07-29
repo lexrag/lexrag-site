@@ -10,7 +10,10 @@ const addAttributesToLinks = () => {
             if (node.tagName === 'a') {
                 node.properties = {
                     ...node.properties,
-                    style: 'color: blue; text-decoration: underline;',
+                    className: [
+                        ...(node.properties.className || []),
+                        'message-link'
+                    ]
                 };
             }
         });

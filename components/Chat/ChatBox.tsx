@@ -150,7 +150,7 @@ const ChatBox = ({
                     {isThinking && (
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
-                                <div className="p-5 md:p-5 p-3 rounded-lg text-gray-900 text-sm message-text">
+                                <div className="p-5 md:p-5 p-3 rounded-lg text-gray-900 dark:text-white text-sm message-text">
                                     <TypingAnimation className="text-sm">{status || ''}</TypingAnimation>
                                 </div>
                             </div>
