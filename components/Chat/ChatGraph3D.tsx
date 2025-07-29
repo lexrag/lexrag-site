@@ -174,11 +174,36 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         };
     }, [layerDataMap, layers, expandedData]);
 
+    const applyForces = () => {
+        const fg = graphRef.current;
+        if (!fg || !fg.d3Force) return;
+
+        fg.d3Force('charge')?.strength(-10);
+        fg.d3Force('link')?.distance(100);
+        fg.d3Force('center')?.strength(0.1);
+    };
+
     useEffect(() => {
-        if (processedData) {
-            handleCardData(processedData);
-        }
+        if (!processedData) return;
+        handleCardData(processedData);
+        applyForces();
     }, [processedData, handleCardData]);
+
+    useEffect(() => {
+        let animationFrame: number;
+
+        const waitForGraph = () => {
+            const fg = graphRef.current;
+            if (fg && fg.d3Force) {
+                applyForces();
+            } else {
+                animationFrame = requestAnimationFrame(waitForGraph);
+            }
+        };
+
+        animationFrame = requestAnimationFrame(waitForGraph);
+        return () => cancelAnimationFrame(animationFrame);
+    }, []);
 
     // Cleanup timer on unmount
     useEffect(() => {
@@ -216,7 +241,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
             if (handleScrollToCardId) {
                 handleScrollToCardId(node.id);
             }
-            
+
             setHighlightedNodeId(node.id);
 
             setTimeout(() => {
@@ -248,12 +273,17 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
                 return;
             } else {
                 console.log('Expanding node:', node.id);
-                setLoadingNodes(prev => new Set([...prev, node.id]));
-                
+                setLoadingNodes((prev) => new Set([...prev, node.id]));
+
                 const response = await getConversationExpandNodes(node.id);
                 console.log('Expand response:', response);
 
-                if (response && response.neighbors && Array.isArray(response.neighbors) && response.neighbors.length > 0) {
+                if (
+                    response &&
+                    response.neighbors &&
+                    Array.isArray(response.neighbors) &&
+                    response.neighbors.length > 0
+                ) {
                     const newNodes = response.neighbors;
                     const newLinks = response.links || [];
 
@@ -288,7 +318,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         } catch (error) {
             console.error('Error expanding node:', error);
         } finally {
-            setLoadingNodes(prev => {
+            setLoadingNodes((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(node.id);
                 return newSet;
