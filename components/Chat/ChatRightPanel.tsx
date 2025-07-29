@@ -69,14 +69,17 @@ const ChatRightPanel = ({
         return nodeId;
     };
 
-    const findGroupByNodeId = useCallback((nodeId: string) => {
-        if (!cardData.nodes) return null;
+    const findGroupByNodeId = useCallback(
+        (nodeId: string) => {
+            if (!cardData.nodes) return null;
 
-        const node = cardData.nodes.find((n) => n.id === nodeId);
-        if (!node) return null;
+            const node = cardData.nodes.find((n) => n.id === nodeId);
+            if (!node) return null;
 
-        return getGroupKey(node.id);
-    }, [cardData.nodes]);
+            return getGroupKey(node.id);
+        },
+        [cardData.nodes],
+    );
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
@@ -283,26 +286,36 @@ const ChatRightPanel = ({
         }
     };
 
+    const formatLegalPath = (legalPath: string) => {
+        if (!legalPath) return '';
+
+        const parts = legalPath.split(' -> ').map((part) => part.trim());
+        const pathParts = parts.slice(1).map((part) => part.replace(/-$/, ''));
+
+        if (pathParts.length === 0) return '';
+
+        const [first, ...rest] = pathParts;
+        if (rest.length === 0) return first;
+
+        return `${first}(${rest.join(')(')})`;
+    };
+
     const getNodeDisplayInfo = (node: any) => {
         const paragraphNum = getParagraphNumber(node.id);
         let title = node.labels?.[0] || 'Node';
 
         if (paragraphNum) {
-            title = `Paragraph ${paragraphNum}`;
+            title = `§ ${paragraphNum}`;
         } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
-            title = node.heading ? `${node.heading}` : `Regulation ${node.legalPath || ''}`;
+            title = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
         } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
             title = 'Subsidiary Legislation';
         } else if (node.labels?.includes('PartOfTheLegislation')) {
-            title = node.legalPath || node.labels?.[0] || 'Section';
+            title = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
         }
 
         let subtitle = null;
         const subtitleParts = [];
-
-        if (node.number) {
-            subtitleParts.push(`№ ${node.number}`);
-        }
 
         if (node.score !== undefined) {
             subtitleParts.push(`Score: ${node.score.toFixed(3)}`);
@@ -317,6 +330,9 @@ const ChatRightPanel = ({
             subtitle,
             citation: node.neutralCitation || null,
             content: node.content || '',
+            topics: node.topics || [],
+            concepts: node.concepts || [],
+            functionalObject: node.functionalObject || null,
         };
     };
 
@@ -355,6 +371,34 @@ const ChatRightPanel = ({
             document.body.style.cursor = '';
         };
     }, [isResizing]);
+
+    const renderBadges = (items: string[], type: 'topic' | 'concept') => {
+        if (!items || items.length === 0) return null;
+
+        const getBadgeColor = (type: string) => {
+            switch (type) {
+                case 'topic':
+                    return 'bg-purple-100 text-purple-800 border-purple-200';
+                case 'concept':
+                    return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                default:
+                    return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
+        };
+
+        return (
+            <div className="flex flex-wrap gap-1 mb-2">
+                {items.map((item, index) => (
+                    <span
+                        key={index}
+                        className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
+                    >
+                        {item}
+                    </span>
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
@@ -635,7 +679,7 @@ const ChatRightPanel = ({
                                                                             />
                                                                         )}
                                                                         <div className="flex-1 min-w-0">
-                                                                            <div className="flex items-center gap-2 mb-1">
+                                                                            <div className="flex justify-between items-center gap-2 mb-1">
                                                                                 <div
                                                                                     className={`font-medium text-sm transition-colors ${
                                                                                         selectedItem === node.id
@@ -645,20 +689,37 @@ const ChatRightPanel = ({
                                                                                 >
                                                                                     {nodeInfo.title}
                                                                                 </div>
+
+                                                                                {(nodeInfo.subtitle ||
+                                                                                    nodeInfo.citation) && (
+                                                                                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                                                                                        {nodeInfo.subtitle && (
+                                                                                            <span>
+                                                                                                {nodeInfo.subtitle}
+                                                                                            </span>
+                                                                                        )}
+                                                                                        {nodeInfo.citation && (
+                                                                                            <span>
+                                                                                                — {nodeInfo.citation}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
-                                                                            {(nodeInfo.subtitle ||
-                                                                                nodeInfo.citation) && (
-                                                                                <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
-                                                                                    {nodeInfo.subtitle && (
-                                                                                        <span>{nodeInfo.subtitle}</span>
-                                                                                    )}
-                                                                                    {nodeInfo.citation && (
-                                                                                        <span>
-                                                                                            — {nodeInfo.citation}
-                                                                                        </span>
-                                                                                    )}
+
+                                                                            {/* Topics badges */}
+                                                                            {renderBadges(nodeInfo.topics, 'topic')}
+
+                                                                            {/* Concepts badges */}
+                                                                            {renderBadges(nodeInfo.concepts, 'concept')}
+
+                                                                            {/* Functional Object */}
+                                                                            {nodeInfo.functionalObject && (
+                                                                                <div className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
+                                                                                    {nodeInfo.functionalObject}
                                                                                 </div>
                                                                             )}
+
                                                                             {nodeInfo.content && (
                                                                                 <div className="text-sm whitespace-pre-wrap mb-3">
                                                                                     {nodeInfo.content}

@@ -26,7 +26,7 @@ export function ChatSidebarMenu({ conversations, onDeleteConversation, showSetti
                                 href={`/chat/${thread_id}`}
                             >
                                 <span className="text-sm text-gray-800 truncate max-w-[85%]">
-                                    {title || 'New chat'}
+                                    {title || 'Untitled'}
                                 </span>
                                 <div
                                     className="hidden group-hover:block"
