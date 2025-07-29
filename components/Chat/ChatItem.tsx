@@ -14,7 +14,7 @@ export function ChatItem({ thread_id, title, onDeleteConversation }: ChatItemPro
             key={thread_id}
             className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
         >
-            <p className="text-sm text-gray-800 truncate max-w-[85%]">
+            <p className="text-sm text-gray-800 dark:text-white truncate max-w-[85%]">
                 {title || 'New chat'}
             </p>
             <div
