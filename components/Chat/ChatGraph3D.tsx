@@ -16,20 +16,50 @@ interface ChatGraph3DProps {
     data: GraphData;
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId?: Dispatch<SetStateAction<string>>;
+    isOrbitEnabled?: boolean;
+
+    expandedNodes: Set<string>;
+    setExpandedNodes: Dispatch<SetStateAction<Set<string>>>;
+    nodeHierarchy: Record<string, Set<string>>;
+    setNodeHierarchy: Dispatch<SetStateAction<Record<string, Set<string>>>>;
+    expandedData: { nodes: any[]; links: any[] };
+    setExpandedData: Dispatch<SetStateAction<{ nodes: any[]; links: any[] }>>;
+    loadingNodes: Set<string>;
+    setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
 }
 
-const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScrollToCardId }: ChatGraph3DProps) => {
+const ChatGraph3D = ({
+    height,
+    width,
+    data,
+    layers,
+    handleCardData,
+    handleScrollToCardId,
+    isOrbitEnabled: externalIsOrbitEnabled,
+    expandedNodes,
+    setExpandedNodes,
+    nodeHierarchy,
+    setNodeHierarchy,
+    expandedData,
+    setExpandedData,
+    loadingNodes,
+    setLoadingNodes,
+}: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
-    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
-    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+    const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const orbitAngleRef = useRef<number>(0);
+
+    const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [draggedNode, setDraggedNode] = useState<any>(null);
+
+    const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
     useEffect(() => {
         console.log(data);
@@ -54,6 +84,133 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
         return unsubscribe;
     }, []);
+
+    useEffect(() => {
+        if (orbitIntervalRef.current) {
+            clearInterval(orbitIntervalRef.current);
+            orbitIntervalRef.current = null;
+        }
+
+        if (!isOrbitEnabled) {
+            return;
+        }
+
+        const waitForGraph = () => {
+            if (!graphRef.current) {
+                setTimeout(waitForGraph, 100);
+                return;
+            }
+
+            const distance = 1400;
+
+            orbitIntervalRef.current = setInterval(() => {
+                if (graphRef.current) {
+                    graphRef.current.cameraPosition({
+                        x: distance * Math.sin(orbitAngleRef.current),
+                        z: distance * Math.cos(orbitAngleRef.current),
+                    });
+                    orbitAngleRef.current += Math.PI / 300;
+                }
+            }, 10);
+        };
+
+        waitForGraph();
+
+        return () => {
+            if (orbitIntervalRef.current) {
+                clearInterval(orbitIntervalRef.current);
+                orbitIntervalRef.current = null;
+            }
+        };
+    }, [isOrbitEnabled]);
+
+    useEffect(() => {
+        return () => {
+            if (orbitIntervalRef.current) {
+                clearInterval(orbitIntervalRef.current);
+                orbitIntervalRef.current = null;
+            }
+        };
+    }, []);
+
+    const getAllDescendants = (nodeId: string): Set<string> => {
+        const descendants = new Set<string>();
+        const visited = new Set<string>();
+        const queue = [nodeId];
+
+        while (queue.length > 0) {
+            const currentNodeId = queue.shift()!;
+
+            if (visited.has(currentNodeId)) {
+                continue;
+            }
+
+            visited.add(currentNodeId);
+            const children = nodeHierarchy[currentNodeId];
+
+            if (children && children.size > 0) {
+                children.forEach((childId) => {
+                    if (!visited.has(childId) && !descendants.has(childId)) {
+                        descendants.add(childId);
+                        queue.push(childId);
+                    }
+                });
+            }
+        }
+
+        return descendants;
+    };
+
+    const removeNodeDescendants = (nodeId: string) => {
+        console.log('Removing descendants for:', nodeId);
+
+        try {
+            const descendantsToRemove = getAllDescendants(nodeId);
+            console.log('Descendants to remove:', descendantsToRemove.size, Array.from(descendantsToRemove));
+
+            setExpandedNodes((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(nodeId);
+                descendantsToRemove.forEach((id) => newSet.delete(id));
+                return newSet;
+            });
+
+            setExpandedData((prev) => {
+                return {
+                    nodes: prev.nodes.filter((node) => !descendantsToRemove.has(node.id)),
+                    links: prev.links.filter((link) => {
+                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                        return !descendantsToRemove.has(sourceId) && !descendantsToRemove.has(targetId);
+                    }),
+                };
+            });
+
+            setNodeHierarchy((prev) => {
+                const newHierarchy = { ...prev };
+
+                descendantsToRemove.forEach((id) => {
+                    delete newHierarchy[id];
+                });
+
+                delete newHierarchy[nodeId];
+
+                Object.keys(newHierarchy).forEach((parentId) => {
+                    if (newHierarchy[parentId]) {
+                        descendantsToRemove.forEach((descendantId) => {
+                            newHierarchy[parentId].delete(descendantId);
+                        });
+                    }
+                });
+
+                return newHierarchy;
+            });
+
+            console.log('Successfully removed descendants');
+        } catch (error) {
+            console.error('Error removing descendants:', error);
+        }
+    };
 
     useEffect(() => {
         if (!data) return;
@@ -179,11 +336,38 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         };
     }, [layerDataMap, layers, expandedData]);
 
+    const applyForces = () => {
+        const fg = graphRef.current;
+        if (!fg || !fg.d3Force) return;
+
+        fg.d3Force('charge')?.strength(-8);
+        fg.d3Force('link')?.distance(90);
+        fg.d3Force('center')?.strength(0.08);
+
+        fg.d3Force('collide')?.radius(15).strength(0.4);
+    };
+
     useEffect(() => {
-        if (processedData) {
-            handleCardData(processedData);
-        }
+        if (!processedData) return;
+        handleCardData(processedData);
+        applyForces();
     }, [processedData, handleCardData]);
+
+    useEffect(() => {
+        let animationFrame: number;
+
+        const waitForGraph = () => {
+            const fg = graphRef.current;
+            if (fg && fg.d3Force) {
+                applyForces();
+            } else {
+                animationFrame = requestAnimationFrame(waitForGraph);
+            }
+        };
+
+        animationFrame = requestAnimationFrame(waitForGraph);
+        return () => cancelAnimationFrame(animationFrame);
+    }, []);
 
     // Cleanup timer on unmount
     useEffect(() => {
@@ -194,7 +378,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         };
     }, [clickTimer]);
 
-    const handleNodeClick = (node: any) => {
+    const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
         // Check if this is a double click
@@ -204,6 +388,17 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
             setClickTimer(null);
             setLastClickedNode(null);
             handleNodeDoubleClick(node);
+            return;
+        }
+
+        if (event.altKey || event.ctrlKey || event.shiftKey) {
+            const newSelectedNodes = new Set(selectedNodes);
+            if (newSelectedNodes.has(node)) {
+                newSelectedNodes.delete(node);
+            } else {
+                newSelectedNodes.add(node);
+            }
+            setSelectedNodes(newSelectedNodes);
             return;
         }
 
@@ -221,7 +416,7 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
             if (handleScrollToCardId) {
                 handleScrollToCardId(node.id);
             }
-            
+
             setHighlightedNodeId(node.id);
 
             setTimeout(() => {
@@ -249,16 +444,21 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
 
         try {
             if (expandedNodes.has(node.id)) {
-                console.log('Node already expanded:', node.id);
-                return;
+                console.log('Collapsing node:', node.id);
+                removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
-                setLoadingNodes(prev => new Set([...prev, node.id]));
-                
+                setLoadingNodes((prev) => new Set([...prev, node.id]));
+
                 const response = await getConversationExpandNodes(node.id);
                 console.log('Expand response:', response);
 
-                if (response && response.neighbors && Array.isArray(response.neighbors) && response.neighbors.length > 0) {
+                if (
+                    response &&
+                    response.neighbors &&
+                    Array.isArray(response.neighbors) &&
+                    response.neighbors.length > 0
+                ) {
                     const newNodes = response.neighbors;
                     const newLinks = response.links || [];
 
@@ -272,12 +472,61 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
                     const filteredNewNodes = newNodes.filter((n: any) => !existingNodeIds.has(n.id));
 
                     if (filteredNewNodes.length > 0) {
+                        const parentNode = processedData.nodes.find((n) => n.id === node.id);
+                        const positionedNodes = filteredNewNodes.map((newNode: any, index: number) => {
+                            if (
+                                parentNode &&
+                                parentNode.x !== undefined &&
+                                parentNode.y !== undefined &&
+                                parentNode.z !== undefined
+                            ) {
+                                const angle = (index / filteredNewNodes.length) * 2 * Math.PI;
+                                const radius = 50;
+
+                                return {
+                                    ...newNode,
+                                    x: parentNode.x + radius * Math.cos(angle),
+                                    y: parentNode.y + radius * Math.sin(angle),
+                                    z: parentNode.z + (Math.random() - 0.5) * 20,
+                                    fx: parentNode.x + radius * Math.cos(angle),
+                                    fy: parentNode.y + radius * Math.sin(angle),
+                                    fz: parentNode.z + (Math.random() - 0.5) * 20,
+                                };
+                            }
+                            return newNode;
+                        });
+
                         setExpandedData((prev) => ({
-                            nodes: [...prev.nodes, ...filteredNewNodes],
+                            nodes: [...prev.nodes, ...positionedNodes],
                             links: [...prev.links, ...newLinks],
                         }));
 
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
+
+                        setNodeHierarchy((prev) => ({
+                            ...prev,
+                            [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
+                        }));
+
+                        setTimeout(() => {
+                            graphRef.current?.zoomToFit(800);
+                        }, 500);
+
+                        setTimeout(() => {
+                            setExpandedData((prev) => ({
+                                nodes: prev.nodes.map((n) => {
+                                    if (positionedNodes.some((pn: any) => pn.id === n.id)) {
+                                        const newNode = { ...n };
+                                        delete newNode.fx;
+                                        delete newNode.fy;
+                                        delete newNode.fz;
+                                        return newNode;
+                                    }
+                                    return n;
+                                }),
+                                links: prev.links,
+                            }));
+                        }, 1000);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
@@ -291,9 +540,9 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
                 }
             }
         } catch (error) {
-            console.error('Error expanding node:', error);
+            console.error('Error expanding/collapsing node:', error);
         } finally {
-            setLoadingNodes(prev => {
+            setLoadingNodes((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(node.id);
                 return newSet;
@@ -302,6 +551,10 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
     };
 
     const getNodeColor = (node: any) => {
+        if (selectedNodes.has(node)) {
+            return '#fbbf24';
+        }
+
         if (highlightedNodeId === node.id) {
             return '#fbbf24'; // Gold for highlighted
         }
@@ -449,9 +702,54 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
         }
     };
 
+    const handleNodeDrag = (node: any) => {
+        setDraggedNode(node);
+    };
+
+    const handleNodeDragEnd = (node: any) => {
+        if (selectedNodes.has(node) && selectedNodes.size > 1 && draggedNode === node) {
+            const finalX = node.x;
+            const finalY = node.y;
+            const finalZ = node.z;
+            
+            const originalPositions = [...selectedNodes].map(selNode => ({
+                node: selNode,
+                originalX: selNode.x,
+                originalY: selNode.y,
+                originalZ: selNode.z
+            }));
+            
+            const draggedOriginal = originalPositions.find(p => p.node === node);
+            
+            if (draggedOriginal) {
+                const offsetX = finalX - draggedOriginal.originalX;
+                const offsetY = finalY - draggedOriginal.originalY;
+                const offsetZ = finalZ - draggedOriginal.originalZ;
+                
+                [...selectedNodes].forEach(selNode => {
+                    const original = originalPositions.find(p => p.node === selNode);
+                    if (original) {
+                        selNode.fx = original.originalX + offsetX;
+                        selNode.fy = original.originalY + offsetY;
+                        selNode.fz = original.originalZ + offsetZ;
+                    }
+                });
+            }
+        } else {
+            if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
+                node.fx = node.x;
+                node.fy = node.y;
+                node.fz = node.z;
+            }
+        }
+        
+        setDraggedNode(null);
+    };
+
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setSelectedNodes(new Set());
     };
 
     const getLinkColor = () => {
@@ -501,7 +799,13 @@ const ChatGraph3D = ({ height, width, data, layers, handleCardData, handleScroll
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
+            onNodeDrag={handleNodeDrag}
+            onNodeDragEnd={handleNodeDragEnd}
             onBackgroundClick={handleBackgroundClick}
+            cooldownTicks={100}
+            cooldownTime={15000}
+            enableNodeDrag={true}
+            enableNavigationControls={true}
         />
     );
 };

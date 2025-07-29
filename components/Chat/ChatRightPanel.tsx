@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ChevronDown, ChevronUp, Expand, Fullscreen, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, Expand, Fullscreen, Globe, Layers } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -46,8 +46,14 @@ const ChatRightPanel = ({
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
-    const nodeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
+    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
+    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
+    const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
     const getGroupKey = (nodeId: string) => {
@@ -81,6 +87,8 @@ const ChatRightPanel = ({
         [cardData.nodes],
     );
 
+    const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
 
@@ -99,7 +107,13 @@ const ChatRightPanel = ({
             setSelectedGroup(groupKey);
 
             setTimeout(() => {
-                const targetElement = nodeRefs.current[scrollToCardId];
+                let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
+
+                if (!targetElement) {
+                    targetElement =
+                        accordionTriggerRefs.current[scrollToCardId] || accordionTriggerRefs.current[groupKey];
+                }
+
                 if (targetElement && accordionContainerRef.current) {
                     const containerRect = accordionContainerRef.current.getBoundingClientRect();
                     const targetRect = targetElement.getBoundingClientRect();
@@ -270,12 +284,33 @@ const ChatRightPanel = ({
         const isCurrentlySelected = selectedItem === groupKey;
         setSelectedItem(isCurrentlySelected ? null : groupKey);
         setSelectedGroup(isCurrentlySelected ? null : groupKey);
+
+        if (!isCurrentlySelected) {
+            setScrollToCardId(groupKey);
+
+            const parentNode = parentNodes[groupKey];
+            if (parentNode && parentNode.x !== undefined && parentNode.y !== undefined) {
+                zoomToNodeGraph({
+                    id: parentNode.id,
+                    x: parentNode.x,
+                    y: parentNode.y,
+                });
+            }
+        }
     };
 
     const handleNodeClick = (nodeId: string, node: any) => {
         const nodeGroupKey = getGroupKey(node.id);
         setSelectedItem(nodeId);
         setSelectedGroup(nodeGroupKey);
+
+        const isParentNode = node.labels?.includes('Act') || node.labels?.includes('CaseLaw');
+
+        if (isParentNode) {
+            setScrollToCardId(nodeGroupKey);
+        } else {
+            setScrollToCardId(nodeId);
+        }
 
         if (node.x !== undefined && node.y !== undefined) {
             zoomToNodeGraph({
@@ -405,7 +440,10 @@ const ChatRightPanel = ({
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
-                <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer" />
+                <div 
+                    className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer"
+                    title="Drag to Resize Panel"
+                />
             </div>
             <aside className="w-full flex flex-col overflow-hidden">
                 <Card className="flex-1 rounded-none border-0 shadow-none overflow-hidden">
@@ -423,6 +461,14 @@ const ChatRightPanel = ({
                                     data={currentMessage}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    expandedNodes={expandedNodes}
+                                    setExpandedNodes={setExpandedNodes}
+                                    nodeHierarchy={nodeHierarchy}
+                                    setNodeHierarchy={setNodeHierarchy}
+                                    expandedData={expandedData}
+                                    setExpandedData={setExpandedData}
+                                    loadingNodes={loadingNodes}
+                                    setLoadingNodes={setLoadingNodes}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -433,6 +479,15 @@ const ChatRightPanel = ({
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    isOrbitEnabled={isOrbitEnabled}
+                                    expandedNodes={expandedNodes}
+                                    setExpandedNodes={setExpandedNodes}
+                                    nodeHierarchy={nodeHierarchy}
+                                    setNodeHierarchy={setNodeHierarchy}
+                                    expandedData={expandedData}
+                                    setExpandedData={setExpandedData}
+                                    loadingNodes={loadingNodes}
+                                    setLoadingNodes={setLoadingNodes}
                                 />
                             )}
 
@@ -441,17 +496,20 @@ const ChatRightPanel = ({
                                     <div className="flex items-center gap-2">
                                         <Tabs value={graphView} onValueChange={setGraphView}>
                                             <TabsList className="w-fit grid grid-cols-2">
-                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2">
+                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2" title="Switch to 2D Graph View">
                                                     2D
                                                 </TabsTrigger>
-                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2">
+                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2" title="Switch to 3D Graph View">
                                                     3D
                                                 </TabsTrigger>
                                             </TabsList>
                                         </Tabs>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                                                <div 
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                    title="Toggle Graph Layers"
+                                                >
                                                     <Layers className="h-4 w-4" />
                                                 </div>
                                             </DropdownMenuTrigger>
@@ -487,16 +545,30 @@ const ChatRightPanel = ({
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="flex items-center gap-1">
+                                            {graphView === '3d' && (
+                                                <div
+                                                    onClick={() => setIsOrbitEnabled(!isOrbitEnabled)}
+                                                    className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer ${
+                                                        isOrbitEnabled
+                                                            ? 'bg-primary text-primary-foreground border-primary'
+                                                            : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                                                    }`}
+                                                    title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
+                                                >
+                                                    <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
+                                                </div>
+                                            )}
                                             <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => setIsOpenGraphModal(true)}
+                                                title="Expand Graph to Full Screen"
                                             >
                                                 <Expand className="h-4 w-4" />
                                             </div>
                                             <div
                                                 className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                 onClick={() => zoomToFitGraph()}
-                                                title="Zoom to Fit Graph"
+                                                title="Zoom to Fit All Nodes"
                                             >
                                                 <Fullscreen className="h-4 w-4" />
                                             </div>
@@ -517,7 +589,7 @@ const ChatRightPanel = ({
                                     <div
                                         className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                         onClick={toggleGraphVisibility}
-                                        title={isGraphCollapsed ? 'Show Graph' : 'Hide Graph'}
+                                        title={isGraphCollapsed ? 'Show Graph Panel' : 'Hide Graph Panel'}
                                     >
                                         {isGraphCollapsed ? (
                                             <ChevronDown className="h-4 w-4" />
@@ -619,6 +691,7 @@ const ChatRightPanel = ({
                                                                 e.stopPropagation();
                                                                 handleGroupClick(groupKey);
                                                             }}
+                                                            title={`Click to select and zoom to ${groupInfo.displayName}`}
                                                         >
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <span
@@ -672,6 +745,7 @@ const ChatRightPanel = ({
                                                                         e.stopPropagation();
                                                                         handleNodeClick(node.id, node);
                                                                     }}
+                                                                    title={`Click to select and zoom to ${nodeInfo.title}`}
                                                                 >
                                                                     <div className="flex items-start gap-2 mb-2">
                                                                         {node.layerColor && (

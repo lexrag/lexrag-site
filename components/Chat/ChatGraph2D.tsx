@@ -17,9 +17,33 @@ interface ChatGraph2DProps {
     data: GraphData;
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId: Dispatch<SetStateAction<string>>;
+
+    expandedNodes: Set<string>;
+    setExpandedNodes: Dispatch<SetStateAction<Set<string>>>;
+    nodeHierarchy: Record<string, Set<string>>;
+    setNodeHierarchy: Dispatch<SetStateAction<Record<string, Set<string>>>>;
+    expandedData: { nodes: any[]; links: any[] };
+    setExpandedData: Dispatch<SetStateAction<{ nodes: any[]; links: any[] }>>;
+    loadingNodes: Set<string>;
+    setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
 }
 
-const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScrollToCardId }: ChatGraph2DProps) => {
+const ChatGraph2D = ({ 
+    height, 
+    width, 
+    data, 
+    layers, 
+    handleCardData, 
+    handleScrollToCardId,
+    expandedNodes,
+    setExpandedNodes,
+    nodeHierarchy,
+    setNodeHierarchy,
+    expandedData,
+    setExpandedData,
+    loadingNodes,
+    setLoadingNodes,
+}: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
     const graphRef = useRef<any>(null);
@@ -29,12 +53,12 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
-    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-    const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
-    const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
-    const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
+
+    const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [dragStartPositions, setDragStartPositions] = useState<Record<string, { x: number; y: number }>>({});
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -56,6 +80,9 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
 
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
+            node.fx = node.x;
+            node.fy = node.y;
+            
             nodePositionsRef.current[node.id] = {
                 x: node.x,
                 y: node.y,
@@ -64,6 +91,40 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
                 fx: node.fx,
                 fy: node.fy,
             };
+        }
+    };
+
+    const handleNodeDrag = (node: any, translate: any) => {
+        if (selectedNodes.has(node)) {
+            if (!isDragging) {
+                const positions: Record<string, { x: number; y: number }> = {};
+                [...selectedNodes].forEach(selNode => {
+                    positions[selNode.id] = { x: selNode.x, y: selNode.y };
+                });
+                setDragStartPositions(positions);
+                setIsDragging(true);
+            }
+
+            [...selectedNodes].forEach(selNode => {
+                const startPos = dragStartPositions[selNode.id];
+                if (startPos) {
+                    selNode.fx = startPos.x + translate.x;
+                    selNode.fy = startPos.y + translate.y;
+                }
+            });
+        }
+    };
+
+    const handleNodeDragEnd = (node: any) => {
+        if (selectedNodes.has(node)) {
+            [...selectedNodes].forEach(selNode => {
+                saveNodePosition(selNode);
+            });
+            setDragStartPositions({});
+            setIsDragging(false);
+        } else {
+            saveNodePosition(node);
+            setIsDragging(false);
         }
     };
 
@@ -374,7 +435,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
         }
     }, [processedData]);
 
-    const handleNodeClick = (node: any) => {
+    const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
         // Check if this is a double click
@@ -384,6 +445,17 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
             setClickTimer(null);
             setLastClickedNode(null);
             handleNodeDoubleClick(node);
+            return;
+        }
+
+        if (event.altKey || event.ctrlKey || event.shiftKey) {
+            const newSelectedNodes = new Set(selectedNodes);
+            if (newSelectedNodes.has(node)) {
+                newSelectedNodes.delete(node);
+            } else {
+                newSelectedNodes.add(node);
+            }
+            setSelectedNodes(newSelectedNodes);
             return;
         }
 
@@ -494,6 +566,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     };
 
     const getNodeColor = (node: any) => {
+        if (selectedNodes.has(node)) {
+            return '#fbbf24';
+        }
+
         if (highlightedNodeId === node.id) {
             return '#00ffff'; // Сyan for highlighted
         }
@@ -644,6 +720,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setSelectedNodes(new Set());
     };
 
     const getLinkColor = () => {
@@ -693,7 +770,8 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
-            onNodeDragEnd={saveNodePosition}
+            onNodeDrag={handleNodeDrag}
+            onNodeDragEnd={handleNodeDragEnd}
             onEngineStop={handleEngineStop}
             onBackgroundClick={handleBackgroundClick}
             cooldownTicks={100}
