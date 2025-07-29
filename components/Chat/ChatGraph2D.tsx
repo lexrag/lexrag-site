@@ -51,6 +51,9 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
 
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
+            node.fx = node.x;
+            node.fy = node.y;
+            
             nodePositionsRef.current[node.id] = {
                 x: node.x,
                 y: node.y,

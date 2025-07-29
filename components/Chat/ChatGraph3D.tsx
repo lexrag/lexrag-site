@@ -666,6 +666,14 @@ const ChatGraph3D = ({
         }
     };
 
+    const handleNodeDragEnd = (node: any) => {
+        if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
+            node.fx = node.x;
+            node.fy = node.y;
+            node.fz = node.z;
+        }
+    };
+
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
@@ -718,6 +726,7 @@ const ChatGraph3D = ({
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
+            onNodeDragEnd={handleNodeDragEnd}
             onBackgroundClick={handleBackgroundClick}
             cooldownTicks={100}
             cooldownTime={15000}
