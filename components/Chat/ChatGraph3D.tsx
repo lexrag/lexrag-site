@@ -43,6 +43,9 @@ const ChatGraph3D = ({
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const orbitAngleRef = useRef<number>(0);
 
+    const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [draggedNode, setDraggedNode] = useState<any>(null);
+
     const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
     useEffect(() => {
@@ -362,7 +365,7 @@ const ChatGraph3D = ({
         };
     }, [clickTimer]);
 
-    const handleNodeClick = (node: any) => {
+    const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
         // Check if this is a double click
@@ -372,6 +375,17 @@ const ChatGraph3D = ({
             setClickTimer(null);
             setLastClickedNode(null);
             handleNodeDoubleClick(node);
+            return;
+        }
+
+        if (event.altKey || event.ctrlKey || event.shiftKey) {
+            const newSelectedNodes = new Set(selectedNodes);
+            if (newSelectedNodes.has(node)) {
+                newSelectedNodes.delete(node);
+            } else {
+                newSelectedNodes.add(node);
+            }
+            setSelectedNodes(newSelectedNodes);
             return;
         }
 
@@ -524,6 +538,10 @@ const ChatGraph3D = ({
     };
 
     const getNodeColor = (node: any) => {
+        if (selectedNodes.has(node)) {
+            return '#fbbf24';
+        }
+
         if (highlightedNodeId === node.id) {
             return '#fbbf24'; // Gold for highlighted
         }
@@ -671,17 +689,54 @@ const ChatGraph3D = ({
         }
     };
 
+    const handleNodeDrag = (node: any) => {
+        setDraggedNode(node);
+    };
+
     const handleNodeDragEnd = (node: any) => {
-        if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
-            node.fx = node.x;
-            node.fy = node.y;
-            node.fz = node.z;
+        if (selectedNodes.has(node) && selectedNodes.size > 1 && draggedNode === node) {
+            const finalX = node.x;
+            const finalY = node.y;
+            const finalZ = node.z;
+            
+            const originalPositions = [...selectedNodes].map(selNode => ({
+                node: selNode,
+                originalX: selNode.x,
+                originalY: selNode.y,
+                originalZ: selNode.z
+            }));
+            
+            const draggedOriginal = originalPositions.find(p => p.node === node);
+            
+            if (draggedOriginal) {
+                const offsetX = finalX - draggedOriginal.originalX;
+                const offsetY = finalY - draggedOriginal.originalY;
+                const offsetZ = finalZ - draggedOriginal.originalZ;
+                
+                [...selectedNodes].forEach(selNode => {
+                    const original = originalPositions.find(p => p.node === selNode);
+                    if (original) {
+                        selNode.fx = original.originalX + offsetX;
+                        selNode.fy = original.originalY + offsetY;
+                        selNode.fz = original.originalZ + offsetZ;
+                    }
+                });
+            }
+        } else {
+            if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
+                node.fx = node.x;
+                node.fy = node.y;
+                node.fz = node.z;
+            }
         }
+        
+        setDraggedNode(null);
     };
 
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setSelectedNodes(new Set());
     };
 
     const getLinkColor = () => {
@@ -731,6 +786,7 @@ const ChatGraph3D = ({
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
+            onNodeDrag={handleNodeDrag}
             onNodeDragEnd={handleNodeDragEnd}
             onBackgroundClick={handleBackgroundClick}
             cooldownTicks={100}

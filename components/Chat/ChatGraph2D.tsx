@@ -36,6 +36,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
 
+    const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [dragStartPositions, setDragStartPositions] = useState<Record<string, { x: number; y: number }>>({});
+    const [isDragging, setIsDragging] = useState(false);
+
     useEffect(() => {
         const updateDimensions = () => {
             const effectiveWidth = width || window.innerWidth * 0.9 - 24;
@@ -67,6 +71,40 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
                 fx: node.fx,
                 fy: node.fy,
             };
+        }
+    };
+
+    const handleNodeDrag = (node: any, translate: any) => {
+        if (selectedNodes.has(node)) {
+            if (!isDragging) {
+                const positions: Record<string, { x: number; y: number }> = {};
+                [...selectedNodes].forEach(selNode => {
+                    positions[selNode.id] = { x: selNode.x, y: selNode.y };
+                });
+                setDragStartPositions(positions);
+                setIsDragging(true);
+            }
+
+            [...selectedNodes].forEach(selNode => {
+                const startPos = dragStartPositions[selNode.id];
+                if (startPos) {
+                    selNode.fx = startPos.x + translate.x;
+                    selNode.fy = startPos.y + translate.y;
+                }
+            });
+        }
+    };
+
+    const handleNodeDragEnd = (node: any) => {
+        if (selectedNodes.has(node)) {
+            [...selectedNodes].forEach(selNode => {
+                saveNodePosition(selNode);
+            });
+            setDragStartPositions({});
+            setIsDragging(false);
+        } else {
+            saveNodePosition(node);
+            setIsDragging(false);
         }
     };
 
@@ -377,7 +415,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
         }
     }, [processedData]);
 
-    const handleNodeClick = (node: any) => {
+    const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
         // Check if this is a double click
@@ -387,6 +425,17 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
             setClickTimer(null);
             setLastClickedNode(null);
             handleNodeDoubleClick(node);
+            return;
+        }
+
+        if (event.altKey || event.ctrlKey || event.shiftKey) {
+            const newSelectedNodes = new Set(selectedNodes);
+            if (newSelectedNodes.has(node)) {
+                newSelectedNodes.delete(node);
+            } else {
+                newSelectedNodes.add(node);
+            }
+            setSelectedNodes(newSelectedNodes);
             return;
         }
 
@@ -497,6 +546,10 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     };
 
     const getNodeColor = (node: any) => {
+        if (selectedNodes.has(node)) {
+            return '#fbbf24';
+        }
+
         if (highlightedNodeId === node.id) {
             return '#fbbf24'; // Gold for highlighted
         }
@@ -647,6 +700,7 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setSelectedNodes(new Set());
     };
 
     const getLinkColor = () => {
@@ -696,7 +750,8 @@ const ChatGraph2D = ({ height, width, data, layers, handleCardData, handleScroll
             nodeLabel={getNodeLabel}
             onNodeClick={handleNodeClick}
             onNodeHover={handleNodeHover}
-            onNodeDragEnd={saveNodePosition}
+            onNodeDrag={handleNodeDrag}
+            onNodeDragEnd={handleNodeDragEnd}
             onEngineStop={handleEngineStop}
             onBackgroundClick={handleBackgroundClick}
             cooldownTicks={100}
