@@ -63,6 +63,9 @@ const ChatGraph3D = ({
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [draggedNode, setDraggedNode] = useState<any>(null);
+    const [dragStartPositions, setDragStartPositions] = useState<Map<any, { x: number; y: number; z: number }>>(
+        new Map(),
+    );
 
     const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
@@ -805,37 +808,50 @@ const ChatGraph3D = ({
 
     const handleNodeDrag = (node: any) => {
         setDraggedNode(node);
-    };
+        if (selectedNodes.has(node) && selectedNodes.size > 1) {
+            if (dragStartPositions.size === 0) {
+                const initialPositions = new Map();
+                [...selectedNodes].forEach((selNode) => {
+                    initialPositions.set(selNode, {
+                        x: selNode.x,
+                        y: selNode.y,
+                        z: selNode.z,
+                    });
+                });
+                setDragStartPositions(initialPositions);
+            }
 
-    const handleNodeDragEnd = (node: any) => {
-        if (selectedNodes.has(node) && selectedNodes.size > 1 && draggedNode === node) {
-            const finalX = node.x;
-            const finalY = node.y;
-            const finalZ = node.z;
-            
-            const originalPositions = [...selectedNodes].map(selNode => ({
-                node: selNode,
-                originalX: selNode.x,
-                originalY: selNode.y,
-                originalZ: selNode.z
-            }));
-            
-            const draggedOriginal = originalPositions.find(p => p.node === node);
-            
-            if (draggedOriginal) {
-                const offsetX = finalX - draggedOriginal.originalX;
-                const offsetY = finalY - draggedOriginal.originalY;
-                const offsetZ = finalZ - draggedOriginal.originalZ;
-                
-                [...selectedNodes].forEach(selNode => {
-                    const original = originalPositions.find(p => p.node === selNode);
-                    if (original) {
-                        selNode.fx = original.originalX + offsetX;
-                        selNode.fy = original.originalY + offsetY;
-                        selNode.fz = original.originalZ + offsetZ;
+            const draggedInitial = dragStartPositions.get(node);
+            if (draggedInitial) {
+                const offsetX = node.x - draggedInitial.x;
+                const offsetY = node.y - draggedInitial.y;
+                const offsetZ = node.z - draggedInitial.z;
+
+                [...selectedNodes].forEach((selNode) => {
+                    if (selNode !== node) {
+                        const initialPos = dragStartPositions.get(selNode);
+                        if (initialPos) {
+                            selNode.fx = initialPos.x + offsetX;
+                            selNode.fy = initialPos.y + offsetY;
+                            selNode.fz = initialPos.z + offsetZ;
+                        }
                     }
                 });
             }
+        }
+    };
+
+    const handleNodeDragEnd = (node: any) => {
+        setDragStartPositions(new Map());
+
+        if (selectedNodes.has(node) && selectedNodes.size > 1) {
+            [...selectedNodes].forEach((selNode) => {
+                if (selNode.x !== undefined && selNode.y !== undefined && selNode.z !== undefined) {
+                    selNode.fx = selNode.x;
+                    selNode.fy = selNode.y;
+                    selNode.fz = selNode.z;
+                }
+            });
         } else {
             if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
                 node.fx = node.x;
