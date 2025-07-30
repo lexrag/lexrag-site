@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import EvaluatorEmptyClient from '@/components/Evaluator/EvaluatorEmptyClient';
+import ChatProvider from '@/components/Chat/ChatProvider';
 
 export default function EvaluatorPage() {
     const onStartClick = () => {
@@ -10,6 +11,8 @@ export default function EvaluatorPage() {
     }
     
     return (
-        <EvaluatorEmptyClient onStartClick={onStartClick} />
+        <ChatProvider mode={"evaluator"}>
+            <EvaluatorEmptyClient onStartClick={onStartClick} />
+        </ChatProvider>
     )
 }

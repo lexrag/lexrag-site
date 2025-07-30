@@ -9,6 +9,7 @@ interface EvaluatorChatBoxProps {
     onStartClick: () => void;
     isSent: boolean;
     setSelectedMsgIdx: (idx: number) => void;
+    connectionError?: string | null;
 }
 
 interface isThinkingObj {
@@ -22,10 +23,15 @@ const EvaluatorChatBox = ({
     onStartClick,
     isSent,
     setSelectedMsgIdx,
+    connectionError,
 }: EvaluatorChatBoxProps) => {
     const [isThinkingObj, setIsThinkingObj] = useState<isThinkingObj | null>(null);
+    
+    // Removed empty useEffect that was causing issues
 
     useEffect(() => {
+        if (messages.length === 0) return;
+        
         const lastMsg = messages[messages.length - 1];
         const direction = lastMsg?.direction === "incoming" ? "outgoing" : "incoming";
 
@@ -35,11 +41,12 @@ const EvaluatorChatBox = ({
             count: (prev?.count || 0) + 1,
         }));
 
-        if (isThinkingObj && messages.length === 6) {
-            setIsThinkingObj({...isThinkingObj, isThinking: false});
+        // Stop thinking after 6 messages
+        if (messages.length >= 6) {
+            setIsThinkingObj(prev => prev ? {...prev, isThinking: false} : null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messages]);
+    }, [messages.length]);
 
     const onStartClickOverride = () => {
         setIsThinkingObj({
@@ -58,7 +65,17 @@ const EvaluatorChatBox = ({
 
     return (
         <div className={'flex flex-col w-full h-full'}>
-            {messages.length === 0 && (
+            {connectionError && (
+                <div className={'h-full flex flex-col justify-center items-center'}>
+                    <div className={'text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800'}>
+                        <h1 className={'text-xl font-bold text-red-600 dark:text-red-400 mb-2'}>Connection Error</h1>
+                        <p className={'text-red-600 dark:text-red-400'}>{connectionError}</p>
+                        <p className={'text-sm text-red-500 dark:text-red-400 mt-2'}>Please try refreshing the page or contact support.</p>
+                    </div>
+                </div>
+            )}
+            
+            {!connectionError && (!messages || messages.length === 0) && (
                 <div className={'h-full flex flex-col justify-center items-center'}>
                     <h1 className={'text-xl font-bold'}>Press "start" to start a synthetic conversation</h1>
                 </div>

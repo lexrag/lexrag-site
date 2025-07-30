@@ -8,6 +8,7 @@ interface ChatContextType {
     socket: WebSocket | null;
     conversations: Conversation[];
     setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
+    connectionError: string | null;
 }
 
 export const ChatSocketContext = createContext<ChatContextType | undefined>(undefined);
@@ -28,6 +29,7 @@ interface ChatProviderProps {
 const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [connectionError, setConnectionError] = useState<string | null>(null);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = 5;
     const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -67,15 +69,20 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
             ws.onopen = () => {
                 console.log('WebSocket connected:', wsUrl);
                 reconnectAttempts.current = 0;
+                setConnectionError(null);
             };
 
             ws.onclose = (e) => {
                 console.log('WebSocket closed:', e.reason);
+                if (e.reason) {
+                    setConnectionError(`Connection closed: ${e.reason}`);
+                }
                 attemptReconnect();
             };
 
             ws.onerror = (e) => {
                 console.log('WebSocket error', e);
+                setConnectionError('WebSocket connection error');
                 ws.close();
             };
         };
@@ -87,6 +94,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
                 reconnectAttempts.current += 1;
             } else {
                 console.error('Max WebSocket reconnect attempts reached');
+                setConnectionError('Failed to connect after multiple attempts');
             }
         };
 
@@ -100,7 +108,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     }, []);
 
     return (
-        <ChatSocketContext.Provider value={{ socket, conversations, setConversations }}>
+        <ChatSocketContext.Provider value={{ socket, conversations, setConversations, connectionError }}>
             {children}
         </ChatSocketContext.Provider>
     );

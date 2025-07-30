@@ -13,10 +13,10 @@ import { EvaluatorRun } from '@/types/EvaluatorRun';
 interface UseChatArgs {
     websocket: WebSocket | null;
     setConversations?: React.Dispatch<React.SetStateAction<Conversation[]>>;
-    setEvaluatorRun?: React.Dispatch<React.SetStateAction<EvaluatorRun>>;
+    setEvaluatorRun?: React.Dispatch<React.SetStateAction<EvaluatorRun | undefined>>;
 }
 
-export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
+export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseChatArgs) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isThinking, setIsThinking] = useState<boolean>(false);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
@@ -30,8 +30,16 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
     const threadId = useMemo(() => {
-        const match = pathname.match(/^\/chat\/([^\/]+)/);
-        return match ? match[1] : null;
+        if (pathname.startsWith('/chat/')) {
+            const match = pathname.match(/^\/chat\/([^\/]+)/);
+            return match ? match[1] : null;
+        } else if (pathname.startsWith('/evaluator/')) {
+            const match = pathname.match(/^\/evaluator\/([^\/]+)/);
+            const id = match ? match[1] : null;
+            console.log('Extracted evaluator thread ID:', id, 'from pathname:', pathname);
+            return id;
+        }
+        return null;
     }, [pathname]);
 
     useEffect(() => {
@@ -53,6 +61,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         if (!websocket || (!pathname.startsWith('/chat') && !pathname.startsWith("/evaluator"))) return;
 
         const handleMessage = async (event: MessageEvent) => {
+            console.log('WebSocket message received:', event.data);
             const data = JSON.parse(event.data);
 
             if (data.name === 'update_status') {
@@ -130,7 +139,10 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
             }
 
             if (data.name === 'evaluator') {
-                if (data.service_message.type === "message") {
+                console.log('Evaluator message received:', data);
+                console.log('Current messages before update:', messages);
+                
+                if (data.service_message && data.service_message.type === "message") {
                     const message = data.service_message.message
                     const direction = message.role === "ai" ? "incoming" : "outgoing";
                     const html = await renderMessageMd(message.content);
@@ -142,7 +154,34 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                         direction: direction,
                     };
 
-                    setMessages((prev) => [...prev, newMessage]);
+                    console.log('Adding evaluator message to chat:', newMessage);
+                    setMessages((prev) => {
+                        const updated = [...prev, newMessage];
+                        return updated;
+                    });
+                }
+                
+                // Handle evaluator run data
+                if (data.service_message && data.service_message.type === "run" && setEvaluatorRun) {
+                    console.log('Setting evaluator run:', data.service_message.run);
+                    if (data.service_message.run) {
+                        setEvaluatorRun(data.service_message.run);
+                    } else {
+                        console.warn('Empty run data received from WebSocket');
+                        setEvaluatorRun(undefined);
+                    }
+                }
+                
+                // Handle evaluator error
+                if (data.service_message && data.service_message.type === "error") {
+                    console.error('Evaluator error received:', data.service_message.error);
+                    const errorMessage: Message = {
+                        html: `<div class="text-red-500">Error: ${data.service_message.error}</div>`,
+                        id: uuidv4(),
+                        content: `Error: ${data.service_message.error}`,
+                        direction: 'incoming',
+                    };
+                    setMessages((prev) => [...prev, errorMessage]);
                 }
             }
         };
@@ -152,11 +191,18 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
         if (threadId !== 'new' && pathname.startsWith('/chat')) {
             getConversationSnapshot(threadId as string).then(setMessages);
         }
+        
+        // Initialize empty messages for evaluator paths
+        if (pathname.startsWith('/evaluator/') && threadId) {
+            console.log('Initializing empty messages for evaluator with threadId:', threadId);
+            setMessages([]);
+        }
 
         return () => {
             websocket.removeEventListener('message', handleMessage);
         };
-    }, [websocket, pathname, threadId, setConversations]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [websocket, pathname, threadId, setConversations, setEvaluatorRun]);
 
     const sendMessage = (input: string, isNew: boolean) => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
