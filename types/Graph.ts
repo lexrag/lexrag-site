@@ -21,3 +21,13 @@ export interface GraphNodePosition {
     fx?: number;
     fy?: number;
 }
+
+export interface GraphLink {
+    source: string | any;
+    target: string | any;
+    relation?: string;
+    relationType?: string;
+    weight?: number;
+    color?: string;
+    id?: string;
+}

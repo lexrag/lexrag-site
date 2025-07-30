@@ -55,10 +55,12 @@ const ChatGraph3D = ({
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+    const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const orbitAngleRef = useRef<number>(0);
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [draggedNode, setDraggedNode] = useState<any>(null);
 
     const isOrbitEnabled = externalIsOrbitEnabled ?? false;
@@ -299,6 +301,7 @@ const ChatGraph3D = ({
                     if (!allLinks.has(linkKey)) {
                         allLinks.set(linkKey, {
                             ...link,
+                            id: linkKey,
                             source: typeof link.source === 'object' ? link.source.id : link.source,
                             target: typeof link.target === 'object' ? link.target.id : link.target,
                         });
@@ -333,6 +336,7 @@ const ChatGraph3D = ({
             if (!allLinks.has(linkKey)) {
                 allLinks.set(linkKey, {
                     ...link,
+                    id: linkKey,
                     source: typeof link.source === 'object' ? link.source.id : link.source,
                     target: typeof link.target === 'object' ? link.target.id : link.target,
                 });
@@ -390,6 +394,8 @@ const ChatGraph3D = ({
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
+        setSelectedLinks(new Set());
+
         if (isOrbitEnabled && setIsOrbitEnabled) {
             setIsOrbitEnabled(false);
         }
@@ -444,6 +450,27 @@ const ChatGraph3D = ({
 
         setClickTimer(timer);
         setLastClickedNode(node.id);
+    };
+
+    const handleLinkClick = (link: any, event: any) => {
+        if (!link) return;
+
+        setSelectedNodes(new Set());
+        setHighlightedNodeId(null);
+
+        if (event.shiftKey) {
+            const newSelectedLinks = new Set(selectedLinks);
+            if (newSelectedLinks.has(link)) {
+                newSelectedLinks.delete(link);
+            } else {
+                newSelectedLinks.add(link);
+            }
+            setSelectedLinks(newSelectedLinks);
+        } else {
+            setSelectedLinks(new Set([link]));
+        }
+
+        console.log('Link selected:', link.id, link);
     };
 
     const handleNodeDoubleClick = async (node: any) => {
@@ -705,6 +732,16 @@ const ChatGraph3D = ({
         }
     };
 
+    const handleLinkHover = (link: any) => {
+        if (link) {
+            document.body.style.cursor = 'pointer';
+            setHighlightedLinkId(link.id);
+        } else {
+            document.body.style.cursor = 'default';
+            setHighlightedLinkId(null);
+        }
+    };
+
     const handleNodeDrag = (node: any) => {
         setDraggedNode(node);
     };
@@ -752,15 +789,37 @@ const ChatGraph3D = ({
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setHighlightedLinkId(null);
         setSelectedNodes(new Set());
+        setSelectedLinks(new Set());
         
         if (isOrbitEnabled && setIsOrbitEnabled) {
             setIsOrbitEnabled(false);
         }
     };
 
-    const getLinkColor = () => {
-        return resolvedTheme === 'dark' ? '#374151' : '#9ca3af';
+    const getLinkColor = (link: any) => {
+        if (selectedLinks.has(link)) {
+            return '#fbbf24';
+        }
+
+        if (highlightedLinkId === link.id) {
+            return '#00ffff';
+        }
+
+        return resolvedTheme === 'dark' ? '#6b7280' : '#9ca3af';
+    };
+
+    const getLinkWidth = (link: any) => {
+        if (selectedLinks.has(link)) {
+            return 3;
+        }
+
+        if (highlightedLinkId === link.id) {
+            return 2.5;
+        }
+
+        return 1.5;
     };
 
     const getNodeLabel = (node: any) => {
@@ -791,6 +850,33 @@ const ChatGraph3D = ({
         return baseLabel;
     };
 
+    const getLinkLabel = (link: any) => {
+        let label = '';
+
+        if (link.relation) {
+            label += `Relation: ${link.relation}`;
+        }
+
+        if (link.relationType) {
+            label += label ? `\nType: ${link.relationType}` : `Type: ${link.relationType}`;
+        }
+
+        if (link.weight !== undefined) {
+            label += label ? `\nWeight: ${link.weight}` : `Weight: ${link.weight}`;
+        }
+
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        
+        if (label) {
+            label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
+        } else {
+            label = `From: ${sourceId}\nTo: ${targetId}`;
+        }
+
+        return label;
+    };
+
     return (
         <ForceGraph3D
             ref={graphRef}
@@ -801,11 +887,15 @@ const ChatGraph3D = ({
             nodeColor={getNodeColor}
             nodeVal={getNodeSize}
             linkColor={getLinkColor}
+            linkWidth={getLinkWidth}
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
             nodeLabel={getNodeLabel}
+            linkLabel={getLinkLabel}
             onNodeClick={handleNodeClick}
+            onLinkClick={handleLinkClick}
             onNodeHover={handleNodeHover}
+            onLinkHover={handleLinkHover}
             onNodeDrag={handleNodeDrag}
             onNodeDragEnd={handleNodeDragEnd}
             onBackgroundClick={handleBackgroundClick}

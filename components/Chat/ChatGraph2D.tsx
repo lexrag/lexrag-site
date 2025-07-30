@@ -52,11 +52,13 @@ const ChatGraph2D = ({
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+    const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
 
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
+    const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [dragStartPositions, setDragStartPositions] = useState<Record<string, { x: number; y: number }>>({});
     const [isDragging, setIsDragging] = useState(false);
 
@@ -304,6 +306,7 @@ const ChatGraph2D = ({
                     if (!allLinks.has(linkKey)) {
                         allLinks.set(linkKey, {
                             ...link,
+                            id: linkKey,
                             source: typeof link.source === 'object' ? link.source.id : link.source,
                             target: typeof link.target === 'object' ? link.target.id : link.target,
                         });
@@ -350,6 +353,7 @@ const ChatGraph2D = ({
             if (!allLinks.has(linkKey)) {
                 allLinks.set(linkKey, {
                     ...link,
+                    id: linkKey,
                     source: typeof link.source === 'object' ? link.source.id : link.source,
                     target: typeof link.target === 'object' ? link.target.id : link.target,
                 });
@@ -366,6 +370,7 @@ const ChatGraph2D = ({
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
+            setHighlightedLinkId(null);
         });
 
         const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
@@ -438,6 +443,8 @@ const ChatGraph2D = ({
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
+        setSelectedLinks(new Set());
+
         // Check if this is a double click
         if (lastClickedNode === node.id && clickTimer) {
             // Double click detected - expand/collapse node
@@ -490,6 +497,27 @@ const ChatGraph2D = ({
 
         setClickTimer(timer);
         setLastClickedNode(node.id);
+    };
+
+    const handleLinkClick = (link: any, event: any) => {
+        if (!link) return;
+
+        setSelectedNodes(new Set());
+        setHighlightedNodeId(null);
+
+        if (event.shiftKey) {
+            const newSelectedLinks = new Set(selectedLinks);
+            if (newSelectedLinks.has(link)) {
+                newSelectedLinks.delete(link);
+            } else {
+                newSelectedLinks.add(link);
+            }
+            setSelectedLinks(newSelectedLinks);
+        } else {
+            setSelectedLinks(new Set([link]));
+        }
+
+        console.log('Link selected:', link.id, link);
     };
 
     const handleNodeDoubleClick = async (node: any) => {
@@ -719,14 +747,46 @@ const ChatGraph2D = ({
         }
     };
 
+    const handleLinkHover = (link: any) => {
+        if (link) {
+            document.body.style.cursor = 'pointer';
+            setHighlightedLinkId(link.id);
+        } else {
+            document.body.style.cursor = 'default';
+            setHighlightedLinkId(null);
+        }
+    };
+
     const handleBackgroundClick = () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
+        setHighlightedLinkId(null);
         setSelectedNodes(new Set());
+        setSelectedLinks(new Set());
     };
 
-    const getLinkColor = () => {
-        return resolvedTheme === 'dark' ? '#374151' : '#9ca3af';
+    const getLinkColor = (link: any) => {
+        if (selectedLinks.has(link)) {
+            return '#fbbf24';
+        }
+
+        if (highlightedLinkId === link.id) {
+            return '#00ffff';
+        }
+
+        return resolvedTheme === 'dark' ? '#6b7280' : '#9ca3af';
+    };
+
+    const getLinkWidth = (link: any) => {
+        if (selectedLinks.has(link)) {
+            return 3; 
+        }
+
+        if (highlightedLinkId === link.id) {
+            return 2.5; 
+        }
+
+        return 1.5; 
     };
 
     const getNodeLabel = (node: any) => {
@@ -757,6 +817,33 @@ const ChatGraph2D = ({
         return baseLabel;
     };
 
+    const getLinkLabel = (link: any) => {
+        let label = '';
+
+        if (link.relation) {
+            label += `Relation: ${link.relation}`;
+        }
+
+        if (link.relationType) {
+            label += label ? `\nType: ${link.relationType}` : `Type: ${link.relationType}`;
+        }
+
+        if (link.weight !== undefined) {
+            label += label ? `\nWeight: ${link.weight}` : `Weight: ${link.weight}`;
+        }
+
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        
+        if (label) {
+            label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
+        } else {
+            label = `From: ${sourceId}\nTo: ${targetId}`;
+        }
+
+        return label;
+    };
+
     return (
         <ForceGraph2D
             ref={graphRef}
@@ -767,11 +854,15 @@ const ChatGraph2D = ({
             nodeColor={getNodeColor}
             nodeVal={getNodeSize}
             linkColor={getLinkColor}
+            linkWidth={getLinkWidth}
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={() => 0.005}
             nodeLabel={getNodeLabel}
+            linkLabel={getLinkLabel}
             onNodeClick={handleNodeClick}
+            onLinkClick={handleLinkClick}
             onNodeHover={handleNodeHover}
+            onLinkHover={handleLinkHover}
             onNodeDrag={handleNodeDrag}
             onNodeDragEnd={handleNodeDragEnd}
             onEngineStop={handleEngineStop}
