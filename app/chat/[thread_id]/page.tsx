@@ -78,6 +78,12 @@ export default function ChatPage() {
         }
     };
 
+    const onRenameConversation = (threadId: string, newTitle: string) => {
+        setConversations((prev) =>
+            prev.map((c) => (c.thread_id === threadId ? { ...c, title: newTitle } : c))
+        );
+    };
+
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
@@ -104,6 +110,7 @@ export default function ChatPage() {
                 handleOpen={setIsOpenLeftSheet}
                 conversations={conversations}
                 handleDeleteConversation={onDeleteConversation}
+                onRenameConversation={onRenameConversation}
                 activeLeftTab={activeLeftTab}
                 setActiveLeftTab={setActiveLeftTab}
             />
@@ -123,6 +130,7 @@ export default function ChatPage() {
                 <ChatLeftPanel
                     conversations={conversations}
                     onDeleteConversation={onDeleteConversation}
+                    onRenameConversation={onRenameConversation}
                     activeLeftTab={activeLeftTab}
                     setActiveLeftTab={setActiveLeftTab}
                 />

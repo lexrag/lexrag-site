@@ -11,6 +11,7 @@ import { ChatSidebarPanelHeader } from './ChatSidebarPanelHeader';
 interface ChatLeftPanelProps {
     conversations: Conversation[];
     onDeleteConversation: (threadId: string) => void;
+    onRenameConversation?: (threadId: string, newTitle: string) => void;
     activeLeftTab: string;
     setActiveLeftTab: (tab: string) => void;
 }
@@ -18,6 +19,7 @@ interface ChatLeftPanelProps {
 const ChatLeftPanel = ({
     conversations,
     onDeleteConversation,
+    onRenameConversation,
     activeLeftTab,
     setActiveLeftTab,
 }: ChatLeftPanelProps) => {
@@ -48,6 +50,7 @@ const ChatLeftPanel = ({
                     <ChatSidebarMenu
                         conversations={conversations}
                         onDeleteConversation={onDeleteConversation}
+                        onRenameConversation={onRenameConversation}
                         showSettings={false}
                         isSidebarOpen={isSidebarOpen}
                     />

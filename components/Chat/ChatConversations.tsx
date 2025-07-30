@@ -1,17 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageSquarePlus, Trash2 } from 'lucide-react';
+import { MessageSquarePlus } from 'lucide-react';
 import { Conversation } from '@/types/Conversation';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Input } from '../ui/input';
+import { ChatItem } from './ChatItem';
 
 interface ChatConversationsProps {
     conversations: Conversation[];
     onDeleteConversation: (threadId: string) => void;
+    onRenameConversation?: (threadId: string, newTitle: string) => void;
 }
 
-const ChatConversations = ({ conversations, onDeleteConversation }: ChatConversationsProps) => {
+const ChatConversations = ({ conversations, onDeleteConversation, onRenameConversation }: ChatConversationsProps) => {
     return (
         <Card className="rounded-none border-0 shadow-none">
             <CardHeader className="border-none p-3">
@@ -25,30 +27,16 @@ const ChatConversations = ({ conversations, onDeleteConversation }: ChatConversa
             <CardContent className="p-3">
                 <div className="max-h-80 overflow-y-auto">
                     <ul className="space-y-2">
-                        {conversations.map(({ thread_id, title }) => (
-                            <li
-                                key={thread_id}
-                                className="group flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-muted transition-colors"
-                            >
-                                <Link
-                                    className="text-sm text-gray-800 truncate max-w-[85%]"
-                                    href={`/chat/${thread_id}`}
-                                >
-                                    {title}
-                                </Link>
-                                <div
-                                    className="hidden group-hover:block"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        onDeleteConversation(thread_id);
-                                    }}
-                                >
-                                    <Trash2
-                                        size={16}
-                                        className="text-muted-foreground hover:text-destructive transition"
-                                    />
-                                </div>
+                        {conversations.map(({ thread_id, title, isGenerating, isTitleGenerating }) => (
+                            <li key={thread_id}>
+                                <ChatItem
+                                    thread_id={thread_id}
+                                    title={title}
+                                    onDeleteConversation={onDeleteConversation}
+                                    onRenameConversation={onRenameConversation}
+                                    isGenerating={isGenerating}
+                                    isTitleGenerating={isTitleGenerating}
+                                />
                             </li>
                         ))}
                     </ul>

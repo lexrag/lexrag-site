@@ -8,6 +8,7 @@ import { SidebarMenu } from '@/components/Sidebar/SidebarMenu';
 interface ChatSidebarMenuProps {
     conversations: Conversation[];
     onDeleteConversation: (threadId: string) => void;
+    onRenameConversation?: (threadId: string, newTitle: string) => void;
     showSettings: boolean;
     className?: string;
     isSidebarOpen: boolean;
@@ -16,6 +17,7 @@ interface ChatSidebarMenuProps {
 export function ChatSidebarMenu({
     conversations,
     onDeleteConversation,
+    onRenameConversation,
     showSettings,
     className,
     isSidebarOpen,
@@ -42,12 +44,15 @@ export function ChatSidebarMenu({
                 ) : (
                     <div className="flex-1 min-h-0 overflow-y-auto">
                         <ul>
-                            {conversations.map(({ thread_id, title }) => (
+                            {conversations.map(({ thread_id, title, isGenerating, isTitleGenerating }) => (
                                 <ChatItem
                                     key={thread_id}
                                     thread_id={thread_id}
                                     title={title}
                                     onDeleteConversation={onDeleteConversation}
+                                    onRenameConversation={onRenameConversation}
+                                    isGenerating={isGenerating}
+                                    isTitleGenerating={isTitleGenerating}
                                 />
                             ))}
                         </ul>

@@ -3,4 +3,6 @@ export interface Conversation {
     user_id: string;
     title: string;
     updated_at: Date;
+    isGenerating?: boolean;
+    isTitleGenerating?: boolean;
 }

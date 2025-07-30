@@ -13,6 +13,7 @@ interface ChatLeftSheetProps {
     handleOpen: Dispatch<SetStateAction<boolean>>;
     conversations: Conversation[];
     handleDeleteConversation: (threadId: string) => void;
+    onRenameConversation?: (threadId: string, newTitle: string) => void;
     activeLeftTab: string;
     setActiveLeftTab: (tab: string) => void;
 }
@@ -22,6 +23,7 @@ const ChatLeftSheet = ({
     handleOpen,
     conversations,
     handleDeleteConversation,
+    onRenameConversation,
     activeLeftTab,
     setActiveLeftTab,
 }: ChatLeftSheetProps) => {
@@ -48,6 +50,7 @@ const ChatLeftSheet = ({
                             <ChatSidebarMenu
                                 conversations={conversations}
                                 onDeleteConversation={handleDeleteConversation}
+                                onRenameConversation={onRenameConversation}
                                 showSettings={showSettings}
                                 className="max-h-[calc(100vh-8.5rem)]"
                                 isSidebarOpen={isOpen}

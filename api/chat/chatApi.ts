@@ -101,7 +101,7 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                 });
             }
 
-            if (data.type === MessageTypes.stop) {
+            if (data.type === MessageTypes.stop) {             
                 const html = await renderMessageMd(accumulatedContentRef.current);
                 const message: Message = {
                     ...data,
@@ -117,6 +117,16 @@ export const useChat = ({ websocket, setConversations }: UseChatArgs) => {
                 setMessages((prev) => [...prev, message]);
                 setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
+                
+                if (setConversations && threadId !== 'new') {
+                    setConversations((prevConversations) =>
+                        prevConversations.map((conversation) =>
+                            conversation.thread_id === threadId
+                                ? { ...conversation, isGenerating: false }
+                                : conversation
+                        )
+                    );
+                }
             }
 
             if (data.name === 'evaluator') {
