@@ -101,13 +101,20 @@ const ChatGraph3D = ({
                 return;
             }
 
-            const distance = 1400;
+            const currentCameraPosition = graphRef.current.cameraPosition();
+            const currentDistance = Math.sqrt(
+                currentCameraPosition.x * currentCameraPosition.x + 
+                currentCameraPosition.z * currentCameraPosition.z
+            );
+            
+            const distance = currentDistance > 0 ? currentDistance : 1400;
 
             orbitIntervalRef.current = setInterval(() => {
                 if (graphRef.current) {
                     graphRef.current.cameraPosition({
                         x: distance * Math.sin(orbitAngleRef.current),
                         z: distance * Math.cos(orbitAngleRef.current),
+                        y: currentCameraPosition.y,
                     });
                     orbitAngleRef.current += Math.PI / 300;
                 }
