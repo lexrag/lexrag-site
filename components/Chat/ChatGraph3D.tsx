@@ -494,16 +494,19 @@ const ChatGraph3D = ({
                                 parentNode.z !== undefined
                             ) {
                                 const angle = (index / filteredNewNodes.length) * 2 * Math.PI;
-                                const radius = 50;
+                                const baseRadius = 120;
+                                const randomRadius = baseRadius + (Math.random() - 0.5) * 40;
+                                const randomAngle = angle + (Math.random() - 0.5) * 0.5;
+                                
+                                const finalX = parentNode.x + randomRadius * Math.cos(randomAngle);
+                                const finalY = parentNode.y + randomRadius * Math.sin(randomAngle);
+                                const finalZ = parentNode.z + (Math.random() - 0.5) * 60;
 
                                 return {
                                     ...newNode,
-                                    x: parentNode.x + radius * Math.cos(angle),
-                                    y: parentNode.y + radius * Math.sin(angle),
-                                    z: parentNode.z + (Math.random() - 0.5) * 20,
-                                    fx: parentNode.x + radius * Math.cos(angle),
-                                    fy: parentNode.y + radius * Math.sin(angle),
-                                    fz: parentNode.z + (Math.random() - 0.5) * 20,
+                                    x: finalX,
+                                    y: finalY,
+                                    z: finalZ,
                                 };
                             }
                             return newNode;
@@ -525,21 +528,6 @@ const ChatGraph3D = ({
                             graphRef.current?.zoomToFit(800);
                         }, 500);
 
-                        setTimeout(() => {
-                            setExpandedData((prev) => ({
-                                nodes: prev.nodes.map((n) => {
-                                    if (positionedNodes.some((pn: any) => pn.id === n.id)) {
-                                        const newNode = { ...n };
-                                        delete newNode.fx;
-                                        delete newNode.fy;
-                                        delete newNode.fz;
-                                        return newNode;
-                                    }
-                                    return n;
-                                }),
-                                links: prev.links,
-                            }));
-                        }, 1000);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
