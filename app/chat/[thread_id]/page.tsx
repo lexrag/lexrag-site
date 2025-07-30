@@ -98,6 +98,7 @@ export default function ChatPage() {
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}
+                setGraphLayers={setGraphLayers}
                 data={currentMessage}
                 handleCardData={setCardData}
             />
