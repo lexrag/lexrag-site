@@ -107,6 +107,19 @@ const ChatGraphModal = ({
             setSelectedItem(scrollToCardId);
             setSelectedGroup(groupKey);
 
+            // Find the target node in cardData and trigger zoom
+            const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
+            if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
+                // Trigger zoom to node for both 2D and 3D graphs
+                zoomToNodeGraph({
+                    id: scrollToCardId,
+                    x: targetNode.x,
+                    y: targetNode.y,
+                    z: targetNode.z,
+                    duration: 1000,
+                });
+            }
+
             setTimeout(() => {
                 let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
 

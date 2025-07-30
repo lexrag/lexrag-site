@@ -4,6 +4,7 @@ import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState }
 import dynamic from 'next/dynamic';
 import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
+import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer } from '@/types/Graph';
 
@@ -84,10 +85,7 @@ const ChatGraph3D = ({
 
 
 
-    useEffect(() => {
-        const unsubscribe = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
-        return unsubscribe;
-    }, []);
+
 
     useEffect(() => {
         if (orbitIntervalRef.current) {
@@ -367,6 +365,48 @@ const ChatGraph3D = ({
     }, [processedData, handleCardData]);
 
     useEffect(() => {
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
+        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
+            if (!graphRef.current) return;
+
+            if (!payload.x || !payload.y) {
+                const targetNode = processedData.nodes.find((node) => node.id === payload.id);
+                if (!targetNode) return;
+
+                payload.x = targetNode.x;
+                payload.y = targetNode.y;
+                payload.z = targetNode.z;
+            }
+
+            const distance = 400;
+            const duration = payload.duration || 1000;
+            
+            const cameraX = payload.x;
+            const cameraY = payload.y;
+            const cameraZ = (payload.z || 0) + distance;
+
+            graphRef.current.cameraPosition({
+                x: cameraX,
+                y: cameraY,
+                z: cameraZ,
+            }, duration);
+
+            if (payload.id) {
+                setHighlightedNodeId(payload.id);
+
+                setTimeout(() => {
+                    setHighlightedNodeId(null);
+                }, 3000);
+            }
+        });
+
+        return () => {
+            unsubscribeZoomToFit();
+            unsubscribeZoomToNode();
+        };
+    }, [processedData]);
+
+    useEffect(() => {
         let animationFrame: number;
 
         const waitForGraph = () => {
@@ -436,6 +476,14 @@ const ChatGraph3D = ({
             // Single click confirmed - select node
             if (handleScrollToCardId) {
                 handleScrollToCardId(node.id);
+            }
+
+            if (node.x !== undefined && node.y !== undefined) {
+                graphRef.current?.cameraPosition({
+                    x: node.x,
+                    y: node.y,
+                    z: (node.z || 0) + 400,
+                }, 1000);
             }
 
             setHighlightedNodeId(node.id);
@@ -586,7 +634,7 @@ const ChatGraph3D = ({
         }
 
         if (highlightedNodeId === node.id) {
-            return '#fbbf24'; // Gold for highlighted
+            return '#00ffff';
         }
 
         if (loadingNodes.has(node.id)) {

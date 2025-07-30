@@ -106,6 +106,17 @@ const ChatRightPanel = ({
             setSelectedItem(scrollToCardId);
             setSelectedGroup(groupKey);
 
+            const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
+            if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
+                zoomToNodeGraph({
+                    id: scrollToCardId,
+                    x: targetNode.x,
+                    y: targetNode.y,
+                    z: targetNode.z,
+                    duration: 1000,
+                });
+            }
+
             setTimeout(() => {
                 let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
 
