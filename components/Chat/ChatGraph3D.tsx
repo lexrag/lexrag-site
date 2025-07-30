@@ -404,7 +404,7 @@ const ChatGraph3D = ({
             return;
         }
 
-        if (event.altKey || event.ctrlKey || event.shiftKey) {
+        if (event.shiftKey) {
             const newSelectedNodes = new Set(selectedNodes);
             if (newSelectedNodes.has(node)) {
                 newSelectedNodes.delete(node);
@@ -414,6 +414,8 @@ const ChatGraph3D = ({
             setSelectedNodes(newSelectedNodes);
             return;
         }
+
+        setSelectedNodes(new Set([node]));
 
         // Single click - select node
         console.log('Node selected:', node.id);
