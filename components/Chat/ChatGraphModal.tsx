@@ -80,6 +80,7 @@ const ChatGraphModal = ({ open, onOpenChange, graphView, setGraphView, graphLaye
                                 handleCardData={handleCardData} 
                                 handleScrollToCardId={setScrollToCardId}
                                 isOrbitEnabled={isOrbitEnabled}
+                                setIsOrbitEnabled={setIsOrbitEnabled}
                                 expandedNodes={expandedNodes}
                                 setExpandedNodes={setExpandedNodes}
                                 nodeHierarchy={nodeHierarchy}

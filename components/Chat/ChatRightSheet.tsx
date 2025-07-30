@@ -209,6 +209,7 @@ const ChatRightSheet = ({
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
                                     isOrbitEnabled={isOrbitEnabled}
+                                    setIsOrbitEnabled={setIsOrbitEnabled}
                                     expandedNodes={expandedNodes}
                                     setExpandedNodes={setExpandedNodes}
                                     nodeHierarchy={nodeHierarchy}

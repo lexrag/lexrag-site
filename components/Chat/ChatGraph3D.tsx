@@ -17,6 +17,7 @@ interface ChatGraph3DProps {
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId?: Dispatch<SetStateAction<string>>;
     isOrbitEnabled?: boolean;
+    setIsOrbitEnabled?: Dispatch<SetStateAction<boolean>>;
 
     expandedNodes: Set<string>;
     setExpandedNodes: Dispatch<SetStateAction<Set<string>>>;
@@ -36,6 +37,7 @@ const ChatGraph3D = ({
     handleCardData,
     handleScrollToCardId,
     isOrbitEnabled: externalIsOrbitEnabled,
+    setIsOrbitEnabled,
     expandedNodes,
     setExpandedNodes,
     nodeHierarchy,
@@ -387,6 +389,10 @@ const ChatGraph3D = ({
 
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
+
+        if (isOrbitEnabled && setIsOrbitEnabled) {
+            setIsOrbitEnabled(false);
+        }
 
         // Check if this is a double click
         if (lastClickedNode === node.id && clickTimer) {
@@ -757,6 +763,10 @@ const ChatGraph3D = ({
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
         setSelectedNodes(new Set());
+        
+        if (isOrbitEnabled && setIsOrbitEnabled) {
+            setIsOrbitEnabled(false);
+        }
     };
 
     const getLinkColor = () => {
