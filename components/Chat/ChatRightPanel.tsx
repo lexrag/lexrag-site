@@ -424,24 +424,40 @@ const ChatRightPanel = ({
         const getBadgeColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'bg-purple-100 text-purple-800 border-purple-200';
+                    return 'bg-green-100 text-green-800 border-green-200';
                 case 'concept':
-                    return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    return 'bg-blue-100 text-blue-800 border-blue-200';
                 default:
                     return 'bg-gray-100 text-gray-800 border-gray-200';
             }
         };
 
+        const getBadgeTitleColor = (type: string) => {
+            switch (type) {
+                case 'topic':
+                    return 'text-green-800';
+                case 'concept':
+                    return 'text-blue-800';
+                default:
+                    return 'text-gray-800';
+            }
+        }
+
         return (
-            <div className="flex flex-wrap gap-1 mb-2">
-                {items.map((item, index) => (
-                    <span
-                        key={index}
-                        className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
-                    >
-                        {item}
-                    </span>
-                ))}
+            <div className="flex flex-wrap gap-2 mb-2">
+                <span className={`px-2 py-0.5 text-xs font-medium ${getBadgeTitleColor(type)}`}>
+                    {`legal ${type}s`}
+                </span>
+                <div className="flex flex-wrap gap-1 mb-2">
+                    {items.map((item, index) => (
+                        <span
+                            key={index}
+                            className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
+                        >
+                            {item}
+                        </span>
+                    ))}
+                </div>
             </div>
         );
     };
@@ -666,7 +682,7 @@ const ChatRightPanel = ({
                                             <AccordionItem
                                                 key={parentId}
                                                 value={parentId}
-                                                className={`transition-all duration-300 ${
+                                                className={`transition-all duration-300 pr-4 ${
                                                     selectedItem === parentId
                                                         ? 'border-l-2 border-l-primary bg-primary/10'
                                                         : selectedGroup === parentId
@@ -780,18 +796,22 @@ const ChatRightPanel = ({
                                                                                 )}
                                                                             </div>
 
+                                                                            <div className='flex gap-1'>
+                                                                            {/* Functional Object */}
+                                                                            {nodeInfo.functionalObject && (
+                                                                                <div className="w-full text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
+                                                                                    {nodeInfo.functionalObject}
+                                                                                </div>
+                                                                            )}
+                                                                            {((nodeInfo.topics?.length > 0) || (nodeInfo.concepts?.length > 0)) && (
+                                                                            <div className='w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200'>
                                                                             {/* Topics badges */}
                                                                             {renderBadges(nodeInfo.topics, 'topic')}
 
                                                                             {/* Concepts badges */}
                                                                             {renderBadges(nodeInfo.concepts, 'concept')}
-
-                                                                            {/* Functional Object */}
-                                                                            {nodeInfo.functionalObject && (
-                                                                                <div className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
-                                                                                    {nodeInfo.functionalObject}
-                                                                                </div>
-                                                                            )}
+                                                                            </div>)}
+                                                                            </div>
 
                                                                             {/* Content with collapsible functionality */}
                                                                             {hasContent && (
