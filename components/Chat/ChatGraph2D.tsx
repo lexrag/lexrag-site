@@ -61,6 +61,8 @@ const ChatGraph2D = ({
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [dragStartPositions, setDragStartPositions] = useState<Record<string, { x: number; y: number }>>({});
     const [isDragging, setIsDragging] = useState(false);
+    const [isZooming, setisZooming] = useState(false)
+    const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -387,9 +389,15 @@ const ChatGraph2D = ({
 
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
+                setisZooming(true)
 
-                setTimeout(() => {
+                if (zoomTimeoutRef.current) {
+                    clearTimeout(zoomTimeoutRef.current);
+                }
+                zoomTimeoutRef.current = setTimeout(() => {
                     setHighlightedNodeId(null);
+                    setisZooming(false);
+                    zoomTimeoutRef.current = null;
                 }, 3000);
             }
         });
@@ -793,6 +801,8 @@ const ChatGraph2D = ({
     };
 
     const handleLinkHover = (link: any) => {
+        if (isZooming) return;
+
         if (link) {
             document.body.style.cursor = 'pointer';
             setHighlightedLinkId(link.id);
