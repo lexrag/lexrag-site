@@ -28,12 +28,12 @@ interface ChatGraph2DProps {
     setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
 }
 
-const ChatGraph2D = ({ 
-    height, 
-    width, 
-    data, 
-    layers, 
-    handleCardData, 
+const ChatGraph2D = ({
+    height,
+    width,
+    data,
+    layers,
+    handleCardData,
     handleScrollToCardId,
     expandedNodes,
     setExpandedNodes,
@@ -66,7 +66,7 @@ const ChatGraph2D = ({
         const updateDimensions = () => {
             const effectiveWidth = width || window.innerWidth * 0.9 - 24;
             const effectiveHeight = height || window.innerHeight * 0.9 - 24;
-            
+
             setDimensions({
                 width: effectiveWidth,
                 height: effectiveHeight,
@@ -78,13 +78,11 @@ const ChatGraph2D = ({
         return () => window.removeEventListener('resize', updateDimensions);
     }, [width, height]);
 
-
-
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
             node.fx = node.x;
             node.fy = node.y;
-            
+
             nodePositionsRef.current[node.id] = {
                 x: node.x,
                 y: node.y,
@@ -100,14 +98,14 @@ const ChatGraph2D = ({
         if (selectedNodes.has(node)) {
             if (!isDragging) {
                 const positions: Record<string, { x: number; y: number }> = {};
-                [...selectedNodes].forEach(selNode => {
+                [...selectedNodes].forEach((selNode) => {
                     positions[selNode.id] = { x: selNode.x, y: selNode.y };
                 });
                 setDragStartPositions(positions);
                 setIsDragging(true);
             }
 
-            [...selectedNodes].forEach(selNode => {
+            [...selectedNodes].forEach((selNode) => {
                 const startPos = dragStartPositions[selNode.id];
                 if (startPos) {
                     selNode.fx = startPos.x + translate.x;
@@ -119,7 +117,7 @@ const ChatGraph2D = ({
 
     const handleNodeDragEnd = (node: any) => {
         if (selectedNodes.has(node)) {
-            [...selectedNodes].forEach(selNode => {
+            [...selectedNodes].forEach((selNode) => {
                 saveNodePosition(selNode);
             });
             setDragStartPositions({});
@@ -424,7 +422,7 @@ const ChatGraph2D = ({
             const linkForce = fg.d3Force('link');
 
             if (linkForce) {
-                linkForce.distance(100).strength(0.1);
+                linkForce.distance(100).strength(0);
             }
 
             const chargeForce = fg.d3Force('charge');
@@ -597,36 +595,39 @@ const ChatGraph2D = ({
 
     const getNodeColor = (node: any) => {
         if (selectedNodes.has(node)) {
-            return '#fbbf24';
-        }
-
-        if (highlightedNodeId === node.id) {
-            return '#00ffff'; // Сyan for highlighted
+            return { r: 251, g: 191, b: 36 }; // #fbbf24
         }
 
         if (loadingNodes.has(node.id)) {
-            return '#f59e0b'; // Orange for loading
+            return { r: 245, g: 158, b: 11 }; // #f59e0b
         }
 
         if (node.color && (!node.labels || node.labels.length === 0)) {
-            return node.color;
+            const hex = node.color.replace('#', '');
+            const bigint = parseInt(hex, 16);
+            return {
+                r: (bigint >> 16) & 255,
+                g: (bigint >> 8) & 255,
+                b: bigint & 255,
+            };
         }
 
         if (node.labels) {
+            // Updated color mapping based on the provided table
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return '#dc2626'; // Red for case/lawsuit
+                return { r: 217, g: 200, b: 174 }; // #D9C8AE
             }
 
             if (node.labels.includes('Paragraph')) {
-                return '#eab308'; // Yellow for paragraphs
+                return { r: 141, g: 204, b: 147 }; // #8DCC93
             }
 
             if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
-                return '#16a34a'; // Green for court
+                return { r: 218, g: 113, b: 148 }; // #DA7194
             }
 
             if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
-                return '#ef4444'; // Lighter red for judge
+                return { r: 201, g: 144, b: 192 }; // #C990C0
             }
 
             if (
@@ -636,7 +637,7 @@ const ChatGraph2D = ({
                 node.labels.includes('Appellant') ||
                 node.labels.includes('Respondent')
             ) {
-                return '#06b6d4'; // Cyan for parties
+                return { r: 236, g: 181, b: 201 }; // #ECB5C9
             }
 
             if (
@@ -645,32 +646,78 @@ const ChatGraph2D = ({
                 node.labels.includes('Statute') ||
                 node.labels.includes('Legislation')
             ) {
-                return '#2563eb'; // Blue for legislation
+                return { r: 247, g: 151, b: 103 }; // #F79767
             }
 
             if (
                 node.labels.includes('Regulation') ||
                 node.labels.includes('Order') ||
                 node.labels.includes('Decree') ||
-                node.labels.includes('Resolution')
+                node.labels.includes('Resolution') ||
+                node.labels.includes('SubsidiaryLegislation')
             ) {
-                return '#7c3aed'; // Purple for regulations
+                return { r: 236, g: 181, b: 201 }; // #ECB5C9
             }
 
             if (node.labels.includes('Article') || node.labels.includes('Section')) {
-                return '#4f46e5'; // Indigo for articles
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
             }
 
             if (node.labels.includes('Citation') || node.labels.includes('Reference')) {
-                return '#ec4899'; // Pink for citations
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
             }
 
             if (node.labels.includes('Document') || node.labels.includes('Filing')) {
-                return '#a3a3a3'; // Gray for documents
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            // New labels from the table
+            if (node.labels.includes('Resource')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            if (node.labels.includes('Work')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            if (node.labels.includes('Organization')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            if (node.labels.includes('Person')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            if (node.labels.includes('Embeddable')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+            }
+
+            if (node.labels.includes('MasterExpression')) {
+                return { r: 241, g: 102, b: 103 }; // #F16667
+            }
+
+            if (node.labels.includes('SubTopic')) {
+                return { r: 87, g: 199, b: 227 }; // #57C7E3
+            }
+
+            if (node.labels.includes('Expression')) {
+                return { r: 241, g: 102, b: 103 }; // #F16667
+            }
+
+            if (node.labels.includes('Topic')) {
+                return { r: 76, g: 142, b: 218 }; // #4C8EDA
+            }
+
+            if (node.labels.includes('PartOfTheLegislation')) {
+                return { r: 255, g: 196, b: 84 }; // #FFC454
+            }
+
+            if (node.labels.includes('SLOpening')) {
+                return { r: 165, g: 171, b: 182 }; // #A5ABB6
             }
         }
 
-        return '#6b7280'; // Gray for unknown types
+        return { r: 165, g: 171, b: 182 }; // Default #A5ABB6
     };
 
     const getNodeSize = (node: any) => {
@@ -680,61 +727,59 @@ const ChatGraph2D = ({
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 12; // Large for cases
+                return 40; // 80px diameter / 2
             }
 
-            if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
-                return 10; // Large for courts
+            if (node.labels.includes('Paragraph')) {
+                return 10; // 20px diameter / 2
             }
 
-            if (
-                node.labels.includes('Act') ||
-                node.labels.includes('Law') ||
-                node.labels.includes('Statute') ||
-                node.labels.includes('Legislation')
-            ) {
-                return 8; // Medium for legislation
+            if (node.labels.includes('Act')) {
+                return 40; // 80px diameter / 2
             }
 
-            if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
-                return 7; // Medium for judges
+            if (node.labels.includes('PartOfTheLegislation')) {
+                return 10; // 20px diameter / 2
             }
 
             if (
+                node.labels.includes('Court') ||
+                node.labels.includes('Tribunal') ||
+                node.labels.includes('Judge') ||
+                node.labels.includes('Justice') ||
                 node.labels.includes('Party') ||
                 node.labels.includes('Plaintiff') ||
                 node.labels.includes('Defendant') ||
                 node.labels.includes('Appellant') ||
-                node.labels.includes('Respondent')
-            ) {
-                return 5; // Small for parties
-            }
-
-            // Маленькие узлы - параграфы
-            if (node.labels.includes('Paragraph')) {
-                return 6; // Small for paragraphs
-            }
-
-            if (
+                node.labels.includes('Respondent') ||
+                node.labels.includes('Legislation') ||
                 node.labels.includes('Regulation') ||
                 node.labels.includes('Order') ||
                 node.labels.includes('Decree') ||
-                node.labels.includes('Resolution')
-            ) {
-                return 7; // Medium for regulations
-            }
-
-            if (
+                node.labels.includes('Resolution') ||
                 node.labels.includes('Article') ||
                 node.labels.includes('Section') ||
                 node.labels.includes('Citation') ||
-                node.labels.includes('Reference')
+                node.labels.includes('Reference') ||
+                node.labels.includes('Document') ||
+                node.labels.includes('Filing') ||
+                node.labels.includes('Resource') ||
+                node.labels.includes('Work') ||
+                node.labels.includes('Organization') ||
+                node.labels.includes('Person') ||
+                node.labels.includes('Embeddable') ||
+                node.labels.includes('MasterExpression') ||
+                node.labels.includes('SubTopic') ||
+                node.labels.includes('Expression') ||
+                node.labels.includes('Topic') ||
+                node.labels.includes('SubsidiaryLegislation') ||
+                node.labels.includes('SLOpening')
             ) {
-                return 5; // Small for articles/citations
+                return 25; // 50px diameter / 2
             }
         }
 
-        return 6;
+        return 25; // Default 50px diameter / 2
     };
 
     const handleNodeHover = (node: any) => {
@@ -844,6 +889,42 @@ const ChatGraph2D = ({
         return label;
     };
 
+    const nodeCanvasObject = (node: any, ctx: any) => {
+        const nodeSize = getNodeSize(node);
+        const rgb = getNodeColor(node);
+
+        if (highlightedNodeId === node.id) {
+            ctx.save();
+
+            const glowRadius = nodeSize * 3.5;
+            const gradient = ctx.createRadialGradient(node.x, node.y, nodeSize, node.x, node.y, glowRadius);
+
+            gradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`);
+            gradient.addColorStop(0.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
+            gradient.addColorStop(0.6, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`);
+            gradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, nodeSize, 0, 2 * Math.PI, false);
+        ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        ctx.fill();
+
+        if (highlightedNodeId === node.id) {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, nodeSize, 0, 2 * Math.PI, false);
+            ctx.fillStyle = `rgba(255, 255, 255, 0.3)`;
+            ctx.fill();
+        }
+    };
+
     return (
         <ForceGraph2D
             ref={graphRef}
@@ -851,8 +932,12 @@ const ChatGraph2D = ({
             height={height || dimensions.height}
             graphData={processedData}
             backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
-            nodeColor={getNodeColor}
-            nodeVal={getNodeSize}
+            nodeCanvasObject={nodeCanvasObject}
+            nodeCanvasObjectMode={() => 'replace'}
+            // nodeVal={(node) => {
+            //     const nodeSize = getNodeSize(node);
+            //     return nodeSize * nodeSize;
+            // }}
             linkColor={getLinkColor}
             linkWidth={getLinkWidth}
             linkDirectionalParticles={2}

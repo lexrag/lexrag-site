@@ -6,6 +6,7 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
+// import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GraphData, GraphLayer } from '@/types/Graph';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
@@ -59,10 +60,11 @@ const ChatGraph3D = ({
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const orbitAngleRef = useRef<number>(0);
+    const bloomPassRef = useRef<any>(null);
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
-    const [, setDraggedNode] = useState<any>(null);
+    const [draggedNode, setDraggedNode] = useState<any>(null);
     const [dragStartPositions, setDragStartPositions] = useState<Map<any, { x: number; y: number; z: number }>>(
         new Map(),
     );
@@ -74,7 +76,7 @@ const ChatGraph3D = ({
         const updateDimensions = () => {
             const effectiveWidth = width || window.innerWidth * 0.9 - 24;
             const effectiveHeight = height || window.innerHeight * 0.9 - 24;
-            
+
             setDimensions({
                 width: effectiveWidth,
                 height: effectiveHeight,
@@ -85,10 +87,6 @@ const ChatGraph3D = ({
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
     }, [data, width, height]);
-
-
-
-
 
     useEffect(() => {
         if (orbitIntervalRef.current) {
@@ -148,6 +146,54 @@ const ChatGraph3D = ({
             }
         };
     }, [isOrbitEnabled]);
+
+    // useEffect(() => {
+    //     if (!graphRef.current) return;
+
+    //     const bloomPass = new UnrealBloomPass();
+    //     bloomPass.strength = 4;
+    //     bloomPass.radius = 1;
+    //     bloomPass.threshold = 0;
+    //     graphRef.current.postProcessingComposer().addPass(bloomPass);
+    // }, [graphRef]);
+
+    // useEffect(() => {
+    //     if(!graphRef.current) return;
+    //     console.log(graphRef)
+    //     const bloomPass = new UnrealBloomPass();
+    //     console.log(bloomPass)
+    //     bloomPass.strength = 4;
+    //     bloomPass.radius = 1;
+    //     bloomPass.threshold = 0;
+    //     graphRef.current.postProcessingComposer().addPass(bloomPass);
+    // }, [graphRef]);
+
+    // useEffect(() => {
+    //     if (graphRef.current && !bloomPassRef.current) {
+    //         const bloomPass = new UnrealBloomPass();
+    //         bloomPass.strength = highlightedNodeId ? 2.5 : 1.5;
+    //         bloomPass.radius = 1;
+    //         bloomPass.threshold = 0.1;
+
+    //         bloomPassRef.current = bloomPass;
+    //         graphRef.current.postProcessingComposer().addPass(bloomPass);
+    //     }
+    // }, []);
+
+    // Update bloom intensity when node is highlighted
+    useEffect(() => {
+        if (bloomPassRef.current) {
+            if (highlightedNodeId) {
+                bloomPassRef.current.strength = 3.0;
+                bloomPassRef.current.radius = 1.2;
+                bloomPassRef.current.threshold = 0;
+            } else {
+                bloomPassRef.current.strength = 1.5;
+                bloomPassRef.current.radius = 1;
+                bloomPassRef.current.threshold = 0.1;
+            }
+        }
+    }, [highlightedNodeId]);
 
     useEffect(() => {
         return () => {
@@ -396,16 +442,19 @@ const ChatGraph3D = ({
 
             const distance = 400;
             const duration = payload.duration || 1000;
-            
+
             const cameraX = payload.x;
             const cameraY = payload.y;
             const cameraZ = (payload.z || 0) + distance;
 
-            graphRef.current.cameraPosition({
-                x: cameraX,
-                y: cameraY,
-                z: cameraZ,
-            }, duration);
+            graphRef.current.cameraPosition(
+                {
+                    x: cameraX,
+                    y: cameraY,
+                    z: cameraZ,
+                },
+                duration,
+            );
 
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
@@ -495,11 +544,14 @@ const ChatGraph3D = ({
             }
 
             if (node.x !== undefined && node.y !== undefined) {
-                graphRef.current?.cameraPosition({
-                    x: node.x,
-                    y: node.y,
-                    z: (node.z || 0) + 400,
-                }, 1000);
+                graphRef.current?.cameraPosition(
+                    {
+                        x: node.x,
+                        y: node.y,
+                        z: (node.z || 0) + 400,
+                    },
+                    1000,
+                );
             }
 
             setHighlightedNodeId(node.id);
@@ -590,7 +642,7 @@ const ChatGraph3D = ({
                                 const baseRadius = 120;
                                 const randomRadius = baseRadius + (Math.random() - 0.5) * 40;
                                 const randomAngle = angle + (Math.random() - 0.5) * 0.5;
-                                
+
                                 const finalX = parentNode.x + randomRadius * Math.cos(randomAngle);
                                 const finalY = parentNode.y + randomRadius * Math.sin(randomAngle);
                                 const finalZ = parentNode.z + (Math.random() - 0.5) * 60;
@@ -621,7 +673,6 @@ const ChatGraph3D = ({
                             graphRef.current?.zoomToFit(800);
                         }, 500);
 
-
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
@@ -644,9 +695,10 @@ const ChatGraph3D = ({
         }
     };
 
+    // Updated getNodeColor function - same as 2D but converted to hex
     const getNodeColor = (node: any) => {
         if (selectedNodes.has(node)) {
-            return '#fbbf24';
+            return '#fbbf24'; // #fbbf24 (rgb(251, 191, 36))
         }
 
         if (highlightedNodeId === node.id) {
@@ -654,7 +706,7 @@ const ChatGraph3D = ({
         }
 
         if (loadingNodes.has(node.id)) {
-            return '#f59e0b'; // Orange for loading
+            return '#f59e0b'; // #f59e0b (rgb(245, 158, 11))
         }
 
         if (node.color && (!node.labels || node.labels.length === 0)) {
@@ -662,20 +714,21 @@ const ChatGraph3D = ({
         }
 
         if (node.labels) {
+            // Updated color mapping based on the 2D graph
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return '#dc2626'; // Red for case/lawsuit
+                return '#D9C8AE'; // rgb(217, 200, 174)
             }
 
             if (node.labels.includes('Paragraph')) {
-                return '#eab308'; // Yellow for paragraphs
+                return '#8DCC93'; // rgb(141, 204, 147)
             }
 
             if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
-                return '#16a34a'; // Green for court
+                return '#DA7194'; // rgb(218, 113, 148)
             }
 
             if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
-                return '#ef4444'; // Lighter red for judge
+                return '#C990C0'; // rgb(201, 144, 192)
             }
 
             if (
@@ -685,7 +738,7 @@ const ChatGraph3D = ({
                 node.labels.includes('Appellant') ||
                 node.labels.includes('Respondent')
             ) {
-                return '#06b6d4'; // Cyan for parties
+                return '#ECB5C9'; // rgb(236, 181, 201)
             }
 
             if (
@@ -694,34 +747,81 @@ const ChatGraph3D = ({
                 node.labels.includes('Statute') ||
                 node.labels.includes('Legislation')
             ) {
-                return '#2563eb'; // Blue for legislation
+                return '#F79767'; // rgb(247, 151, 103)
             }
 
             if (
                 node.labels.includes('Regulation') ||
                 node.labels.includes('Order') ||
                 node.labels.includes('Decree') ||
-                node.labels.includes('Resolution')
+                node.labels.includes('Resolution') ||
+                node.labels.includes('SubsidiaryLegislation')
             ) {
-                return '#7c3aed'; // Purple for regulations
+                return '#ECB5C9'; // rgb(236, 181, 201)
             }
 
             if (node.labels.includes('Article') || node.labels.includes('Section')) {
-                return '#4f46e5'; // Indigo for articles
+                return '#A5ABB6'; // rgb(165, 171, 182)
             }
 
             if (node.labels.includes('Citation') || node.labels.includes('Reference')) {
-                return '#ec4899'; // Pink for citations
+                return '#A5ABB6'; // rgb(165, 171, 182)
             }
 
             if (node.labels.includes('Document') || node.labels.includes('Filing')) {
-                return '#a3a3a3'; // Gray for documents
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            // New labels from the table
+            if (node.labels.includes('Resource')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            if (node.labels.includes('Work')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            if (node.labels.includes('Organization')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            if (node.labels.includes('Person')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            if (node.labels.includes('Embeddable')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
+            }
+
+            if (node.labels.includes('MasterExpression')) {
+                return '#F16667'; // rgb(241, 102, 103)
+            }
+
+            if (node.labels.includes('SubTopic')) {
+                return '#57C7E3'; // rgb(87, 199, 227)
+            }
+
+            if (node.labels.includes('Expression')) {
+                return '#F16667'; // rgb(241, 102, 103)
+            }
+
+            if (node.labels.includes('Topic')) {
+                return '#4C8EDA'; // rgb(76, 142, 218)
+            }
+
+            if (node.labels.includes('PartOfTheLegislation')) {
+                return '#FFC454'; // rgb(255, 196, 84)
+            }
+
+            if (node.labels.includes('SLOpening')) {
+                return '#A5ABB6'; // rgb(165, 171, 182)
             }
         }
 
-        return '#6b7280'; // Gray for unknown types
+        return '#A5ABB6'; // Default rgb(165, 171, 182)
     };
 
+    // Updated getNodeSize function - same as 2D graph
     const getNodeSize = (node: any) => {
         if (loadingNodes.has(node.id)) {
             return 8;
@@ -729,61 +829,59 @@ const ChatGraph3D = ({
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 12; // Large for cases
+                return 40; // 80px diameter / 2
             }
 
-            if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
-                return 10; // Large for courts
+            if (node.labels.includes('Paragraph')) {
+                return 10; // 20px diameter / 2
             }
 
-            if (
-                node.labels.includes('Act') ||
-                node.labels.includes('Law') ||
-                node.labels.includes('Statute') ||
-                node.labels.includes('Legislation')
-            ) {
-                return 8; // Medium for legislation
+            if (node.labels.includes('Act')) {
+                return 40; // 80px diameter / 2
             }
 
-            if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
-                return 7; // Medium for judges
+            if (node.labels.includes('PartOfTheLegislation')) {
+                return 10; // 20px diameter / 2
             }
 
             if (
+                node.labels.includes('Court') ||
+                node.labels.includes('Tribunal') ||
+                node.labels.includes('Judge') ||
+                node.labels.includes('Justice') ||
                 node.labels.includes('Party') ||
                 node.labels.includes('Plaintiff') ||
                 node.labels.includes('Defendant') ||
                 node.labels.includes('Appellant') ||
-                node.labels.includes('Respondent')
-            ) {
-                return 5; // Small for parties
-            }
-
-            // Маленькие узлы - параграфы
-            if (node.labels.includes('Paragraph')) {
-                return 6; // Small for paragraphs
-            }
-
-            if (
+                node.labels.includes('Respondent') ||
+                node.labels.includes('Legislation') ||
                 node.labels.includes('Regulation') ||
                 node.labels.includes('Order') ||
                 node.labels.includes('Decree') ||
-                node.labels.includes('Resolution')
-            ) {
-                return 7; // Medium for regulations
-            }
-
-            if (
+                node.labels.includes('Resolution') ||
                 node.labels.includes('Article') ||
                 node.labels.includes('Section') ||
                 node.labels.includes('Citation') ||
-                node.labels.includes('Reference')
+                node.labels.includes('Reference') ||
+                node.labels.includes('Document') ||
+                node.labels.includes('Filing') ||
+                node.labels.includes('Resource') ||
+                node.labels.includes('Work') ||
+                node.labels.includes('Organization') ||
+                node.labels.includes('Person') ||
+                node.labels.includes('Embeddable') ||
+                node.labels.includes('MasterExpression') ||
+                node.labels.includes('SubTopic') ||
+                node.labels.includes('Expression') ||
+                node.labels.includes('Topic') ||
+                node.labels.includes('SubsidiaryLegislation') ||
+                node.labels.includes('SLOpening')
             ) {
-                return 5; // Small for articles/citations
+                return 25; // 50px diameter / 2
             }
         }
 
-        return 6;
+        return 25; // Default 50px diameter / 2
     };
 
     const handleNodeHover = (node: any) => {
@@ -842,16 +940,34 @@ const ChatGraph3D = ({
     };
 
     const handleNodeDragEnd = (node: any) => {
-        setDragStartPositions(new Map());
+        if (selectedNodes.has(node) && selectedNodes.size > 1 && draggedNode === node) {
+            const finalX = node.x;
+            const finalY = node.y;
+            const finalZ = node.z;
 
-        if (selectedNodes.has(node) && selectedNodes.size > 1) {
-            [...selectedNodes].forEach((selNode) => {
-                if (selNode.x !== undefined && selNode.y !== undefined && selNode.z !== undefined) {
-                    selNode.fx = selNode.x;
-                    selNode.fy = selNode.y;
-                    selNode.fz = selNode.z;
-                }
-            });
+            const originalPositions = [...selectedNodes].map((selNode) => ({
+                node: selNode,
+                originalX: selNode.x,
+                originalY: selNode.y,
+                originalZ: selNode.z,
+            }));
+
+            const draggedOriginal = originalPositions.find((p) => p.node === node);
+
+            if (draggedOriginal) {
+                const offsetX = finalX - draggedOriginal.originalX;
+                const offsetY = finalY - draggedOriginal.originalY;
+                const offsetZ = finalZ - draggedOriginal.originalZ;
+
+                [...selectedNodes].forEach((selNode) => {
+                    const original = originalPositions.find((p) => p.node === selNode);
+                    if (original) {
+                        selNode.fx = original.originalX + offsetX;
+                        selNode.fy = original.originalY + offsetY;
+                        selNode.fz = original.originalZ + offsetZ;
+                    }
+                });
+            }
         } else {
             if (node && node.x !== undefined && node.y !== undefined && node.z !== undefined) {
                 node.fx = node.x;
@@ -859,7 +975,7 @@ const ChatGraph3D = ({
                 node.fz = node.z;
             }
         }
-        
+
         setDraggedNode(null);
     };
 
@@ -869,7 +985,7 @@ const ChatGraph3D = ({
         setHighlightedLinkId(null);
         setSelectedNodes(new Set());
         setSelectedLinks(new Set());
-        
+
         if (isOrbitEnabled && setIsOrbitEnabled) {
             setIsOrbitEnabled(false);
         }
@@ -944,7 +1060,7 @@ const ChatGraph3D = ({
 
         const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
         const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-        
+
         if (label) {
             label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
         } else {

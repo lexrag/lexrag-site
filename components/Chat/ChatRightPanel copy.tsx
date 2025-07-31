@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ChevronDown, ChevronRight, ChevronUp, Expand, Fullscreen, Globe, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, Expand, Fullscreen, Globe, Layers } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,7 +39,7 @@ const ChatRightPanel = ({
     handleCardData,
     setIsOpenGraphModal,
 }: ChatRightPanelProps) => {
-    console.log(cardData);
+    console.log(cardData)
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -48,7 +48,6 @@ const ChatRightPanel = ({
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
-    const [expandedContents, setExpandedContents] = useState<Set<string>>(new Set());
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
@@ -72,18 +71,6 @@ const ChatRightPanel = ({
 
     const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-    const toggleContentExpansion = (nodeId: string) => {
-        setExpandedContents((prev) => {
-            const newSet = new Set(prev);
-            if (newSet.has(nodeId)) {
-                newSet.delete(nodeId);
-            } else {
-                newSet.add(nodeId);
-            }
-            return newSet;
-        });
-    };
-
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
 
@@ -100,17 +87,6 @@ const ChatRightPanel = ({
 
             setSelectedItem(scrollToCardId);
             setSelectedGroup(groupKey);
-
-            const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
-            if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
-                zoomToNodeGraph({
-                    id: scrollToCardId,
-                    x: targetNode.x,
-                    y: targetNode.y,
-                    z: targetNode.z,
-                    duration: 1000,
-                });
-            }
 
             setTimeout(() => {
                 let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
@@ -188,6 +164,7 @@ const ChatRightPanel = ({
             }
         }
 
+        // Если родительский узел не найден, пытаемся определить тип по дочерним узлам
         const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
         if (caseNode) {
             return {
@@ -449,7 +426,7 @@ const ChatRightPanel = ({
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
-                <div
+                <div 
                     className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-12 w-2 rounded-md bg-muted-foreground/40 hover:bg-primary transition-colors cursor-pointer"
                     title="Drag to Resize Panel"
                 />
@@ -489,7 +466,6 @@ const ChatRightPanel = ({
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
                                     isOrbitEnabled={isOrbitEnabled}
-                                    setIsOrbitEnabled={setIsOrbitEnabled}
                                     expandedNodes={expandedNodes}
                                     setExpandedNodes={setExpandedNodes}
                                     nodeHierarchy={nodeHierarchy}
@@ -506,25 +482,17 @@ const ChatRightPanel = ({
                                     <div className="flex items-center gap-2">
                                         <Tabs value={graphView} onValueChange={setGraphView}>
                                             <TabsList className="w-fit grid grid-cols-2">
-                                                <TabsTrigger
-                                                    value="2d"
-                                                    className="text-[12px] py-1 px-2"
-                                                    title="Switch to 2D Graph View"
-                                                >
+                                                <TabsTrigger value="2d" className="text-[12px] py-1 px-2" title="Switch to 2D Graph View">
                                                     2D
                                                 </TabsTrigger>
-                                                <TabsTrigger
-                                                    value="3d"
-                                                    className="text-[12px] py-1 px-2"
-                                                    title="Switch to 3D Graph View"
-                                                >
+                                                <TabsTrigger value="3d" className="text-[12px] py-1 px-2" title="Switch to 3D Graph View">
                                                     3D
                                                 </TabsTrigger>
                                             </TabsList>
                                         </Tabs>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <div
+                                                <div 
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                     title="Toggle Graph Layers"
                                                 >
@@ -571,13 +539,9 @@ const ChatRightPanel = ({
                                                             ? 'bg-primary text-primary-foreground border-primary'
                                                             : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
                                                     }`}
-                                                    title={
-                                                        isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'
-                                                    }
+                                                    title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
                                                 >
-                                                    <Globe
-                                                        className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`}
-                                                    />
+                                                    <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
                                                 </div>
                                             )}
                                             <div
@@ -600,7 +564,7 @@ const ChatRightPanel = ({
                             </div>
                         </div>
 
-                        {!!currentMessage && Object.entries(groupedNodes).length > 0 && (
+                        {(!!currentMessage && Object.entries(groupedNodes).length > 0)  && (
                             <div
                                 className={`px-3 py-2 overflow-hidden transition-all duration-300 ${
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'
@@ -631,8 +595,8 @@ const ChatRightPanel = ({
                                     {Object.entries(groupedNodes).map(([parentId, nodes]) => {
                                         const groupInfo = getGroupInfo(parentId, nodes);
 
-                                        // Скрываем все группы с кастомным типом
-                                        if (groupInfo.type === 'custom') {
+                                        // Скрываем группы с кастомным типом если нет контента
+                                        if (groupInfo.type === 'custom' && nodes.length === 0 && !parentNodesMap[parentId]) {
                                             return null;
                                         }
 
@@ -674,9 +638,11 @@ const ChatRightPanel = ({
                                                           : 'hover:bg-muted/30'
                                                 }`}
                                             >
-                                                <AccordionTrigger className="hover:no-underline [&>svg]:size-6">
+                                                <AccordionTrigger
+                                                    className="hover:no-underline"
+                                                >
                                                     <div className="text-left flex items-center gap-2 w-full">
-                                                        <div
+                                                        <div 
                                                             className="flex-1 min-w-0 cursor-pointer"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -721,10 +687,6 @@ const ChatRightPanel = ({
                                                     ) : (
                                                         nodes.map((node: any) => {
                                                             const nodeInfo = getNodeDisplayInfo(node);
-                                                            const isContentExpanded = expandedContents.has(node.id);
-                                                            const hasContent =
-                                                                nodeInfo.content && nodeInfo.content.trim().length > 0;
-
                                                             return (
                                                                 <div
                                                                     key={node.id}
@@ -793,44 +755,9 @@ const ChatRightPanel = ({
                                                                                 </div>
                                                                             )}
 
-                                                                            {/* Content with collapsible functionality */}
-                                                                            {hasContent && (
-                                                                                <div className="mb-2">
-                                                                                    <button
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            toggleContentExpansion(
-                                                                                                node.id,
-                                                                                            );
-                                                                                        }}
-                                                                                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2 p-1 -ml-1 rounded hover:bg-muted/50"
-                                                                                        title={
-                                                                                            isContentExpanded
-                                                                                                ? 'Скрыть контент'
-                                                                                                : 'Показать контент'
-                                                                                        }
-                                                                                    >
-                                                                                        <ChevronRight
-                                                                                            className={`h-3 w-3 transition-transform ${
-                                                                                                isContentExpanded
-                                                                                                    ? 'rotate-90'
-                                                                                                    : ''
-                                                                                            }`}
-                                                                                        />
-                                                                                        <span>Content</span>
-                                                                                    </button>
-
-                                                                                    <div
-                                                                                        className={`overflow-hidden transition-all duration-200 ${
-                                                                                            isContentExpanded
-                                                                                                ? 'max-h-96 opacity-100'
-                                                                                                : 'max-h-0 opacity-0'
-                                                                                        }`}
-                                                                                    >
-                                                                                        <div className="text-sm whitespace-pre-wrap bg-muted/30 p-2 rounded-md border">
-                                                                                            {nodeInfo.content}
-                                                                                        </div>
-                                                                                    </div>
+                                                                            {nodeInfo.content && (
+                                                                                <div className="text-sm whitespace-pre-wrap mb-3">
+                                                                                    {nodeInfo.content}
                                                                                 </div>
                                                                             )}
                                                                         </div>
