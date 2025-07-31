@@ -53,7 +53,7 @@ const ChatGraph2D = ({
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
-    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
@@ -389,13 +389,13 @@ const ChatGraph2D = ({
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
 
-                if(highlightedTimeoutRef.current) {
-                    clearTimeout(highlightedTimeoutRef.current)
+                if (highlightedTimeoutRef.current) {
+                    clearTimeout(highlightedTimeoutRef.current);
                 }
 
                 highlightedTimeoutRef.current = setTimeout(() => {
                     setHighlightedNodeId(null);
-                    highlightedTimeoutRef.current = null
+                    highlightedTimeoutRef.current = null;
                 }, 3000);
             }
         });
@@ -600,9 +600,9 @@ const ChatGraph2D = ({
     };
 
     const getNodeColor = (node: any) => {
-        if (selectedNodes.has(node)) {
-            return { r: 251, g: 191, b: 36 }; // #fbbf24
-        }
+        // if (selectedNodes.has(node)) {
+        //     return { r: 251, g: 191, b: 36 }; // #fbbf24
+        // }
 
         if (loadingNodes.has(node.id)) {
             return { r: 245, g: 158, b: 11 }; // #f59e0b
@@ -825,19 +825,19 @@ const ChatGraph2D = ({
             return '#00ffff';
         }
 
-        return resolvedTheme === 'dark' ? '#6b7280' : '#9ca3af';
+        return resolvedTheme === 'dark' ? '#6b7280' : 'rgba(156, 163, 175, 0.2)';
     };
 
     const getLinkWidth = (link: any) => {
         if (selectedLinks.has(link)) {
-            return 3; 
+            return 3;
         }
 
         if (highlightedLinkId === link.id) {
-            return 2.5; 
+            return 2.5;
         }
 
-        return 1.5; 
+        return 1.5;
     };
 
     const getNodeLabel = (node: any) => {
@@ -885,7 +885,7 @@ const ChatGraph2D = ({
 
         const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
         const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-        
+
         if (label) {
             label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
         } else {
@@ -940,10 +940,10 @@ const ChatGraph2D = ({
             backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
             nodeCanvasObject={nodeCanvasObject}
             nodeCanvasObjectMode={() => 'replace'}
-            // nodeVal={(node) => {
-            //     const nodeSize = getNodeSize(node);
-            //     return nodeSize * nodeSize;
-            // }}
+            nodeVal={(node) => {
+                const nodeSize = getNodeSize(node);
+                return nodeSize * 2;
+            }}
             linkColor={getLinkColor}
             linkWidth={getLinkWidth}
             linkDirectionalParticles={2}

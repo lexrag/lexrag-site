@@ -14,8 +14,6 @@ export const getConversationSnapshot = async (threadId: string) => {
         return [];
     }
 
-    // const mock = `\n\n[LINK](https://www.lawnet.com/openlaw/cases/citation/[1990]%20SGHC%2051#[97])`;
-
     return await Promise.all(
         data.messages.map(async (m: any) => ({
             id: uuidv4(),
