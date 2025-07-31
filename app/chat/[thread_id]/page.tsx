@@ -98,8 +98,10 @@ export default function ChatPage() {
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}
+                setGraphLayers={setGraphLayers}
                 data={currentMessage}
                 handleCardData={setCardData}
+                cardData={cardData}
             />
             <header className="w-full flex md:hidden items-center justify-between pt-2 px-2 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0">
                 <Menu className="size-6" onClick={() => setIsOpenLeftSheet((prevState) => !prevState)} />

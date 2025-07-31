@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
 import { ArrowRight, Link, Layers, Expand, Fullscreen, X } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/card';
@@ -96,6 +96,21 @@ const ChatRightSheet = ({
 
         return connections;
     }, [cardData.links, cardData.nodes]);
+
+    useEffect(() => {
+        if (!scrollToCardId || !cardData.nodes) return;
+
+        const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
+        if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
+            zoomToNodeGraph({
+                id: scrollToCardId,
+                x: targetNode.x,
+                y: targetNode.y,
+                z: targetNode.z,
+                duration: 1000,
+            });
+        }
+    }, [scrollToCardId, cardData.nodes]);
 
     return (
         <Sheet open={isOpen} onOpenChange={handleOpen}>
@@ -209,6 +224,7 @@ const ChatRightSheet = ({
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
                                     isOrbitEnabled={isOrbitEnabled}
+                                    setIsOrbitEnabled={setIsOrbitEnabled}
                                     expandedNodes={expandedNodes}
                                     setExpandedNodes={setExpandedNodes}
                                     nodeHierarchy={nodeHierarchy}

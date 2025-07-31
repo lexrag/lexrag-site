@@ -4,6 +4,7 @@ interface ZoomToNodePayload {
     id: string;
     x?: number;
     y?: number;
+    z?: number;
     zoomLevel?: number;
     duration?: number;
 }
