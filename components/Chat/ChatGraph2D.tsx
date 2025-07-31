@@ -53,6 +53,7 @@ const ChatGraph2D = ({
     const [layerDataMap, setLayerDataMap] = useState<Record<string, { nodes: any[]; links: any[] }>>({});
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
+    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
@@ -388,8 +389,13 @@ const ChatGraph2D = ({
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
 
-                setTimeout(() => {
+                if(highlightedTimeoutRef.current) {
+                    clearTimeout(highlightedTimeoutRef.current)
+                }
+
+                highlightedTimeoutRef.current = setTimeout(() => {
                     setHighlightedNodeId(null);
+                    highlightedTimeoutRef.current = null
                 }, 3000);
             }
         });

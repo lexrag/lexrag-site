@@ -58,6 +58,7 @@ const ChatGraph3D = ({
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
+    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const orbitAngleRef = useRef<number>(0);
     const bloomPassRef = useRef<any>(null);
@@ -459,8 +460,13 @@ const ChatGraph3D = ({
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
 
-                setTimeout(() => {
+                if(highlightedTimeoutRef.current) {
+                    clearTimeout(highlightedTimeoutRef.current)
+                }
+
+                highlightedTimeoutRef.current = setTimeout(() => {
                     setHighlightedNodeId(null);
+                    highlightedTimeoutRef.current = null
                 }, 3000);
             }
         });
