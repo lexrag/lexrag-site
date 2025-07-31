@@ -59,7 +59,6 @@ const ChatGraph3D = ({
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const orbitAngleRef = useRef<number>(0);
     const bloomPassRef = useRef<any>(null);
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
@@ -89,61 +88,30 @@ const ChatGraph3D = ({
     }, [data, width, height]);
 
     useEffect(() => {
-        if (orbitIntervalRef.current) {
-            clearInterval(orbitIntervalRef.current);
-            orbitIntervalRef.current = null;
-        }
+        let frameId: number;
 
-        if (!isOrbitEnabled) {
-            return;
-        }
+        if (!isOrbitEnabled) return;
 
-        const waitForGraph = () => {
-            if (!graphRef.current) {
-                setTimeout(waitForGraph, 100);
+        const rotateGraph = () => {
+            const scene = graphRef.current?.scene();
+            if (!scene) {
+                frameId = requestAnimationFrame(rotateGraph);
                 return;
             }
 
-            const currentCameraPosition = graphRef.current.cameraPosition();
-            const currentDistance = Math.sqrt(
-                currentCameraPosition.x * currentCameraPosition.x + currentCameraPosition.z * currentCameraPosition.z,
-            );
+            const graphObj = scene.children[3];
 
-            const distance = currentDistance > 0 ? currentDistance : 1400;
+            if (graphObj) {
+                graphObj.rotation.y -= 0.02;
+            }
 
-            orbitIntervalRef.current = setInterval(() => {
-                if (graphRef.current) {
-                    const x = distance * Math.sin(orbitAngleRef.current);
-                    const z = distance * Math.cos(orbitAngleRef.current);
-                    const y = currentCameraPosition.y;
-
-                    graphRef.current.cameraPosition(
-                        {
-                            x: x,
-                            z: z,
-                            y: y,
-                        },
-                        0,
-                    );
-
-                    const camera = graphRef.current.camera();
-                    if (camera && camera.lookAt) {
-                        camera.lookAt(0, 0, 0);
-                        camera.up.set(0, 1, 0);
-                    }
-
-                    orbitAngleRef.current += Math.PI / 300;
-                }
-            }, 10);
+            frameId = requestAnimationFrame(rotateGraph);
         };
 
-        waitForGraph();
+        rotateGraph();
 
         return () => {
-            if (orbitIntervalRef.current) {
-                clearInterval(orbitIntervalRef.current);
-                orbitIntervalRef.current = null;
-            }
+            if (frameId) cancelAnimationFrame(frameId);
         };
     }, [isOrbitEnabled]);
 
