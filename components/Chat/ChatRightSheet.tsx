@@ -46,9 +46,7 @@ const ChatRightSheet = ({
     handleCardData,
 }: ChatRightSheetProps) => {
     const direction = useDirection();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());

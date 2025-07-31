@@ -62,7 +62,7 @@ const ChatGraph3D = ({
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
-    const [draggedNode, setDraggedNode] = useState<any>(null);
+    const [, setDraggedNode] = useState<any>(null);
     const [dragStartPositions, setDragStartPositions] = useState<Map<any, { x: number; y: number; z: number }>>(
         new Map(),
     );
