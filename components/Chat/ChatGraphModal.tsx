@@ -433,16 +433,21 @@ const ChatGraphModal = ({
     const modalDimensions = useMemo(() => {
         const modalWidth = window.innerWidth * 0.95;
         const modalHeight = window.innerHeight * 0.9;
-        const graphWidth = modalWidth * 0.6;
+        
+        const hasSidebar = !!data && Object.entries(groupedNodes).length > 0 && window.innerWidth >= 768;
+        const sidebarWidth = hasSidebar ? Math.max(modalWidth * 0.4, 300) : 0;
+        const graphWidth = Math.max(modalWidth - sidebarWidth, 400);
         const graphHeight = modalHeight * 0.8;
         
         return {
             modalWidth,
             modalHeight,
             graphWidth,
-            graphHeight
+            graphHeight,
+            sidebarWidth,
+            hasSidebar
         };
-    }, []);
+    }, [data, groupedNodes]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -451,7 +456,7 @@ const ChatGraphModal = ({
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, [modalDimensions]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -527,7 +532,10 @@ const ChatGraphModal = ({
                         </div>
                     </DialogHeader>
                     <DialogBody className="flex-1 flex overflow-hidden p-0">
-                        <div className="w-[60%] h-full relative overflow-hidden">
+                        <div 
+                            className="h-full relative overflow-hidden"
+                            style={{ width: modalDimensions.graphWidth }}
+                        >
                             <TabsContent value="2d" className="w-full h-full m-0 data-[state=inactive]:hidden">
                                 <ChatGraph2D 
                                     height={modalDimensions.graphHeight}
@@ -547,6 +555,7 @@ const ChatGraphModal = ({
                                 />
                             </TabsContent>
                             <TabsContent value="3d" className="w-full h-full m-0 data-[state=inactive]:hidden">
+                                <div className="w-full h-full">
                                 <ChatGraph3D 
                                     height={modalDimensions.graphHeight}
                                     width={modalDimensions.graphWidth}
@@ -564,12 +573,16 @@ const ChatGraphModal = ({
                                     setExpandedData={setExpandedData}
                                     loadingNodes={loadingNodes}
                                     setLoadingNodes={setLoadingNodes}
-                                />
+                                    />
+                                    </div>
                             </TabsContent>
                         </div>
 
-                        {!!data && Object.entries(groupedNodes).length > 0 && (
-                            <div className="w-[40%] h-full border-l flex flex-col bg-background relative z-10">
+                        {modalDimensions.hasSidebar && (
+                            <div 
+                                className="h-full border-l flex flex-col bg-background relative z-10"
+                                style={{ width: modalDimensions.sidebarWidth }}
+                            >
                                 <div className="px-4 py-3 border-b">
                                     <h3 className="font-semibold text-sm text-muted-foreground">Legal Documents</h3>
                                 </div>
