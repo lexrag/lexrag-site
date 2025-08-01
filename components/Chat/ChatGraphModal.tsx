@@ -303,8 +303,18 @@ const ChatGraphModal = ({
 
     const handleGroupClick = (groupKey: string) => {
         const isCurrentlySelected = selectedItem === groupKey;
+        const isCurrentlyOpen = openAccordionItems.includes(groupKey);
+        
         setSelectedItem(isCurrentlySelected ? null : groupKey);
         setSelectedGroup(isCurrentlySelected ? null : groupKey);
+
+        setOpenAccordionItems((prev) => {
+            if (isCurrentlyOpen) {
+                return prev.filter(item => item !== groupKey);
+            } else {
+                return [...prev, groupKey];
+            }
+        });
 
         if (!isCurrentlySelected) {
             setScrollToCardId(groupKey);
