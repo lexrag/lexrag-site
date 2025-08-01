@@ -389,6 +389,7 @@ const ChatGraphModal = ({
             topics: node.topics || [],
             concepts: node.concepts || [],
             functionalObject: node.functionalObject || null,
+            functionalRole: node.functionalRole || null,
         };
     };
 
@@ -398,22 +399,22 @@ const ChatGraphModal = ({
         const getBadgeColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'bg-green-100 text-green-800 border-green-200';
+                    return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700';
                 case 'concept':
-                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                    return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700';
                 default:
-                    return 'bg-gray-100 text-gray-800 border-gray-200';
+                    return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
             }
         };
 
         const getBadgeTitleColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'text-green-800';
+                    return 'text-green-800 dark:text-green-200';
                 case 'concept':
-                    return 'text-blue-800';
+                    return 'text-blue-800 dark:text-blue-200';
                 default:
-                    return 'text-gray-800';
+                    return 'text-gray-800 dark:text-gray-200';
             }
         }
 
@@ -872,12 +873,15 @@ const ChatGraphModal = ({
                                                                                 <div className='flex gap-1'>
                                                                                 {/* Functional Object */}
                                                                                 {nodeInfo.functionalObject && (
-                                                                                    <div className="w-full text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
+                                                                                    <div className="w-full text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md mb-2 border border-amber-200 dark:border-amber-700">
+                                                                                       {nodeInfo.functionalRole && (<div className="font-medium mb-1 text-amber-800 dark:text-amber-200">
+                                                                                            {nodeInfo.functionalRole}
+                                                                                        </div>)}
                                                                                         {nodeInfo.functionalObject}
                                                                                     </div>
                                                                                 )}
                                                                                 {((nodeInfo.topics?.length > 0) || (nodeInfo.concepts?.length > 0)) && (
-                                                                                <div className='w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200'>
+                                                                                <div className='w-full flex flex-col bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md mb-2 border border-amber-200 dark:border-amber-700'>
                                                                                 {/* Topics badges */}
                                                                                 {renderBadges(nodeInfo.topics, 'topic')}
 

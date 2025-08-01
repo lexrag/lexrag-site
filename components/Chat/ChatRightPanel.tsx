@@ -500,6 +500,7 @@ const ChatRightPanel = ({
             topics: node.topics || [],
             concepts: node.concepts || [],
             functionalObject: node.functionalObject || null,
+            functionalRole: node.functionalRole || null,
         };
     };
 
@@ -545,33 +546,22 @@ const ChatRightPanel = ({
         const getBadgeColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'text-gray-800 border-gray-300';
+                    return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700';
                 case 'concept':
-                    return 'text-gray-800 border-gray-300';
+                    return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700';
                 default:
-                    return 'text-gray-800 border-gray-300';
-            }
-        };
-
-        const getBadgeBackgroundColor = (type: string) => {
-            switch (type) {
-                case 'topic':
-                    return '#4C8EDA';
-                case 'concept':
-                    return '#57C7E3';
-                default:
-                    return '#A5ABB6';
+                    return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
             }
         };
 
         const getBadgeTitleColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'text-gray-800';
+                    return 'text-green-800 dark:text-green-200';
                 case 'concept':
-                    return 'text-gray-800';
+                    return 'text-blue-800 dark:text-blue-200';
                 default:
-                    return 'text-gray-800';
+                    return 'text-gray-800 dark:text-gray-200';
             }
         };
 
@@ -585,7 +575,6 @@ const ChatRightPanel = ({
                         <span
                             key={index}
                             className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
-                            style={{ backgroundColor: getBadgeBackgroundColor(type) }}
                         >
                             {item}
                         </span>
@@ -1035,23 +1024,20 @@ const ChatRightPanel = ({
                                                                             <div className="flex gap-1">
                                                                                 {/* Functional Object */}
                                                                                 {nodeInfo.functionalObject && (
-                                                                                    <div
-                                                                                        className="w-full text-xs text-gray-800 px-2 py-1 rounded-md mb-2 border border-gray-300"
-                                                                                        style={{
-                                                                                            backgroundColor: '#FFC454',
-                                                                                        }}
-                                                                                    >
+                                                                                    <div className="w-full text-xs text-gray-800 dark:text-gray-200 px-2 py-1 rounded-md mb-2 border border-gray-300 dark:border-gray-600 bg-amber-400 dark:bg-amber-900/30">
+                                                                                        {nodeInfo.functionalRole && (
+                                                                                            <div className="font-medium mb-1 text-gray-900 dark:text-gray-100">
+                                                                                                {
+                                                                                                    nodeInfo.functionalRole
+                                                                                                }
+                                                                                            </div>
+                                                                                        )}
                                                                                         {nodeInfo.functionalObject}
                                                                                     </div>
                                                                                 )}
                                                                                 {(nodeInfo.topics?.length > 0 ||
                                                                                     nodeInfo.concepts?.length > 0) && (
-                                                                                    <div
-                                                                                        className="w-full flex flex-col px-2 py-1 rounded-md mb-2 border border-gray-300"
-                                                                                        style={{
-                                                                                            backgroundColor: '#f8f9fa',
-                                                                                        }}
-                                                                                    >
+                                                                                    <div className="w-full flex flex-col px-2 py-1 rounded-md mb-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-amber-900/30">
                                                                                         {/* Topics badges */}
                                                                                         {renderBadges(
                                                                                             nodeInfo.topics,
