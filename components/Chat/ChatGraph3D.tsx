@@ -1207,15 +1207,69 @@ const ChatGraph3D = ({
         return 1.5;
     };
 
+    const extractActCode = (node: any): string => {
+        if (node.url) {
+            const urlMatch = node.url.match(/[A-Z]{2,}\d{4}/);
+            if (urlMatch) {
+                return urlMatch[0];
+            }
+        }
+
+        if (node.content) {
+            const actMatch = node.content.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+Act\s+(\d{4})/);
+            if (actMatch) {
+                const words = actMatch[1].split(' ');
+                const year = actMatch[2];
+                const abbreviation = words.map((word: string) => word[0]).join('') + year;
+                return abbreviation;
+            }
+        }
+
+        return '';
+    };
+
+    const formatSectionReference = (node: any): string => {
+        let result = '';
+
+        if (node.part) {
+            result += `Part ${node.part}`;
+        }
+
+        if (node.section) {
+            if (result) result += ', ';
+            result += `s ${node.section}`;
+        }
+
+        if (node.subsection) {
+            result += `(${node.subsection})`;
+        }
+
+        return result;
+    };
+
     const getNodeLabel = (node: any) => {
         let baseLabel = '';
 
         if (node.labels && node.labels.includes('CaseLaw')) {
-            baseLabel = `${node.content}\n${node.neutralCitation || ''}`;
+            baseLabel = node.neutralCitation || node.content || node.id;
         } else if (node.labels && node.labels.includes('Act')) {
-            baseLabel = node.content;
+            const actCode = extractActCode(node);
+            baseLabel = actCode || node.content || node.id;
         } else if (node.labels && node.labels.includes('Paragraph')) {
-            baseLabel = `¶${node.number}: ${node.content.substring(0, 100)}...`;
+            baseLabel = `§ ${node.number || node.id}`;
+        } else if (node.labels && (node.labels.includes('Article') || node.labels.includes('Section'))) {
+            const sectionRef = formatSectionReference(node);
+            const actCode = extractActCode(node);
+
+            if (sectionRef && actCode) {
+                baseLabel = `${sectionRef} ${actCode}`;
+            } else if (sectionRef) {
+                baseLabel = sectionRef;
+            } else if (actCode) {
+                baseLabel = actCode;
+            } else {
+                baseLabel = node.content || node.id;
+            }
         } else {
             baseLabel = node.content || node.id;
         }
