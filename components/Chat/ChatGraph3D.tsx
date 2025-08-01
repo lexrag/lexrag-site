@@ -404,7 +404,7 @@ const ChatGraph3D = ({
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
-        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
+        const unsubscribeZoomToNode = subscribeToZoomToNodeGraph(async (payload) => {
             if (!graphRef.current) return;
 
             const targetNode = processedData.nodes.find((node) => node.id === payload.id);
@@ -414,39 +414,16 @@ const ChatGraph3D = ({
             const nodeY = targetNode.y || payload.y || 0;
             const nodeZ = targetNode.z || payload.z || 0;
 
-            const viewDistance = payload.distance || 300;
-            const duration = payload.duration || 1500;
+            await animateCameraAndRotation({ x: nodeX, y: nodeY, z: nodeZ });
 
-            const currentCamera = graphRef.current.cameraPosition();
-
-            const currentX = currentCamera.x || 0;
-            const currentY = currentCamera.y || 0;
-            const currentZ = currentCamera.z || 400;
-
-            let dirX = currentX - nodeX;
-            let dirY = currentY - nodeY;
-            let dirZ = currentZ - nodeZ;
-
-            const length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-            if (length > 0) {
-                dirX /= length;
-                dirY /= length;
-                dirZ /= length;
-            } else {
-                dirX = 0;
-                dirY = 0;
-                dirZ = 1;
-            }
-
-            const newCameraX = nodeX + dirX * viewDistance;
-            const newCameraY = nodeY + dirY * viewDistance;
-            const newCameraZ = nodeZ + dirZ * viewDistance;
+            const viewDistance = payload.distance || 400;
+            const duration = payload.duration || 1000;
 
             graphRef.current.cameraPosition(
                 {
-                    x: newCameraX,
-                    y: newCameraY,
-                    z: newCameraZ,
+                    x: nodeX,
+                    y: nodeY,
+                    z: nodeZ + viewDistance,
                 },
                 {
                     x: nodeX,
