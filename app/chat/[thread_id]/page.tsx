@@ -6,7 +6,7 @@ import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter } from '@/types/Graph';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
@@ -55,6 +55,7 @@ export default function ChatPage() {
         { id: 'relevant_retrieved_nodes', name: 'Relevant Nodes', enabled: true, color: '#10b981', priority: 3 },
         { id: 'relevant_context', name: 'Relevant Context', enabled: true, color: '#ef4444', priority: 4 },
     ]);
+    const [graphLinkFilters, setGraphLinkFilters] = useState<GraphLinkFilter[]>([]);
     const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
     const [input, setInput] = useState<string>('');
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
@@ -156,6 +157,8 @@ export default function ChatPage() {
                     currentMessage={currentMessage}
                     graphLayers={graphLayers}
                     setGraphLayers={setGraphLayers}
+                    graphLinkFilters={graphLinkFilters}
+                    setGraphLinkFilters={setGraphLinkFilters}
                     graphView={graphView}
                     setGraphView={setGraphView}
                     cardData={cardData}

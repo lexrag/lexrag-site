@@ -6,7 +6,7 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer, GraphNodePosition } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphLinkFilter, GraphNodePosition } from '@/types/Graph';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -26,6 +26,9 @@ interface ChatGraph2DProps {
     setExpandedData: Dispatch<SetStateAction<{ nodes: any[]; links: any[] }>>;
     loadingNodes: Set<string>;
     setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
+
+    linkFilters: GraphLinkFilter[];
+    setLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
 }
 
 const ChatGraph2D = ({
@@ -43,6 +46,8 @@ const ChatGraph2D = ({
     setExpandedData,
     loadingNodes,
     setLoadingNodes,
+    linkFilters,
+    setLinkFilters,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -61,7 +66,7 @@ const ChatGraph2D = ({
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [dragStartPositions, setDragStartPositions] = useState<Record<string, { x: number; y: number }>>({});
     const [isDragging, setIsDragging] = useState(false);
-    const [isZooming, setisZooming] = useState(false)
+    const [isZooming, setisZooming] = useState(false);
     const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -131,7 +136,7 @@ const ChatGraph2D = ({
     };
 
     const handleEngineStop = () => {
-        processedData.nodes.forEach((node) => {
+        processedNodes.forEach((node) => {
             saveNodePosition(node);
         });
     };
@@ -171,6 +176,126 @@ const ChatGraph2D = ({
 
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
+
+    const getAllLinkTypes = (layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.links) {
+                layerData.links.forEach((link: any) => {
+                    const linkType = getLinkType(link);
+                    if (!linkTypesMap.has(linkType)) {
+                        linkTypesMap.set(linkType, { count: 0, examples: [] });
+                    }
+                    const existing = linkTypesMap.get(linkType)!;
+                    existing.count++;
+                    if (existing.examples.length < 3) {
+                        existing.examples.push(link);
+                    }
+                });
+            }
+        });
+
+        expandedData.links.forEach((link: any) => {
+            const linkType = getLinkType(link);
+            if (!linkTypesMap.has(linkType)) {
+                linkTypesMap.set(linkType, { count: 0, examples: [] });
+            }
+            const existing = linkTypesMap.get(linkType)!;
+            existing.count++;
+            if (existing.examples.length < 3) {
+                existing.examples.push(link);
+            }
+        });
+
+        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
+            id: type,
+            label: getLinkTypeLabel(type),
+            enabled: true,
+            color: getLinkTypeColor(type, index),
+            count: data.count,
+        }));
+
+        return linkTypes.sort((a, b) => b.count - a.count);
+    };
+
+    const getLinkType = (link: any): string => {
+        if (link.relationType) {
+            return link.relationType;
+        }
+        if (link.relation) {
+            return link.relation;
+        }
+        if (link.type) {
+            return link.type;
+        }
+        return 'default';
+    };
+
+    const getLinkTypeLabel = (type: string): string => {
+        const labelMap: Record<string, string> = {
+            CITES: 'Citations',
+            REFERENCED_BY: 'References',
+            PART_OF: 'Part of',
+            CONTAINS: 'Contains',
+            RELATES_TO: 'Related to',
+            FOLLOWS: 'Follows',
+            PRECEDES: 'Precedes',
+            SIMILAR_TO: 'Similar to',
+            CONTRADICTS: 'Contradicts',
+            SUPPORTS: 'Supports',
+            default: 'Other',
+        };
+        return labelMap[type] || type;
+    };
+
+    const getLinkTypeColor = (type: string, index: number): string => {
+        const colors = [
+            '#3b82f6', // blue
+            '#ef4444', // red
+            '#10b981', // green
+            '#f59e0b', // amber
+            '#8b5cf6', // violet
+            '#ec4899', // pink
+            '#06b6d4', // cyan
+            '#84cc16', // lime
+            '#f97316', // orange
+            '#6366f1', // indigo
+        ];
+
+        const colorMap: Record<string, string> = {
+            CITES: '#3b82f6',
+            REFERENCED_BY: '#ef4444',
+            PART_OF: '#10b981',
+            CONTAINS: '#f59e0b',
+            RELATES_TO: '#8b5cf6',
+            FOLLOWS: '#ec4899',
+            PRECEDES: '#06b6d4',
+            SIMILAR_TO: '#84cc16',
+            CONTRADICTS: '#f97316',
+            SUPPORTS: '#6366f1',
+        };
+
+        return colorMap[type] || colors[index % colors.length];
+    };
+
+    useEffect(() => {
+        const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
+
+        if (newLinkTypes.length > 0) {
+            setLinkFilters((prevFilters) => {
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+
+                return newLinkTypes.map((newType) => {
+                    const existing = existingFiltersMap.get(newType.id);
+                    return {
+                        ...newType,
+                        enabled: existing ? existing.enabled : true,
+                    };
+                });
+            });
+        }
+    }, [layerDataMap, expandedData]);
 
     const getAllDescendants = (nodeId: string): Set<string> => {
         const descendants = new Set<string>();
@@ -251,17 +376,21 @@ const ChatGraph2D = ({
         }
     };
 
-    const processedData = useMemo(() => {
+    const isLinkVisible = (link: any): boolean => {
+        const linkType = getLinkType(link);
+        const filter = linkFilters.find((f) => f.id === linkType);
+        return filter ? filter.enabled : true;
+    };
+
+    const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
         if (enabledLayers.length === 0) {
-            return { nodes: [], links: [] };
+            return [];
         }
 
         const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
-
         const allNodes = new Map();
-        const allLinks = new Map();
 
         sortedEnabledLayers.forEach((layer) => {
             const layerData = layerDataMap[layer.id];
@@ -299,20 +428,6 @@ const ChatGraph2D = ({
 
                 allNodes.set(node.id, nodeData);
             });
-
-            if (layerData.links) {
-                layerData.links.forEach((link: any) => {
-                    const linkKey = `${link.source}-${link.target}`;
-                    if (!allLinks.has(linkKey)) {
-                        allLinks.set(linkKey, {
-                            ...link,
-                            id: linkKey,
-                            source: typeof link.source === 'object' ? link.source.id : link.source,
-                            target: typeof link.target === 'object' ? link.target.id : link.target,
-                        });
-                    }
-                });
-            }
         });
 
         expandedData.nodes.forEach((node: any) => {
@@ -348,23 +463,64 @@ const ChatGraph2D = ({
             allNodes.set(node.id, nodeData);
         });
 
-        expandedData.links.forEach((link: any) => {
-            const linkKey = `${link.source}-${link.target}`;
-            if (!allLinks.has(linkKey)) {
-                allLinks.set(linkKey, {
-                    ...link,
-                    id: linkKey,
-                    source: typeof link.source === 'object' ? link.source.id : link.source,
-                    target: typeof link.target === 'object' ? link.target.id : link.target,
+        return Array.from(allNodes.values());
+    }, [layerDataMap, layers, expandedData]);
+
+    const processedLinks = useMemo(() => {
+        const enabledLayers = layers.filter((layer) => layer.enabled);
+
+        if (enabledLayers.length === 0) {
+            return [];
+        }
+
+        const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
+        const allLinks = new Map();
+
+        sortedEnabledLayers.forEach((layer) => {
+            const layerData = layerDataMap[layer.id];
+            if (!layerData) return;
+
+            if (layerData.links) {
+                layerData.links.forEach((link: any) => {
+                    if (isLinkVisible(link)) {
+                        const linkKey = `${link.source}-${link.target}`;
+                        if (!allLinks.has(linkKey)) {
+                            allLinks.set(linkKey, {
+                                ...link,
+                                id: linkKey,
+                                source: typeof link.source === 'object' ? link.source.id : link.source,
+                                target: typeof link.target === 'object' ? link.target.id : link.target,
+                            });
+                        }
+                    }
                 });
             }
         });
 
-        return {
-            nodes: Array.from(allNodes.values()),
-            links: Array.from(allLinks.values()),
-        };
-    }, [layerDataMap, layers, expandedData]);
+        expandedData.links.forEach((link: any) => {
+            if (isLinkVisible(link)) {
+                const linkKey = `${link.source}-${link.target}`;
+                if (!allLinks.has(linkKey)) {
+                    allLinks.set(linkKey, {
+                        ...link,
+                        id: linkKey,
+                        source: typeof link.source === 'object' ? link.source.id : link.source,
+                        target: typeof link.target === 'object' ? link.target.id : link.target,
+                    });
+                }
+            }
+        });
+
+        return Array.from(allLinks.values());
+    }, [layerDataMap, layers, expandedData, linkFilters]);
+
+    const processedData = useMemo(
+        () => ({
+            nodes: processedNodes,
+            links: processedLinks,
+        }),
+        [processedNodes, processedLinks],
+    );
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
@@ -377,7 +533,7 @@ const ChatGraph2D = ({
             if (!graphRef.current) return;
 
             if (!payload.x || !payload.y) {
-                const targetNode = processedData.nodes.find((node) => node.id === payload.id);
+                const targetNode = processedNodes.find((node) => node.id === payload.id);
                 if (!targetNode) return;
 
                 payload.x = targetNode.x;
@@ -389,7 +545,7 @@ const ChatGraph2D = ({
 
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
-                setisZooming(true)
+                setisZooming(true);
 
                 if (zoomTimeoutRef.current) {
                     clearTimeout(zoomTimeoutRef.current);
@@ -406,7 +562,7 @@ const ChatGraph2D = ({
             unsubscribeZoomToFit();
             unsubscribeZoomToNode();
         };
-    }, [processedData]);
+    }, [processedNodes]);
 
     // Cleanup timer on unmount
     useEffect(() => {
@@ -424,7 +580,7 @@ const ChatGraph2D = ({
     }, [processedData, handleCardData]);
 
     useEffect(() => {
-        if (graphRef.current && processedData.nodes.length > 0) {
+        if (graphRef.current && processedNodes.length > 0) {
             const fg = graphRef.current;
 
             const linkForce = fg.d3Force('link');
@@ -444,16 +600,25 @@ const ChatGraph2D = ({
                 fg.zoomToFit(300);
             }, 500);
         }
-    }, [processedData]);
+    }, [processedNodes]);
+
+    useEffect(() => {
+        if (graphRef.current && processedLinks.length >= 0) {
+            const fg = graphRef.current;
+
+            const linkForce = fg.d3Force('link');
+            if (linkForce) {
+                linkForce.distance(100).strength(0);
+            }
+        }
+    }, [processedLinks]);
 
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
 
         setSelectedLinks(new Set());
 
-        // Check if this is a double click
         if (lastClickedNode === node.id && clickTimer) {
-            // Double click detected - expand/collapse node
             clearTimeout(clickTimer);
             setClickTimer(null);
             setLastClickedNode(null);
@@ -560,7 +725,7 @@ const ChatGraph2D = ({
                     console.log('Adding nodes:', newNodes.length, 'Adding links:', newLinks.length);
 
                     const existingNodeIds = new Set([
-                        ...processedData.nodes.map((n) => n.id),
+                        ...processedNodes.map((n) => n.id),
                         ...expandedData.nodes.map((n) => n.id),
                     ]);
 
@@ -602,10 +767,6 @@ const ChatGraph2D = ({
     };
 
     const getNodeColor = (node: any) => {
-        // if (selectedNodes.has(node)) {
-        //     return { r: 251, g: 191, b: 36 }; // #fbbf24
-        // }
-
         if (loadingNodes.has(node.id)) {
             return { r: 245, g: 158, b: 11 }; // #f59e0b
         }
@@ -829,19 +990,25 @@ const ChatGraph2D = ({
             return '#00ffff';
         }
 
+        const linkType = getLinkType(link);
+        const filter = linkFilters.find((f) => f.id === linkType);
+        if (filter) {
+            return filter.color;
+        }
+
         return resolvedTheme === 'dark' ? '#6b7280' : 'rgba(156, 163, 175, 0.2)';
     };
 
     const getLinkWidth = (link: any) => {
         if (selectedLinks.has(link)) {
-            return 3;
-        }
-
-        if (highlightedLinkId === link.id) {
             return 2.5;
         }
 
-        return 1.5;
+        if (highlightedLinkId === link.id) {
+            return 2;
+        }
+
+        return 0.5;
     };
 
     const getNodeLabel = (node: any) => {

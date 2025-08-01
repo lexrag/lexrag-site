@@ -3,25 +3,30 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ChevronDown, ChevronRight, ChevronUp, Expand, Fullscreen, Globe, Layers } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp, Expand, Fullscreen, Globe, Layers, Link } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Button } from '../ui/button';
 
 interface ChatRightPanelProps {
     currentMessage: any;
     graphLayers: GraphLayer[];
     setGraphLayers: Dispatch<SetStateAction<GraphLayer[]>>;
+    graphLinkFilters: GraphLinkFilter[];
+    setGraphLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
     cardData: CardData;
     graphView: string;
     setGraphView: (view: string) => void;
@@ -33,6 +38,8 @@ const ChatRightPanel = ({
     currentMessage,
     graphLayers,
     setGraphLayers,
+    graphLinkFilters,
+    setGraphLinkFilters,
     cardData,
     graphView,
     setGraphView,
@@ -445,6 +452,16 @@ const ChatRightPanel = ({
         );
     };
 
+    const handleLinkFilter = (filterId: string) => {
+        setGraphLinkFilters((prevFilters) =>
+            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter)),
+        );
+    };
+
+    const handleAllLinkFilters = (enabled: boolean) => {
+        setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
+    };
+
     return (
         <div className="hidden md:flex h-full" style={{ width: `${rightPanelWidth}px` }}>
             <div onMouseDown={() => setIsResizing(true)} className="w-3 cursor-col-resize relative z-30">
@@ -477,6 +494,8 @@ const ChatRightPanel = ({
                                     setExpandedData={setExpandedData}
                                     loadingNodes={loadingNodes}
                                     setLoadingNodes={setLoadingNodes}
+                                    linkFilters={graphLinkFilters}
+                                    setLinkFilters={setGraphLinkFilters}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -559,6 +578,86 @@ const ChatRightPanel = ({
                                                         </DropdownMenuCheckboxItem>
                                                     );
                                                 })}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                    title="Toggle Graph Layers"
+                                                >
+                                                    <Link className="h-4 w-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent
+                                                className="w-80 max-h-64 overflow-y-auto"
+                                                align="end"
+                                                sideOffset={5}
+                                            >
+                                                <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                    <span>Link Filters</span>
+                                                </DropdownMenuLabel>
+
+                                                <DropdownMenuSeparator />
+
+                                                <div className="flex gap-2 p-2">
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllLinkFilters(true);
+                                                        }}
+                                                    >
+                                                        All
+                                                    </Button>
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllLinkFilters(false);
+                                                        }}
+                                                    >
+                                                        None
+                                                    </Button>
+                                                </div>
+
+                                                <DropdownMenuSeparator />
+
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {graphLinkFilters.map((filter) => (
+                                                        <div
+                                                            key={filter.id}
+                                                            className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleLinkFilter(filter.id);
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filter.enabled}
+                                                                onChange={() => handleLinkFilter(filter.id)}
+                                                                className="cursor-pointer"
+                                                                style={{ accentColor: filter.color }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            <div
+                                                                className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                                style={{ backgroundColor: filter.color }}
+                                                            />
+                                                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                                {filter.label}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                                {filter.count}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="flex items-center gap-1">
