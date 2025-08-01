@@ -60,7 +60,6 @@ const ChatGraph3D = ({
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
     const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const orbitAngleRef = useRef<number>(0);
     const bloomPassRef = useRef<any>(null);
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
@@ -90,61 +89,30 @@ const ChatGraph3D = ({
     }, [data, width, height]);
 
     useEffect(() => {
-        if (orbitIntervalRef.current) {
-            clearInterval(orbitIntervalRef.current);
-            orbitIntervalRef.current = null;
-        }
+        let frameId: number;
 
-        if (!isOrbitEnabled) {
-            return;
-        }
+        if (!isOrbitEnabled) return;
 
-        const waitForGraph = () => {
-            if (!graphRef.current) {
-                setTimeout(waitForGraph, 100);
+        const rotateGraph = () => {
+            const scene = graphRef.current?.scene();
+            if (!scene) {
+                frameId = requestAnimationFrame(rotateGraph);
                 return;
             }
 
-            const currentCameraPosition = graphRef.current.cameraPosition();
-            const currentDistance = Math.sqrt(
-                currentCameraPosition.x * currentCameraPosition.x + currentCameraPosition.z * currentCameraPosition.z,
-            );
+            const graphObj = scene.children[3];
 
-            const distance = currentDistance > 0 ? currentDistance : 1400;
+            if (graphObj) {
+                graphObj.rotation.y -= 0.02;
+            }
 
-            orbitIntervalRef.current = setInterval(() => {
-                if (graphRef.current) {
-                    const x = distance * Math.sin(orbitAngleRef.current);
-                    const z = distance * Math.cos(orbitAngleRef.current);
-                    const y = currentCameraPosition.y;
-
-                    graphRef.current.cameraPosition(
-                        {
-                            x: x,
-                            z: z,
-                            y: y,
-                        },
-                        0,
-                    );
-
-                    const camera = graphRef.current.camera();
-                    if (camera && camera.lookAt) {
-                        camera.lookAt(0, 0, 0);
-                        camera.up.set(0, 1, 0);
-                    }
-
-                    orbitAngleRef.current += Math.PI / 300;
-                }
-            }, 10);
+            frameId = requestAnimationFrame(rotateGraph);
         };
 
-        waitForGraph();
+        rotateGraph();
 
         return () => {
-            if (orbitIntervalRef.current) {
-                clearInterval(orbitIntervalRef.current);
-                orbitIntervalRef.current = null;
-            }
+            if (frameId) cancelAnimationFrame(frameId);
         };
     }, [isOrbitEnabled]);
 
@@ -432,27 +400,51 @@ const ChatGraph3D = ({
         const unsubscribeZoomToNode = subscribeToZoomToNodeGraph((payload) => {
             if (!graphRef.current) return;
 
-            if (!payload.x || !payload.y) {
-                const targetNode = processedData.nodes.find((node) => node.id === payload.id);
-                if (!targetNode) return;
+            const targetNode = processedData.nodes.find((node) => node.id === payload.id);
+            if (!targetNode) return;
 
-                payload.x = targetNode.x;
-                payload.y = targetNode.y;
-                payload.z = targetNode.z;
+            const nodeX = targetNode.x || payload.x || 0;
+            const nodeY = targetNode.y || payload.y || 0;
+            const nodeZ = targetNode.z || payload.z || 0;
+
+            const viewDistance = payload.distance || 300;
+            const duration = payload.duration || 1500;
+
+            const currentCamera = graphRef.current.cameraPosition();
+
+            const currentX = currentCamera.x || 0;
+            const currentY = currentCamera.y || 0;
+            const currentZ = currentCamera.z || 400;
+
+            let dirX = currentX - nodeX;
+            let dirY = currentY - nodeY;
+            let dirZ = currentZ - nodeZ;
+
+            const length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+            if (length > 0) {
+                dirX /= length;
+                dirY /= length;
+                dirZ /= length;
+            } else {
+                dirX = 0;
+                dirY = 0;
+                dirZ = 1;
             }
 
-            const distance = 400;
-            const duration = payload.duration || 1000;
-
-            const cameraX = payload.x;
-            const cameraY = payload.y;
-            const cameraZ = (payload.z || 0) + distance;
+            const newCameraX = nodeX + dirX * viewDistance;
+            const newCameraY = nodeY + dirY * viewDistance;
+            const newCameraZ = nodeZ + dirZ * viewDistance;
 
             graphRef.current.cameraPosition(
                 {
-                    x: cameraX,
-                    y: cameraY,
-                    z: cameraZ,
+                    x: newCameraX,
+                    y: newCameraY,
+                    z: newCameraZ,
+                },
+                {
+                    x: nodeX,
+                    y: nodeY,
+                    z: nodeZ,
                 },
                 duration,
             );
@@ -550,11 +542,16 @@ const ChatGraph3D = ({
             }
 
             if (node.x !== undefined && node.y !== undefined) {
-                graphRef.current?.cameraPosition(
+                graphRef.current.cameraPosition(
                     {
                         x: node.x,
                         y: node.y,
                         z: (node.z || 0) + 400,
+                    },
+                    {
+                        x: node.x,
+                        y: node.y,
+                        z: node.z || 0,
                     },
                     1000,
                 );

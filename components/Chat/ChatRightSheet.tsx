@@ -110,6 +110,50 @@ const ChatRightSheet = ({
         }
     }, [scrollToCardId, cardData.nodes]);
 
+    const renderBadges = (items: string[], type: 'topic' | 'concept') => {
+        if (!items || items.length === 0) return null;
+
+        const getBadgeColor = (type: string) => {
+            switch (type) {
+                case 'topic':
+                    return 'bg-green-100 text-green-800 border-green-200';
+                case 'concept':
+                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                default:
+                    return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
+        };
+
+        const getBadgeTitleColor = (type: string) => {
+            switch (type) {
+                case 'topic':
+                    return 'text-green-800';
+                case 'concept':
+                    return 'text-blue-800';
+                default:
+                    return 'text-gray-800';
+            }
+        }
+
+        return (
+            <div className="flex flex-wrap gap-2 mb-2">
+                <span className={`px-2 py-0.5 text-xs font-medium ${getBadgeTitleColor(type)}`}>
+                    {`legal ${type}s`}
+                </span>
+                <div className="flex flex-wrap gap-1 mb-2">
+                    {items.map((item, index) => (
+                        <span
+                            key={index}
+                            className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
+                        >
+                            {item}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <Sheet open={isOpen} onOpenChange={handleOpen}>
             <SheetTitle />
@@ -249,7 +293,7 @@ const ChatRightSheet = ({
                                         <AccordionItem
                                             key={node.id}
                                             value={node.id}
-                                            className="transition-all duration-300"
+                                            className="transition-all duration-300 pr-4"
                                         >
                                             <AccordionTrigger>
                                                 <div
@@ -284,6 +328,24 @@ const ChatRightSheet = ({
                                             </AccordionTrigger>
                                             <AccordionContent className="whitespace-pre-wrap">
                                                 <div className="mb-4">{node.content}</div>
+
+                                                {/* Functional Object */}
+                                                {node.functionalObject && (
+                                                    <div className="w-full text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
+                                                        {node.functionalObject}
+                                                    </div>
+                                                )}
+
+                                                {/* Topics and Concepts */}
+                                                {((node.topics?.length > 0) || (node.concepts?.length > 0)) && (
+                                                    <div className='w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200'>
+                                                        {/* Topics badges */}
+                                                        {renderBadges(node.topics, 'topic')}
+
+                                                        {/* Concepts badges */}
+                                                        {renderBadges(node.concepts, 'concept')}
+                                                    </div>
+                                                )}
 
                                                 {hasLinkedNodes && (
                                                     <div className="border-t pt-4">

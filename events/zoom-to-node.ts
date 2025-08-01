@@ -7,6 +7,7 @@ interface ZoomToNodePayload {
     z?: number;
     zoomLevel?: number;
     duration?: number;
+    distance?: number;
 }
 
 export const zoomToNodeGraph = (payload: ZoomToNodePayload) => {
