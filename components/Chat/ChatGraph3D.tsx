@@ -68,6 +68,7 @@ const ChatGraph3D = ({
     const [dragStartPositions, setDragStartPositions] = useState<Map<any, { x: number; y: number; z: number }>>(
         new Map(),
     );
+    const [canvasClickCount, setCanvasClickCount] = useState<number>(0);
 
     const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
@@ -114,6 +115,12 @@ const ChatGraph3D = ({
         return () => {
             if (frameId) cancelAnimationFrame(frameId);
         };
+    }, [isOrbitEnabled]);
+
+    useEffect(() => {
+        if (isOrbitEnabled) {
+            setCanvasClickCount(0);
+        }
     }, [isOrbitEnabled]);
 
     // useEffect(() => {
@@ -1049,6 +1056,12 @@ const ChatGraph3D = ({
 
         if (isOrbitEnabled && setIsOrbitEnabled) {
             setIsOrbitEnabled(false);
+            setCanvasClickCount(1);
+        } else if (canvasClickCount === 1) {
+            graphRef.current?.zoomToFit(400);
+            setCanvasClickCount(0);
+        } else {
+            graphRef.current?.zoomToFit(400);
         }
     };
 

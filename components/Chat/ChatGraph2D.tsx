@@ -979,6 +979,8 @@ const ChatGraph2D = ({
         setHighlightedLinkId(null);
         setSelectedNodes(new Set());
         setSelectedLinks(new Set());
+        
+        graphRef.current?.zoomToFit(300);
     };
 
     const getLinkColor = (link: any) => {
