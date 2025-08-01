@@ -386,6 +386,8 @@ const ChatRightSheet = ({
                                     setExpandedData={setExpandedData}
                                     loadingNodes={loadingNodes}
                                     setLoadingNodes={setLoadingNodes}
+                                    linkFilters={graphLinkFilters}
+                                    setLinkFilters={setGraphLinkFilters}
                                 />
                             )}
                         </div>

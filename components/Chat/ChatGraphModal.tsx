@@ -673,6 +673,8 @@ const ChatGraphModal = ({
                                     setExpandedData={setExpandedData}
                                     loadingNodes={loadingNodes}
                                     setLoadingNodes={setLoadingNodes}
+                                    linkFilters={graphLinkFilters}
+                                    setLinkFilters={setGraphLinkFilters}
                                     />
                                     </div>
                             </TabsContent>
