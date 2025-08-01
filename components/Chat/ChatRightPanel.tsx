@@ -1026,9 +1026,9 @@ const ChatRightPanel = ({
                                                                             <div className="flex gap-1">
                                                                                 {/* Functional Object */}
                                                                                 {nodeInfo.functionalObject && (
-                                                                                    <div className="w-full text-xs text-gray-800 dark:text-gray-200 px-2 py-1 rounded-md mb-2 border border-gray-300 dark:border-gray-600 bg-amber-400 dark:bg-amber-900/30">
+                                                                                    <div className="w-full text-xs text-gray-700 dark:text-gray-300 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
                                                                                         {nodeInfo.functionalRole && (
-                                                                                            <div className="font-medium mb-1 text-gray-900 dark:text-gray-100">
+                                                                                            <div className="font-medium mb-1 text-gray-800 dark:text-gray-200">
                                                                                                 {
                                                                                                     nodeInfo.functionalRole
                                                                                                 }
@@ -1039,7 +1039,7 @@ const ChatRightPanel = ({
                                                                                 )}
                                                                                 {(nodeInfo.topics?.length > 0 ||
                                                                                     nodeInfo.concepts?.length > 0) && (
-                                                                                    <div className="w-full flex flex-col px-2 py-1 rounded-md mb-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-amber-900/30">
+                                                                                    <div className="w-full flex flex-col px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
                                                                                         {/* Topics badges */}
                                                                                         {renderBadges(
                                                                                             nodeInfo.topics,

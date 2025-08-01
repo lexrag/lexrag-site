@@ -439,9 +439,9 @@ const ChatRightSheet = ({
 
                                                 {/* Functional Object */}
                                                 {node.functionalObject && (
-                                                    <div className="w-full text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md mb-2 border border-amber-200 dark:border-amber-700">
+                                                    <div className="w-full text-xs text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600">
                                                         {node.functionalRole && (
-                                                            <div className="font-medium mb-1 text-amber-800 dark:text-amber-200">
+                                                            <div className="font-medium mb-1 text-gray-800 dark:text-gray-200">
                                                                 {node.functionalRole}
                                                             </div>
                                                         )}
@@ -451,7 +451,7 @@ const ChatRightSheet = ({
 
                                                 {/* Topics and Concepts */}
                                                 {(node.topics?.length > 0 || node.concepts?.length > 0) && (
-                                                    <div className="w-full flex flex-col bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md mb-2 border border-amber-200 dark:border-amber-700">
+                                                    <div className="w-full flex flex-col bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600">
                                                         {/* Topics badges */}
                                                         {renderBadges(node.topics, 'topic')}
 
