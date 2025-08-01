@@ -58,7 +58,7 @@ const ChatGraph3D = ({
     const [lastClickedNode, setLastClickedNode] = useState<string | null>(null);
     const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
     const [highlightedLinkId, setHighlightedLinkId] = useState<string | null>(null);
-    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const highlightedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const bloomPassRef = useRef<any>(null);
 
@@ -452,13 +452,13 @@ const ChatGraph3D = ({
             if (payload.id) {
                 setHighlightedNodeId(payload.id);
 
-                if(highlightedTimeoutRef.current) {
-                    clearTimeout(highlightedTimeoutRef.current)
+                if (highlightedTimeoutRef.current) {
+                    clearTimeout(highlightedTimeoutRef.current);
                 }
 
                 highlightedTimeoutRef.current = setTimeout(() => {
                     setHighlightedNodeId(null);
-                    highlightedTimeoutRef.current = null
+                    highlightedTimeoutRef.current = null;
                 }, 3000);
             }
         });
@@ -493,6 +493,62 @@ const ChatGraph3D = ({
             }
         };
     }, [clickTimer]);
+
+    const animateCameraAndRotation = (target: { x: number; y: number; z: number }) => {
+        return new Promise<void>((resolve) => {
+            const graphObj = graphRef.current?.scene()?.children[3];
+            const camera = graphRef.current?.camera();
+            if (!graphObj || !camera) return resolve();
+
+            const startRotationY = graphObj.rotation.y;
+            const startPos = { ...camera.position };
+            const startLookAt = graphRef.current?.controls().target.clone();
+
+            const endRotationY = 0;
+            const endPos = {
+                x: target.x,
+                y: target.y,
+                z: target.z + 400,
+            };
+            const endLookAt = {
+                x: target.x,
+                y: target.y,
+                z: target.z,
+            };
+
+            const duration = 1000;
+            const startTime = performance.now();
+
+            const animate = (time: number) => {
+                const t = Math.min((time - startTime) / duration, 1);
+
+                const ease = t * (2 - t);
+
+                graphObj.rotation.y = startRotationY + (endRotationY - startRotationY) * ease;
+
+                camera.position.x = startPos.x + (endPos.x - startPos.x) * ease;
+                camera.position.y = startPos.y + (endPos.y - startPos.y) * ease;
+                camera.position.z = startPos.z + (endPos.z - startPos.z) * ease;
+
+                const controls = graphRef.current?.controls();
+                if (controls) {
+                    controls.target.x = startLookAt.x + (endLookAt.x - startLookAt.x) * ease;
+                    controls.target.y = startLookAt.y + (endLookAt.y - startLookAt.y) * ease;
+                    controls.target.z = startLookAt.z + (endLookAt.z - startLookAt.z) * ease;
+                    controls.update();
+                }
+
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    graphObj.rotation.y = 0;
+                    resolve();
+                }
+            };
+
+            requestAnimationFrame(animate);
+        });
+    };
 
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
@@ -535,13 +591,15 @@ const ChatGraph3D = ({
         }
 
         // Set timer for potential double click
-        const timer = setTimeout(() => {
+        const timer = setTimeout(async () => {
             // Single click confirmed - select node
             if (handleScrollToCardId) {
                 handleScrollToCardId(node.id);
             }
 
             if (node.x !== undefined && node.y !== undefined) {
+                await animateCameraAndRotation({ x: node.x, y: node.y, z: node.z || 0 });
+
                 graphRef.current.cameraPosition(
                     {
                         x: node.x,
