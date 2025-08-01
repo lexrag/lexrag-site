@@ -848,7 +848,7 @@ const ChatRightPanel = ({
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'
                                 }`}
                             >
-                                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                                <div className="flex items-center justify-between mb-3 pb-2 pl-4 border-b border-border">
                                     <h3 className="font-semibold text-sm text-muted-foreground">Legal Documents</h3>
                                     <div
                                         className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
@@ -916,7 +916,7 @@ const ChatRightPanel = ({
                                             <AccordionItem
                                                 key={parentId}
                                                 value={parentId}
-                                                className={`transition-all duration-300 pr-4 ${
+                                                className={`transition-all duration-300 px-4 ${
                                                     selectedItem === parentId
                                                         ? 'border-l-2 border-l-primary bg-primary/10'
                                                         : selectedGroup === parentId
@@ -968,7 +968,7 @@ const ChatRightPanel = ({
                                                         </div>
                                                     </div>
                                                 </AccordionTrigger>
-                                                <AccordionContent className="space-y-3">
+                                                <AccordionContent className="space-y-3 pt-2">
                                                     {nodes.length === 0 ? (
                                                         <div className="text-sm text-muted-foreground italic">
                                                             No detailed nodes available
@@ -986,7 +986,7 @@ const ChatRightPanel = ({
                                                                     ref={(el) => {
                                                                         nodeRefs.current[node.id] = el;
                                                                     }}
-                                                                    className={`border-l-2 pl-4 cursor-pointer transition-all duration-200 ${
+                                                                    className={`border-l-2 pl-2 pr-2 py-2 cursor-pointer transition-all duration-200 ${
                                                                         selectedItem === node.id
                                                                             ? 'bg-primary/15 border-l-primary shadow-sm scale-[1.02]'
                                                                             : 'border-muted hover:bg-muted/20 hover:border-l-muted-foreground/50'

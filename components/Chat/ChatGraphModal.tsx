@@ -820,7 +820,7 @@ const ChatGraphModal = ({
                                                             </div>
                                                         </div>
                                                     </AccordionTrigger>
-                                                    <AccordionContent className="space-y-3 px-4">
+                                                    <AccordionContent className="space-y-3 px-4 pt-2">
                                                         {nodes.length === 0 ? (
                                                             <div className="text-sm text-muted-foreground italic">
                                                                 No detailed nodes available
@@ -834,7 +834,7 @@ const ChatGraphModal = ({
                                                                         ref={(el) => {
                                                                             nodeRefs.current[node.id] = el;
                                                                         }}
-                                                                        className={`border-l-2 pl-4 cursor-pointer transition-all duration-200 ${
+                                                                        className={`border-l-2 pl-6 pr-2 py-2 cursor-pointer transition-all duration-200 ${
                                                                             selectedItem === node.id
                                                                                 ? 'bg-primary/15 border-l-primary shadow-sm scale-[1.02]'
                                                                                 : 'border-muted hover:bg-muted/20 hover:border-l-muted-foreground/50'
