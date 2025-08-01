@@ -536,11 +536,16 @@ const ChatGraph3D = ({
             }
 
             if (node.x !== undefined && node.y !== undefined) {
-                graphRef.current?.cameraPosition(
+                graphRef.current.cameraPosition(
                     {
                         x: node.x,
                         y: node.y,
                         z: (node.z || 0) + 400,
+                    },
+                    {
+                        x: node.x,
+                        y: node.y,
+                        z: node.z || 0,
                     },
                     1000,
                 );
