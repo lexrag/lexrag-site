@@ -7,7 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 // import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { GraphData, GraphLayer } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphLinkFilter } from '@/types/Graph';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
@@ -29,6 +29,9 @@ interface ChatGraph3DProps {
     setExpandedData: Dispatch<SetStateAction<{ nodes: any[]; links: any[] }>>;
     loadingNodes: Set<string>;
     setLoadingNodes: Dispatch<SetStateAction<Set<string>>>;
+
+    linkFilters: GraphLinkFilter[];
+    setLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
 }
 
 const ChatGraph3D = ({
@@ -48,6 +51,8 @@ const ChatGraph3D = ({
     setExpandedData,
     loadingNodes,
     setLoadingNodes,
+    linkFilters,
+    setLinkFilters,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -288,6 +293,132 @@ const ChatGraph3D = ({
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
+    const getAllLinkTypes = (layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.links) {
+                layerData.links.forEach((link: any) => {
+                    const linkType = getLinkType(link);
+                    if (!linkTypesMap.has(linkType)) {
+                        linkTypesMap.set(linkType, { count: 0, examples: [] });
+                    }
+                    const existing = linkTypesMap.get(linkType)!;
+                    existing.count++;
+                    if (existing.examples.length < 3) {
+                        existing.examples.push(link);
+                    }
+                });
+            }
+        });
+
+        expandedData.links.forEach((link: any) => {
+            const linkType = getLinkType(link);
+            if (!linkTypesMap.has(linkType)) {
+                linkTypesMap.set(linkType, { count: 0, examples: [] });
+            }
+            const existing = linkTypesMap.get(linkType)!;
+            existing.count++;
+            if (existing.examples.length < 3) {
+                existing.examples.push(link);
+            }
+        });
+
+        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
+            id: type,
+            label: getLinkTypeLabel(type),
+            enabled: true,
+            color: getLinkTypeColor(type, index),
+            count: data.count,
+        }));
+
+        return linkTypes.sort((a, b) => b.count - a.count);
+    };
+
+    const getLinkType = (link: any): string => {
+        if (link.relationType) {
+            return link.relationType;
+        }
+        if (link.relation) {
+            return link.relation;
+        }
+        if (link.type) {
+            return link.type;
+        }
+        return 'default';
+    };
+
+    const getLinkTypeLabel = (type: string): string => {
+        const labelMap: Record<string, string> = {
+            CITES: 'Citations',
+            REFERENCED_BY: 'References',
+            PART_OF: 'Part of',
+            CONTAINS: 'Contains',
+            RELATES_TO: 'Related to',
+            FOLLOWS: 'Follows',
+            PRECEDES: 'Precedes',
+            SIMILAR_TO: 'Similar to',
+            CONTRADICTS: 'Contradicts',
+            SUPPORTS: 'Supports',
+            default: 'Other',
+        };
+        return labelMap[type] || type;
+    };
+
+    const getLinkTypeColor = (type: string, index: number): string => {
+        const colors = [
+            '#3b82f6', // blue
+            '#ef4444', // red
+            '#10b981', // green
+            '#f59e0b', // amber
+            '#8b5cf6', // violet
+            '#ec4899', // pink
+            '#06b6d4', // cyan
+            '#84cc16', // lime
+            '#f97316', // orange
+            '#6366f1', // indigo
+        ];
+
+        const colorMap: Record<string, string> = {
+            CITES: '#3b82f6',
+            REFERENCED_BY: '#ef4444',
+            PART_OF: '#10b981',
+            CONTAINS: '#f59e0b',
+            RELATES_TO: '#8b5cf6',
+            FOLLOWS: '#ec4899',
+            PRECEDES: '#06b6d4',
+            SIMILAR_TO: '#84cc16',
+            CONTRADICTS: '#f97316',
+            SUPPORTS: '#6366f1',
+        };
+
+        return colorMap[type] || colors[index % colors.length];
+    };
+
+    const isLinkVisible = (link: any): boolean => {
+        const linkType = getLinkType(link);
+        const filter = linkFilters.find((f) => f.id === linkType);
+        return filter ? filter.enabled : true;
+    };
+
+    useEffect(() => {
+        const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
+
+        if (newLinkTypes.length > 0) {
+            setLinkFilters((prevFilters) => {
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+
+                return newLinkTypes.map((newType) => {
+                    const existing = existingFiltersMap.get(newType.id);
+                    return {
+                        ...newType,
+                        enabled: existing ? existing.enabled : true,
+                    };
+                });
+            });
+        }
+    }, [layerDataMap, expandedData]);
+
     const processedData = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
@@ -326,14 +457,16 @@ const ChatGraph3D = ({
 
             if (layerData.links) {
                 layerData.links.forEach((link: any) => {
-                    const linkKey = `${link.source}-${link.target}`;
-                    if (!allLinks.has(linkKey)) {
-                        allLinks.set(linkKey, {
-                            ...link,
-                            id: linkKey,
-                            source: typeof link.source === 'object' ? link.source.id : link.source,
-                            target: typeof link.target === 'object' ? link.target.id : link.target,
-                        });
+                    if (isLinkVisible(link)) {
+                        const linkKey = `${link.source}-${link.target}`;
+                        if (!allLinks.has(linkKey)) {
+                            allLinks.set(linkKey, {
+                                ...link,
+                                id: linkKey,
+                                source: typeof link.source === 'object' ? link.source.id : link.source,
+                                target: typeof link.target === 'object' ? link.target.id : link.target,
+                            });
+                        }
                     }
                 });
             }
@@ -361,14 +494,16 @@ const ChatGraph3D = ({
         });
 
         expandedData.links.forEach((link: any) => {
-            const linkKey = `${link.source}-${link.target}`;
-            if (!allLinks.has(linkKey)) {
-                allLinks.set(linkKey, {
-                    ...link,
-                    id: linkKey,
-                    source: typeof link.source === 'object' ? link.source.id : link.source,
-                    target: typeof link.target === 'object' ? link.target.id : link.target,
-                });
+            if (isLinkVisible(link)) {
+                const linkKey = `${link.source}-${link.target}`;
+                if (!allLinks.has(linkKey)) {
+                    allLinks.set(linkKey, {
+                        ...link,
+                        id: linkKey,
+                        source: typeof link.source === 'object' ? link.source.id : link.source,
+                        target: typeof link.target === 'object' ? link.target.id : link.target,
+                    });
+                }
             }
         });
 
@@ -376,7 +511,7 @@ const ChatGraph3D = ({
             nodes: Array.from(allNodes.values()),
             links: Array.from(allLinks.values()),
         };
-    }, [layerDataMap, layers, expandedData]);
+    }, [layerDataMap, layers, expandedData, linkFilters]);
 
     const applyForces = () => {
         const fg = graphRef.current;
@@ -1001,6 +1136,12 @@ const ChatGraph3D = ({
 
         if (highlightedLinkId === link.id) {
             return '#00ffff';
+        }
+
+        const linkType = getLinkType(link);
+        const filter = linkFilters.find((f) => f.id === linkType);
+        if (filter) {
+            return filter.color;
         }
 
         return resolvedTheme === 'dark' ? '#6b7280' : '#9ca3af';
