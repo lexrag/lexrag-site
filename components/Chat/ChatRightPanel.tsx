@@ -64,6 +64,121 @@ const ChatRightPanel = ({
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
 
+    const getNodeColor = (node: any): string => {
+        if (loadingNodes.has(node.id)) {
+            return '#f59e0b';
+        }
+
+        if (node.color && (!node.labels || node.labels.length === 0)) {
+            return node.color;
+        }
+
+        if (node.labels) {
+            if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
+                return '#D9C8AE';
+            }
+
+            if (node.labels.includes('Paragraph')) {
+                return '#8DCC93';
+            }
+
+            if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
+                return '#DA7194';
+            }
+
+            if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
+                return '#C990C0';
+            }
+
+            if (
+                node.labels.includes('Party') ||
+                node.labels.includes('Plaintiff') ||
+                node.labels.includes('Defendant') ||
+                node.labels.includes('Appellant') ||
+                node.labels.includes('Respondent')
+            ) {
+                return '#ECB5C9';
+            }
+
+            if (
+                node.labels.includes('Act') ||
+                node.labels.includes('Law') ||
+                node.labels.includes('Statute') ||
+                node.labels.includes('Legislation')
+            ) {
+                return '#F79767';
+            }
+
+            if (
+                node.labels.includes('Regulation') ||
+                node.labels.includes('Order') ||
+                node.labels.includes('Decree') ||
+                node.labels.includes('Resolution') ||
+                node.labels.includes('SubsidiaryLegislation')
+            ) {
+                return '#ECB5C9';
+            }
+
+            if (node.labels.includes('Article') || node.labels.includes('Section')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Citation') || node.labels.includes('Reference')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Document') || node.labels.includes('Filing')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Resource')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Work')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Organization')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Person')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('Embeddable')) {
+                return '#A5ABB6';
+            }
+
+            if (node.labels.includes('MasterExpression')) {
+                return '#F16667';
+            }
+
+            if (node.labels.includes('SubTopic')) {
+                return '#57C7E3';
+            }
+
+            if (node.labels.includes('Expression')) {
+                return '#F16667';
+            }
+
+            if (node.labels.includes('Topic')) {
+                return '#4C8EDA';
+            }
+
+            if (node.labels.includes('PartOfTheLegislation')) {
+                return '#FFC454';
+            }
+
+            if (node.labels.includes('SLOpening')) {
+                return '#A5ABB6';
+            }
+        }
+
+        return '#A5ABB6'; // Default color
+    };
+
     const findGroupByNodeId = useCallback(
         (nodeId: string) => {
             if (!cardData.nodes) return null;
@@ -430,24 +545,35 @@ const ChatRightPanel = ({
         const getBadgeColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'bg-green-100 text-green-800 border-green-200';
+                    return 'text-gray-800 border-gray-300';
                 case 'concept':
-                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                    return 'text-gray-800 border-gray-300';
                 default:
-                    return 'bg-gray-100 text-gray-800 border-gray-200';
+                    return 'text-gray-800 border-gray-300';
+            }
+        };
+
+        const getBadgeBackgroundColor = (type: string) => {
+            switch (type) {
+                case 'topic':
+                    return '#4C8EDA';
+                case 'concept':
+                    return '#57C7E3';
+                default:
+                    return '#A5ABB6';
             }
         };
 
         const getBadgeTitleColor = (type: string) => {
             switch (type) {
                 case 'topic':
-                    return 'text-green-800';
+                    return 'text-gray-800';
                 case 'concept':
-                    return 'text-blue-800';
+                    return 'text-gray-800';
                 default:
                     return 'text-gray-800';
             }
-        }
+        };
 
         return (
             <div className="flex flex-wrap gap-2 mb-2">
@@ -459,6 +585,7 @@ const ChatRightPanel = ({
                         <span
                             key={index}
                             className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
+                            style={{ backgroundColor: getBadgeBackgroundColor(type) }}
                         >
                             {item}
                         </span>
@@ -745,21 +872,29 @@ const ChatRightPanel = ({
                                     {Object.entries(groupedNodes).map(([parentId, nodes]) => {
                                         const groupInfo = getGroupInfo(parentId, nodes);
 
-                                        // Скрываем все группы с кастомным типом
-                                        if (groupInfo.type === 'custom') {
-                                            return null;
-                                        }
-
                                         const getTypeBadgeColor = (type: string) => {
                                             switch (type) {
                                                 case 'case':
-                                                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                                                    return 'text-gray-800 border-gray-300';
                                                 case 'act':
-                                                    return 'bg-green-100 text-green-800 border-green-200';
+                                                    return 'text-gray-800 border-gray-300';
                                                 case 'subsidiary':
-                                                    return 'bg-orange-100 text-orange-800 border-orange-200';
+                                                    return 'text-gray-800 border-gray-300';
                                                 default:
-                                                    return 'bg-gray-100 text-gray-800 border-gray-200';
+                                                    return 'text-gray-800 border-gray-300';
+                                            }
+                                        };
+
+                                        const getTypeBadgeBackgroundColor = (type: string) => {
+                                            switch (type) {
+                                                case 'case':
+                                                    return '#D9C8AE';
+                                                case 'act':
+                                                    return '#F79767';
+                                                case 'subsidiary':
+                                                    return '#A5ABB6';
+                                                default:
+                                                    return '#A5ABB6';
                                             }
                                         };
 
@@ -801,6 +936,11 @@ const ChatRightPanel = ({
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <span
                                                                     className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getTypeBadgeColor(groupInfo.type)}`}
+                                                                    style={{
+                                                                        backgroundColor: getTypeBadgeBackgroundColor(
+                                                                            groupInfo.type,
+                                                                        ),
+                                                                    }}
                                                                 >
                                                                     {getTypeLabel(groupInfo.type)}
                                                                 </span>
@@ -857,14 +997,12 @@ const ChatRightPanel = ({
                                                                     title={`Click to select and zoom to ${nodeInfo.title}`}
                                                                 >
                                                                     <div className="flex items-start gap-2 mb-2">
-                                                                        {node.layerColor && (
-                                                                            <div
-                                                                                className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
-                                                                                style={{
-                                                                                    backgroundColor: node.layerColor,
-                                                                                }}
-                                                                            />
-                                                                        )}
+                                                                        <div
+                                                                            className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
+                                                                            style={{
+                                                                                backgroundColor: getNodeColor(node),
+                                                                            }}
+                                                                        />
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="flex justify-between items-center gap-2 mb-1">
                                                                                 <div
@@ -894,21 +1032,39 @@ const ChatRightPanel = ({
                                                                                 )}
                                                                             </div>
 
-                                                                            <div className='flex gap-1'>
-                                                                            {/* Functional Object */}
-                                                                            {nodeInfo.functionalObject && (
-                                                                                <div className="w-full text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
-                                                                                    {nodeInfo.functionalObject}
-                                                                                </div>
-                                                                            )}
-                                                                            {((nodeInfo.topics?.length > 0) || (nodeInfo.concepts?.length > 0)) && (
-                                                                            <div className='w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200'>
-                                                                            {/* Topics badges */}
-                                                                            {renderBadges(nodeInfo.topics, 'topic')}
+                                                                            <div className="flex gap-1">
+                                                                                {/* Functional Object */}
+                                                                                {nodeInfo.functionalObject && (
+                                                                                    <div
+                                                                                        className="w-full text-xs text-gray-800 px-2 py-1 rounded-md mb-2 border border-gray-300"
+                                                                                        style={{
+                                                                                            backgroundColor: '#FFC454',
+                                                                                        }}
+                                                                                    >
+                                                                                        {nodeInfo.functionalObject}
+                                                                                    </div>
+                                                                                )}
+                                                                                {(nodeInfo.topics?.length > 0 ||
+                                                                                    nodeInfo.concepts?.length > 0) && (
+                                                                                    <div
+                                                                                        className="w-full flex flex-col px-2 py-1 rounded-md mb-2 border border-gray-300"
+                                                                                        style={{
+                                                                                            backgroundColor: '#f8f9fa',
+                                                                                        }}
+                                                                                    >
+                                                                                        {/* Topics badges */}
+                                                                                        {renderBadges(
+                                                                                            nodeInfo.topics,
+                                                                                            'topic',
+                                                                                        )}
 
-                                                                            {/* Concepts badges */}
-                                                                            {renderBadges(nodeInfo.concepts, 'concept')}
-                                                                            </div>)}
+                                                                                        {/* Concepts badges */}
+                                                                                        {renderBadges(
+                                                                                            nodeInfo.concepts,
+                                                                                            'concept',
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
 
                                                                             {/* Content with collapsible functionality */}
