@@ -96,6 +96,8 @@ export default function ChatPage() {
             <ChatGraphModal
                 open={isOpenGraphModal}
                 onOpenChange={setIsOpenGraphModal}
+                graphLinkFilters={graphLinkFilters}
+                setGraphLinkFilters={setGraphLinkFilters}
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}
@@ -120,6 +122,8 @@ export default function ChatPage() {
             <ChatRightSheet
                 isOpen={isOpenRightSheet}
                 handleOpen={setIsOpenRightSheet}
+                graphLinkFilters={graphLinkFilters}
+                setGraphLinkFilters={setGraphLinkFilters}
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}

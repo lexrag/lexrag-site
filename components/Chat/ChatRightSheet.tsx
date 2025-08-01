@@ -1,24 +1,27 @@
 'use client';
 
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
-import { useDirection } from '@radix-ui/react-direction';
-import { ArrowRight, Link, Layers, Expand, Fullscreen, X } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '../ui/card';
-import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
-import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
-import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
+import { zoomToNodeGraph } from '@/events/zoom-to-node';
+import { useDirection } from '@radix-ui/react-direction';
+import { ArrowRight, Expand, Fullscreen, Layers, Link, X } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter } from '@/types/Graph';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader } from '../ui/card';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 
 interface ChatRightSheetProps {
     isOpen: boolean;
@@ -29,6 +32,8 @@ interface ChatRightSheetProps {
     setGraphLayers: Dispatch<SetStateAction<GraphLayer[]>>;
     setIsOpenGraphModal: (open: boolean) => void;
     currentMessage: any;
+    graphLinkFilters: GraphLinkFilter[];
+    setGraphLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
     cardData: CardData;
     handleCardData: Dispatch<SetStateAction<CardData>>;
 }
@@ -41,6 +46,8 @@ const ChatRightSheet = ({
     graphLayers,
     setGraphLayers,
     setIsOpenGraphModal,
+    graphLinkFilters,
+    setGraphLinkFilters,
     currentMessage,
     cardData,
     handleCardData,
@@ -133,7 +140,7 @@ const ChatRightSheet = ({
                 default:
                     return 'text-gray-800';
             }
-        }
+        };
 
         return (
             <div className="flex flex-wrap gap-2 mb-2">
@@ -154,6 +161,16 @@ const ChatRightSheet = ({
         );
     };
 
+    const handleLinkFilter = (filterId: string) => {
+        setGraphLinkFilters((prevFilters) =>
+            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter)),
+        );
+    };
+
+    const handleAllLinkFilters = (enabled: boolean) => {
+        setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
+    };
+
     return (
         <Sheet open={isOpen} onOpenChange={handleOpen}>
             <SheetTitle />
@@ -164,17 +181,25 @@ const ChatRightSheet = ({
                             <div className="flex items-center gap-2">
                                 <Tabs value={graphView} onValueChange={setGraphView}>
                                     <TabsList className="w-fit grid grid-cols-2">
-                                        <TabsTrigger value="2d" className="text-[12px] py-1 px-2" title="Switch to 2D Graph View">
+                                        <TabsTrigger
+                                            value="2d"
+                                            className="text-[12px] py-1 px-2"
+                                            title="Switch to 2D Graph View"
+                                        >
                                             2D
                                         </TabsTrigger>
-                                        <TabsTrigger value="3d" className="text-[12px] py-1 px-2" title="Switch to 3D Graph View">
+                                        <TabsTrigger
+                                            value="3d"
+                                            className="text-[12px] py-1 px-2"
+                                            title="Switch to 3D Graph View"
+                                        >
                                             3D
                                         </TabsTrigger>
                                     </TabsList>
                                 </Tabs>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <div 
+                                        <div
                                             className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                             title="Toggle Graph Layers"
                                         >
@@ -183,7 +208,9 @@ const ChatRightSheet = ({
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="w-48">
                                         {graphLayers.map(({ id, enabled, name }) => {
-                                            const enabledLayersCount = graphLayers.filter((layer) => layer.enabled).length;
+                                            const enabledLayersCount = graphLayers.filter(
+                                                (layer) => layer.enabled,
+                                            ).length;
                                             const isLastEnabled = enabled && enabledLayersCount === 1;
 
                                             return (
@@ -196,7 +223,9 @@ const ChatRightSheet = ({
 
                                                         setGraphLayers((prevLayers) =>
                                                             prevLayers.map((layer) =>
-                                                                layer.id === id ? { ...layer, enabled: checked } : layer,
+                                                                layer.id === id
+                                                                    ? { ...layer, enabled: checked }
+                                                                    : layer,
                                                             ),
                                                         );
                                                     }}
@@ -207,32 +236,112 @@ const ChatRightSheet = ({
                                             );
                                         })}
                                     </DropdownMenuContent>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <div
+                                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                title="Toggle Graph Layers"
+                                            >
+                                                <Link className="h-4 w-4" />
+                                            </div>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent
+                                            className="w-80 max-h-64 overflow-y-auto"
+                                            align="end"
+                                            sideOffset={5}
+                                        >
+                                            <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                <span>Link Filters</span>
+                                            </DropdownMenuLabel>
+
+                                            <DropdownMenuSeparator />
+
+                                            <div className="flex gap-2 p-2">
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleAllLinkFilters(true);
+                                                    }}
+                                                >
+                                                    All
+                                                </Button>
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleAllLinkFilters(false);
+                                                    }}
+                                                >
+                                                    None
+                                                </Button>
+                                            </div>
+
+                                            <DropdownMenuSeparator />
+
+                                            <div className="max-h-48 overflow-y-auto">
+                                                {graphLinkFilters.map((filter) => (
+                                                    <div
+                                                        key={filter.id}
+                                                        className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleLinkFilter(filter.id);
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={filter.enabled}
+                                                            onChange={() => handleLinkFilter(filter.id)}
+                                                            className="cursor-pointer"
+                                                            style={{ accentColor: filter.color }}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <div
+                                                            className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                            style={{ backgroundColor: filter.color }}
+                                                        />
+                                                        <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                            {filter.label}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                            {filter.count}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </DropdownMenu>
-                                                                    <div className="flex items-center gap-1">
-                                        <div 
-                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                            onClick={() => setIsOpenGraphModal(true)}
-                                            title="Expand Graph to Full Screen"
-                                        >
-                                            <Expand className="h-4 w-4" />
-                                        </div>
-                                        <div 
-                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                            onClick={() => zoomToFitGraph()}
-                                            title="Zoom to Fit All Nodes"
-                                        >
-                                            <Fullscreen className="h-4 w-4" />
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Close button */}
-                                    <div 
+                                <div className="flex items-center gap-1">
+                                    <div
                                         className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                        onClick={() => handleOpen(false)}
-                                        title="Close Panel"
+                                        onClick={() => setIsOpenGraphModal(true)}
+                                        title="Expand Graph to Full Screen"
                                     >
-                                        <X className="h-4 w-4" />
+                                        <Expand className="h-4 w-4" />
                                     </div>
+                                    <div
+                                        className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                        onClick={() => zoomToFitGraph()}
+                                        title="Zoom to Fit All Nodes"
+                                    >
+                                        <Fullscreen className="h-4 w-4" />
+                                    </div>
+                                </div>
+
+                                {/* Close button */}
+                                <div
+                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                    onClick={() => handleOpen(false)}
+                                    title="Close Panel"
+                                >
+                                    <X className="h-4 w-4" />
+                                </div>
                             </div>
                         </div>
                     </CardHeader>
@@ -255,6 +364,8 @@ const ChatRightSheet = ({
                                     setExpandedData={setExpandedData}
                                     loadingNodes={loadingNodes}
                                     setLoadingNodes={setLoadingNodes}
+                                    linkFilters={graphLinkFilters}
+                                    setLinkFilters={setGraphLinkFilters}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -281,10 +392,7 @@ const ChatRightSheet = ({
 
                         {/* Accordion with padding - 50% height */}
                         <div className="flex-1 px-3 py-2 overflow-hidden">
-                            <Accordion
-                                type="multiple"
-                                className="w-full h-full overflow-y-auto"
-                            >
+                            <Accordion type="multiple" className="w-full h-full overflow-y-auto">
                                 {cardData.nodes.map((node: any) => {
                                     const linkedNodes = nodeConnections[node.id] || [];
                                     const hasLinkedNodes = linkedNodes.length > 0;
@@ -296,9 +404,7 @@ const ChatRightSheet = ({
                                             className="transition-all duration-300 pr-4"
                                         >
                                             <AccordionTrigger>
-                                                <div
-                                                    className="text-left flex items-center gap-2 w-full"
-                                                >
+                                                <div className="text-left flex items-center gap-2 w-full">
                                                     {node.layerColor && (
                                                         <div
                                                             className="w-3 h-3 rounded-full flex-shrink-0"
@@ -337,8 +443,8 @@ const ChatRightSheet = ({
                                                 )}
 
                                                 {/* Topics and Concepts */}
-                                                {((node.topics?.length > 0) || (node.concepts?.length > 0)) && (
-                                                    <div className='w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200'>
+                                                {(node.topics?.length > 0 || node.concepts?.length > 0) && (
+                                                    <div className="w-full flex flex-col bg-amber-50 px-2 py-1 rounded-md mb-2 border border-amber-200">
                                                         {/* Topics badges */}
                                                         {renderBadges(node.topics, 'topic')}
 
@@ -382,8 +488,10 @@ const ChatRightSheet = ({
                                                                             {linkedNode.neutralCitation ||
                                                                                 (linkedNode.content &&
                                                                                 linkedNode.content.length > 100
-                                                                                    ? linkedNode.content.substring(0, 100) +
-                                                                                      '...'
+                                                                                    ? linkedNode.content.substring(
+                                                                                          0,
+                                                                                          100,
+                                                                                      ) + '...'
                                                                                     : linkedNode.content)}
                                                                         </div>
                                                                     </div>
