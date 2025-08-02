@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
@@ -183,7 +183,7 @@ const ChatGraph2D = ({
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
-    const getAllLinkTypes = (layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
         const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
 
         Object.values(layerDataMap).forEach((layerData: any) => {
@@ -223,7 +223,7 @@ const ChatGraph2D = ({
         }));
 
         return linkTypes.sort((a, b) => b.count - a.count);
-    };
+    }, []);
 
     const getLinkType = (link: any): string => {
         if (link.relationType) {
@@ -301,7 +301,7 @@ const ChatGraph2D = ({
                 });
             });
         }
-    }, [layerDataMap, expandedData]);
+    }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
 
     useEffect(() => {
         const newNodeTypes = getAllNodeTypes(layerDataMap, expandedData);
@@ -319,7 +319,7 @@ const ChatGraph2D = ({
                 });
             });
         }
-    }, [layerDataMap, expandedData]);
+    }, [layerDataMap, expandedData, setNodeFilters]);
 
     const getAllDescendants = (nodeId: string): Set<string> => {
         const descendants = new Set<string>();
@@ -400,13 +400,13 @@ const ChatGraph2D = ({
         }
     };
 
-    const isLinkVisible = (link: any): boolean => {
+    const isLinkVisible = useCallback((link: any): boolean => {
         const linkType = getLinkType(link);
         const filter = linkFilters.find((f) => f.id === linkType);
         return filter ? filter.enabled : true;
-    };
+    }, [linkFilters]);
 
-    const getAllNodeTypes = (layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
+    const getAllNodeTypes = useCallback((layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
         const nodeTypesMap = new Map<string, { count: number; examples: any[] }>();
 
         Object.values(layerDataMap).forEach((layerData: any) => {
@@ -446,7 +446,7 @@ const ChatGraph2D = ({
         }));
 
         return nodeTypes.sort((a, b) => b.count - a.count);
-    };
+    }, []);
 
     const getNodeType = (node: any): string => {
         if (node.labels && node.labels.length > 0) {
@@ -558,11 +558,11 @@ const ChatGraph2D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isNodeVisible = (node: any): boolean => {
+    const isNodeVisible = useCallback((node: any): boolean => {
         const nodeType = getNodeType(node);
         const filter = nodeFilters.find((f) => f.id === nodeType);
         return filter ? filter.enabled : true;
-    };
+    }, [nodeFilters]);
 
     const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -650,7 +650,7 @@ const ChatGraph2D = ({
         });
 
         return Array.from(allNodes.values());
-    }, [layerDataMap, layers, expandedData, nodeFilters]);
+    }, [layerDataMap, layers, expandedData, isNodeVisible]);
 
     const processedLinks = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -713,7 +713,7 @@ const ChatGraph2D = ({
         });
 
         return Array.from(allLinks.values());
-    }, [layerDataMap, layers, expandedData, linkFilters, processedNodes]);
+    }, [layerDataMap, layers, expandedData, processedNodes, isLinkVisible]);
 
     const processedData = useMemo(
         () => ({

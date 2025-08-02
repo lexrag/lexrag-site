@@ -1,13 +1,12 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNodes';
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
-import * as d3 from 'd3';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
@@ -269,7 +268,7 @@ const ChatGraph3D = ({
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
-    const getAllLinkTypes = (layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
         const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
 
         Object.values(layerDataMap).forEach((layerData: any) => {
@@ -309,7 +308,7 @@ const ChatGraph3D = ({
         }));
 
         return linkTypes.sort((a, b) => b.count - a.count);
-    };
+    }, []);
 
     const getLinkType = (link: any): string => {
         if (link.relationType) {
@@ -371,13 +370,13 @@ const ChatGraph3D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isLinkVisible = (link: any): boolean => {
+    const isLinkVisible = useCallback((link: any): boolean => {
         const linkType = getLinkType(link);
         const filter = linkFilters.find((f) => f.id === linkType);
         return filter ? filter.enabled : true;
-    };
+    }, [linkFilters]);
 
-    const getAllNodeTypes = (layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
+    const getAllNodeTypes = useCallback((layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
         const nodeTypesMap = new Map<string, { count: number; examples: any[] }>();
 
         Object.values(layerDataMap).forEach((layerData: any) => {
@@ -417,7 +416,7 @@ const ChatGraph3D = ({
         }));
 
         return nodeTypes.sort((a, b) => b.count - a.count);
-    };
+    }, []);
 
     const getNodeType = (node: any): string => {
         if (node.labels && node.labels.length > 0) {
@@ -529,11 +528,11 @@ const ChatGraph3D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isNodeVisible = (node: any): boolean => {
+    const isNodeVisible = useCallback((node: any): boolean => {
         const nodeType = getNodeType(node);
         const filter = nodeFilters.find((f) => f.id === nodeType);
         return filter ? filter.enabled : true;
-    };
+    }, [nodeFilters]);
 
     useEffect(() => {
         const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
@@ -551,7 +550,7 @@ const ChatGraph3D = ({
                 });
             });
         }
-    }, [layerDataMap, expandedData]);
+    }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
 
     useEffect(() => {
         const newNodeTypes = getAllNodeTypes(layerDataMap, expandedData);
@@ -569,7 +568,7 @@ const ChatGraph3D = ({
                 });
             });
         }
-    }, [layerDataMap, expandedData]);
+    }, [layerDataMap, expandedData, setNodeFilters, getAllNodeTypes]);
 
     const processedData = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -679,9 +678,9 @@ const ChatGraph3D = ({
             nodes: Array.from(allNodes.values()),
             links: Array.from(allLinks.values()),
         };
-    }, [layerDataMap, layers, expandedData, linkFilters, nodeFilters]);
+    }, [layerDataMap, layers, expandedData, isLinkVisible, isNodeVisible]);
 
-    const applyForces = () => {
+    const applyForces = useCallback(() => {
         const fg = graphRef.current;
         if (!fg || !fg.d3Force) return;
 
@@ -695,25 +694,16 @@ const ChatGraph3D = ({
             return nodeSize + Math.max(10, 20 - (nodeCount * 0.05));
         };
 
-        // Increase the strength of the charge force
         fg.d3Force('charge')?.strength(chargeStrength);
-        
-        // Increase the distance between connected nodes
+
         fg.d3Force('link')?.distance(linkDistance);
-        
-        // Decrease the force of attraction to the center for a more natural distribution
+
         fg.d3Force('center')?.strength(0.02);
-
-        // Improve collision - increase radius and strength
         fg.d3Force('collide')?.radius(collideRadius).strength(0.7);
-
-        // Remove the forces of repulsion from the edges, which cause stretching in a line
-        // fg.d3Force('x', d3.forceX().strength(0.1));
-        // fg.d3Force('y', d3.forceY().strength(0.1));
-    };
+    }, [processedData]);
 
     // Function to calculate optimal zoom distance based on container size and node count
-    const calculateOptimalZoomDistance = () => {
+    const calculateOptimalZoomDistance = useCallback(() => {
         const nodeCount = processedData?.nodes?.length || 0;
         const containerWidth = dimensions.width;
         const containerHeight = dimensions.height;
@@ -744,10 +734,10 @@ const ChatGraph3D = ({
         const maxDistance = Math.min(containerWidth, containerHeight) * 0.7;
         
         return Math.max(minDistance, Math.min(maxDistance, baseDistance));
-    };
+    }, [processedData, dimensions]);
 
     // Function to initialize node positions in a wider space
-    const initializeNodePositions = () => {
+    const initializeNodePositions = useCallback(() => {
         if (!processedData || !processedData.nodes) return;
 
         const nodes = processedData.nodes;
@@ -817,7 +807,7 @@ const ChatGraph3D = ({
                 node.z = radius * Math.cos(phi) + randomZ;
             }
         });
-    };
+    }, [processedData]);
 
     useEffect(() => {
         if (!processedData) return;
@@ -830,7 +820,7 @@ const ChatGraph3D = ({
             const optimalDistance = calculateOptimalZoomDistance();
             graphRef.current?.zoomToFit(optimalDistance);
         }, 1000);
-    }, [processedData, handleCardData]);
+    }, [processedData, handleCardData, applyForces, calculateOptimalZoomDistance, initializeNodePositions]);
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
@@ -884,7 +874,7 @@ const ChatGraph3D = ({
             unsubscribeZoomToFit();
             unsubscribeZoomToNode();
         };
-    }, [processedData]);
+    }, [processedData, calculateOptimalZoomDistance]);
 
     useEffect(() => {
         let animationFrame: number;
@@ -900,7 +890,7 @@ const ChatGraph3D = ({
 
         animationFrame = requestAnimationFrame(waitForGraph);
         return () => cancelAnimationFrame(animationFrame);
-    }, []);
+    }, [applyForces]);
 
     // Cleanup timer on unmount
     useEffect(() => {
