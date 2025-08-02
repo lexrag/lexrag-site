@@ -516,6 +516,40 @@ const ChatGraph3D = ({
         // fg.d3Force('y', d3.forceY().strength(0.1));
     };
 
+    // Function to calculate optimal zoom distance based on container size and node count
+    const calculateOptimalZoomDistance = () => {
+        const nodeCount = processedData?.nodes?.length || 0;
+        const containerWidth = dimensions.width;
+        const containerHeight = dimensions.height;
+        
+        // Base distance calculation based on container size
+        let baseDistance = Math.min(containerWidth, containerHeight) * 0.35;
+        
+        // Adjust based on node count
+        if (nodeCount > 0) {
+            // More nodes = closer zoom to fit them all
+            const nodeCountFactor = Math.max(0.25, 1 - (nodeCount * 0.015));
+            baseDistance *= nodeCountFactor;
+        }
+        
+        // Calculate average node size to adjust zoom
+        if (processedData?.nodes && processedData.nodes.length > 0) {
+            const avgNodeSize = processedData.nodes.reduce((sum, node) => {
+                return sum + getNodeSize(node);
+            }, 0) / processedData.nodes.length;
+            
+            // Larger nodes need more space
+            const nodeSizeFactor = Math.max(0.8, Math.min(1.5, avgNodeSize / 25));
+            baseDistance *= nodeSizeFactor;
+        }
+        
+        // Ensure minimum and maximum bounds
+        const minDistance = 150;
+        const maxDistance = Math.min(containerWidth, containerHeight) * 0.7;
+        
+        return Math.max(minDistance, Math.min(maxDistance, baseDistance));
+    };
+
     // Function to initialize node positions in a wider space
     const initializeNodePositions = () => {
         if (!processedData || !processedData.nodes) return;
@@ -594,10 +628,19 @@ const ChatGraph3D = ({
         handleCardData(processedData);
         initializeNodePositions();
         applyForces();
+        
+        // Auto zoom to fit after data is processed
+        setTimeout(() => {
+            const optimalDistance = calculateOptimalZoomDistance();
+            graphRef.current?.zoomToFit(optimalDistance);
+        }, 1000);
     }, [processedData, handleCardData]);
 
     useEffect(() => {
-        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => graphRef.current?.zoomToFit(400));
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            const optimalDistance = calculateOptimalZoomDistance();
+            graphRef.current?.zoomToFit(optimalDistance);
+        });
         const unsubscribeZoomToNode = subscribeToZoomToNodeGraph(async (payload) => {
             if (!graphRef.current) return;
 
@@ -909,7 +952,8 @@ const ChatGraph3D = ({
                         }));
 
                         setTimeout(() => {
-                            graphRef.current?.zoomToFit(800);
+                            const optimalDistance = calculateOptimalZoomDistance();
+                            graphRef.current?.zoomToFit(optimalDistance);
                         }, 500);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
@@ -1229,10 +1273,12 @@ const ChatGraph3D = ({
             setIsOrbitEnabled(false);
             setCanvasClickCount(1);
         } else if (canvasClickCount === 1) {
-            graphRef.current?.zoomToFit(400);
+            const optimalDistance = calculateOptimalZoomDistance();
+            graphRef.current?.zoomToFit(optimalDistance);
             setCanvasClickCount(0);
         } else {
-            graphRef.current?.zoomToFit(400);
+            const optimalDistance = calculateOptimalZoomDistance();
+            graphRef.current?.zoomToFit(optimalDistance);
         }
     };
 
