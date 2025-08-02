@@ -6,8 +6,8 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-// import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GraphData, GraphLayer, GraphLinkFilter } from '@/types/Graph';
+import * as d3 from 'd3';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
@@ -127,41 +127,6 @@ const ChatGraph3D = ({
             setCanvasClickCount(0);
         }
     }, [isOrbitEnabled]);
-
-    // useEffect(() => {
-    //     if (!graphRef.current) return;
-
-    //     const bloomPass = new UnrealBloomPass();
-    //     bloomPass.strength = 4;
-    //     bloomPass.radius = 1;
-    //     bloomPass.threshold = 0;
-    //     graphRef.current.postProcessingComposer().addPass(bloomPass);
-    // }, [graphRef]);
-
-    // useEffect(() => {
-    //     if(!graphRef.current) return;
-    //     console.log(graphRef)
-    //     const bloomPass = new UnrealBloomPass();
-    //     console.log(bloomPass)
-    //     bloomPass.strength = 4;
-    //     bloomPass.radius = 1;
-    //     bloomPass.threshold = 0;
-    //     graphRef.current.postProcessingComposer().addPass(bloomPass);
-    // }, [graphRef]);
-
-    // useEffect(() => {
-    //     if (graphRef.current && !bloomPassRef.current) {
-    //         const bloomPass = new UnrealBloomPass();
-    //         bloomPass.strength = highlightedNodeId ? 2.5 : 1.5;
-    //         bloomPass.radius = 1;
-    //         bloomPass.threshold = 0.1;
-
-    //         bloomPassRef.current = bloomPass;
-    //         graphRef.current.postProcessingComposer().addPass(bloomPass);
-    //     }
-    // }, []);
-
-    // Update bloom intensity when node is highlighted
     useEffect(() => {
         if (bloomPassRef.current) {
             if (highlightedNodeId) {
@@ -524,16 +489,110 @@ const ChatGraph3D = ({
         const fg = graphRef.current;
         if (!fg || !fg.d3Force) return;
 
-        fg.d3Force('charge')?.strength(-8);
-        fg.d3Force('link')?.distance(90);
-        fg.d3Force('center')?.strength(0.08);
+        const nodeCount = processedData?.nodes?.length || 0;
+        
+        // Dynamically adjust forces based on the number of nodes
+        const chargeStrength = Math.max(-40, -25 - (nodeCount * 0.3));
+        const linkDistance = Math.max(80, 120 + (nodeCount * 1.5));
+        const collideRadius = (d: any) => {
+            const nodeSize = getNodeSize(d);
+            return nodeSize + Math.max(10, 20 - (nodeCount * 0.05));
+        };
 
-        fg.d3Force('collide')?.radius(15).strength(0.4);
+        // Increase the strength of the charge force
+        fg.d3Force('charge')?.strength(chargeStrength);
+        
+        // Increase the distance between connected nodes
+        fg.d3Force('link')?.distance(linkDistance);
+        
+        // Decrease the force of attraction to the center for a more natural distribution
+        fg.d3Force('center')?.strength(0.02);
+
+        // Improve collision - increase radius and strength
+        fg.d3Force('collide')?.radius(collideRadius).strength(0.7);
+
+        // Remove the forces of repulsion from the edges, which cause stretching in a line
+        // fg.d3Force('x', d3.forceX().strength(0.1));
+        // fg.d3Force('y', d3.forceY().strength(0.1));
+    };
+
+    // Function to initialize node positions in a wider space
+    const initializeNodePositions = () => {
+        if (!processedData || !processedData.nodes) return;
+
+        const nodes = processedData.nodes;
+        const links = processedData.links || [];
+        const radius = Math.max(150, nodes.length * 8); // Decreased radius for more compact distribution
+
+        // Create a map of connections for each node
+        const nodeConnections = new Map();
+        nodes.forEach(node => {
+            nodeConnections.set(node.id, []);
+        });
+
+        links.forEach(link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            
+            if (nodeConnections.has(sourceId)) {
+                nodeConnections.get(sourceId).push(targetId);
+            }
+            if (nodeConnections.has(targetId)) {
+                nodeConnections.get(targetId).push(sourceId);
+            }
+        });
+
+        nodes.forEach((node: any, index: number) => {
+            if (node.x === undefined || node.y === undefined || node.z === undefined) {
+                // If the node has connections, try to place it closer to the connected nodes
+                const connections = nodeConnections.get(node.id) || [];
+                
+                if (connections.length > 0) {
+                    // Find the average position of the connected nodes
+                    let avgX = 0, avgY = 0, avgZ = 0;
+                    let connectedCount = 0;
+                    
+                    connections.forEach((connectedId: string) => {
+                        const connectedNode = nodes.find(n => n.id === connectedId);
+                        if (connectedNode && connectedNode.x !== undefined) {
+                            avgX += connectedNode.x;
+                            avgY += connectedNode.y;
+                            avgZ += connectedNode.z || 0;
+                            connectedCount++;
+                        }
+                    });
+                    
+                    if (connectedCount > 0) {
+                        // Place the node near the connected nodes
+                        const offset = radius * 0.3;
+                        node.x = (avgX / connectedCount) + (Math.random() - 0.5) * offset;
+                        node.y = (avgY / connectedCount) + (Math.random() - 0.5) * offset;
+                        node.z = (avgZ / connectedCount) + (Math.random() - 0.5) * offset;
+                        return;
+                    }
+                }
+                
+                // If there are no connections or the connected nodes are not yet placed, use spherical distribution
+                const phi = Math.acos(-1 + (2 * index) / nodes.length);
+                const theta = Math.sqrt(nodes.length * Math.PI) * phi;
+                
+                // Add a small randomness to prevent perfect symmetry
+                const randomOffset = 0.3;
+                const randomX = (Math.random() - 0.5) * radius * randomOffset;
+                const randomY = (Math.random() - 0.5) * radius * randomOffset;
+                const randomZ = (Math.random() - 0.5) * radius * randomOffset;
+
+                node.x = radius * Math.cos(theta) * Math.sin(phi) + randomX;
+                node.y = radius * Math.sin(theta) * Math.sin(phi) + randomY;
+                node.z = radius * Math.cos(phi) + randomZ;
+            }
+        });
     };
 
     useEffect(() => {
         if (!processedData) return;
         handleCardData(processedData);
+        initializeNodePositions();
         applyForces();
     }, [processedData, handleCardData]);
 
@@ -1342,6 +1401,13 @@ const ChatGraph3D = ({
             cooldownTime={15000}
             enableNodeDrag={true}
             enableNavigationControls={true}
+            // opacity of nodes and links
+            nodeOpacity={1}
+            linkOpacity={0.2}
+            // Additional parameters for better distribution
+            d3AlphaDecay={0.01}
+            d3VelocityDecay={0.4}
+            warmupTicks={300}
         />
     );
 };
