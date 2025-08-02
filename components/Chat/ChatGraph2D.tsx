@@ -29,6 +29,7 @@ interface ChatGraph2DProps {
 
     linkFilters: GraphLinkFilter[];
     setLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
+    showNodeLabels?: boolean;
 }
 
 const ChatGraph2D = ({
@@ -48,6 +49,7 @@ const ChatGraph2D = ({
     setLoadingNodes,
     linkFilters,
     setLinkFilters,
+    showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -979,7 +981,7 @@ const ChatGraph2D = ({
         setHighlightedLinkId(null);
         setSelectedNodes(new Set());
         setSelectedLinks(new Set());
-        
+
         graphRef.current?.zoomToFit(300);
     };
 
@@ -1034,51 +1036,79 @@ const ChatGraph2D = ({
         return '';
     };
 
-    const formatSectionReference = (node: any): string => {
-        let result = '';
+    // const formatSectionReference = (node: any): string => {
+    //     let result = '';
 
-        if (node.part) {
-            result += `Part ${node.part}`;
+    //     if (node.part) {
+    //         result += `Part ${node.part}`;
+    //     }
+
+    //     if (node.section) {
+    //         if (result) result += ', ';
+    //         result += `s ${node.section}`;
+    //     }
+
+    //     if (node.subsection) {
+    //         result += `(${node.subsection})`;
+    //     }
+
+    //     return result;
+    // };
+
+    const getParagraphNumber = (nodeId: string) => {
+        if (nodeId.includes('#[')) {
+            const match = nodeId.match(/#\[(\d+)\]/);
+            return match ? match[1] : null;
+        }
+        return null;
+    };
+
+    const formatLegalPath = (legalPath: string) => {
+        if (!legalPath) return '';
+
+        const parts = legalPath.split(' -> ').map((part) => part.trim());
+        const pathParts = parts.slice(1).map((part) => part.replace(/-$/, ''));
+
+        if (pathParts.length === 0) return '';
+
+        const [first, ...rest] = pathParts;
+        if (rest.length === 0) return first;
+
+        return `${first}(${rest.join(')(')})`;
+    };
+
+    const getNodeDisplayLabel = (node: any): string => {
+        const paragraphNum = getParagraphNumber(node.id);
+        let label = node.labels?.[0] || 'Node';
+
+        if (paragraphNum) {
+            label = `§ ${paragraphNum}`;
+        } else if (node.labels && node.labels.includes('CaseLaw')) {
+            label = node.neutralCitation || node.content || node.id;
+        } else if (node.labels && node.labels.includes('Act')) {
+            const actCode = extractActCode(node);
+            label = actCode || node.content || node.id;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+            label = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+            label = 'Subsidiary Legislation';
+        } else if (node.labels?.includes('PartOfTheLegislation')) {
+            label = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
+        } else if (node.heading) {
+            label = node.heading;
+        } else if (node.name) {
+            label = node.name;
+        } else if (node.content) {
+            label = node.content;
+        } else {
+            label = node.id;
         }
 
-        if (node.section) {
-            if (result) result += ', ';
-            result += `s ${node.section}`;
-        }
-
-        if (node.subsection) {
-            result += `(${node.subsection})`;
-        }
-
-        return result;
+        return label;
     };
 
     const getNodeLabel = (node: any) => {
-        let baseLabel = '';
-
-        if (node.labels && node.labels.includes('CaseLaw')) {
-            baseLabel = node.neutralCitation || node.content || node.id;
-        } else if (node.labels && node.labels.includes('Act')) {
-            const actCode = extractActCode(node);
-            baseLabel = actCode || node.content || node.id;
-        } else if (node.labels && node.labels.includes('Paragraph')) {
-            baseLabel = `§ ${node.number || node.id}`;
-        } else if (node.labels && (node.labels.includes('Article') || node.labels.includes('Section'))) {
-            const sectionRef = formatSectionReference(node);
-            const actCode = extractActCode(node);
-
-            if (sectionRef && actCode) {
-                baseLabel = `${sectionRef} ${actCode}`;
-            } else if (sectionRef) {
-                baseLabel = sectionRef;
-            } else if (actCode) {
-                baseLabel = actCode;
-            } else {
-                baseLabel = node.content || node.id;
-            }
-        } else {
-            baseLabel = node.content || node.id;
-        }
+        let baseLabel = getNodeDisplayLabel(node);
 
         if (node.layerName) {
             baseLabel += `\n[${node.layerName}]`;
@@ -1126,7 +1156,7 @@ const ChatGraph2D = ({
         const nodeSize = getNodeSize(node);
         const rgb = getNodeColor(node);
 
-        if (highlightedNodeId === node.id) {
+        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
             ctx.save();
 
             const glowRadius = nodeSize * 3.5;
@@ -1150,11 +1180,64 @@ const ChatGraph2D = ({
         ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
         ctx.fill();
 
-        if (highlightedNodeId === node.id) {
+        // if (selectedNodes.has(node)) {
+        //     ctx.strokeStyle = '#fbbf24';
+        //     ctx.lineWidth = 3;
+        //     ctx.stroke();
+        // }
+
+        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
             ctx.beginPath();
             ctx.arc(node.x, node.y, nodeSize, 0, 2 * Math.PI, false);
             ctx.fillStyle = `rgba(255, 255, 255, 0.3)`;
             ctx.fill();
+        }
+
+        if (showNodeLabels) {
+            const label = getNodeDisplayLabel(node);
+            if (label) {
+                ctx.save();
+
+                const fontSize = Math.max(8, Math.min(12, nodeSize * 0.4));
+                ctx.font = `${fontSize}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const textColor = resolvedTheme === 'dark' ? '#ffffff' : '#000000';
+
+                let textX = node.x;
+                let textY = node.y;
+
+                if (nodeSize < 20) {
+                    textX = node.x + nodeSize + 5;
+                    textY = node.y;
+                    ctx.textAlign = 'left';
+                }
+
+                const textMetrics = ctx.measureText(label);
+                const textWidth = textMetrics.width;
+                const textHeight = fontSize;
+
+                if (nodeSize < 20) {
+                    ctx.fillStyle = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+                    ctx.fillRect(textX - 2, textY - textHeight / 2 - 2, textWidth + 4, textHeight + 4);
+                } else {
+                    if (label.length > 10) {
+                        ctx.fillStyle = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+                        ctx.fillRect(
+                            textX - textWidth / 2 - 2,
+                            textY - textHeight / 2 - 2,
+                            textWidth + 4,
+                            textHeight + 4,
+                        );
+                    }
+                }
+
+                ctx.fillStyle = textColor;
+                ctx.fillText(label, textX, textY);
+
+                ctx.restore();
+            }
         }
     };
 

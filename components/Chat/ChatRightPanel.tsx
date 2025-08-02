@@ -262,7 +262,6 @@ const ChatRightPanel = ({
         scrollToCard();
     }, [scrollToCardId, cardData.nodes, findGroupByNodeId]);
 
-    // Создаем мапу родительских узлов по parentId
     const parentNodesMap = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
             return {};
@@ -271,7 +270,6 @@ const ChatRightPanel = ({
         const parents: { [key: string]: any } = {};
 
         cardData.nodes.forEach((node) => {
-            // Если у узла нет parentId, то он сам является родительским
             if (!node.parentId) {
                 parents[node.id] = node;
             }
@@ -281,7 +279,6 @@ const ChatRightPanel = ({
     }, [cardData.nodes]);
 
     const getGroupInfo = (parentId: string, nodes: any[]) => {
-        // Сначала ищем родительский узел по parentId
         const parentNode = parentNodesMap[parentId];
 
         if (parentNode) {
@@ -329,7 +326,6 @@ const ChatRightPanel = ({
             };
         }
 
-        // Определяем тип по parentId URL
         if (parentId.includes('sso.agc.gov.sg/Act/')) {
             return {
                 displayName: parentId.split('/').pop() || 'Act',
@@ -353,7 +349,6 @@ const ChatRightPanel = ({
             };
         }
 
-        // Fallback для неопределенных типов
         const firstNode = nodes[0];
         return {
             displayName: firstNode?.content || parentId.split('/').pop() || 'Document',
@@ -371,7 +366,6 @@ const ChatRightPanel = ({
         return null;
     };
 
-    // Группировка узлов по parentId
     const groupedNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
             return {};
@@ -380,21 +374,17 @@ const ChatRightPanel = ({
         const groups: { [key: string]: any[] } = {};
 
         cardData.nodes.forEach((node) => {
-            // Если у узла есть parentId, группируем по parentId
-            // Если нет parentId, то узел группируется сам с собой
             const groupKey = node.parentId || node.id;
 
             if (!groups[groupKey]) {
                 groups[groupKey] = [];
             }
 
-            // Добавляем узел в группу только если у него есть parentId (т.е. это дочерний узел)
             if (node.parentId) {
                 groups[groupKey].push(node);
             }
         });
 
-        // Фильтруем группы - оставляем только те, которые имеют дочерние узлы или являются родительскими
         const filteredGroups: { [key: string]: any[] } = {};
         Object.keys(groups).forEach((groupKey) => {
             const hasChildren = groups[groupKey].length > 0;
