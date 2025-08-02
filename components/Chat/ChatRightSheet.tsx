@@ -6,7 +6,7 @@ import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { useDirection } from '@radix-ui/react-direction';
 import { ArrowRight, Expand, Fullscreen, Layers, Link, X } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer, GraphLinkFilter } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -34,6 +34,8 @@ interface ChatRightSheetProps {
     currentMessage: any;
     graphLinkFilters: GraphLinkFilter[];
     setGraphLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
+    graphNodeFilters: GraphNodeFilter[];
+    setGraphNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     cardData: CardData;
     handleCardData: Dispatch<SetStateAction<CardData>>;
 }
@@ -48,6 +50,8 @@ const ChatRightSheet = ({
     setIsOpenGraphModal,
     graphLinkFilters,
     setGraphLinkFilters,
+    graphNodeFilters,
+    setGraphNodeFilters,
     currentMessage,
     cardData,
     handleCardData,
@@ -169,6 +173,16 @@ const ChatRightSheet = ({
 
     const handleAllLinkFilters = (enabled: boolean) => {
         setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
+    };
+
+    const handleNodeFilter = (filterId: string) => {
+        setGraphNodeFilters((prevFilters) =>
+            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter)),
+        );
+    };
+
+    const handleAllNodeFilters = (enabled: boolean) => {
+        setGraphNodeFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
     };
 
     return (
@@ -316,6 +330,87 @@ const ChatRightSheet = ({
                                             </div>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <div
+                                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                title="Toggle Node Filters"
+                                            >
+                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                </svg>
+                                            </div>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            className="w-80 max-h-64 overflow-y-auto"
+                                            align="end"
+                                            sideOffset={5}
+                                        >
+                                            <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                <span>Node Filters</span>
+                                            </DropdownMenuLabel>
+
+                                            <DropdownMenuSeparator />
+
+                                            <div className="flex gap-2 p-2">
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleAllNodeFilters(true);
+                                                    }}
+                                                >
+                                                    All
+                                                </Button>
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleAllNodeFilters(false);
+                                                    }}
+                                                >
+                                                    None
+                                                </Button>
+                                            </div>
+
+                                            <DropdownMenuSeparator />
+
+                                            <div className="max-h-48 overflow-y-auto">
+                                                {graphNodeFilters.map((filter) => (
+                                                    <div
+                                                        key={filter.id}
+                                                        className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleNodeFilter(filter.id);
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={filter.enabled}
+                                                            onChange={() => handleNodeFilter(filter.id)}
+                                                            className="cursor-pointer"
+                                                            style={{ accentColor: filter.color }}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <div
+                                                            className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                            style={{ backgroundColor: filter.color }}
+                                                        />
+                                                        <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                            {filter.label}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                            {filter.count}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </DropdownMenu>
                                 <div className="flex items-center gap-1">
                                     <div
@@ -366,6 +461,8 @@ const ChatRightSheet = ({
                                     setLoadingNodes={setLoadingNodes}
                                     linkFilters={graphLinkFilters}
                                     setLinkFilters={setGraphLinkFilters}
+                                    nodeFilters={graphNodeFilters}
+                                    setNodeFilters={setGraphNodeFilters}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -388,6 +485,8 @@ const ChatRightSheet = ({
                                     setLoadingNodes={setLoadingNodes}
                                     linkFilters={graphLinkFilters}
                                     setLinkFilters={setGraphLinkFilters}
+                                    nodeFilters={graphNodeFilters}
+                                    setNodeFilters={setGraphNodeFilters}
                                 />
                             )}
                         </div>

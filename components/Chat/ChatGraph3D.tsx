@@ -6,7 +6,7 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer, GraphLinkFilter } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
 import * as d3 from 'd3';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
@@ -32,6 +32,8 @@ interface ChatGraph3DProps {
 
     linkFilters: GraphLinkFilter[];
     setLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
+    nodeFilters: GraphNodeFilter[];
+    setNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
 }
 
 const ChatGraph3D = ({
@@ -53,6 +55,8 @@ const ChatGraph3D = ({
     setLoadingNodes,
     linkFilters,
     setLinkFilters,
+    nodeFilters,
+    setNodeFilters,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -373,6 +377,164 @@ const ChatGraph3D = ({
         return filter ? filter.enabled : true;
     };
 
+    const getAllNodeTypes = (layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
+        const nodeTypesMap = new Map<string, { count: number; examples: any[] }>();
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.nodes) {
+                layerData.nodes.forEach((node: any) => {
+                    const nodeType = getNodeType(node);
+                    if (!nodeTypesMap.has(nodeType)) {
+                        nodeTypesMap.set(nodeType, { count: 0, examples: [] });
+                    }
+                    const existing = nodeTypesMap.get(nodeType)!;
+                    existing.count++;
+                    if (existing.examples.length < 3) {
+                        existing.examples.push(node);
+                    }
+                });
+            }
+        });
+
+        expandedData.nodes.forEach((node: any) => {
+            const nodeType = getNodeType(node);
+            if (!nodeTypesMap.has(nodeType)) {
+                nodeTypesMap.set(nodeType, { count: 0, examples: [] });
+            }
+            const existing = nodeTypesMap.get(nodeType)!;
+            existing.count++;
+            if (existing.examples.length < 3) {
+                existing.examples.push(node);
+            }
+        });
+
+        const nodeTypes: GraphNodeFilter[] = Array.from(nodeTypesMap.entries()).map(([type, data], index) => ({
+            id: type,
+            label: getNodeTypeLabel(type),
+            enabled: true,
+            color: getNodeTypeColor(type, index),
+            count: data.count,
+        }));
+
+        return nodeTypes.sort((a, b) => b.count - a.count);
+    };
+
+    const getNodeType = (node: any): string => {
+        if (node.labels && node.labels.length > 0) {
+            return node.labels[0];
+        }
+        return 'default';
+    };
+
+    const getNodeTypeLabel = (type: string): string => {
+        const labelMap: Record<string, string> = {
+            CaseLaw: 'Case Law',
+            Case: 'Case',
+            Paragraph: 'Paragraph',
+            Court: 'Court',
+            Tribunal: 'Tribunal',
+            Judge: 'Judge',
+            Justice: 'Justice',
+            Party: 'Party',
+            Plaintiff: 'Plaintiff',
+            Defendant: 'Defendant',
+            Appellant: 'Appellant',
+            Respondent: 'Respondent',
+            Act: 'Act',
+            Law: 'Law',
+            Statute: 'Statute',
+            Legislation: 'Legislation',
+            Regulation: 'Regulation',
+            Order: 'Order',
+            Decree: 'Decree',
+            Resolution: 'Resolution',
+            SubsidiaryLegislation: 'Subsidiary Legislation',
+            Article: 'Article',
+            Section: 'Section',
+            Citation: 'Citation',
+            Reference: 'Reference',
+            Document: 'Document',
+            Filing: 'Filing',
+            Resource: 'Resource',
+            Work: 'Work',
+            Organization: 'Organization',
+            Person: 'Person',
+            Embeddable: 'Embeddable',
+            MasterExpression: 'Master Expression',
+            SubTopic: 'Sub Topic',
+            Expression: 'Expression',
+            Topic: 'Topic',
+            PartOfTheLegislation: 'Part of Legislation',
+            SLOpening: 'SL Opening',
+            default: 'Other',
+        };
+        return labelMap[type] || type;
+    };
+
+    const getNodeTypeColor = (type: string, index: number): string => {
+        const colors = [
+            '#3b82f6', // blue
+            '#ef4444', // red
+            '#10b981', // green
+            '#f59e0b', // amber
+            '#8b5cf6', // violet
+            '#ec4899', // pink
+            '#06b6d4', // cyan
+            '#84cc16', // lime
+            '#f97316', // orange
+            '#6366f1', // indigo
+        ];
+
+        const colorMap: Record<string, string> = {
+            CaseLaw: '#D9C8AE',
+            Case: '#D9C8AE',
+            Paragraph: '#8DCC93',
+            Court: '#DA7194',
+            Tribunal: '#DA7194',
+            Judge: '#C990C0',
+            Justice: '#C990C0',
+            Party: '#ECB5C9',
+            Plaintiff: '#ECB5C9',
+            Defendant: '#ECB5C9',
+            Appellant: '#ECB5C9',
+            Respondent: '#ECB5C9',
+            Act: '#F79767',
+            Law: '#F79767',
+            Statute: '#F79767',
+            Legislation: '#F79767',
+            Regulation: '#ECB5C9',
+            Order: '#ECB5C9',
+            Decree: '#ECB5C9',
+            Resolution: '#ECB5C9',
+            SubsidiaryLegislation: '#ECB5C9',
+            Article: '#A5ABB6',
+            Section: '#A5ABB6',
+            Citation: '#A5ABB6',
+            Reference: '#A5ABB6',
+            Document: '#A5ABB6',
+            Filing: '#A5ABB6',
+            Resource: '#A5ABB6',
+            Work: '#A5ABB6',
+            Organization: '#A5ABB6',
+            Person: '#A5ABB6',
+            Embeddable: '#A5ABB6',
+            MasterExpression: '#F16667',
+            SubTopic: '#57C7E3',
+            Expression: '#F16667',
+            Topic: '#4C8EDA',
+            PartOfTheLegislation: '#FFC454',
+            SLOpening: '#A5ABB6',
+        };
+
+        return colorMap[type] || colors[index % colors.length];
+    };
+
+    const isNodeVisible = (node: any): boolean => {
+        const nodeType = getNodeType(node);
+        const filter = nodeFilters.find((f) => f.id === nodeType);
+        return filter ? filter.enabled : true;
+    };
+
     useEffect(() => {
         const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
 
@@ -381,6 +543,24 @@ const ChatGraph3D = ({
                 const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
 
                 return newLinkTypes.map((newType) => {
+                    const existing = existingFiltersMap.get(newType.id);
+                    return {
+                        ...newType,
+                        enabled: existing ? existing.enabled : true,
+                    };
+                });
+            });
+        }
+    }, [layerDataMap, expandedData]);
+
+    useEffect(() => {
+        const newNodeTypes = getAllNodeTypes(layerDataMap, expandedData);
+
+        if (newNodeTypes.length > 0) {
+            setNodeFilters((prevFilters) => {
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+
+                return newNodeTypes.map((newType) => {
                     const existing = existingFiltersMap.get(newType.id);
                     return {
                         ...newType,
@@ -408,6 +588,8 @@ const ChatGraph3D = ({
             if (!layerData) return;
 
             layerData.nodes.forEach((node: any) => {
+                if (!isNodeVisible(node)) return;
+
                 const existingNode = allNodes.get(node.id);
                 if (existingNode) {
                     allNodes.set(node.id, {
@@ -430,14 +612,20 @@ const ChatGraph3D = ({
             if (layerData.links) {
                 layerData.links.forEach((link: any) => {
                     if (isLinkVisible(link)) {
-                        const linkKey = `${link.source}-${link.target}`;
-                        if (!allLinks.has(linkKey)) {
-                            allLinks.set(linkKey, {
-                                ...link,
-                                id: linkKey,
-                                source: typeof link.source === 'object' ? link.source.id : link.source,
-                                target: typeof link.target === 'object' ? link.target.id : link.target,
-                            });
+                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                        
+                        // Check if both nodes (source and target) are visible
+                        if (allNodes.has(sourceId) && allNodes.has(targetId)) {
+                            const linkKey = `${sourceId}-${targetId}`;
+                            if (!allLinks.has(linkKey)) {
+                                allLinks.set(linkKey, {
+                                    ...link,
+                                    id: linkKey,
+                                    source: sourceId,
+                                    target: targetId,
+                                });
+                            }
                         }
                     }
                 });
@@ -446,6 +634,8 @@ const ChatGraph3D = ({
 
         // Add expanded data
         expandedData.nodes.forEach((node: any) => {
+            if (!isNodeVisible(node)) return;
+
             const existingNode = allNodes.get(node.id);
             if (existingNode) {
                 allNodes.set(node.id, {
@@ -467,14 +657,20 @@ const ChatGraph3D = ({
 
         expandedData.links.forEach((link: any) => {
             if (isLinkVisible(link)) {
-                const linkKey = `${link.source}-${link.target}`;
-                if (!allLinks.has(linkKey)) {
-                    allLinks.set(linkKey, {
-                        ...link,
-                        id: linkKey,
-                        source: typeof link.source === 'object' ? link.source.id : link.source,
-                        target: typeof link.target === 'object' ? link.target.id : link.target,
-                    });
+                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                
+                // Check if both nodes (source and target) are visible
+                if (allNodes.has(sourceId) && allNodes.has(targetId)) {
+                    const linkKey = `${sourceId}-${targetId}`;
+                    if (!allLinks.has(linkKey)) {
+                        allLinks.set(linkKey, {
+                            ...link,
+                            id: linkKey,
+                            source: sourceId,
+                            target: targetId,
+                        });
+                    }
                 }
             }
         });
@@ -483,7 +679,7 @@ const ChatGraph3D = ({
             nodes: Array.from(allNodes.values()),
             links: Array.from(allLinks.values()),
         };
-    }, [layerDataMap, layers, expandedData, linkFilters]);
+    }, [layerDataMap, layers, expandedData, linkFilters, nodeFilters]);
 
     const applyForces = () => {
         const fg = graphRef.current;

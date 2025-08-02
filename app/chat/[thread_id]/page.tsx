@@ -6,7 +6,7 @@ import { useChat } from '@/api/chat/chatApi';
 import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer, GraphLinkFilter } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
@@ -56,6 +56,7 @@ export default function ChatPage() {
         { id: 'relevant_context', name: 'Relevant Context', enabled: true, color: '#ef4444', priority: 4 },
     ]);
     const [graphLinkFilters, setGraphLinkFilters] = useState<GraphLinkFilter[]>([]);
+    const [graphNodeFilters, setGraphNodeFilters] = useState<GraphNodeFilter[]>([]);
     const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
     const [input, setInput] = useState<string>('');
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
@@ -98,6 +99,8 @@ export default function ChatPage() {
                 onOpenChange={setIsOpenGraphModal}
                 graphLinkFilters={graphLinkFilters}
                 setGraphLinkFilters={setGraphLinkFilters}
+                graphNodeFilters={graphNodeFilters}
+                setGraphNodeFilters={setGraphNodeFilters}
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}
@@ -124,6 +127,8 @@ export default function ChatPage() {
                 handleOpen={setIsOpenRightSheet}
                 graphLinkFilters={graphLinkFilters}
                 setGraphLinkFilters={setGraphLinkFilters}
+                graphNodeFilters={graphNodeFilters}
+                setGraphNodeFilters={setGraphNodeFilters}
                 graphView={graphView}
                 setGraphView={setGraphView}
                 graphLayers={graphLayers}
@@ -163,6 +168,8 @@ export default function ChatPage() {
                     setGraphLayers={setGraphLayers}
                     graphLinkFilters={graphLinkFilters}
                     setGraphLinkFilters={setGraphLinkFilters}
+                    graphNodeFilters={graphNodeFilters}
+                    setGraphNodeFilters={setGraphNodeFilters}
                     graphView={graphView}
                     setGraphView={setGraphView}
                     cardData={cardData}

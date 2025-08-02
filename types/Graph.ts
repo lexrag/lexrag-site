@@ -14,6 +14,14 @@ export interface GraphLinkFilter {
     count: number;
 }
 
+export interface GraphNodeFilter {
+    id: string;
+    label: string;
+    enabled: boolean;
+    color: string;
+    count: number;
+}
+
 export interface GraphData {
     all_retrieved_nodes?: any;
     all_retrieved_nodes_with_neighbors?: any;
