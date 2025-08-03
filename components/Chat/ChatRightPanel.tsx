@@ -3,7 +3,18 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
-import { ChevronDown, ChevronRight, ChevronUp, Expand, Fullscreen, Globe, Layers, Link } from 'lucide-react';
+import {
+    ChevronDown,
+    ChevronRight,
+    ChevronUp,
+    Expand,
+    Fullscreen,
+    Globe,
+    Layers,
+    LetterText,
+    Link,
+    ListFilterPlus,
+} from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +31,7 @@ import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface ChatRightPanelProps {
     currentMessage: any;
@@ -34,6 +46,8 @@ interface ChatRightPanelProps {
     setGraphView: (view: string) => void;
     handleCardData: Dispatch<SetStateAction<CardData>>;
     setIsOpenGraphModal: (open: boolean) => void;
+    scrollToCardId: string;
+    setScrollToCardId: Dispatch<SetStateAction<string>>;
 }
 
 const ChatRightPanel = ({
@@ -49,6 +63,8 @@ const ChatRightPanel = ({
     setGraphView,
     handleCardData,
     setIsOpenGraphModal,
+    scrollToCardId,
+    setScrollToCardId,
 }: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -56,7 +72,8 @@ const ChatRightPanel = ({
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
-    const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
     const [showNodeLabels, setShowNodeLabels] = useState<boolean>(graphView === '2d');
     const [expandedContents, setExpandedContents] = useState<Set<string>>(new Set());
@@ -408,57 +425,6 @@ const ChatRightPanel = ({
         return filteredGroups;
     }, [cardData.nodes, parentNodesMap]);
 
-    const handleGroupClick = (groupKey: string) => {
-        const isCurrentlySelected = selectedItem === groupKey;
-        const isCurrentlyOpen = openAccordionItems.includes(groupKey);
-        
-        setSelectedItem(isCurrentlySelected ? null : groupKey);
-        setSelectedGroup(isCurrentlySelected ? null : groupKey);
-
-        setOpenAccordionItems((prev) => {
-            if (isCurrentlyOpen) {
-                return prev.filter(item => item !== groupKey);
-            } else {
-                return [...prev, groupKey];
-            }
-        });
-
-        if (!isCurrentlySelected) {
-            setScrollToCardId(groupKey);
-
-            const parentNode = parentNodesMap[groupKey];
-            if (parentNode && parentNode.x !== undefined && parentNode.y !== undefined) {
-                zoomToNodeGraph({
-                    id: parentNode.id,
-                    x: parentNode.x,
-                    y: parentNode.y,
-                });
-            }
-        }
-    };
-
-    const handleNodeClick = (nodeId: string, node: any) => {
-        const nodeGroupKey = node.parentId || node.id;
-        setSelectedItem(nodeId);
-        setSelectedGroup(nodeGroupKey);
-
-        const isParentNode = !node.parentId;
-
-        if (isParentNode) {
-            setScrollToCardId(nodeGroupKey);
-        } else {
-            setScrollToCardId(nodeId);
-        }
-
-        if (node.x !== undefined && node.y !== undefined) {
-            zoomToNodeGraph({
-                id: nodeId,
-                x: node.x,
-                y: node.y,
-            });
-        }
-    };
-
     const formatLegalPath = (legalPath: string) => {
         if (!legalPath) return '';
 
@@ -512,6 +478,103 @@ const ChatRightPanel = ({
             functionalObject: node.functionalObject || null,
             functionalRole: node.functionalRole || null,
         };
+    };
+
+    const filteredGroupedNodes = useMemo(() => {
+        if (!searchQuery.trim()) {
+            return groupedNodes;
+        }
+
+        const searchLower = searchQuery.toLowerCase().trim();
+        const filtered: { [key: string]: any[] } = {};
+
+        Object.entries(groupedNodes).forEach(([parentId, nodes]) => {
+            const groupInfo = getGroupInfo(parentId, nodes);
+
+            const groupMatches =
+                groupInfo.displayName.toLowerCase().includes(searchLower) ||
+                (groupInfo.citation && groupInfo.citation.toLowerCase().includes(searchLower));
+
+            const matchingNodes = nodes.filter((node: any) => {
+                const nodeInfo = getNodeDisplayInfo(node);
+
+                return (
+                    nodeInfo.title.toLowerCase().includes(searchLower) ||
+                    nodeInfo.content.toLowerCase().includes(searchLower) ||
+                    (nodeInfo.citation && nodeInfo.citation.toLowerCase().includes(searchLower)) ||
+                    (nodeInfo.functionalObject && nodeInfo.functionalObject.toLowerCase().includes(searchLower)) ||
+                    (nodeInfo.functionalRole && nodeInfo.functionalRole.toLowerCase().includes(searchLower)) ||
+                    (nodeInfo.topics &&
+                        nodeInfo.topics.some((topic: string) => topic.toLowerCase().includes(searchLower))) ||
+                    (nodeInfo.concepts &&
+                        nodeInfo.concepts.some((concept: string) => concept.toLowerCase().includes(searchLower)))
+                );
+            });
+
+            if (groupMatches || matchingNodes.length > 0) {
+                filtered[parentId] = groupMatches ? nodes : matchingNodes;
+            }
+        });
+
+        return filtered;
+    }, [groupedNodes, searchQuery, parentNodesMap]);
+
+    useEffect(() => {
+        if (searchQuery.trim()) {
+            const matchingGroups = Object.keys(filteredGroupedNodes);
+            setOpenAccordionItems(matchingGroups);
+        }
+    }, [searchQuery, filteredGroupedNodes]);
+
+    const handleGroupClick = (groupKey: string) => {
+        const isCurrentlySelected = selectedItem === groupKey;
+        const isCurrentlyOpen = openAccordionItems.includes(groupKey);
+
+        setSelectedItem(isCurrentlySelected ? null : groupKey);
+        setSelectedGroup(isCurrentlySelected ? null : groupKey);
+
+        setOpenAccordionItems((prev) => {
+            if (isCurrentlyOpen) {
+                return prev.filter((item) => item !== groupKey);
+            } else {
+                return [...prev, groupKey];
+            }
+        });
+
+        if (!isCurrentlySelected) {
+            setScrollToCardId(groupKey);
+
+            const parentNode = parentNodesMap[groupKey];
+            if (parentNode && parentNode.x !== undefined && parentNode.y !== undefined) {
+                zoomToNodeGraph({
+                    id: parentNode.id,
+                    x: parentNode.x,
+                    y: parentNode.y,
+                });
+            }
+        }
+    };
+
+    const handleNodeClick = (nodeId: string, node: any) => {
+        const nodeGroupKey = node.parentId || node.id;
+        setSelectedItem(nodeId);
+        setSelectedGroup(nodeGroupKey);
+
+        const isParentNode = !node.parentId;
+
+        if (isParentNode) {
+            setScrollToCardId(nodeGroupKey);
+        } else {
+            setScrollToCardId(nodeId);
+        }
+
+        if (node.x !== undefined && node.y !== undefined) {
+            zoomToNodeGraph({
+                id: nodeId,
+                x: node.x,
+                y: node.y,
+            });
+        }
     };
 
     const toggleGraphVisibility = () => {
@@ -826,9 +889,7 @@ const ChatRightPanel = ({
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                                     title="Toggle Node Filters"
                                                 >
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                                    </svg>
+                                                    <ListFilterPlus className="size-4" />
                                                 </div>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent
@@ -911,9 +972,7 @@ const ChatRightPanel = ({
                                                 onClick={() => setShowNodeLabels(!showNodeLabels)}
                                                 title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
                                             >
-                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                                </svg>
+                                                <LetterText className="size-4" />
                                             </div>
                                             {graphView === '3d' && (
                                                 <div
@@ -952,26 +1011,35 @@ const ChatRightPanel = ({
                             </div>
                         </div>
 
-                        {!!currentMessage && Object.entries(groupedNodes).length > 0 && (
+                        {!!currentMessage && (
                             <div
                                 className={`px-3 py-2 overflow-hidden transition-all duration-300 ${
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'
                                 }`}
                             >
-                                <div className="flex items-center justify-between mb-3 pb-2 pl-4 border-b border-border">
-                                    <h3 className="font-semibold text-sm text-muted-foreground">Sources</h3>
+                                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                                    <Input
+                                        placeholder="Search..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="flex-1 mr-2"
+                                    />
                                     <div
-                                        className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                        className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                         onClick={toggleGraphVisibility}
                                         title={isGraphCollapsed ? 'Show Graph Panel' : 'Hide Graph Panel'}
                                     >
                                         {isGraphCollapsed ? (
-                                            <ChevronDown className="h-4 w-4" />
+                                            <ChevronDown className="size-4" />
                                         ) : (
-                                            <ChevronUp className="h-4 w-4" />
+                                            <ChevronUp className="size-4" />
                                         )}
                                     </div>
                                 </div>
+
+                                {searchQuery.trim() && Object.keys(filteredGroupedNodes).length === 0 && (
+                                    <div className="text-sm text-muted-foreground text-center py-6">Nothing found</div>
+                                )}
 
                                 <Accordion
                                     type="multiple"
@@ -980,7 +1048,7 @@ const ChatRightPanel = ({
                                     onValueChange={setOpenAccordionItems}
                                     ref={accordionContainerRef}
                                 >
-                                    {Object.entries(groupedNodes).map(([parentId, nodes]) => {
+                                    {Object.entries(filteredGroupedNodes).map(([parentId, nodes]) => {
                                         const groupInfo = getGroupInfo(parentId, nodes);
 
                                         const getTypeBadgeColor = (type: string) => {
@@ -1188,8 +1256,8 @@ const ChatRightPanel = ({
                                                                                         className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2 p-1 -ml-1 rounded hover:bg-muted/50"
                                                                                         title={
                                                                                             isContentExpanded
-                                                                                                ? 'Скрыть контент'
-                                                                                                : 'Показать контент'
+                                                                                                ? 'Hide Content'
+                                                                                                : 'Show Content'
                                                                                         }
                                                                                     >
                                                                                         <ChevronRight

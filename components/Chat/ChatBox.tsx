@@ -16,6 +16,7 @@ interface ChatBoxProps {
     sendMessage: (input: string, isNew: boolean) => void;
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
+    setScrollToCardId: Dispatch<SetStateAction<string>>;
 }
 
 const ChatBox = ({
@@ -27,6 +28,7 @@ const ChatBox = ({
     sendMessage,
     copyToClipboard,
     handleCurrentMessage,
+    setScrollToCardId,
 }: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
@@ -73,6 +75,7 @@ const ChatBox = ({
             const id = decodeExceptSpace(href);
 
             zoomToNodeGraph({ id });
+            setScrollToCardId(id);
         }
     };
 

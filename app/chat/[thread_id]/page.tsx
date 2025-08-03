@@ -60,6 +60,7 @@ export default function ChatPage() {
     const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
     const [input, setInput] = useState<string>('');
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
+    const [scrollToCardId, setScrollToCardId] = useState<string>('');
 
     useEffect(() => {
         if (!!currentGraphData) {
@@ -81,9 +82,7 @@ export default function ChatPage() {
     };
 
     const onRenameConversation = (threadId: string, newTitle: string) => {
-        setConversations((prev) =>
-            prev.map((c) => (c.thread_id === threadId ? { ...c, title: newTitle } : c))
-        );
+        setConversations((prev) => prev.map((c) => (c.thread_id === threadId ? { ...c, title: newTitle } : c)));
     };
 
     const toggleMsgType = (type: string) => {
@@ -158,6 +157,7 @@ export default function ChatPage() {
                             sendMessage={sendMessage}
                             copyToClipboard={copyToClipboard}
                             handleCurrentMessage={setCurrentMessage}
+                            setScrollToCardId={setScrollToCardId}
                         />
                     </div>
                 </section>
@@ -175,6 +175,8 @@ export default function ChatPage() {
                     cardData={cardData}
                     handleCardData={setCardData}
                     setIsOpenGraphModal={setIsOpenGraphModal}
+                    scrollToCardId={scrollToCardId}
+                    setScrollToCardId={setScrollToCardId}
                 />
             </main>
 
@@ -188,7 +190,6 @@ export default function ChatPage() {
                     toggleMsgType={toggleMsgType}
                 />
             </div>
-
         </div>
     );
 }
