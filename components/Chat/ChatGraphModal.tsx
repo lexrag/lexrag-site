@@ -21,6 +21,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import ChatGraph2D from './ChatGraph2D';
 import ChatGraph3D from './ChatGraph3D';
 import { Button } from '../ui/button';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface ChatGraphModalProps {
     open: boolean;
@@ -479,7 +480,7 @@ const ChatGraphModal = ({
         const hasSidebar = !!data && Object.entries(groupedNodes).length > 0 && window.innerWidth >= 768;
         const sidebarWidth = hasSidebar ? Math.max(modalWidth * 0.4, 300) : 0;
         const graphWidth = Math.max(modalWidth - sidebarWidth, 400);
-        const graphHeight = modalHeight * 0.8;
+        const graphHeight = modalHeight; // Используем всю высоту модального окна
         
         return {
             modalWidth,
@@ -502,65 +503,92 @@ const ChatGraphModal = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[95vw] h-[90vh] max-w-none p-0" dir={direction}>
-                <Tabs value={graphView} onValueChange={setGraphView} className="w-full h-full flex flex-col">
-                    <DialogHeader className="flex-row items-center gap-2 p-4 border-b">
-                        <DialogTitle className="sr-only">Chat Graph Modal</DialogTitle>
-                        <div className="flex items-center gap-2">
-                            <TabsList className="grid w-fit grid-cols-2">
-                                <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
-                                <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
-                            </TabsList>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <div 
-                                        className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                        title="Toggle Graph Layers"
-                                    >
-                                        <Layers className="h-4 w-4" />
-                                    </div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-48">
-                                    {graphLayers.map(({ id, enabled, name }) => {
-                                        const enabledLayersCount = graphLayers.filter(
-                                            (layer) => layer.enabled,
-                                        ).length;
-                                        const isLastEnabled = enabled && enabledLayersCount === 1;
+            <DialogContent className="w-[95vw] h-[90vh] max-w-none p-0 border-0" dir={direction}>
+                <DialogTitle className="sr-only">Chat Graph</DialogTitle>
+                <Tabs value={graphView} onValueChange={setGraphView} className="w-full h-full flex flex-col border-0 p-0">
+                    <div className="flex-1 flex overflow-hidden p-0">
+                        <div 
+                            className="h-full relative overflow-hidden"
+                            style={{ width: modalDimensions.graphWidth }}
+                        >
+                            <TabsContent value="2d" className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0">
+                                <div className="relative w-full h-full">
+                                    <ChatGraph2D 
+                                        height={modalDimensions.graphHeight}
+                                        width={modalDimensions.graphWidth}
+                                        data={data} 
+                                        layers={graphLayers} 
+                                        handleCardData={handleCardData} 
+                                        handleScrollToCardId={setScrollToCardId}
+                                        expandedNodes={expandedNodes}
+                                        setExpandedNodes={setExpandedNodes}
+                                        nodeHierarchy={nodeHierarchy}
+                                        setNodeHierarchy={setNodeHierarchy}
+                                        expandedData={expandedData}
+                                        setExpandedData={setExpandedData}
+                                        loadingNodes={loadingNodes}
+                                        setLoadingNodes={setLoadingNodes}
+                                        linkFilters={graphLinkFilters}
+                                        setLinkFilters={setGraphLinkFilters}
+                                        nodeFilters={graphNodeFilters}
+                                        setNodeFilters={setGraphNodeFilters}
+                                    />
+                                    
+                                    {/* Control buttons overlay for 2D */}
+                                    <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                                        <TabsList className="grid w-fit grid-cols-2 bg-background/80 backdrop-blur-sm border border-input shadow-sm">
+                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
+                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
+                                        </TabsList>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div 
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Graph Layers"
+                                                >
+                                                    <Layers className="h-4 w-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-48">
+                                                {graphLayers.map(({ id, enabled, name }) => {
+                                                    const enabledLayersCount = graphLayers.filter(
+                                                        (layer) => layer.enabled,
+                                                    ).length;
+                                                    const isLastEnabled = enabled && enabledLayersCount === 1;
 
-                                        return (
-                                            <DropdownMenuCheckboxItem
-                                                key={id}
-                                                checked={enabled}
-                                                onSelect={(event) => event.preventDefault()}
-                                                onCheckedChange={(checked) => {
-                                                    if (!checked && isLastEnabled) return;
+                                                    return (
+                                                        <DropdownMenuCheckboxItem
+                                                            key={id}
+                                                            checked={enabled}
+                                                            onSelect={(event) => event.preventDefault()}
+                                                            onCheckedChange={(checked) => {
+                                                                if (!checked && isLastEnabled) return;
 
-                                                    setGraphLayers((prevLayers) =>
-                                                        prevLayers.map((layer) =>
-                                                            layer.id === id
-                                                                ? { ...layer, enabled: checked }
-                                                                : layer,
-                                                        ),
+                                                                setGraphLayers((prevLayers) =>
+                                                                    prevLayers.map((layer) =>
+                                                                        layer.id === id
+                                                                            ? { ...layer, enabled: checked }
+                                                                            : layer,
+                                                                    ),
+                                                                );
+                                                            }}
+                                                            disabled={isLastEnabled}
+                                                        >
+                                                            {name}
+                                                        </DropdownMenuCheckboxItem>
                                                     );
-                                                }}
-                                                disabled={isLastEnabled}
-                                            >
-                                                {name}
-                                            </DropdownMenuCheckboxItem>
-                                        );
-                                    })}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DropdownMenu>
+                                                })}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <div
-                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                                    title="Toggle Graph Layers"
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Link Filters"
                                                 >
                                                     <Link className="h-4 w-4" />
                                                 </div>
                                             </DropdownMenuTrigger>
-
                                             <DropdownMenuContent
                                                 className="w-80 max-h-64 overflow-y-auto"
                                                 align="end"
@@ -569,9 +597,7 @@ const ChatGraphModal = ({
                                                 <DropdownMenuLabel className="flex justify-between items-center py-2">
                                                     <span>Link Filters</span>
                                                 </DropdownMenuLabel>
-
                                                 <DropdownMenuSeparator />
-
                                                 <div className="flex gap-2 p-2">
                                                     <Button
                                                         className="flex-1"
@@ -594,9 +620,7 @@ const ChatGraphModal = ({
                                                         None
                                                     </Button>
                                                 </div>
-
                                                 <DropdownMenuSeparator />
-
                                                 <div className="max-h-48 overflow-y-auto">
                                                     {graphLinkFilters.map((filter) => (
                                                         <div
@@ -631,171 +655,355 @@ const ChatGraphModal = ({
                                                 </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <div
-                                        className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                        title="Toggle Node Filters"
-                                    >
-                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                        </svg>
-                                    </div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    className="w-80 max-h-64 overflow-y-auto"
-                                    align="end"
-                                    sideOffset={5}
-                                >
-                                    <DropdownMenuLabel className="flex justify-between items-center py-2">
-                                        <span>Node Filters</span>
-                                    </DropdownMenuLabel>
-
-                                    <DropdownMenuSeparator />
-
-                                    <div className="flex gap-2 p-2">
-                                        <Button
-                                            className="flex-1"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                handleAllNodeFilters(true);
-                                            }}
-                                        >
-                                            All
-                                        </Button>
-                                        <Button
-                                            className="flex-1"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                handleAllNodeFilters(false);
-                                            }}
-                                        >
-                                            None
-                                        </Button>
-                                    </div>
-
-                                    <DropdownMenuSeparator />
-
-                                    <div className="max-h-48 overflow-y-auto">
-                                        {graphNodeFilters.map((filter) => (
-                                            <div
-                                                key={filter.id}
-                                                className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleNodeFilter(filter.id);
-                                                }}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filter.enabled}
-                                                    onChange={() => handleNodeFilter(filter.id)}
-                                                    className="cursor-pointer"
-                                                    style={{ accentColor: filter.color }}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
                                                 <div
-                                                    className="w-3 h-3 rounded-sm flex-shrink-0"
-                                                    style={{ backgroundColor: filter.color }}
-                                                />
-                                                <span className="flex-1 text-sm text-gray-900 dark:text-white">
-                                                    {filter.label}
-                                                </span>
-                                                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
-                                                    {filter.count}
-                                                </span>
-                                            </div>
-                                        ))}
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Node Filters"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                    </svg>
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                className="w-80 max-h-64 overflow-y-auto"
+                                                align="end"
+                                                sideOffset={5}
+                                            >
+                                                <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                    <span>Node Filters</span>
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <div className="flex gap-2 p-2">
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllNodeFilters(true);
+                                                        }}
+                                                    >
+                                                        All
+                                                    </Button>
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllNodeFilters(false);
+                                                        }}
+                                                    >
+                                                        None
+                                                    </Button>
+                                                </div>
+                                                <DropdownMenuSeparator />
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {graphNodeFilters.map((filter) => (
+                                                        <div
+                                                            key={filter.id}
+                                                            className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleNodeFilter(filter.id);
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filter.enabled}
+                                                                onChange={() => handleNodeFilter(filter.id)}
+                                                                className="cursor-pointer"
+                                                                style={{ accentColor: filter.color }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            <div
+                                                                className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                                style={{ backgroundColor: filter.color }}
+                                                            />
+                                                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                                {filter.label}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                                {filter.count}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <div
+                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                            onClick={() => zoomToFitGraph()}
+                                            title="Zoom to Fit All Nodes"
+                                        >
+                                            <Fullscreen className="h-4 w-4" />
+                                        </div>
                                     </div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            {graphView === '3d' && (
-                                <div
-                                    onClick={() => setIsOrbitEnabled(!isOrbitEnabled)}
-                                    className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer ${
-                                        isOrbitEnabled
-                                            ? 'bg-primary text-primary-foreground border-primary'
-                                            : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
-                                    }`}
-                                    title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
-                                >
-                                    <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
                                 </div>
-                            )}
-                            <div
-                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                                onClick={() => zoomToFitGraph()}
-                                title="Zoom to Fit All Nodes"
-                            >
-                                <Fullscreen className="h-4 w-4" />
-                            </div>
-                        </div>
-                    </DialogHeader>
-                    <DialogBody className="flex-1 flex overflow-hidden p-0">
-                        <div 
-                            className="h-full relative overflow-hidden"
-                            style={{ width: modalDimensions.graphWidth }}
-                        >
-                            <TabsContent value="2d" className="w-full h-full m-0 data-[state=inactive]:hidden">
-                                <ChatGraph2D 
-                                    height={modalDimensions.graphHeight}
-                                    width={modalDimensions.graphWidth}
-                                    data={data} 
-                                    layers={graphLayers} 
-                                    handleCardData={handleCardData} 
-                                    handleScrollToCardId={setScrollToCardId}
-                                    expandedNodes={expandedNodes}
-                                    setExpandedNodes={setExpandedNodes}
-                                    nodeHierarchy={nodeHierarchy}
-                                    setNodeHierarchy={setNodeHierarchy}
-                                    expandedData={expandedData}
-                                    setExpandedData={setExpandedData}
-                                    loadingNodes={loadingNodes}
-                                    setLoadingNodes={setLoadingNodes}
-                                    linkFilters={graphLinkFilters}
-                                    setLinkFilters={setGraphLinkFilters}
-                                    nodeFilters={graphNodeFilters}
-                                    setNodeFilters={setGraphNodeFilters}
-                                />
                             </TabsContent>
-                            <TabsContent value="3d" className="w-full h-full m-0 data-[state=inactive]:hidden">
-                                <div className="w-full h-full">
-                                <ChatGraph3D 
-                                    height={modalDimensions.graphHeight}
-                                    width={modalDimensions.graphWidth}
-                                    data={data} 
-                                    layers={graphLayers} 
-                                    handleCardData={handleCardData} 
-                                    handleScrollToCardId={setScrollToCardId}
-                                    isOrbitEnabled={isOrbitEnabled}
-                                    setIsOrbitEnabled={setIsOrbitEnabled}
-                                    expandedNodes={expandedNodes}
-                                    setExpandedNodes={setExpandedNodes}
-                                    nodeHierarchy={nodeHierarchy}
-                                    setNodeHierarchy={setNodeHierarchy}
-                                    expandedData={expandedData}
-                                    setExpandedData={setExpandedData}
-                                    loadingNodes={loadingNodes}
-                                    setLoadingNodes={setLoadingNodes}
-                                    linkFilters={graphLinkFilters}
-                                    setLinkFilters={setGraphLinkFilters}
-                                    nodeFilters={graphNodeFilters}
-                                    setNodeFilters={setGraphNodeFilters}
+                            <TabsContent value="3d" className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0">
+                                <div className="relative w-full h-full">
+                                    <ChatGraph3D 
+                                        height={modalDimensions.graphHeight}
+                                        width={modalDimensions.graphWidth}
+                                        data={data} 
+                                        layers={graphLayers} 
+                                        handleCardData={handleCardData} 
+                                        handleScrollToCardId={setScrollToCardId}
+                                        isOrbitEnabled={isOrbitEnabled}
+                                        setIsOrbitEnabled={setIsOrbitEnabled}
+                                        expandedNodes={expandedNodes}
+                                        setExpandedNodes={setExpandedNodes}
+                                        nodeHierarchy={nodeHierarchy}
+                                        setNodeHierarchy={setNodeHierarchy}
+                                        expandedData={expandedData}
+                                        setExpandedData={setExpandedData}
+                                        loadingNodes={loadingNodes}
+                                        setLoadingNodes={setLoadingNodes}
+                                        linkFilters={graphLinkFilters}
+                                        setLinkFilters={setGraphLinkFilters}
+                                        nodeFilters={graphNodeFilters}
+                                        setNodeFilters={setGraphNodeFilters}
                                     />
+                                    
+                                    {/* Control buttons overlay for 3D */}
+                                    <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                                        <TabsList className="grid w-fit grid-cols-2 bg-background/80 backdrop-blur-sm border border-input shadow-sm">
+                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
+                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
+                                        </TabsList>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div 
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Graph Layers"
+                                                >
+                                                    <Layers className="h-4 w-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-48">
+                                                {graphLayers.map(({ id, enabled, name }) => {
+                                                    const enabledLayersCount = graphLayers.filter(
+                                                        (layer) => layer.enabled,
+                                                    ).length;
+                                                    const isLastEnabled = enabled && enabledLayersCount === 1;
+
+                                                    return (
+                                                        <DropdownMenuCheckboxItem
+                                                            key={id}
+                                                            checked={enabled}
+                                                            onSelect={(event) => event.preventDefault()}
+                                                            onCheckedChange={(checked) => {
+                                                                if (!checked && isLastEnabled) return;
+
+                                                                setGraphLayers((prevLayers) =>
+                                                                    prevLayers.map((layer) =>
+                                                                        layer.id === id
+                                                                            ? { ...layer, enabled: checked }
+                                                                            : layer,
+                                                                    ),
+                                                                );
+                                                            }}
+                                                            disabled={isLastEnabled}
+                                                        >
+                                                            {name}
+                                                        </DropdownMenuCheckboxItem>
+                                                    );
+                                                })}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Link Filters"
+                                                >
+                                                    <Link className="h-4 w-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                className="w-80 max-h-64 overflow-y-auto"
+                                                align="end"
+                                                sideOffset={5}
+                                            >
+                                                <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                    <span>Link Filters</span>
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <div className="flex gap-2 p-2">
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllLinkFilters(true);
+                                                        }}
+                                                    >
+                                                        All
+                                                    </Button>
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllLinkFilters(false);
+                                                        }}
+                                                    >
+                                                        None
+                                                    </Button>
+                                                </div>
+                                                <DropdownMenuSeparator />
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {graphLinkFilters.map((filter) => (
+                                                        <div
+                                                            key={filter.id}
+                                                            className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleLinkFilter(filter.id);
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filter.enabled}
+                                                                onChange={() => handleLinkFilter(filter.id)}
+                                                                className="cursor-pointer"
+                                                                style={{ accentColor: filter.color }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            <div
+                                                                className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                                style={{ backgroundColor: filter.color }}
+                                                            />
+                                                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                                {filter.label}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                                {filter.count}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div
+                                                    className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                                    title="Toggle Node Filters"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                    </svg>
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                className="w-80 max-h-64 overflow-y-auto"
+                                                align="end"
+                                                sideOffset={5}
+                                            >
+                                                <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                    <span>Node Filters</span>
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <div className="flex gap-2 p-2">
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllNodeFilters(true);
+                                                        }}
+                                                    >
+                                                        All
+                                                    </Button>
+                                                    <Button
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAllNodeFilters(false);
+                                                        }}
+                                                    >
+                                                        None
+                                                    </Button>
+                                                </div>
+                                                <DropdownMenuSeparator />
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {graphNodeFilters.map((filter) => (
+                                                        <div
+                                                            key={filter.id}
+                                                            className="flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleNodeFilter(filter.id);
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filter.enabled}
+                                                                onChange={() => handleNodeFilter(filter.id)}
+                                                                className="cursor-pointer"
+                                                                style={{ accentColor: filter.color }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            <div
+                                                                className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                                style={{ backgroundColor: filter.color }}
+                                                            />
+                                                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                                                {filter.label}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                                {filter.count}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <div
+                                            onClick={() => setIsOrbitEnabled(!isOrbitEnabled)}
+                                            className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer shadow-sm ${
+                                                isOrbitEnabled
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background/80 backdrop-blur-sm border-input hover:bg-accent hover:text-accent-foreground'
+                                            }`}
+                                            title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
+                                        >
+                                            <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
+                                        </div>
+                                        <div
+                                            className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
+                                            onClick={() => zoomToFitGraph()}
+                                            title="Zoom to Fit All Nodes"
+                                        >
+                                            <Fullscreen className="h-4 w-4" />
+                                        </div>
                                     </div>
+                                </div>
                             </TabsContent>
                         </div>
 
                         {modalDimensions.hasSidebar && (
                             <div 
-                                className="h-full border-l flex flex-col bg-background relative z-10"
+                                className="h-full border-l flex flex-col bg-background relative z-10 pt-4"
                                 style={{ width: modalDimensions.sidebarWidth }}
                             >
-                                <div className="px-4 py-3 border-b">
-                                    <h3 className="font-semibold text-sm text-muted-foreground">Legal Documents</h3>
+                                <div className="px-4 py-3 border-b flex items-center justify-between">
+                                    <h3 className="font-semibold text-sm text-muted-foreground">Sources</h3>
+                                    <button
+                                        onClick={() => onOpenChange(false)}
+                                        className="flex items-center justify-center w-6 h-6 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                        title="Close modal"
+                                    >
+                                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
                                 <div className="flex-1 overflow-hidden">
                                     <Accordion
@@ -1021,7 +1229,7 @@ const ChatGraphModal = ({
                                 </div>
                             </div>
                         )}
-                    </DialogBody>
+                    </div>
                 </Tabs>
             </DialogContent>
         </Dialog>

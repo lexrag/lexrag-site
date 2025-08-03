@@ -938,7 +938,7 @@ const ChatRightPanel = ({
                                 }`}
                             >
                                 <div className="flex items-center justify-between mb-3 pb-2 pl-4 border-b border-border">
-                                    <h3 className="font-semibold text-sm text-muted-foreground">Legal Documents</h3>
+                                    <h3 className="font-semibold text-sm text-muted-foreground">Sources</h3>
                                     <div
                                         className="flex items-center justify-center w-7 h-7 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                         onClick={toggleGraphVisibility}

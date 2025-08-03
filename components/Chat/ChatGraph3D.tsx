@@ -112,7 +112,7 @@ const ChatGraph3D = ({
             const graphObj = scene.children[3];
 
             if (graphObj) {
-                graphObj.rotation.y -= 0.02;
+                graphObj.rotation.y -= 0.009;
             }
 
             frameId = requestAnimationFrame(rotateGraph);
@@ -688,7 +688,7 @@ const ChatGraph3D = ({
         
         // Dynamically adjust forces based on the number of nodes
         const chargeStrength = Math.max(-40, -25 - (nodeCount * 0.3));
-        const linkDistance = Math.max(80, 120 + (nodeCount * 1.5));
+        const linkDistance = Math.max(5, 7 + (nodeCount * 1.05));
         const collideRadius = (d: any) => {
             const nodeSize = getNodeSize(d);
             return nodeSize + Math.max(10, 20 - (nodeCount * 0.05));
@@ -709,7 +709,7 @@ const ChatGraph3D = ({
         const containerHeight = dimensions.height;
         
         // Base distance calculation based on container size
-        let baseDistance = Math.min(containerWidth, containerHeight) * 0.35;
+        let baseDistance = Math.min(containerWidth, containerHeight) * 0.5;
         
         // Adjust based on node count
         if (nodeCount > 0) {
@@ -742,7 +742,7 @@ const ChatGraph3D = ({
 
         const nodes = processedData.nodes;
         const links = processedData.links || [];
-        const radius = Math.max(150, nodes.length * 8); // Decreased radius for more compact distribution
+        const radius = Math.max(100, nodes.length * 5); // Decreased radius for more compact distribution
 
         // Create a map of connections for each node
         const nodeConnections = new Map();
@@ -784,7 +784,7 @@ const ChatGraph3D = ({
                     
                     if (connectedCount > 0) {
                         // Place the node near the connected nodes
-                        const offset = radius * 0.3;
+                        const offset = radius * 0.2;
                         node.x = (avgX / connectedCount) + (Math.random() - 0.5) * offset;
                         node.y = (avgY / connectedCount) + (Math.random() - 0.5) * offset;
                         node.z = (avgZ / connectedCount) + (Math.random() - 0.5) * offset;
@@ -797,7 +797,7 @@ const ChatGraph3D = ({
                 const theta = Math.sqrt(nodes.length * Math.PI) * phi;
                 
                 // Add a small randomness to prevent perfect symmetry
-                const randomOffset = 0.3;
+                const randomOffset = 0.2;
                 const randomX = (Math.random() - 0.5) * radius * randomOffset;
                 const randomY = (Math.random() - 0.5) * radius * randomOffset;
                 const randomZ = (Math.random() - 0.5) * radius * randomOffset;
