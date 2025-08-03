@@ -14,7 +14,7 @@ let CSS2DRenderer: any = null;
 let CSS2DObject: any = null;
 
 if (typeof window !== 'undefined') {
-    // @ts-expect-error
+    // @ts-expect-error - Dynamic import for CSS2DRenderer from Three.js
     import('three/examples/jsm/renderers/CSS2DRenderer.js').then(module => {
         CSS2DRenderer = module.CSS2DRenderer;
         CSS2DObject = module.CSS2DObject;
@@ -704,7 +704,7 @@ const ChatGraph3D = ({
         const linkDistance = Math.max(5, 7 + (nodeCount * 1.05));
         const collideRadius = (d: any) => {
             const nodeSize = getNodeSize(d);
-            return nodeSize + Math.max(10, 20 - (nodeCount * 0.05));
+            return nodeSize + Math.max(5, 10 - (nodeCount * 0.02));
         };
 
         fg.d3Force('charge')?.strength(chargeStrength);
@@ -722,12 +722,12 @@ const ChatGraph3D = ({
         const containerHeight = dimensions.height;
         
         // Base distance calculation based on container size
-        let baseDistance = Math.min(containerWidth, containerHeight) * 0.5;
+        let baseDistance = Math.min(containerWidth, containerHeight) * 0.15;
         
         // Adjust based on node count
         if (nodeCount > 0) {
             // More nodes = closer zoom to fit them all
-            const nodeCountFactor = Math.max(0.25, 1 - (nodeCount * 0.015));
+            const nodeCountFactor = Math.max(0.4, 1 - (nodeCount * 0.008));
             baseDistance *= nodeCountFactor;
         }
         
@@ -738,16 +738,16 @@ const ChatGraph3D = ({
             }, 0) / processedData.nodes.length;
             
             // Larger nodes need more space
-            const nodeSizeFactor = Math.max(0.8, Math.min(1.5, avgNodeSize / 25));
+            const nodeSizeFactor = Math.max(0.6, Math.min(2.0, avgNodeSize / 18));
             baseDistance *= nodeSizeFactor;
         }
         
         // Ensure minimum and maximum bounds
-        const minDistance = 150;
-        const maxDistance = Math.min(containerWidth, containerHeight) * 0.7;
+        const minDistance = 60; // Было 80, стало 60
+        const maxDistance = Math.min(containerWidth, containerHeight) * 0.95;
         
         return Math.max(minDistance, Math.min(maxDistance, baseDistance));
-    }, [processedData, dimensions]);
+    }, [processedData, dimensions]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Function to initialize node positions in a wider space
     const initializeNodePositions = useCallback(() => {
@@ -820,7 +820,7 @@ const ChatGraph3D = ({
                 node.z = radius * Math.cos(phi) + randomZ;
             }
         });
-    }, [processedData]);
+    }, [processedData]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!processedData) return;
@@ -1305,27 +1305,25 @@ const ChatGraph3D = ({
 
     // Updated getNodeSize function - same as 2D graph
     const getNodeSize = (node: any) => {
-        const NODE_SIZE_MULTIPLIER_3D = 4;
-        
         if (loadingNodes.has(node.id)) {
-            return 8 * NODE_SIZE_MULTIPLIER_3D;
+            return 8;
         }
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 40 * NODE_SIZE_MULTIPLIER_3D; // 80px diameter / 2
+                return 40; // 80px diameter / 2
             }
 
             if (node.labels.includes('Paragraph')) {
-                return 10 * NODE_SIZE_MULTIPLIER_3D; // 20px diameter / 2
+                return 10; // 20px diameter / 2
             }
 
             if (node.labels.includes('Act')) {
-                return 40 * NODE_SIZE_MULTIPLIER_3D; // 80px diameter / 2
+                return 40; // 80px diameter / 2
             }
 
             if (node.labels.includes('PartOfTheLegislation')) {
-                return 10 * NODE_SIZE_MULTIPLIER_3D; // 20px diameter / 2
+                return 10; // 20px diameter / 2
             }
 
             if (
@@ -1361,11 +1359,11 @@ const ChatGraph3D = ({
                 node.labels.includes('SubsidiaryLegislation') ||
                 node.labels.includes('SLOpening')
             ) {
-                return 25 * NODE_SIZE_MULTIPLIER_3D; // 50px diameter / 2
+                return 25; // 50px diameter / 2
             }
         }
 
-        return 25 * NODE_SIZE_MULTIPLIER_3D; // Default 50px diameter / 2
+        return 25; // Default 50px diameter / 2
     };
 
     const handleNodeHover = (node: any) => {
@@ -1598,25 +1596,17 @@ const ChatGraph3D = ({
     const getLinkLabel = (link: any) => {
         let label = '';
 
-        if (link.relation) {
-            label += `Relation: ${link.relation}`;
-        }
+        const linkType = getLinkType(link);
+        const linkTypeLabel = getLinkTypeLabel(linkType);
+        
+        label = linkTypeLabel;
 
-        if (link.relationType) {
-            label += label ? `\nType: ${link.relationType}` : `Type: ${link.relationType}`;
+        if (link.relation && link.relation !== linkType) {
+            label += `\nRelation: ${link.relation}`;
         }
 
         if (link.weight !== undefined) {
-            label += label ? `\nWeight: ${link.weight}` : `Weight: ${link.weight}`;
-        }
-
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-
-        if (label) {
-            label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
-        } else {
-            label = `From: ${sourceId}\nTo: ${targetId}`;
+            label += `\nWeight: ${link.weight}`;
         }
 
         return label;
@@ -1683,7 +1673,7 @@ const ChatGraph3D = ({
         `;
 
         return new CSS2DObject(nodeEl);
-    }, [resolvedTheme, showNodeLabels, highlightedNodeId, selectedNodes]);
+    }, [resolvedTheme, showNodeLabels, highlightedNodeId, selectedNodes]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Function to get the displayed node text
     const getNodeDisplayLabel = (node: any): string => {

@@ -25,7 +25,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import ChatGraph2D from './ChatGraph2D';
 import ChatGraph3D from './ChatGraph3D';
 import { Button } from '../ui/button';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface ChatGraphModalProps {
     open: boolean;

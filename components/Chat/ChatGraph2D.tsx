@@ -303,23 +303,7 @@ const ChatGraph2D = ({
         }
     }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
 
-    useEffect(() => {
-        const newNodeTypes = getAllNodeTypes(layerDataMap, expandedData);
 
-        if (newNodeTypes.length > 0) {
-            setNodeFilters((prevFilters) => {
-                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
-
-                return newNodeTypes.map((newType) => {
-                    const existing = existingFiltersMap.get(newType.id);
-                    return {
-                        ...newType,
-                        enabled: existing ? existing.enabled : true,
-                    };
-                });
-            });
-        }
-    }, [layerDataMap, expandedData, setNodeFilters]);
 
     const getAllDescendants = (nodeId: string): Set<string> => {
         const descendants = new Set<string>();
@@ -447,6 +431,24 @@ const ChatGraph2D = ({
 
         return nodeTypes.sort((a, b) => b.count - a.count);
     }, []);
+
+    useEffect(() => {
+        const newNodeTypes = getAllNodeTypes(layerDataMap, expandedData);
+
+        if (newNodeTypes.length > 0) {
+            setNodeFilters((prevFilters) => {
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+
+                return newNodeTypes.map((newType) => {
+                    const existing = existingFiltersMap.get(newType.id);
+                    return {
+                        ...newType,
+                        enabled: existing ? existing.enabled : true,
+                    };
+                });
+            });
+        }
+    }, [layerDataMap, expandedData, setNodeFilters, getAllNodeTypes]);
 
     const getNodeType = (node: any): string => {
         if (node.labels && node.labels.length > 0) {
@@ -1327,25 +1329,17 @@ const ChatGraph2D = ({
     const getLinkLabel = (link: any) => {
         let label = '';
 
-        if (link.relation) {
-            label += `Relation: ${link.relation}`;
-        }
+        const linkType = getLinkType(link);
+        const linkTypeLabel = getLinkTypeLabel(linkType);
+        
+        label = linkTypeLabel;
 
-        if (link.relationType) {
-            label += label ? `\nType: ${link.relationType}` : `Type: ${link.relationType}`;
+        if (link.relation && link.relation !== linkType) {
+            label += `\nRelation: ${link.relation}`;
         }
 
         if (link.weight !== undefined) {
-            label += label ? `\nWeight: ${link.weight}` : `Weight: ${link.weight}`;
-        }
-
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-
-        if (label) {
-            label += `\nFrom: ${sourceId}\nTo: ${targetId}`;
-        } else {
-            label = `From: ${sourceId}\nTo: ${targetId}`;
+            label += `\nWeight: ${link.weight}`;
         }
 
         return label;
