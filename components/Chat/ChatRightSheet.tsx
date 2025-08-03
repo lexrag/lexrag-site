@@ -59,11 +59,17 @@ const ChatRightSheet = ({
     const direction = useDirection();
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
+    const [showNodeLabels, setShowNodeLabels] = useState<boolean>(graphView === '2d');
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
+    // Update showNodeLabels when graphView changes
+    useEffect(() => {
+        setShowNodeLabels(graphView === '2d');
+    }, [graphView]);
 
     const nodeConnections = useMemo(() => {
         const connections: { [key: string]: any[] } = {};
@@ -414,6 +420,19 @@ const ChatRightSheet = ({
                                 </DropdownMenu>
                                 <div className="flex items-center gap-1">
                                     <div
+                                        className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer ${
+                                            showNodeLabels
+                                                ? 'bg-primary text-primary-foreground border-primary'
+                                                : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                                        }`}
+                                        onClick={() => setShowNodeLabels(!showNodeLabels)}
+                                        title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
+                                    >
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                        </svg>
+                                    </div>
+                                    <div
                                         className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                                         onClick={() => setIsOpenGraphModal(true)}
                                         title="Expand Graph to Full Screen"
@@ -463,6 +482,7 @@ const ChatRightSheet = ({
                                     setLinkFilters={setGraphLinkFilters}
                                     nodeFilters={graphNodeFilters}
                                     setNodeFilters={setGraphNodeFilters}
+                                    showNodeLabels={showNodeLabels}
                                 />
                             )}
                             {graphView === '3d' && (
@@ -487,6 +507,7 @@ const ChatRightSheet = ({
                                     setLinkFilters={setGraphLinkFilters}
                                     nodeFilters={graphNodeFilters}
                                     setNodeFilters={setGraphNodeFilters}
+                                    showNodeLabels={showNodeLabels}
                                 />
                             )}
                         </div>

@@ -4,7 +4,11 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRe
 import { useDirection } from '@radix-ui/react-direction';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
 import { CardData } from '@/types/Chat';
-import DialogContent, { Dialog, DialogBody, DialogHeader, DialogTitle } from '../ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Globe, Layers, Fullscreen, Link } from 'lucide-react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
@@ -65,6 +69,12 @@ const ChatGraphModal = ({
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+    const [showNodeLabels, setShowNodeLabels] = useState<boolean>(graphView === '2d');
+
+    // Update showNodeLabels when graphView changes
+    useEffect(() => {
+        setShowNodeLabels(graphView === '2d');
+    }, [graphView]);
 
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
@@ -532,6 +542,7 @@ const ChatGraphModal = ({
                                         setLinkFilters={setGraphLinkFilters}
                                         nodeFilters={graphNodeFilters}
                                         setNodeFilters={setGraphNodeFilters}
+                                        showNodeLabels={showNodeLabels}
                                     />
                                     
                                     {/* Control buttons overlay for 2D */}
@@ -635,20 +646,16 @@ const ChatGraphModal = ({
                                                             <input
                                                                 type="checkbox"
                                                                 checked={filter.enabled}
-                                                                onChange={() => handleLinkFilter(filter.id)}
-                                                                className="cursor-pointer"
-                                                                style={{ accentColor: filter.color }}
-                                                                onClick={(e) => e.stopPropagation()}
+                                                                onChange={() => {}}
+                                                                className="rounded"
                                                             />
                                                             <div
-                                                                className="w-3 h-3 rounded-sm flex-shrink-0"
+                                                                className="w-3 h-3 rounded-full"
                                                                 style={{ backgroundColor: filter.color }}
                                                             />
-                                                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
-                                                                {filter.label}
-                                                            </span>
-                                                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded flex-shrink-0">
-                                                                {filter.count}
+                                                            <span className="text-sm">{filter.label}</span>
+                                                            <span className="text-xs text-gray-500 ml-auto">
+                                                                ({filter.count})
                                                             </span>
                                                         </div>
                                                     ))}
@@ -733,6 +740,19 @@ const ChatGraphModal = ({
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div
+                                            onClick={() => setShowNodeLabels(!showNodeLabels)}
+                                            className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer shadow-sm ${
+                                                showNodeLabels
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background/80 backdrop-blur-sm border-input hover:bg-accent hover:text-accent-foreground'
+                                            }`}
+                                            title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
+                                        >
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            </svg>
+                                        </div>
+                                        <div
                                             className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
                                             onClick={() => zoomToFitGraph()}
                                             title="Zoom to Fit All Nodes"
@@ -765,6 +785,7 @@ const ChatGraphModal = ({
                                         setLinkFilters={setGraphLinkFilters}
                                         nodeFilters={graphNodeFilters}
                                         setNodeFilters={setGraphNodeFilters}
+                                        showNodeLabels={showNodeLabels}
                                     />
                                     
                                     {/* Control buttons overlay for 3D */}
@@ -975,6 +996,19 @@ const ChatGraphModal = ({
                                             title={isOrbitEnabled ? 'Disable Camera Orbit' : 'Enable Camera Orbit'}
                                         >
                                             <Globe className={`h-4 w-4 ${isOrbitEnabled ? 'animate-spin' : ''}`} />
+                                        </div>
+                                        <div
+                                            onClick={() => setShowNodeLabels(!showNodeLabels)}
+                                            className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer shadow-sm ${
+                                                showNodeLabels
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background/80 backdrop-blur-sm border-input hover:bg-accent hover:text-accent-foreground'
+                                            }`}
+                                            title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
+                                        >
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            </svg>
                                         </div>
                                         <div
                                             className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"

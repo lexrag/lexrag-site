@@ -10,6 +10,17 @@ import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
+let CSS2DRenderer: any = null;
+let CSS2DObject: any = null;
+
+if (typeof window !== 'undefined') {
+    // @ts-expect-error
+    import('three/examples/jsm/renderers/CSS2DRenderer.js').then(module => {
+        CSS2DRenderer = module.CSS2DRenderer;
+        CSS2DObject = module.CSS2DObject;
+    });
+}
+
 interface ChatGraph3DProps {
     height?: number;
     width?: number;
@@ -33,6 +44,7 @@ interface ChatGraph3DProps {
     setLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
     nodeFilters: GraphNodeFilter[];
     setNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
+    showNodeLabels?: boolean;
 }
 
 const ChatGraph3D = ({
@@ -56,6 +68,7 @@ const ChatGraph3D = ({
     setLinkFilters,
     nodeFilters,
     setNodeFilters,
+    showNodeLabels = true,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -1292,25 +1305,27 @@ const ChatGraph3D = ({
 
     // Updated getNodeSize function - same as 2D graph
     const getNodeSize = (node: any) => {
+        const NODE_SIZE_MULTIPLIER_3D = 4;
+        
         if (loadingNodes.has(node.id)) {
-            return 8;
+            return 8 * NODE_SIZE_MULTIPLIER_3D;
         }
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 40; // 80px diameter / 2
+                return 40 * NODE_SIZE_MULTIPLIER_3D; // 80px diameter / 2
             }
 
             if (node.labels.includes('Paragraph')) {
-                return 10; // 20px diameter / 2
+                return 10 * NODE_SIZE_MULTIPLIER_3D; // 20px diameter / 2
             }
 
             if (node.labels.includes('Act')) {
-                return 40; // 80px diameter / 2
+                return 40 * NODE_SIZE_MULTIPLIER_3D; // 80px diameter / 2
             }
 
             if (node.labels.includes('PartOfTheLegislation')) {
-                return 10; // 20px diameter / 2
+                return 10 * NODE_SIZE_MULTIPLIER_3D; // 20px diameter / 2
             }
 
             if (
@@ -1346,11 +1361,11 @@ const ChatGraph3D = ({
                 node.labels.includes('SubsidiaryLegislation') ||
                 node.labels.includes('SLOpening')
             ) {
-                return 25; // 50px diameter / 2
+                return 25 * NODE_SIZE_MULTIPLIER_3D; // 50px diameter / 2
             }
         }
 
-        return 25; // Default 50px diameter / 2
+        return 25 * NODE_SIZE_MULTIPLIER_3D; // Default 50px diameter / 2
     };
 
     const handleNodeHover = (node: any) => {
@@ -1607,6 +1622,129 @@ const ChatGraph3D = ({
         return label;
     };
 
+    // Function to create text objects in nodes
+    const createNodeTextObject = useCallback((node: any) => {
+        if (!CSS2DObject || !showNodeLabels) return null;
+
+        const nodeEl = document.createElement('div');
+        const label = getNodeDisplayLabel(node);
+        
+        if (!label) return null;
+
+        const nodeSize = getNodeSize(node);
+        const fontSize = Math.max(8, Math.min(12, nodeSize * 0.5));
+        const textColor = resolvedTheme === 'dark' ? '#ffffff' : '#000000';
+        
+        let textAlign = 'center';
+        let textX = 0;
+        let textY = 0;
+        
+        if (nodeSize < 20) {
+            textAlign = 'left';
+            textX = nodeSize + 5;
+            textY = 0;
+        }
+        
+        let backgroundColor = 'transparent';
+        let padding = '2px 6px';
+        
+        if (nodeSize < 20) {
+            backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+            padding = '2px 4px';
+        } else if (label.length > 10) {
+            backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+            padding = '2px 6px';
+        }
+        
+        let borderColor = resolvedTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
+        let boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        
+        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
+            borderColor = '#fbbf24';
+            boxShadow = '0 0 8px rgba(251, 191, 36, 0.6)';
+        }
+        
+        nodeEl.textContent = label;
+        nodeEl.className = 'node-label';
+        nodeEl.style.cssText = `
+            font-size: ${fontSize}px;
+            font-family: Arial, sans-serif;
+            color: ${textColor};
+            background-color: ${backgroundColor};
+            padding: ${padding};
+            border-radius: 4px;
+            user-select: none;
+            white-space: nowrap;
+            pointer-events: none;
+            text-align: ${textAlign};
+            transform: translate(${textX}px, ${textY}px);
+            box-shadow: ${boxShadow};
+            border: 1px solid ${borderColor};
+        `;
+
+        return new CSS2DObject(nodeEl);
+    }, [resolvedTheme, showNodeLabels, highlightedNodeId, selectedNodes]);
+
+    // Function to get the displayed node text
+    const getNodeDisplayLabel = (node: any): string => {
+        const paragraphNum = getParagraphNumber(node.id);
+        let label = node.labels?.[0] || 'Node';
+
+        if (paragraphNum) {
+            label = `§ ${paragraphNum}`;
+        } else if (node.labels && node.labels.includes('CaseLaw')) {
+            label = node.neutralCitation || node.content || node.id;
+        } else if (node.labels && node.labels.includes('Act')) {
+            const actCode = extractActCode(node);
+            label = actCode || node.content || node.id;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+            label = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+            label = 'Subsidiary Legislation';
+        } else if (node.labels?.includes('PartOfTheLegislation')) {
+            label = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
+        } else if (node.heading) {
+            label = node.heading;
+        } else if (node.name) {
+            label = node.name;
+        } else if (node.content) {
+            label = node.content;
+        } else {
+            label = node.id;
+        }
+
+        return label;
+    };
+
+    const getParagraphNumber = (nodeId: string) => {
+        if (nodeId.includes('#[')) {
+            const match = nodeId.match(/#\[(\d+)\]/);
+            return match ? match[1] : null;
+        }
+        return null;
+    };
+
+    const formatLegalPath = (legalPath: string) => {
+        if (!legalPath) return '';
+
+        const parts = legalPath.split(' -> ').map((part) => part.trim());
+        const pathParts = parts.slice(1).map((part) => part.replace(/-$/, ''));
+
+        if (pathParts.length === 0) return '';
+
+        const [first, ...rest] = pathParts;
+        if (rest.length === 0) return first;
+
+        return `${first}(${rest.join(')(')})`;
+    };
+
+    const extraRenderers = useMemo(() => {
+        if (CSS2DRenderer) {
+            return [new CSS2DRenderer()];
+        }
+        return [];
+    }, []);
+
     return (
         <ForceGraph3D
             ref={graphRef}
@@ -1640,6 +1778,9 @@ const ChatGraph3D = ({
             d3AlphaDecay={0.01}
             d3VelocityDecay={0.4}
             warmupTicks={300}
+            extraRenderers={extraRenderers}
+            nodeThreeObject={createNodeTextObject}
+            nodeThreeObjectExtend={true}
         />
     );
 };
