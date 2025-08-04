@@ -12,8 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import CancelPlanDialog from './Plans/CancelPlanDialog';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 const BillingPlan = () => {
+    const { trackSubscription } = useAnalytics();
     const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -50,6 +52,16 @@ const BillingPlan = () => {
         setLoading(true);
         try {
             await cancelSubscription();
+            
+            if (currentSubscription?.tariff) {
+                trackSubscription(
+                    'cancelled',
+                    currentSubscription.tariff_id,
+                    currentSubscription.tariff.name,
+                    currentSubscription.tariff.price || 0
+                );
+            }
+            
             setDialogOpen(false);
             setCurrentSubscription(null);
         } catch (err) {
