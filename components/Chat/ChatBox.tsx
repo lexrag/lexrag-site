@@ -6,6 +6,7 @@ import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { TypingAnimation } from '../magicui/typing-animation';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 interface ChatBoxProps {
     messages: Message[];
@@ -35,6 +36,7 @@ const ChatBox = ({
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const { trackMessageCopied, trackContentCopied } = useAnalytics();
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,6 +120,11 @@ const ChatBox = ({
                                                 if (parsed.content) copyText = parsed.content;
                                                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
+                                            
+                                            trackMessageCopied(msg.id, msg.direction === 'incoming' ? 'ai' : 'user');
+                                            
+                                            trackContentCopied(msg.id, 'message', copyText.length);
+                                            
                                             copyToClipboard(msg.id, copyText);
                                         }}
                                     >
