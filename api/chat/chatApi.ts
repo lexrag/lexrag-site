@@ -9,6 +9,7 @@ import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 interface UseChatArgs {
     websocket: WebSocket | null;
@@ -17,6 +18,7 @@ interface UseChatArgs {
 }
 
 export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseChatArgs) => {
+    const { trackChatResponse } = useAnalytics();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isThinking, setIsThinking] = useState<boolean>(false);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
@@ -28,6 +30,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const pathname = usePathname();
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const responseStartTimeRef = useRef<number>(0);
 
     const threadId = useMemo(() => {
         if (pathname.startsWith('/chat/')) {
@@ -102,6 +105,10 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
 
             if (data.type === MessageTypes.token) {
                 setIsThinking(false);
+                
+                if (responseStartTimeRef.current === 0) {
+                    responseStartTimeRef.current = Date.now();
+                }
 
                 setCurrentResponseContent((prev) => {
                     const updated = prev + data.content;
@@ -123,9 +130,23 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                     relevantRetrievedNodes: graphDataRef.current?.relevant_retrieved_nodes,
                 };
 
+                const responseTime = responseStartTimeRef.current > 0 ? Date.now() - responseStartTimeRef.current : 0;
+                const hasGraph = !!(graphDataRef.current?.all_retrieved_nodes || graphDataRef.current?.relevant_retrieved_nodes);
+                const nodeCount = (graphDataRef.current?.all_retrieved_nodes?.nodes?.length || 0) + 
+                                (graphDataRef.current?.relevant_retrieved_nodes?.nodes?.length || 0);
+                
+                trackChatResponse(
+                    threadId || 'unknown',
+                    accumulatedContentRef.current.length,
+                    responseTime,
+                    hasGraph,
+                    nodeCount
+                );
+
                 setMessages((prev) => [...prev, message]);
                 setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
+                responseStartTimeRef.current = 0;
                 
                 if (setConversations && threadId !== 'new') {
                     setConversations((prevConversations) =>
