@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import '@/css/globals.css';
 import '@/components/keenicons/assets/styles.css';
 import { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { UserProvider } from '@/providers/user-provider';
@@ -33,6 +34,21 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html className="h-full" suppressHydrationWarning>
+            <head>
+                <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-CVRRVW8L0M" />
+                <Script
+                    id="gtag-init"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-CVRRVW8L0M');
+            `,
+                    }}
+                />
+            </head>
             <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
                 <QueryProvider>
                     <ThemeProvider>
