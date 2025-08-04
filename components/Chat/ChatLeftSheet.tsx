@@ -2,7 +2,6 @@
 
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDirection } from '@radix-ui/react-direction';
-import { Conversation } from '@/types/Conversation';
 import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
 import { ChatSidebarMenu } from './ChatSidebarMenu';
 import { ChatSidebarSheetFooter } from './ChatSidebarSheetFooter';
@@ -11,22 +10,11 @@ import { ChatSidebarSheetHeader } from './ChatSidebarSheetHeader';
 interface ChatLeftSheetProps {
     isOpen: boolean;
     handleOpen: Dispatch<SetStateAction<boolean>>;
-    conversations: Conversation[];
-    handleDeleteConversation: (threadId: string) => void;
-    onRenameConversation?: (threadId: string, newTitle: string) => void;
     activeLeftTab: string;
     setActiveLeftTab: (tab: string) => void;
 }
 
-const ChatLeftSheet = ({
-    isOpen,
-    handleOpen,
-    conversations,
-    handleDeleteConversation,
-    onRenameConversation,
-    activeLeftTab,
-    setActiveLeftTab,
-}: ChatLeftSheetProps) => {
+const ChatLeftSheet = ({ isOpen, handleOpen, activeLeftTab, setActiveLeftTab }: ChatLeftSheetProps) => {
     const direction = useDirection();
     const [showSettings, setShowSettings] = useState(false);
 
@@ -48,12 +36,10 @@ const ChatLeftSheet = ({
                         {/* Content area */}
                         <div className="flex-1">
                             <ChatSidebarMenu
-                                conversations={conversations}
-                                onDeleteConversation={handleDeleteConversation}
-                                onRenameConversation={onRenameConversation}
                                 showSettings={showSettings}
                                 className="max-h-[calc(100vh-8.5rem)]"
                                 isSidebarOpen={isOpen}
+                                activeTab={activeLeftTab}
                             />
                         </div>
 
