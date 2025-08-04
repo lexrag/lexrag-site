@@ -17,6 +17,9 @@ export const metadata: Metadata = {
         template: '%s | Lexrag',
         default: 'Lexrag',
     },
+    other: {
+        'google-site-verification': 'IKxx-FRONvplOxvRULlgKDdlKdWD4MZFsDr7HrLtKUM',
+    },
 };
 
 export const viewport: Viewport = {
