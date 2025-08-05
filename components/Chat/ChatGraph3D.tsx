@@ -83,6 +83,13 @@ const ChatGraph3D = ({
     const orbitIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const bloomPassRef = useRef<any>(null);
 
+    const initialCameraStateRef = useRef<{
+        position: { x: number; y: number; z: number };
+        target: { x: number; y: number; z: number };
+        up: { x: number; y: number; z: number };
+    } | null>(null);
+    const cameraStateInitializedRef = useRef<boolean>(false);
+
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
     const [draggedNode, setDraggedNode] = useState<any>(null);
@@ -847,24 +854,143 @@ const ChatGraph3D = ({
         });
     }, [processedData]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const saveInitialCameraState = useCallback(() => {
+        const camera = graphRef.current?.camera();
+        const controls = graphRef.current?.controls();
+
+        if (camera && controls && !cameraStateInitializedRef.current) {
+            initialCameraStateRef.current = {
+                position: {
+                    x: camera.position.x,
+                    y: camera.position.y,
+                    z: camera.position.z,
+                },
+                target: {
+                    x: controls.target.x,
+                    y: controls.target.y,
+                    z: controls.target.z,
+                },
+                up: {
+                    x: camera.up.x,
+                    y: camera.up.y,
+                    z: camera.up.z,
+                },
+            };
+            cameraStateInitializedRef.current = true;
+        }
+    }, []);
+
     useEffect(() => {
         if (!processedData) return;
         handleCardData(processedData);
         initializeNodePositions();
         applyForces();
-        
-        // Auto zoom to fit after data is processed
-        setTimeout(() => {
-            const optimalDistance = calculateOptimalZoomDistance();
-            graphRef.current?.zoomToFit(optimalDistance);
-        }, 1000);
-    }, [processedData, handleCardData, applyForces, calculateOptimalZoomDistance, initializeNodePositions]);
+
+        if (!cameraStateInitializedRef.current) {
+            setTimeout(async () => {
+                saveInitialCameraState();
+                setTimeout(() => {
+                    const optimalDistance = calculateOptimalZoomDistance();
+                    graphRef.current?.zoomToFit(optimalDistance);
+                }, 100);
+            }, 1500);
+        }
+    }, [
+        processedData,
+        handleCardData,
+        applyForces,
+        calculateOptimalZoomDistance,
+        initializeNodePositions,
+        saveInitialCameraState,
+    ]);
+
+    const animateCameraAndRotation = useCallback((target?: { x: number; y: number; z: number }) => {
+        return new Promise<void>((resolve) => {
+            const graphObj = graphRef.current?.scene()?.children[3];
+            const camera = graphRef.current?.camera();
+            const controls = graphRef.current?.controls();
+
+            if (!graphObj || !camera || !controls) return resolve();
+
+            const startRotationY = graphObj.rotation.y;
+            const startCameraPos = { ...camera.position };
+            const startCameraUp = { ...camera.up };
+            const startTarget = controls.target.clone();
+
+            let endRotationY = 0;
+            let endCameraPos: { x: number; y: number; z: number };
+            let endCameraUp: { x: number; y: number; z: number };
+            let endTarget: { x: number; y: number; z: number };
+
+            if (target) {
+                endCameraPos = {
+                    x: target.x,
+                    y: target.y,
+                    z: target.z + 400,
+                };
+                endTarget = { ...target };
+                endCameraUp = { x: 0, y: 1, z: 0 };
+            } else if (initialCameraStateRef.current) {
+                endCameraPos = { ...initialCameraStateRef.current.position };
+                endTarget = { ...initialCameraStateRef.current.target };
+                endCameraUp = { ...initialCameraStateRef.current.up };
+            } else {
+                endCameraPos = { x: 0, y: 0, z: 300 };
+                endTarget = { x: 0, y: 0, z: 0 };
+                endCameraUp = { x: 0, y: 1, z: 0 };
+            }
+
+            const duration = 1500;
+            const startTime = performance.now();
+
+            const animate = (time: number) => {
+                const elapsed = time - startTime;
+                const t = Math.min(elapsed / duration, 1);
+
+                const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                graphObj.rotation.y = startRotationY + (endRotationY - startRotationY) * ease;
+
+                camera.position.x = startCameraPos.x + (endCameraPos.x - startCameraPos.x) * ease;
+                camera.position.y = startCameraPos.y + (endCameraPos.y - startCameraPos.y) * ease;
+                camera.position.z = startCameraPos.z + (endCameraPos.z - startCameraPos.z) * ease;
+
+                camera.up.x = startCameraUp.x + (endCameraUp.x - startCameraUp.x) * ease;
+                camera.up.y = startCameraUp.y + (endCameraUp.y - startCameraUp.y) * ease;
+                camera.up.z = startCameraUp.z + (endCameraUp.z - startCameraUp.z) * ease;
+
+                controls.target.x = startTarget.x + (endTarget.x - startTarget.x) * ease;
+                controls.target.y = startTarget.y + (endTarget.y - startTarget.y) * ease;
+                controls.target.z = startTarget.z + (endTarget.z - startTarget.z) * ease;
+
+                controls.update();
+
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    graphObj.rotation.y = endRotationY;
+                    camera.position.set(endCameraPos.x, endCameraPos.y, endCameraPos.z);
+                    camera.up.set(endCameraUp.x, endCameraUp.y, endCameraUp.z);
+                    controls.target.set(endTarget.x, endTarget.y, endTarget.z);
+                    controls.update();
+                    resolve();
+                }
+            };
+
+            requestAnimationFrame(animate);
+        });
+    }, []);
 
     useEffect(() => {
-        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
-            const optimalDistance = calculateOptimalZoomDistance();
-            graphRef.current?.zoomToFit(optimalDistance);
+        const unsubscribeZoomToFit = subscribeToZoomToFitGraph(async () => {
+            await animateCameraAndRotation();
+
+            setTimeout(() => {
+                const optimalDistance = calculateOptimalZoomDistance();
+                graphRef.current?.zoomToFit(optimalDistance);
+            }, 100);
         });
+
         const unsubscribeZoomToNode = subscribeToZoomToNodeGraph(async (payload) => {
             if (!graphRef.current) return;
 
@@ -912,7 +1038,7 @@ const ChatGraph3D = ({
             unsubscribeZoomToFit();
             unsubscribeZoomToNode();
         };
-    }, [processedData, calculateOptimalZoomDistance]);
+    }, [processedData, calculateOptimalZoomDistance, animateCameraAndRotation]);
 
     useEffect(() => {
         let animationFrame: number;
@@ -939,61 +1065,30 @@ const ChatGraph3D = ({
         };
     }, [clickTimer]);
 
-    const animateCameraAndRotation = (target: { x: number; y: number; z: number }) => {
-        return new Promise<void>((resolve) => {
-            const graphObj = graphRef.current?.scene()?.children[3];
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
+        const waitForGraphAndSaveState = () => {
             const camera = graphRef.current?.camera();
-            if (!graphObj || !camera) return resolve();
+            const controls = graphRef.current?.controls();
 
-            const startRotationY = graphObj.rotation.y;
-            const startPos = { ...camera.position };
-            const startLookAt = graphRef.current?.controls().target.clone();
+            if (camera && controls && processedData && processedData.nodes.length > 0) {
+                timeoutId = setTimeout(() => {
+                    saveInitialCameraState();
+                }, 2000);
+            } else {
+                timeoutId = setTimeout(waitForGraphAndSaveState, 100);
+            }
+        };
 
-            const endRotationY = 0;
-            const endPos = {
-                x: target.x,
-                y: target.y,
-                z: target.z + 400,
-            };
-            const endLookAt = {
-                x: target.x,
-                y: target.y,
-                z: target.z,
-            };
+        waitForGraphAndSaveState();
 
-            const duration = 1000;
-            const startTime = performance.now();
-
-            const animate = (time: number) => {
-                const t = Math.min((time - startTime) / duration, 1);
-
-                const ease = t * (2 - t);
-
-                graphObj.rotation.y = startRotationY + (endRotationY - startRotationY) * ease;
-
-                camera.position.x = startPos.x + (endPos.x - startPos.x) * ease;
-                camera.position.y = startPos.y + (endPos.y - startPos.y) * ease;
-                camera.position.z = startPos.z + (endPos.z - startPos.z) * ease;
-
-                const controls = graphRef.current?.controls();
-                if (controls) {
-                    controls.target.x = startLookAt.x + (endLookAt.x - startLookAt.x) * ease;
-                    controls.target.y = startLookAt.y + (endLookAt.y - startLookAt.y) * ease;
-                    controls.target.z = startLookAt.z + (endLookAt.z - startLookAt.z) * ease;
-                    controls.update();
-                }
-
-                if (t < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    graphObj.rotation.y = 0;
-                    resolve();
-                }
-            };
-
-            requestAnimationFrame(animate);
-        });
-    };
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [processedData, saveInitialCameraState]);
 
     const handleNodeClick = (node: any, event: any) => {
         if (!node || !node.id) return;
@@ -1486,7 +1581,7 @@ const ChatGraph3D = ({
         setDraggedNode(null);
     };
 
-    const handleBackgroundClick = () => {
+    const handleBackgroundClick = async () => {
         document.body.style.cursor = 'default';
         setHighlightedNodeId(null);
         setHighlightedLinkId(null);
@@ -1497,12 +1592,18 @@ const ChatGraph3D = ({
             setIsOrbitEnabled(false);
             setCanvasClickCount(1);
         } else if (canvasClickCount === 1) {
-            const optimalDistance = calculateOptimalZoomDistance();
-            graphRef.current?.zoomToFit(optimalDistance);
+            await animateCameraAndRotation();
+            setTimeout(() => {
+                const optimalDistance = calculateOptimalZoomDistance();
+                graphRef.current?.zoomToFit(optimalDistance);
+            }, 100);
             setCanvasClickCount(0);
         } else {
-            const optimalDistance = calculateOptimalZoomDistance();
-            graphRef.current?.zoomToFit(optimalDistance);
+            await animateCameraAndRotation();
+            setTimeout(() => {
+                const optimalDistance = calculateOptimalZoomDistance();
+                graphRef.current?.zoomToFit(optimalDistance);
+            }, 100);
         }
     };
 
