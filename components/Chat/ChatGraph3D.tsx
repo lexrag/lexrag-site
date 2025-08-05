@@ -90,6 +90,7 @@ const ChatGraph3D = ({
         new Map(),
     );
     const [canvasClickCount, setCanvasClickCount] = useState<number>(0);
+    const filtersInitializedRef = useRef<boolean>(false);
 
     const isOrbitEnabled = externalIsOrbitEnabled ?? false;
 
@@ -552,15 +553,27 @@ const ChatGraph3D = ({
 
         if (newLinkTypes.length > 0) {
             setLinkFilters((prevFilters) => {
-                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
-
-                return newLinkTypes.map((newType) => {
-                    const existing = existingFiltersMap.get(newType.id);
-                    return {
+                if (prevFilters.length === 0) {
+                    filtersInitializedRef.current = true;
+                    return newLinkTypes.map((newType) => ({
                         ...newType,
-                        enabled: existing ? existing.enabled : true,
-                    };
+                        enabled: true,
+                    }));
+                }
+
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+                const newFilters = [...prevFilters];
+
+                newLinkTypes.forEach((newType) => {
+                    if (!existingFiltersMap.has(newType.id)) {
+                        newFilters.push({
+                            ...newType,
+                            enabled: true,
+                        });
+                    }
                 });
+
+                return newFilters;
             });
         }
     }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
@@ -570,15 +583,27 @@ const ChatGraph3D = ({
 
         if (newNodeTypes.length > 0) {
             setNodeFilters((prevFilters) => {
-                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
-
-                return newNodeTypes.map((newType) => {
-                    const existing = existingFiltersMap.get(newType.id);
-                    return {
+                if (prevFilters.length === 0) {
+                    filtersInitializedRef.current = true;
+                    return newNodeTypes.map((newType) => ({
                         ...newType,
-                        enabled: existing ? existing.enabled : true,
-                    };
+                        enabled: true,
+                    }));
+                }
+
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+                const newFilters = [...prevFilters];
+
+                newNodeTypes.forEach((newType) => {
+                    if (!existingFiltersMap.has(newType.id)) {
+                        newFilters.push({
+                            ...newType,
+                            enabled: true,
+                        });
+                    }
                 });
+
+                return newFilters;
             });
         }
     }, [layerDataMap, expandedData, setNodeFilters, getAllNodeTypes]);
