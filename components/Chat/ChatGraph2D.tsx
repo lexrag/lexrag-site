@@ -303,8 +303,6 @@ const ChatGraph2D = ({
         }
     }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
 
-
-
     const getAllDescendants = (nodeId: string): Set<string> => {
         const descendants = new Set<string>();
         const visited = new Set<string>();
@@ -384,11 +382,14 @@ const ChatGraph2D = ({
         }
     };
 
-    const isLinkVisible = useCallback((link: any): boolean => {
-        const linkType = getLinkType(link);
-        const filter = linkFilters.find((f) => f.id === linkType);
-        return filter ? filter.enabled : true;
-    }, [linkFilters]);
+    const isLinkVisible = useCallback(
+        (link: any): boolean => {
+            const linkType = getLinkType(link);
+            const filter = linkFilters.find((f) => f.id === linkType);
+            return filter ? filter.enabled : true;
+        },
+        [linkFilters],
+    );
 
     const getAllNodeTypes = useCallback((layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
         const nodeTypesMap = new Map<string, { count: number; examples: any[] }>();
@@ -560,11 +561,14 @@ const ChatGraph2D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isNodeVisible = useCallback((node: any): boolean => {
-        const nodeType = getNodeType(node);
-        const filter = nodeFilters.find((f) => f.id === nodeType);
-        return filter ? filter.enabled : true;
-    }, [nodeFilters]);
+    const isNodeVisible = useCallback(
+        (node: any): boolean => {
+            const nodeType = getNodeType(node);
+            const filter = nodeFilters.find((f) => f.id === nodeType);
+            return filter ? filter.enabled : true;
+        },
+        [nodeFilters],
+    );
 
     const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -661,8 +665,7 @@ const ChatGraph2D = ({
             return [];
         }
 
-        // Create Set of visible nodes for quick check
-        const visibleNodeIds = new Set(processedNodes.map(node => node.id));
+        const visibleNodeIds = new Set(processedNodes.map((node) => node.id));
 
         const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
         const allLinks = new Map();
@@ -676,7 +679,7 @@ const ChatGraph2D = ({
                     if (isLinkVisible(link)) {
                         const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                         const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                        
+
                         // Check if both nodes (source and target) are visible
                         if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                             const linkKey = `${sourceId}-${targetId}`;
@@ -698,7 +701,7 @@ const ChatGraph2D = ({
             if (isLinkVisible(link)) {
                 const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                 const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                
+
                 // Check if both nodes (source and target) are visible
                 if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                     const linkKey = `${sourceId}-${targetId}`;
@@ -712,6 +715,28 @@ const ChatGraph2D = ({
                     }
                 }
             }
+        });
+
+        const parentChildLinks = new Map();
+
+        processedNodes.forEach((node) => {
+            if (node.labels?.includes('Paragraph') && node.parentId) {
+                const linkKey = `${node.id}-${node.parentId}`;
+
+                if (!allLinks.has(linkKey) && visibleNodeIds.has(node.parentId)) {
+                    parentChildLinks.set(linkKey, {
+                        id: linkKey,
+                        source: node.id,
+                        target: node.parentId,
+                        type: 'IS_PARAGRAPH_OF',
+                        relationType: 'IS_PARAGRAPH_OF',
+                    });
+                }
+            }
+        });
+
+        parentChildLinks.forEach((link, key) => {
+            allLinks.set(key, link);
         });
 
         return Array.from(allLinks.values());
@@ -1331,7 +1356,7 @@ const ChatGraph2D = ({
 
         const linkType = getLinkType(link);
         const linkTypeLabel = getLinkTypeLabel(linkType);
-        
+
         label = linkTypeLabel;
 
         if (link.relation && link.relation !== linkType) {

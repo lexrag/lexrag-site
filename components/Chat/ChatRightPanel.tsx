@@ -414,10 +414,9 @@ const ChatRightPanel = ({
 
         const filteredGroups: { [key: string]: any[] } = {};
         Object.keys(groups).forEach((groupKey) => {
-            const hasChildren = groups[groupKey].length > 0;
             const hasParent = parentNodesMap[groupKey] !== undefined;
 
-            if (hasChildren || hasParent) {
+            if (hasParent) {
                 filteredGroups[groupKey] = groups[groupKey];
             }
         });
