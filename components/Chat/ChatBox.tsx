@@ -82,13 +82,13 @@ const ChatBox = ({
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-6xl mx-auto px-4 md:px-4 px-2 min-h-0">
-            <div className="scrollable flex-1 overflow-y-auto space-y-2 pb-4 md:pb-4 pb-20 min-h-0">
+        <div className="flex flex-col h-full w-full max-w-6xl mx-auto md:px-4 px-2 min-h-0">
+            <div className="scrollable flex-1 overflow-y-auto space-y-2 md:pb-4 pb-20 min-h-0">
                 <div className="flex flex-col">
                     {messages.map((msg, i) => (
                         <div
                             key={msg.id}
-                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'} ${i === 0 ? 'pt-8 md:pt-8 pt-4' : 'pt-0'}`}
+                            className={`flex ${msg.direction === 'incoming' ? 'justify-start' : 'justify-end'} ${i === 0 ? 'md:pt-8 pt-4' : 'pt-0'}`}
                         >
                             <div
                                 className={`flex flex-col ${
@@ -98,7 +98,7 @@ const ChatBox = ({
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <div
-                                    className={`p-5 md:p-5 p-3 rounded-lg text-sm message-text ${
+                                    className={`md:p-5 p-3 rounded-lg text-sm message-text ${
                                         msg.direction === 'incoming'
                                             ? 'bg-stone-100 dark:bg-stone-900 text-gray-900 dark:text-white'
                                             : 'bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white'
@@ -107,7 +107,7 @@ const ChatBox = ({
                                     onClick={(e) => handleMessageClick(e, msg)}
                                 ></div>
                                 <div
-                                    className={`flex space-x-2 transition-opacity duration-250 pt-1 md:pt-1 pt-0.5 ${
+                                    className={`flex space-x-2 transition-opacity duration-250 md:pt-1 pt-0.5 ${
                                         hoveredMessageId === msg.id ? 'opacity-100 visible' : 'opacity-0 invisible'
                                     }`}
                                 >
@@ -129,15 +129,15 @@ const ChatBox = ({
                                         }}
                                     >
                                         {copiedMessageId === msg.id ? (
-                                            <CopyCheck className="size-4 md:size-4 size-3" />
+                                            <CopyCheck className="md:size-4 size-3" />
                                         ) : (
-                                            <Copy className="size-4 md:size-4 size-3" />
+                                            <Copy className="md:size-4 size-3" />
                                         )}
                                     </button>
                                     {msg.direction === 'incoming' && (
                                         <button className="btn btn-xs btn-icon p-0 text-gray-500 hover:text-primary">
                                             <Network
-                                                className="size-4 md:size-4 size-3"
+                                                className="md:size-4 size-3"
                                                 onClick={() => handleCurrentMessage(msg)}
                                             />
                                         </button>
@@ -150,7 +150,7 @@ const ChatBox = ({
                     {currentResponseContent && (
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
-                                <div className="p-5 md:p-5 p-3 rounded-lg text-gray-900 text-sm message-text">
+                                <div className="md:p-5 p-3 rounded-lg text-gray-900 text-sm message-text">
                                     {currentResponseContent}
                                 </div>
                             </div>
@@ -160,7 +160,7 @@ const ChatBox = ({
                     {isThinking && (
                         <div className="flex justify-start">
                             <div className="flex flex-col items-start relative">
-                                <div className="p-5 md:p-5 p-3 rounded-lg text-gray-900 dark:text-white text-sm message-text">
+                                <div className="md:p-5 p-3 rounded-lg text-gray-900 dark:text-white text-sm message-text">
                                     <TypingAnimation className="text-sm">{status || ''}</TypingAnimation>
                                 </div>
                             </div>

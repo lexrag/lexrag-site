@@ -1,29 +1,22 @@
 'use client';
 
-import { Conversation } from '@/types/Conversation';
 import { cn } from '@/lib/utils';
 import { ChatItem } from '@/components/Chat/ChatItem';
 import { SidebarMenu } from '@/components/Sidebar/SidebarMenu';
+import { useChatContext } from './ChatProvider';
+import UserDocuments from './UserDocuments';
 
 interface ChatSidebarMenuProps {
-    conversations: Conversation[];
-    onDeleteConversation: (threadId: string) => void;
-    onRenameConversation?: (threadId: string, newTitle: string) => void;
     showSettings: boolean;
     className?: string;
     isSidebarOpen: boolean;
+    activeTab: string;
 }
 
-export function ChatSidebarMenu({
-    conversations,
-    onDeleteConversation,
-    onRenameConversation,
-    showSettings,
-    className,
-    isSidebarOpen,
-}: ChatSidebarMenuProps) {
-    return (
+export function ChatSidebarMenu({ showSettings, className, isSidebarOpen, activeTab }: ChatSidebarMenuProps) {
+    const { conversations } = useChatContext();
 
+    return (
         <div className={cn('relative flex flex-row min-h-0 h-full', className)}>
             <div
                 className={cn(
@@ -43,19 +36,20 @@ export function ChatSidebarMenu({
                     <SidebarMenu noGroups />
                 ) : (
                     <div className="flex-1 min-h-0 overflow-y-auto">
-                        <ul>
-                            {conversations.map(({ thread_id, title, isGenerating, isTitleGenerating }) => (
-                                <ChatItem
-                                    key={thread_id}
-                                    thread_id={thread_id}
-                                    title={title}
-                                    onDeleteConversation={onDeleteConversation}
-                                    onRenameConversation={onRenameConversation}
-                                    isGenerating={isGenerating}
-                                    isTitleGenerating={isTitleGenerating}
-                                />
-                            ))}
-                        </ul>
+                        {activeTab === 'chats' && (
+                            <ul>
+                                {conversations.map(({ thread_id, title, isGenerating, isTitleGenerating }) => (
+                                    <ChatItem
+                                        key={thread_id}
+                                        thread_id={thread_id}
+                                        title={title}
+                                        isGenerating={isGenerating}
+                                        isTitleGenerating={isTitleGenerating}
+                                    />
+                                ))}
+                            </ul>
+                        )}
+                        {activeTab === 'files' && <UserDocuments />}
                     </div>
                 )}
             </div>

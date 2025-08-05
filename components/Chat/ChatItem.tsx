@@ -1,28 +1,27 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import deleteConversation from '@/api/chat/deleteConversation';
+import renameConversation from '@/api/chat/renameConversation';
 import { Loader2, Trash2 } from 'lucide-react';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
-import renameConversation from '@/api/chat/renameConversation';
+import { useChatContext } from './ChatProvider';
 
 interface ChatItemProps {
     thread_id: string;
     title: string;
-    onDeleteConversation: (thread_id: string) => void;
-    onRenameConversation?: (thread_id: string, newTitle: string) => void;
     isGenerating?: boolean;
     isTitleGenerating?: boolean;
 }
 
-export function ChatItem({ 
-    thread_id, 
-    title, 
-    onDeleteConversation, 
-    onRenameConversation,
-    isGenerating = false,
-    isTitleGenerating = false
-}: ChatItemProps) {
+export function ChatItem({ thread_id, title, isGenerating = false, isTitleGenerating = false }: ChatItemProps) {
+    const { setConversations } = useChatContext();
+
+    const pathname = usePathname();
+    const router = useRouter();
+
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(title);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +34,7 @@ export function ChatItem({
     }, []);
 
     useEffect(() => {
-        // Animation only if:   
+        // Animation only if:
         // 1. Title is not generating
         // 2. There is a real title (not "New chat")
         // 3. Answer generation is in progress (means this is a new dialog)
@@ -134,7 +133,7 @@ export function ChatItem({
         // Animations only for new titles
         if (isNewTitle && !isTitleGenerating) {
             return (
-                <TypingAnimation 
+                <TypingAnimation
                     className="text-sm text-gray-800 dark:text-white font-normal leading-normal tracking-normal"
                     duration={30}
                     delay={0}
@@ -145,11 +144,20 @@ export function ChatItem({
         }
 
         // Default display for existing titles
-        return (
-            <span className="text-sm text-gray-800 dark:text-white">
-                {title || 'New chat'}
-            </span>
-        );
+        return <span className="text-sm text-gray-800 dark:text-white">{title || 'New chat'}</span>;
+    };
+
+    const onDeleteConversation = async (threadId: string) => {
+        await deleteConversation(threadId);
+        setConversations((prev) => prev.filter((c) => c.thread_id !== threadId));
+
+        if (pathname.includes(threadId)) {
+            router.replace('/chat/new');
+        }
+    };
+
+    const onRenameConversation = (threadId: string, newTitle: string) => {
+        setConversations((prev) => prev.map((c) => (c.thread_id === threadId ? { ...c, title: newTitle } : c)));
     };
 
     if (isEditing) {
@@ -168,11 +176,7 @@ export function ChatItem({
                     className="text-sm text-gray-800 dark:text-white bg-transparent border-none outline-none flex-1 min-w-0"
                     disabled={isLoading}
                 />
-                {isLoading && (
-                    <div className="text-xs text-muted-foreground">
-                        Saving...
-                    </div>
-                )}
+                {isLoading && <div className="text-xs text-muted-foreground">Saving...</div>}
             </div>
         );
     }
@@ -194,12 +198,8 @@ export function ChatItem({
                     }
                 }}
             >
-                <span className="flex-1 min-w-0 break-words leading-relaxed">
-                    {displayTitle()}
-                </span>
-                {isGenerating && (
-                    <Loader2 className="size-3 animate-spin text-primary flex-shrink-0 mt-0.5" />
-                )}
+                <span className="flex-1 min-w-0 break-words leading-relaxed">{displayTitle()}</span>
+                {isGenerating && <Loader2 className="size-3 animate-spin text-primary flex-shrink-0 mt-0.5" />}
             </Link>
             <div
                 className="md:hidden block group-hover:block flex-shrink-0"

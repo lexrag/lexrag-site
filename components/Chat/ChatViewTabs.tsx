@@ -1,4 +1,4 @@
-import { ClockArrowDown, ClockArrowUp, MessageSquare, Settings } from 'lucide-react';
+import { ClockArrowDown, ClockArrowUp, Files, MessageSquare, Settings } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ChatViewTabsProps {
@@ -13,6 +13,9 @@ export default function ChatViewTabs({ activeTab, onTabChange, isSettings }: Cha
             <TabsList className="flex items-center w-full py-1 md:py-2 gap-2 md:gap-1">
                 <TabsTrigger value="chats" className="flex-1 min-w-0 p-2 md:p-1">
                     <MessageSquare className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
+                </TabsTrigger>
+                <TabsTrigger value="files" className="flex-1 min-w-0 p-2 md:p-1">
+                    <Files className="h-7 w-7 md:h-5 md:w-5 mx-auto" />
                 </TabsTrigger>
                 <TabsTrigger value="new" className="flex-1 min-w-0 p-2 md:p-1">
                     <ClockArrowDown className="h-7 w-7 md:h-5 md:w-5 mx-auto" />

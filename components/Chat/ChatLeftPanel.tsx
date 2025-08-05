@@ -2,27 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { getMeClient } from '@/api/auth/getMeClient';
-import { Conversation } from '@/types/Conversation';
 import { useUser } from '@/providers/user-provider';
 import { ChatSidebarMenu } from './ChatSidebarMenu';
 import { ChatSidebarPanelFooter } from './ChatSidebarPanelFooter';
 import { ChatSidebarPanelHeader } from './ChatSidebarPanelHeader';
 
 interface ChatLeftPanelProps {
-    conversations: Conversation[];
-    onDeleteConversation: (threadId: string) => void;
-    onRenameConversation?: (threadId: string, newTitle: string) => void;
     activeLeftTab: string;
     setActiveLeftTab: (tab: string) => void;
 }
 
-const ChatLeftPanel = ({
-    conversations,
-    onDeleteConversation,
-    onRenameConversation,
-    activeLeftTab,
-    setActiveLeftTab,
-}: ChatLeftPanelProps) => {
+const ChatLeftPanel = ({ activeLeftTab, setActiveLeftTab }: ChatLeftPanelProps) => {
     const { setUser } = useUser();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -47,13 +37,7 @@ const ChatLeftPanel = ({
                 </div>
 
                 <div className="flex-1">
-                    <ChatSidebarMenu
-                        conversations={conversations}
-                        onDeleteConversation={onDeleteConversation}
-                        onRenameConversation={onRenameConversation}
-                        showSettings={false}
-                        isSidebarOpen={isSidebarOpen}
-                    />
+                    <ChatSidebarMenu showSettings={false} isSidebarOpen={isSidebarOpen} activeTab={activeLeftTab} />
                 </div>
 
                 <ChatSidebarPanelFooter />

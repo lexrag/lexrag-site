@@ -3,12 +3,15 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { getConversations } from '@/api/chat/getConversations';
 import { Conversation } from '@/types/Conversation';
+import { UserDocuments } from '@/types/UserDocuments';
 
 interface ChatContextType {
     socket: WebSocket | null;
     conversations: Conversation[];
     setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
     connectionError: string | null;
+    userDocuments: UserDocuments[];
+    setUserDocuments: React.Dispatch<React.SetStateAction<UserDocuments[]>>;
 }
 
 export const ChatSocketContext = createContext<ChatContextType | undefined>(undefined);
@@ -22,7 +25,7 @@ export const useChatContext = () => {
 };
 
 interface ChatProviderProps {
-    mode: "chat" | "evaluator";
+    mode: 'chat' | 'evaluator';
     children: ReactNode;
 }
 
@@ -30,6 +33,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [connectionError, setConnectionError] = useState<string | null>(null);
+    const [userDocuments, setUserDocuments] = useState<UserDocuments[]>([]);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = 5;
     const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -108,7 +112,9 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     }, []);
 
     return (
-        <ChatSocketContext.Provider value={{ socket, conversations, setConversations, connectionError }}>
+        <ChatSocketContext.Provider
+            value={{ socket, conversations, setConversations, connectionError, userDocuments, setUserDocuments }}
+        >
             {children}
         </ChatSocketContext.Provider>
     );
