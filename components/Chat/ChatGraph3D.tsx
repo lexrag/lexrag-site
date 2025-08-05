@@ -7,6 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
@@ -71,6 +72,11 @@ const ChatGraph3D = ({
     showNodeLabels = true,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
+    const { 
+        trackGraphNodeClick, 
+        trackGraphNodeExpansion, 
+        trackGraphZoom
+    } = useCombinedAnalytics();
 
     const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -997,6 +1003,8 @@ const ChatGraph3D = ({
             const targetNode = processedData.nodes.find((node) => node.id === payload.id);
             if (!targetNode) return;
 
+            trackGraphZoom('node', payload.id);
+
             const nodeX = targetNode.x || payload.x || 0;
             const nodeY = targetNode.y || payload.y || 0;
             const nodeZ = targetNode.z || payload.z || 0;
@@ -1122,6 +1130,8 @@ const ChatGraph3D = ({
 
         setSelectedNodes(new Set([node]));
 
+        trackGraphNodeClick(node, '3d', expandedNodes.has(node.id));
+
         // Single click - select node
         console.log('Node selected:', node.id);
 
@@ -1204,6 +1214,7 @@ const ChatGraph3D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
+                trackGraphNodeExpansion(node, 'collapse', 0);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1270,6 +1281,8 @@ const ChatGraph3D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
+                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+
                         setTimeout(() => {
                             const optimalDistance = calculateOptimalZoomDistance();
                             graphRef.current?.zoomToFit(optimalDistance);
@@ -1279,11 +1292,13 @@ const ChatGraph3D = ({
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
+                        trackGraphNodeExpansion(node, 'expand', 0);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     // Mark node as expanded even if no children to prevent repeated API calls
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
+                    trackGraphNodeExpansion(node, 'expand', 0);
                 }
             }
         } catch (error) {

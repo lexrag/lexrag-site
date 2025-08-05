@@ -10,6 +10,8 @@ import Script from 'next/script';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { UserProvider } from '@/providers/user-provider';
+import { CombinedAnalyticsProvider } from '@/providers/combined-analytics-provider';
+import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -54,8 +56,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     <ThemeProvider>
                         <TooltipsProvider>
                             <UserProvider>
-                                <Suspense>{children}</Suspense>
-                                <Toaster />
+                                <CombinedAnalyticsProvider>
+                                    <PageViewTracker />
+                                    <Suspense>{children}</Suspense>
+                                    <Toaster />
+                                </CombinedAnalyticsProvider>
                             </UserProvider>
                         </TooltipsProvider>
                     </ThemeProvider>

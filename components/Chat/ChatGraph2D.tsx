@@ -7,6 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -56,6 +57,11 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
+    const { 
+        trackGraphNodeClick, 
+        trackGraphNodeExpansion, 
+        trackGraphZoom,
+    } = useCombinedAnalytics();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
@@ -752,6 +758,7 @@ const ChatGraph2D = ({
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            trackGraphZoom('fit');
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
             setHighlightedLinkId(null);
@@ -767,6 +774,8 @@ const ChatGraph2D = ({
                 payload.x = targetNode.x;
                 payload.y = targetNode.y;
             }
+
+            trackGraphZoom('node', payload.id);
 
             graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
             graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
@@ -867,6 +876,8 @@ const ChatGraph2D = ({
 
         setSelectedNodes(new Set([node]));
 
+        trackGraphNodeClick(node, '2d', expandedNodes.has(node.id));
+
         // Single click - select node
         console.log('Node selected:', node.id);
         handleScrollToCardId(node.id);
@@ -933,6 +944,7 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
+                trackGraphNodeExpansion(node, 'collapse', 0);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -972,15 +984,19 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
+                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
+                        trackGraphNodeExpansion(node, 'expand', 0);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     // Mark node as expanded even if no children to prevent repeated API calls
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
+                    trackGraphNodeExpansion(node, 'expand', 0);
                 }
             }
         } catch (error) {

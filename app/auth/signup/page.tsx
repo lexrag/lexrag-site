@@ -17,8 +17,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/common/icons';
 import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 export default function Page() {
+    const { trackAuth } = useCombinedAnalytics();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -38,6 +40,7 @@ export default function Page() {
     });
 
     async function googleButtonOnClick() {
+        trackAuth('sign_up', 'google', true);
         const result = await getGoogleAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
@@ -45,6 +48,7 @@ export default function Page() {
     }
 
     async function linkedinButtonOnClick() {
+        trackAuth('sign_up', 'linkedin', true);
         const result = await getLinkedinAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
@@ -65,9 +69,12 @@ export default function Page() {
         });
 
         if (!response.success) {
+            trackAuth('sign_up', 'email', false);
             setError(response.error);
             return;
         }
+
+        trackAuth('sign_up', 'email', true);
 
         const verificationCodeResult = await sendVerificationCode(email);
 
