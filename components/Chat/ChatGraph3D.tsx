@@ -923,7 +923,7 @@ const ChatGraph3D = ({
             const startCameraUp = { ...camera.up };
             const startTarget = controls.target.clone();
 
-            let endRotationY = 0;
+            const endRotationY = 0;
             let endCameraPos: { x: number; y: number; z: number };
             let endCameraUp: { x: number; y: number; z: number };
             let endTarget: { x: number; y: number; z: number };
