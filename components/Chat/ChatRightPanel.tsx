@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
@@ -89,7 +89,7 @@ const ChatRightPanel = ({
         stopTrackingContent,
         trackGraphFilterChange,
         trackGraphViewChange,
-    } = useAnalytics();
+    } = useCombinedAnalytics();
 
     // Update showNodeLabels when graphView changes
     useEffect(() => {

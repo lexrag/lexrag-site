@@ -2,11 +2,11 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 export const PageViewTracker = () => {
     const pathname = usePathname();
-    const { trackPageView, trackSessionStart } = useAnalytics();
+    const { trackPageView, trackSessionStart } = useCombinedAnalytics();
 
     useEffect(() => {
         trackSessionStart();

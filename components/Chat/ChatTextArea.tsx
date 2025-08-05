@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 export interface ChatTextAreaProps {
     input: string;
@@ -14,7 +14,7 @@ export interface ChatTextAreaProps {
 const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
-    const { trackChatQuestion } = useAnalytics();
+    const { trackChatQuestion } = useCombinedAnalytics();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {

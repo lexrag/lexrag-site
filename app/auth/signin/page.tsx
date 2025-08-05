@@ -20,11 +20,11 @@ import ReusableDialog from '@/components/common/ReusableDialog';
 import Reset2FAModal from '@/components/UserProfile/Security/components/Reset2FAModal';
 import TwoFactorVerifyStep from '@/components/UserProfile/Security/components/TwoFactorVerifyStep';
 import { getSigninSchema, SigninSchemaType } from '../forms/signin-schema';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 export default function Page() {
     const router = useRouter();
-    const { trackAuth } = useAnalytics();
+    const { trackAuth } = useCombinedAnalytics();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);

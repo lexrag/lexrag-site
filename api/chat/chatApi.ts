@@ -9,7 +9,7 @@ import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
-import { useAnalytics } from '@/hooks/use-analytics';
+import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
 
 interface UseChatArgs {
     websocket: WebSocket | null;
@@ -18,7 +18,7 @@ interface UseChatArgs {
 }
 
 export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseChatArgs) => {
-    const { trackChatResponse } = useAnalytics();
+    const { trackChatResponse } = useCombinedAnalytics();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isThinking, setIsThinking] = useState<boolean>(false);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
