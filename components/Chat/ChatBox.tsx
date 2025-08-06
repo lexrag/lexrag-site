@@ -6,7 +6,7 @@ import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { TypingAnimation } from '../magicui/typing-animation';
-import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
+import { useSegment } from '@/hooks/use-segment';
 
 interface ChatBoxProps {
     messages: Message[];
@@ -36,7 +36,7 @@ const ChatBox = ({
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const { trackMessageCopied, trackContentCopied } = useCombinedAnalytics();
+    const { trackMessageCopied, trackContentCopied } = useSegment();
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

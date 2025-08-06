@@ -12,10 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import CancelPlanDialog from './Plans/CancelPlanDialog';
-import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
+import { useSegment } from '@/hooks/use-segment';
 
 const BillingPlan = () => {
-    const { trackSubscription } = useCombinedAnalytics();
+    const { trackSubscription } = useSegment();
     const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
