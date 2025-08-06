@@ -21,6 +21,7 @@ import {
     trackGraphFilterChange,
     trackGraphViewChange,
     trackGraphZoom,
+    trackLinkedInConversion,
     trackMessageCopied,
     trackNodeClick,
     trackNodeExpansion,
@@ -137,6 +138,13 @@ export const useSegment = () => {
         trackEvent(eventName, properties);
     }, []);
 
+    const trackLinkedInConversionEvent = useCallback(
+        (conversionType: 'signup' | 'signin' | 'subscription' | 'purchase' | 'lead', value?: number, currency?: string) => {
+            trackLinkedInConversion(conversionType, value, currency);
+        },
+        [],
+    );
+
     const checkSegmentAvailable = useCallback(() => {
         return isSegmentAvailable();
     }, []);
@@ -183,6 +191,7 @@ export const useSegment = () => {
         trackStripeSuccess,
         trackBitrixContactSync,
         trackAccountRegistered,
+        trackLinkedInConversion: trackLinkedInConversionEvent,
 
         EVENT_CATEGORIES,
         EVENT_ACTIONS,

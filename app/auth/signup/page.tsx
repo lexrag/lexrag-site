@@ -20,7 +20,7 @@ import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
 import { useSegment } from '@/hooks/use-segment';
 
 export default function Page() {
-    const { trackAuth } = useSegment();
+    const { trackAuth, trackLinkedInConversion } = useSegment();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -49,9 +49,13 @@ export default function Page() {
 
     async function linkedinButtonOnClick() {
         trackAuth('sign_up', 'linkedin', true);
+        trackLinkedInConversion('signup');
+        
         const result = await getLinkedinAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
+        } else {
+            console.error('Failed to get LinkedIn auth link:', result.error);
         }
     }
 

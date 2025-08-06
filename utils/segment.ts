@@ -72,6 +72,11 @@ export const CUSTOM_DIMENSIONS = {
     CHAT_SESSION_ID: 'chat_session_id',
     RESPONSE_LENGTH: 'response_length',
     QUERY_COMPLEXITY: 'query_complexity',
+    LINKEDIN_CLICK_ID: 'linkedin_click_id',
+    LINKEDIN_LEAD_ID: 'linkedin_lead_id',
+    LINKEDIN_CAMPAIGN_ID: 'linkedin_campaign_id',
+    LINKEDIN_AD_ID: 'linkedin_ad_id',
+    LINKEDIN_PLACEMENT: 'linkedin_placement',
 } as const;
 
 export const LEGAL_CONTENT_TYPES = {
@@ -209,14 +214,28 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
         return;
     }
 
+    if (!analytics) {
+        initializeSegment();
+    }
+
     try {
         const userId = await getUserId();
         const userType = await getUserType();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkedinProperties = {
+            linkedin_click_id: urlParams.get('li_fat_id'),
+            linkedin_lead_id: urlParams.get('li_lead_id'),
+            linkedin_campaign_id: urlParams.get('li_campaign_id'),
+            linkedin_ad_id: urlParams.get('li_ad_id'),
+            linkedin_placement: urlParams.get('li_placement'),
+        };
 
         const eventProperties = {
             user_id: userId,
             user_type: userType,
             timestamp: new Date().toISOString(),
+            ...linkedinProperties,
             ...properties,
         };
 
@@ -227,16 +246,34 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
 };
 
 export const trackSignUp = async (method: 'email' | 'google' | 'linkedin', success: boolean = true) => {
+    const linkedinProperties =
+        method === 'linkedin'
+            ? {
+                  linkedin_signup_method: true,
+                  linkedin_conversion_type: 'signup',
+              }
+            : {};
+
     await trackEvent(EVENT_ACTIONS.SIGN_UP, {
         signup_method: method,
         success: success,
+        ...linkedinProperties,
     });
 };
 
 export const trackSignIn = async (method: 'email' | 'google' | 'linkedin', success: boolean = true) => {
+    const linkedinProperties =
+        method === 'linkedin'
+            ? {
+                  linkedin_signin_method: true,
+                  linkedin_conversion_type: 'signin',
+              }
+            : {};
+
     await trackEvent(EVENT_ACTIONS.SIGN_IN, {
         signin_method: method,
         success: success,
+        ...linkedinProperties,
     });
 };
 
@@ -440,6 +477,7 @@ export const trackSubscriptionStarted = async (planId: string, planName: string,
         plan_name: planName,
         amount: amount,
         currency: 'USD',
+        linkedin_conversion_type: 'subscription_started',
     });
 };
 
@@ -449,6 +487,7 @@ export const trackSubscriptionCompleted = async (planId: string, invoiceId: stri
         invoice_id: invoiceId,
         amount: amount,
         currency: 'USD',
+        linkedin_conversion_type: 'subscription_completed',
     });
 };
 
@@ -520,6 +559,25 @@ export const trackAccountRegistered = async (utmSource?: string, country?: strin
     });
 };
 
+export const trackLinkedInConversion = async (
+    conversionType: 'signup' | 'signin' | 'subscription' | 'purchase' | 'lead',
+    value?: number,
+    currency: string = 'USD',
+) => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    await trackEvent('linkedin_conversion', {
+        conversion_type: conversionType,
+        value: value,
+        currency: currency,
+        linkedin_click_id: urlParams.get('li_fat_id'),
+        linkedin_lead_id: urlParams.get('li_lead_id'),
+        linkedin_campaign_id: urlParams.get('li_campaign_id'),
+        linkedin_ad_id: urlParams.get('li_ad_id'),
+        linkedin_placement: urlParams.get('li_placement'),
+    });
+};
+
 export const initializeSegmentAnalytics = async () => {
     if (typeof window !== 'undefined') {
         initializeSegment();
@@ -576,6 +634,7 @@ export default {
     trackStripeSuccess,
     trackBitrixContactSync,
     trackAccountRegistered,
+    trackLinkedInConversion,
 
     EVENT_CATEGORIES,
     EVENT_ACTIONS,
