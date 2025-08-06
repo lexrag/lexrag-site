@@ -1,14 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, ReactNode } from 'react';
-import { initializeAnalytics, contentTimeTracker } from '@/utils/analytics';
-import { initializeMixpanelAnalytics, mixpanelContentTimeTracker } from '@/utils/mixpanel';
+import React, { createContext, ReactNode, useContext, useEffect } from 'react';
+import { contentTimeTracker, initializeAnalytics } from '@/utils/analytics';
+import { initializeSegment, segmentContentTimeTracker } from '@/utils/segment';
 
 interface CombinedAnalyticsContextType {
     contentTimeTracker: typeof contentTimeTracker;
-    mixpanelContentTimeTracker: typeof mixpanelContentTimeTracker;
+    segmentContentTimeTracker: typeof segmentContentTimeTracker;
     isAnalyticsAvailable: boolean;
-    isMixpanelAvailable: boolean;
+    isSegmentAvailable: boolean;
 }
 
 const CombinedAnalyticsContext = createContext<CombinedAnalyticsContextType | undefined>(undefined);
@@ -19,30 +19,26 @@ interface CombinedAnalyticsProviderProps {
 
 export const CombinedAnalyticsProvider: React.FC<CombinedAnalyticsProviderProps> = ({ children }) => {
     const [isAnalyticsAvailable, setIsAnalyticsAvailable] = React.useState(false);
-    const [isMixpanelAvailable, setIsMixpanelAvailable] = React.useState(false);
+    const [isSegmentAvailable, setIsSegmentAvailable] = React.useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             initializeAnalytics();
-            initializeMixpanelAnalytics();
-            
+            initializeSegment();
+
             setIsAnalyticsAvailable(true);
-            setIsMixpanelAvailable(true);
+            setIsSegmentAvailable(true);
         }
     }, []);
 
     const value: CombinedAnalyticsContextType = {
         contentTimeTracker,
-        mixpanelContentTimeTracker,
+        segmentContentTimeTracker,
         isAnalyticsAvailable,
-        isMixpanelAvailable,
+        isSegmentAvailable,
     };
 
-    return (
-        <CombinedAnalyticsContext.Provider value={value}>
-            {children}
-        </CombinedAnalyticsContext.Provider>
-    );
+    return <CombinedAnalyticsContext.Provider value={value}>{children}</CombinedAnalyticsContext.Provider>;
 };
 
 export const useCombinedAnalyticsContext = () => {
@@ -53,4 +49,4 @@ export const useCombinedAnalyticsContext = () => {
     return context;
 };
 
-export default CombinedAnalyticsProvider; 
+export default CombinedAnalyticsProvider;

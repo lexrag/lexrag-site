@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useAnalytics } from './use-analytics';
-import { useMixpanel } from './use-mixpanel';
+import { useSegment } from './use-segment';
 
 export const useCombinedAnalytics = () => {
     const analytics = useAnalytics();
-    const mixpanel = useMixpanel();
+    const segment = useSegment();
     const isInitialized = useRef(false);
 
     useEffect(() => {
@@ -15,33 +15,45 @@ export const useCombinedAnalytics = () => {
         }
     }, []);
 
-    const trackContentView = useCallback((contentId: string, contentType: string, contentTitle: string) => {
-        analytics.trackContentView(contentId, contentType, contentTitle);
-        mixpanel.trackContentView(contentId, contentType, contentTitle);
-    }, [analytics, mixpanel]);
+    const trackContentView = useCallback(
+        (contentId: string, contentType: string, contentTitle: string) => {
+            analytics.trackContentView(contentId, contentType, contentTitle);
+            segment.trackContentView(contentId, contentType, contentTitle);
+        },
+        [analytics, segment],
+    );
 
-    const stopTrackingContent = useCallback((contentId: string, contentType: string) => {
-        analytics.stopTrackingContent(contentId, contentType);
-        mixpanel.stopTrackingContent(contentId, contentType);
-    }, [analytics, mixpanel]);
+    const stopTrackingContent = useCallback(
+        (contentId: string, contentType: string) => {
+            analytics.stopTrackingContent(contentId, contentType);
+            segment.stopTrackingContent(contentId, contentType);
+        },
+        [analytics, segment],
+    );
 
-    const trackGraphNodeClick = useCallback((node: any, graphView: '2d' | '3d', isExpanded: boolean = false) => {
-        analytics.trackGraphNodeClick(node, graphView, isExpanded);
-        mixpanel.trackGraphNodeClick(node, graphView, isExpanded);
-    }, [analytics, mixpanel]);
+    const trackGraphNodeClick = useCallback(
+        (node: any, graphView: '2d' | '3d', isExpanded: boolean = false) => {
+            analytics.trackGraphNodeClick(node, graphView, isExpanded);
+            segment.trackGraphNodeClick(node, graphView, isExpanded);
+        },
+        [analytics, segment],
+    );
 
     const trackGraphNodeExpansion = useCallback(
         (node: any, expansionType: 'expand' | 'collapse', childNodeCount: number = 0) => {
             analytics.trackGraphNodeExpansion(node, expansionType, childNodeCount);
-            mixpanel.trackGraphNodeExpansion(node, expansionType, childNodeCount);
+            segment.trackGraphNodeExpansion(node, expansionType, childNodeCount);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
-    const trackChatQuestion = useCallback((question: string, sessionId: string, isNewConversation: boolean = false) => {
-        analytics.trackChatQuestion(question, sessionId, isNewConversation);
-        mixpanel.trackChatQuestion(question, sessionId, isNewConversation);
-    }, [analytics, mixpanel]);
+    const trackChatQuestion = useCallback(
+        (question: string, sessionId: string, isNewConversation: boolean = false) => {
+            analytics.trackChatQuestion(question, sessionId, isNewConversation);
+            segment.trackChatQuestion(question, sessionId, isNewConversation);
+        },
+        [analytics, segment],
+    );
 
     const trackChatResponse = useCallback(
         (
@@ -52,17 +64,17 @@ export const useCombinedAnalytics = () => {
             nodeCount: number = 0,
         ) => {
             analytics.trackChatResponse(sessionId, responseLength, responseTime, hasGraph, nodeCount);
-            mixpanel.trackChatResponse(sessionId, responseLength, responseTime, hasGraph, nodeCount);
+            segment.trackChatResponse(sessionId, responseLength, responseTime, hasGraph, nodeCount);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
     const trackAccordionInteraction = useCallback(
         (accordionId: string, accordionType: string, expansionType: 'expand' | 'collapse', itemCount: number = 0) => {
             analytics.trackAccordionInteraction(accordionId, accordionType, expansionType, itemCount);
-            mixpanel.trackAccordionInteraction(accordionId, accordionType, expansionType, itemCount);
+            segment.trackAccordionInteraction(accordionId, accordionType, expansionType, itemCount);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
     const trackAuth = useCallback(
@@ -72,9 +84,9 @@ export const useCombinedAnalytics = () => {
             success: boolean = true,
         ) => {
             analytics.trackAuth(action, method, success);
-            mixpanel.trackAuth(action, method, success);
+            segment.trackAuth(action, method, success);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
     const trackSubscription = useCallback(
@@ -86,112 +98,157 @@ export const useCombinedAnalytics = () => {
             invoiceId?: string,
         ) => {
             analytics.trackSubscription(action, planId, planName, amount, invoiceId);
-            mixpanel.trackSubscription(action, planId, planName, amount, invoiceId);
+            segment.trackSubscription(action, planId, planName, amount, invoiceId);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
     const trackCustomEvent = useCallback(
         (action: string, category: string, label?: string, value?: number, customParameters?: Record<string, any>) => {
             analytics.trackEvent(action, category, label, value, customParameters);
-            const mixpanelProperties = {
+            const segmentProperties = {
                 category,
                 label,
                 value,
                 ...customParameters,
             };
-            mixpanel.trackEvent(action, mixpanelProperties);
+            segment.trackEvent(action, segmentProperties);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
-    const trackPageView = useCallback((pagePath: string, pageTitle: string) => {
-        analytics.trackPageView(pagePath, pageTitle);
-        mixpanel.trackPageView(pagePath, pageTitle);
-    }, [analytics, mixpanel]);
+    const trackPageView = useCallback(
+        (pagePath: string, pageTitle: string) => {
+            analytics.trackPageView(pagePath, pageTitle);
+            segment.trackPageView(pagePath, pageTitle);
+        },
+        [analytics, segment],
+    );
 
-    const trackFeatureAccessed = useCallback((featureName: string, featureType: string) => {
-        analytics.trackFeatureAccessed(featureName, featureType);
-        mixpanel.trackFeatureAccessed(featureName, featureType);
-    }, [analytics, mixpanel]);
+    const trackFeatureAccessed = useCallback(
+        (featureName: string, featureType: string) => {
+            analytics.trackFeatureAccessed(featureName, featureType);
+            segment.trackFeatureAccessed(featureName, featureType);
+        },
+        [analytics, segment],
+    );
 
-    const trackMessageCopied = useCallback((messageId: string, messageType: 'user' | 'ai') => {
-        analytics.trackMessageCopied(messageId, messageType);
-        mixpanel.trackMessageCopied(messageId, messageType);
-    }, [analytics, mixpanel]);
+    const trackMessageCopied = useCallback(
+        (messageId: string, messageType: 'user' | 'ai') => {
+            analytics.trackMessageCopied(messageId, messageType);
+            segment.trackMessageCopied(messageId, messageType);
+        },
+        [analytics, segment],
+    );
 
-    const trackGraphViewChange = useCallback((fromView: '2d' | '3d', toView: '2d' | '3d') => {
-        analytics.trackGraphViewChange(fromView, toView);
-        mixpanel.trackGraphViewChange(fromView, toView);
-    }, [analytics, mixpanel]);
+    const trackGraphViewChange = useCallback(
+        (fromView: '2d' | '3d', toView: '2d' | '3d') => {
+            analytics.trackGraphViewChange(fromView, toView);
+            segment.trackGraphViewChange(fromView, toView);
+        },
+        [analytics, segment],
+    );
 
-    const trackGraphZoom = useCallback((zoomType: 'fit' | 'node' | 'manual', targetId?: string) => {
-        analytics.trackGraphZoom(zoomType, targetId);
-        mixpanel.trackGraphZoom(zoomType, targetId);
-    }, [analytics, mixpanel]);
+    const trackGraphZoom = useCallback(
+        (zoomType: 'fit' | 'node' | 'manual', targetId?: string) => {
+            analytics.trackGraphZoom(zoomType, targetId);
+            segment.trackGraphZoom(zoomType, targetId);
+        },
+        [analytics, segment],
+    );
 
     const trackGraphFilterChange = useCallback(
         (filterType: 'node' | 'link' | 'layer', filterId: string, enabled: boolean) => {
             analytics.trackGraphFilterChange(filterType, filterId, enabled);
-            mixpanel.trackGraphFilterChange(filterType, filterId, enabled);
+            segment.trackGraphFilterChange(filterType, filterId, enabled);
         },
-        [analytics, mixpanel],
+        [analytics, segment],
     );
 
-    const trackContentCopied = useCallback((contentId: string, contentType: string, contentLength: number) => {
-        analytics.trackContentCopied(contentId, contentType, contentLength);
-        mixpanel.trackContentCopied(contentId, contentType, contentLength);
-    }, [analytics, mixpanel]);
+    const trackContentCopied = useCallback(
+        (contentId: string, contentType: string, contentLength: number) => {
+            analytics.trackContentCopied(contentId, contentType, contentLength);
+            segment.trackContentCopied(contentId, contentType, contentLength);
+        },
+        [analytics, segment],
+    );
 
     const trackSessionStart = useCallback(() => {
         analytics.trackSessionStart();
-        mixpanel.trackSessionStart();
-    }, [analytics, mixpanel]);
+        segment.trackSessionStart();
+    }, [analytics, segment]);
 
-    const identifyUser = useCallback(async (userId: string, userProperties?: Record<string, any>) => {
-        await mixpanel.identifyUser(userId, userProperties);
-    }, [mixpanel]);
+    const identifyUser = useCallback(
+        async (userId: string, userProperties?: Record<string, any>) => {
+            await segment.identifyUser(userId, userProperties);
+        },
+        [segment],
+    );
 
     // Additional functions from Analytics Architecture plan
-    const trackStartResearch = useCallback((query: string, language: string = 'en', intent?: string) => {
-        mixpanel.trackStartResearch(query, language, intent);
-    }, [mixpanel]);
+    const trackStartResearch = useCallback(
+        (query: string, language: string = 'en', intent?: string) => {
+            segment.trackStartResearch(query, language, intent);
+        },
+        [segment],
+    );
 
-    const trackSubmitDraftRequest = useCallback((docType: string, service: string, length: number) => {
-        mixpanel.trackSubmitDraftRequest(docType, service, length);
-    }, [mixpanel]);
+    const trackSubmitDraftRequest = useCallback(
+        (docType: string, service: string, length: number) => {
+            segment.trackSubmitDraftRequest(docType, service, length);
+        },
+        [segment],
+    );
 
-    const trackViewDraftResult = useCallback((source: string, duration: number, exported: boolean = false) => {
-        mixpanel.trackViewDraftResult(source, duration, exported);
-    }, [mixpanel]);
+    const trackViewDraftResult = useCallback(
+        (source: string, duration: number, exported: boolean = false) => {
+            segment.trackViewDraftResult(source, duration, exported);
+        },
+        [segment],
+    );
 
-    const trackPanelMessageSent = useCallback((role: 'user' | 'assistant', threadId: string, tokensUsed: number) => {
-        mixpanel.trackPanelMessageSent(role, threadId, tokensUsed);
-    }, [mixpanel]);
+    const trackPanelMessageSent = useCallback(
+        (role: 'user' | 'assistant', threadId: string, tokensUsed: number) => {
+            segment.trackPanelMessageSent(role, threadId, tokensUsed);
+        },
+        [segment],
+    );
 
-    const trackStripeCheckout = useCallback((planId: string, currency: string = 'USD') => {
-        mixpanel.trackStripeCheckout(planId, currency);
-    }, [mixpanel]);
+    const trackStripeCheckout = useCallback(
+        (planId: string, currency: string = 'USD') => {
+            segment.trackStripeCheckout(planId, currency);
+        },
+        [segment],
+    );
 
-    const trackStripeSuccess = useCallback((amount: number, invoiceId: string, status: string) => {
-        mixpanel.trackStripeSuccess(amount, invoiceId, status);
-    }, [mixpanel]);
+    const trackStripeSuccess = useCallback(
+        (amount: number, invoiceId: string, status: string) => {
+            segment.trackStripeSuccess(amount, invoiceId, status);
+        },
+        [segment],
+    );
 
-    const trackBitrixContactSync = useCallback((formType: string, crmId: string) => {
-        mixpanel.trackBitrixContactSync(formType, crmId);
-    }, [mixpanel]);
+    const trackBitrixContactSync = useCallback(
+        (formType: string, crmId: string) => {
+            segment.trackBitrixContactSync(formType, crmId);
+        },
+        [segment],
+    );
 
-    const trackAccountRegistered = useCallback((utmSource?: string, country?: string) => {
-        mixpanel.trackAccountRegistered(utmSource, country);
-    }, [mixpanel]);
+    const trackAccountRegistered = useCallback(
+        (utmSource?: string, country?: string) => {
+            segment.trackAccountRegistered(utmSource, country);
+        },
+        [segment],
+    );
 
     const isAnalyticsAvailable = useCallback(() => {
         return analytics.isAnalyticsAvailable();
     }, [analytics]);
 
-    const isMixpanelAvailable = useCallback(() => {
-        return mixpanel.isMixpanelAvailable();
-    }, [mixpanel]);
+    const isSegmentAvailable = useCallback(() => {
+        return segment.isSegmentAvailable();
+    }, [segment]);
 
     return {
         trackEvent: trackCustomEvent,
@@ -223,10 +280,10 @@ export const useCombinedAnalytics = () => {
         trackAccountRegistered,
 
         isAnalyticsAvailable,
-        isMixpanelAvailable,
+        isSegmentAvailable,
 
         analytics,
-        mixpanel,
+        segment,
 
         EVENT_CATEGORIES: analytics.EVENT_CATEGORIES,
         EVENT_ACTIONS: analytics.EVENT_ACTIONS,
@@ -235,8 +292,8 @@ export const useCombinedAnalytics = () => {
         NODE_TYPES: analytics.NODE_TYPES,
 
         contentTimeTracker: analytics.contentTimeTracker,
-        mixpanelContentTimeTracker: mixpanel.mixpanelContentTimeTracker,
+        segmentContentTimeTracker: segment.segmentContentTimeTracker,
     };
 };
 
-export default useCombinedAnalytics; 
+export default useCombinedAnalytics;
