@@ -17,10 +17,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/common/icons';
 import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
-import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
+import { useSegment } from '@/hooks/use-segment';
 
 export default function Page() {
-    const { trackAuth } = useCombinedAnalytics();
+    const { trackAuth } = useSegment();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);

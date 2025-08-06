@@ -7,7 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
-import { useCombinedAnalytics } from '@/hooks/use-combined-analytics';
+import { useSegment } from '@/hooks/use-segment';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -61,7 +61,7 @@ const ChatGraph2D = ({
         trackGraphNodeClick, 
         trackGraphNodeExpansion, 
         trackGraphZoom,
-    } = useCombinedAnalytics();
+    } = useSegment();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
