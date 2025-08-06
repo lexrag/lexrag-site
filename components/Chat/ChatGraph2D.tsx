@@ -7,6 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
+import { useSegment } from '@/hooks/use-segment';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -56,6 +57,11 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
+    const { 
+        trackGraphNodeClick, 
+        trackGraphNodeExpansion, 
+        trackGraphZoom,
+    } = useSegment();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
@@ -74,6 +80,7 @@ const ChatGraph2D = ({
     const [isDragging, setIsDragging] = useState(false);
     const [isZooming, setisZooming] = useState(false);
     const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const filtersInitializedRef = useRef<boolean>(false);
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -317,15 +324,27 @@ const ChatGraph2D = ({
 
         if (newLinkTypes.length > 0) {
             setLinkFilters((prevFilters) => {
-                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
-
-                return newLinkTypes.map((newType) => {
-                    const existing = existingFiltersMap.get(newType.id);
-                    return {
+                if (prevFilters.length === 0) {
+                    filtersInitializedRef.current = true;
+                    return newLinkTypes.map((newType) => ({
                         ...newType,
-                        enabled: existing ? existing.enabled : true,
-                    };
+                        enabled: true,
+                    }));
+                }
+
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+                const newFilters = [...prevFilters];
+
+                newLinkTypes.forEach((newType) => {
+                    if (!existingFiltersMap.has(newType.id)) {
+                        newFilters.push({
+                            ...newType,
+                            enabled: true,
+                        });
+                    }
                 });
+
+                return newFilters;
             });
         }
     }, [layerDataMap, expandedData, setLinkFilters, getAllLinkTypes]);
@@ -465,15 +484,27 @@ const ChatGraph2D = ({
 
         if (newNodeTypes.length > 0) {
             setNodeFilters((prevFilters) => {
-                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
-
-                return newNodeTypes.map((newType) => {
-                    const existing = existingFiltersMap.get(newType.id);
-                    return {
+                if (prevFilters.length === 0) {
+                    filtersInitializedRef.current = true;
+                    return newNodeTypes.map((newType) => ({
                         ...newType,
-                        enabled: existing ? existing.enabled : true,
-                    };
+                        enabled: true,
+                    }));
+                }
+
+                const existingFiltersMap = new Map(prevFilters.map((f) => [f.id, f]));
+                const newFilters = [...prevFilters];
+
+                newNodeTypes.forEach((newType) => {
+                    if (!existingFiltersMap.has(newType.id)) {
+                        newFilters.push({
+                            ...newType,
+                            enabled: true,
+                        });
+                    }
                 });
+
+                return newFilters;
             });
         }
     }, [layerDataMap, expandedData, setNodeFilters, getAllNodeTypes]);
@@ -787,6 +818,7 @@ const ChatGraph2D = ({
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
+            trackGraphZoom('fit');
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
             setHighlightedLinkId(null);
@@ -802,6 +834,8 @@ const ChatGraph2D = ({
                 payload.x = targetNode.x;
                 payload.y = targetNode.y;
             }
+
+            trackGraphZoom('node', payload.id);
 
             graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
             graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
@@ -900,7 +934,6 @@ const ChatGraph2D = ({
         }
 
         setSelectedNodes(new Set([node]));
-
         console.log('Node selected:', node.id);
         handleScrollToCardId(node.id);
 
@@ -962,6 +995,7 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
+                trackGraphNodeExpansion(node, 'collapse', 0);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1001,14 +1035,18 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
+                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
+                        trackGraphNodeExpansion(node, 'expand', 0);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
+                    trackGraphNodeExpansion(node, 'expand', 0);
                 }
             }
         } catch (error) {

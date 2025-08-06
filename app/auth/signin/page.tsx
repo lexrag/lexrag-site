@@ -20,9 +20,11 @@ import ReusableDialog from '@/components/common/ReusableDialog';
 import Reset2FAModal from '@/components/UserProfile/Security/components/Reset2FAModal';
 import TwoFactorVerifyStep from '@/components/UserProfile/Security/components/TwoFactorVerifyStep';
 import { getSigninSchema, SigninSchemaType } from '../forms/signin-schema';
+import { useSegment } from '@/hooks/use-segment';
 
 export default function Page() {
     const router = useRouter();
+    const { trackAuth, trackLinkedInConversion } = useSegment();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -48,6 +50,7 @@ export default function Page() {
     });
 
     async function googleButtonOnClick() {
+        trackAuth('sign_in', 'google', true);
         const result = await getGoogleAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
@@ -55,9 +58,14 @@ export default function Page() {
     }
 
     async function linkedinButtonOnClick() {
+        trackAuth('sign_in', 'linkedin', true);
+        trackLinkedInConversion('signin');
+        
         const result = await getLinkedinAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
+        } else {
+            console.error('Failed to get LinkedIn auth link:', result.error);
         }
     }
 
@@ -68,6 +76,7 @@ export default function Page() {
 
         const response = await signIn({ email: email.trim(), password: password.trim() });
         if (response?.error) {
+            trackAuth('sign_in', 'email', false);
             if (response.status === 403) {
                 setPendingLogin({ email, password });
                 setShow2FAModal(true);
@@ -78,6 +87,7 @@ export default function Page() {
                 setError(response.error);
             }
         } else {
+            trackAuth('sign_in', 'email', true);
             router.push('/chat/new');
         }
         setIsProcessing(false);
@@ -92,7 +102,9 @@ export default function Page() {
             otp_code: values.otp_code.trim(),
         });
         if (response?.error) {
+            trackAuth('email_verification', 'email', false);
         } else {
+            trackAuth('email_verification', 'email', true);
             setShow2FAModal(false);
             setPendingLogin(null);
             router.push('/chat/new');

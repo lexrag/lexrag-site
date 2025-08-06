@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
-import deleteConversation from '@/api/chat/deleteConversation';
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
@@ -18,9 +16,7 @@ import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 
 export default function ChatPage() {
-    const pathname = usePathname();
-    const router = useRouter();
-    const { socket, conversations, setConversations } = useChatContext();
+    const { socket, setConversations } = useChatContext();
     useViewportHeight();
     const {
         messages,
@@ -72,19 +68,6 @@ export default function ChatPage() {
         setCurrentMessage(message);
     }, [messages, currentGraphData]);
 
-    const onDeleteConversation = async (threadId: string) => {
-        await deleteConversation(threadId);
-        setConversations((prev) => prev.filter((c) => c.thread_id !== threadId));
-
-        if (pathname.includes(threadId)) {
-            router.replace('/chat/new');
-        }
-    };
-
-    const onRenameConversation = (threadId: string, newTitle: string) => {
-        setConversations((prev) => prev.map((c) => (c.thread_id === threadId ? { ...c, title: newTitle } : c)));
-    };
-
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
     };
@@ -115,9 +98,6 @@ export default function ChatPage() {
             <ChatLeftSheet
                 isOpen={isOpenLeftSheet}
                 handleOpen={setIsOpenLeftSheet}
-                conversations={conversations}
-                handleDeleteConversation={onDeleteConversation}
-                onRenameConversation={onRenameConversation}
                 activeLeftTab={activeLeftTab}
                 setActiveLeftTab={setActiveLeftTab}
             />
@@ -139,9 +119,6 @@ export default function ChatPage() {
             />
             <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
                 <ChatLeftPanel
-                    conversations={conversations}
-                    onDeleteConversation={onDeleteConversation}
-                    onRenameConversation={onRenameConversation}
                     activeLeftTab={activeLeftTab}
                     setActiveLeftTab={setActiveLeftTab}
                 />

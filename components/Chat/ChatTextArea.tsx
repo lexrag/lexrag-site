@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
+import { useSegment } from '@/hooks/use-segment';
 
 export interface ChatTextAreaProps {
     input: string;
@@ -13,10 +14,20 @@ export interface ChatTextAreaProps {
 const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
+    const { trackChatQuestion } = useSegment();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
+            
+            if (input.trim()) {
+                trackChatQuestion(
+                    input.trim(),
+                    pathname.split('/').pop() || 'new',
+                    isNewConversation
+                );
+            }
+            
             sendMessage(input, isNewConversation);
             setInput('');
         }

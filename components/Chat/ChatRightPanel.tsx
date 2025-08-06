@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { useSegment } from '@/hooks/use-segment';
 import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
@@ -83,10 +84,25 @@ const ChatRightPanel = ({
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+    const {
+        trackAccordionInteraction,
+        trackContentView,
+        stopTrackingContent,
+        trackGraphFilterChange,
+        trackGraphViewChange,
+    } = useSegment();
 
     useEffect(() => {
         setShowNodeLabels(graphView === '2d');
     }, [graphView]);
+
+    useEffect(() => {
+        return () => {
+            if (selectedItem) {
+                stopTrackingContent(selectedItem, 'unknown');
+            }
+        };
+    }, [selectedItem, stopTrackingContent]);
 
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
@@ -661,6 +677,10 @@ const ChatRightPanel = ({
             setScrollToCardId(nodeId);
         }
 
+        const contentType = node.labels?.[0] || 'unknown';
+        const contentTitle = node.content || node.id;
+        trackContentView(nodeId, contentType, contentTitle);
+
         if (node.x !== undefined && node.y !== undefined) {
             zoomToNodeGraph({
                 id: nodeId,
@@ -751,22 +771,40 @@ const ChatRightPanel = ({
     };
 
     const handleLinkFilter = (filterId: string) => {
+        const currentFilter = graphLinkFilters.find((f) => f.id === filterId);
+        const newEnabled = !currentFilter?.enabled;
+
+        trackGraphFilterChange('link', filterId, newEnabled);
+
         setGraphLinkFilters((prevFilters) =>
-            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter)),
+            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
         );
     };
 
     const handleAllLinkFilters = (enabled: boolean) => {
+        graphLinkFilters.forEach((filter) => {
+            trackGraphFilterChange('link', filter.id, enabled);
+        });
+
         setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
     };
 
     const handleNodeFilter = (filterId: string) => {
+        const currentFilter = graphNodeFilters.find((f) => f.id === filterId);
+        const newEnabled = !currentFilter?.enabled;
+
+        trackGraphFilterChange('node', filterId, newEnabled);
+
         setGraphNodeFilters((prevFilters) =>
-            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter)),
+            prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
         );
     };
 
     const handleAllNodeFilters = (enabled: boolean) => {
+        graphNodeFilters.forEach((filter) => {
+            trackGraphFilterChange('node', filter.id, enabled);
+        });
+
         setGraphNodeFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
     };
 
@@ -838,7 +876,13 @@ const ChatRightPanel = ({
                             <div className="absolute top-3 left-3 right-3 z-10">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Tabs value={graphView} onValueChange={setGraphView}>
+                                        <Tabs
+                                            value={graphView}
+                                            onValueChange={(newView) => {
+                                                trackGraphViewChange(graphView as '2d' | '3d', newView as '2d' | '3d');
+                                                setGraphView(newView);
+                                            }}
+                                        >
                                             <TabsList className="w-fit grid grid-cols-2">
                                                 <TabsTrigger
                                                     value="2d"
@@ -1138,7 +1182,24 @@ const ChatRightPanel = ({
                                     type="multiple"
                                     className="w-full h-full overflow-y-auto pb-6"
                                     value={openAccordionItems}
-                                    onValueChange={setOpenAccordionItems}
+                                    onValueChange={(newValue) => {
+                                        const addedItems = newValue.filter(
+                                            (item) => !openAccordionItems.includes(item),
+                                        );
+                                        const removedItems = openAccordionItems.filter(
+                                            (item) => !newValue.includes(item),
+                                        );
+
+                                        addedItems.forEach((itemId) => {
+                                            trackAccordionInteraction(itemId, 'content_group', 'expand', 0);
+                                        });
+
+                                        removedItems.forEach((itemId) => {
+                                            trackAccordionInteraction(itemId, 'content_group', 'collapse', 0);
+                                        });
+
+                                        setOpenAccordionItems(newValue);
+                                    }}
                                     ref={accordionContainerRef}
                                 >
                                     {Object.entries(filteredGroupedNodes).map(([parentId, nodes]) => {
