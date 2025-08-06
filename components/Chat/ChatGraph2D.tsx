@@ -701,7 +701,7 @@ const ChatGraph2D = ({
                     const linkKey = `${node.id}-${node.parentId}`;
 
                     if (!allLinks.has(linkKey)) {
-                        allLinks.set(linkKey, {
+                        const parentChildLink = {
                             id: linkKey,
                             source: node.id,
                             target: node.parentId,
@@ -709,7 +709,11 @@ const ChatGraph2D = ({
                             relationType: 'PARENT_CHILD',
                             parentChild: true,
                             source_type: source,
-                        });
+                        };
+
+                        if (isLinkVisible(parentChildLink)) {
+                            allLinks.set(linkKey, parentChildLink);
+                        }
                     }
                 }
             });
