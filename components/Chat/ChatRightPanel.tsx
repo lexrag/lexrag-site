@@ -49,6 +49,8 @@ interface ChatRightPanelProps {
     setIsOpenGraphModal: (open: boolean) => void;
     scrollToCardId: string;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
+    searchQuery: string;
+    setSearchQuery: Dispatch<SetStateAction<string>>;
 }
 
 const ChatRightPanel = ({
@@ -66,6 +68,8 @@ const ChatRightPanel = ({
     setIsOpenGraphModal,
     scrollToCardId,
     setScrollToCardId,
+    searchQuery,
+    setSearchQuery,
 }: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -73,7 +77,7 @@ const ChatRightPanel = ({
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    // const [searchQuery, setSearchQuery] = useState<string>('');
     const [isScrolling, setIsScrolling] = useState<boolean>(false);
 
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
@@ -845,6 +849,7 @@ const ChatRightPanel = ({
                                     nodeFilters={graphNodeFilters}
                                     setNodeFilters={setGraphNodeFilters}
                                     showNodeLabels={showNodeLabels}
+                                    searchQuery={searchQuery}
                                 />
                             )}
                             {graphView === '3d' && (

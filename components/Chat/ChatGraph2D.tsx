@@ -33,6 +33,7 @@ interface ChatGraph2DProps {
     nodeFilters: GraphNodeFilter[];
     setNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     showNodeLabels?: boolean;
+    searchQuery: string;
 }
 
 const ChatGraph2D = ({
@@ -55,6 +56,7 @@ const ChatGraph2D = ({
     nodeFilters,
     setNodeFilters,
     showNodeLabels = true,
+    searchQuery,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
     const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
@@ -149,6 +151,73 @@ const ChatGraph2D = ({
             saveNodePosition(node);
         });
     };
+
+    const getNodeDisplayInfo = useCallback((node: any) => {
+        const getParagraphNumber = (nodeId: string) => {
+            if (nodeId.includes('#[')) {
+                const match = nodeId.match(/#\[(\d+)\]/);
+                return match ? match[1] : null;
+            }
+            return null;
+        };
+
+        const formatLegalPath = (legalPath: string) => {
+            if (!legalPath) return '';
+
+            const parts = legalPath.split(' -> ').map((part) => part.trim());
+            const pathParts = parts.slice(1).map((part) => part.replace(/-$/, ''));
+
+            if (pathParts.length === 0) return '';
+
+            const [first, ...rest] = pathParts;
+            if (rest.length === 0) return first;
+
+            return `${first}(${rest.join(')(')})`;
+        };
+
+        const paragraphNum = getParagraphNumber(node.id);
+        let title = node.labels?.[0] || 'Node';
+
+        if (paragraphNum) {
+            title = `§ ${paragraphNum}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+            title = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+            title = 'Subsidiary Legislation';
+        } else if (node.labels?.includes('PartOfTheLegislation')) {
+            title = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
+        } else if (node.heading) {
+            title = node.heading;
+        } else if (node.name) {
+            title = node.name;
+        }
+
+        return {
+            title,
+            citation: node.neutralCitation || null,
+            content: node.content || '',
+            topics: node.topics || [],
+            concepts: node.concepts || [],
+            functionalObject: node.functionalObject || null,
+            functionalRole: node.functionalRole || null,
+        };
+    }, []);
+
+    const nodeMatchesSearch = useCallback((node: any, searchLower: string): boolean => {
+        const nodeInfo = getNodeDisplayInfo(node);
+
+        return (
+            nodeInfo.title.toLowerCase().includes(searchLower) ||
+            nodeInfo.content.toLowerCase().includes(searchLower) ||
+            (nodeInfo.citation && nodeInfo.citation.toLowerCase().includes(searchLower)) ||
+            (nodeInfo.functionalObject && nodeInfo.functionalObject.toLowerCase().includes(searchLower)) ||
+            (nodeInfo.functionalRole && nodeInfo.functionalRole.toLowerCase().includes(searchLower)) ||
+            (nodeInfo.topics &&
+                nodeInfo.topics.some((topic: string) => topic.toLowerCase().includes(searchLower))) ||
+            (nodeInfo.concepts &&
+                nodeInfo.concepts.some((concept: string) => concept.toLowerCase().includes(searchLower)))
+        );
+    }, [getNodeDisplayInfo]);
 
     useEffect(() => {
         if (!data) return;
@@ -624,6 +693,68 @@ const ChatGraph2D = ({
         [nodeFilters],
     );
 
+    const getSearchFilteredNodes = useCallback((allNodes: any[]): any[] => {
+        if (!searchQuery.trim()) {
+            return allNodes;
+        }
+
+        const searchLower = searchQuery.toLowerCase().trim();
+        const matchingNodes = new Set<string>();
+        const nodesToInclude = new Set<string>();
+
+        const nodesByParent = new Map<string | null, any[]>();
+        const nodeMap = new Map<string, any>();
+
+        allNodes.forEach((node) => {
+            nodeMap.set(node.id, node);
+            const parentId = node.parentId || null;
+            if (!nodesByParent.has(parentId)) {
+                nodesByParent.set(parentId, []);
+            }
+            nodesByParent.get(parentId)!.push(node);
+        });
+
+        allNodes.forEach((node) => {
+            if (nodeMatchesSearch(node, searchLower)) {
+                matchingNodes.add(node.id);
+                
+                nodesToInclude.add(node.id);
+                
+                if (!node.parentId) {
+                    const children = nodesByParent.get(node.id) || [];
+                    children.forEach((child) => {
+                        nodesToInclude.add(child.id);
+                    });
+                } else {
+                    const parent = nodeMap.get(node.parentId);
+                    if (parent) {
+                        nodesToInclude.add(parent.id);
+                        
+                        const siblings = nodesByParent.get(node.parentId) || [];
+                        siblings.forEach((sibling) => {
+                            nodesToInclude.add(sibling.id);
+                        });
+                    }
+                }
+            }
+        });
+
+        nodesByParent.forEach((children, parentId) => {
+            if (parentId) {
+                const parent = nodeMap.get(parentId);
+                if (parent && nodeMatchesSearch(parent, searchLower)) {
+                    matchingNodes.add(parent.id);
+                    nodesToInclude.add(parent.id);
+                    children.forEach((child) => {
+                        nodesToInclude.add(child.id);
+                    });
+                }
+            }
+        });
+
+        return allNodes.filter((node) => nodesToInclude.has(node.id));
+    }, [searchQuery, nodeMatchesSearch]);
+
     const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
@@ -709,8 +840,10 @@ const ChatGraph2D = ({
             allNodes.set(node.id, nodeData);
         });
 
-        return Array.from(allNodes.values());
-    }, [layerDataMap, layers, expandedData, isNodeVisible]);
+        const allNodesArray = Array.from(allNodes.values());
+        
+        return getSearchFilteredNodes(allNodesArray);
+    }, [layerDataMap, layers, expandedData, isNodeVisible, getSearchFilteredNodes]);
 
     const processedLinks = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -1164,19 +1297,19 @@ const ChatGraph2D = ({
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 40; // 80px diameter / 2
+                return 40;
             }
 
             if (node.labels.includes('Paragraph')) {
-                return 10; // 20px diameter / 2
+                return 10;
             }
 
             if (node.labels.includes('Act')) {
-                return 40; // 80px diameter / 2
+                return 40;
             }
 
             if (node.labels.includes('PartOfTheLegislation')) {
-                return 10; // 20px diameter / 2
+                return 10;
             }
 
             if (
@@ -1212,11 +1345,11 @@ const ChatGraph2D = ({
                 node.labels.includes('SubsidiaryLegislation') ||
                 node.labels.includes('SLOpening')
             ) {
-                return 25; // 50px diameter / 2
+                return 25;
             }
         }
 
-        return 25; // Default 50px diameter / 2
+        return 25;
     };
 
     const handleNodeHover = (node: any) => {
@@ -1261,7 +1394,6 @@ const ChatGraph2D = ({
         }
 
         if (link.parentChild) {
-            // const sourceNode = processedNodes.find((n) => n.id === link.source);
             const targetNode = processedNodes.find((n) => n.id === link.target);
 
             if (targetNode?.labels?.includes('Act')) {
@@ -1419,16 +1551,22 @@ const ChatGraph2D = ({
         const nodeSize = getNodeSize(node);
         const rgb = getNodeColor(node);
 
-        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
+        const isSearchMatch = searchQuery.trim() && nodeMatchesSearch(node, searchQuery.toLowerCase().trim());
+        
+        if (highlightedNodeId === node.id || selectedNodes.has(node) || isSearchMatch) {
             ctx.save();
 
-            const glowRadius = nodeSize * 3.5;
+            const glowRadius = nodeSize * (isSearchMatch ? 4.5 : 3.5);
             const gradient = ctx.createRadialGradient(node.x, node.y, nodeSize, node.x, node.y, glowRadius);
 
-            gradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`);
-            gradient.addColorStop(0.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
-            gradient.addColorStop(0.6, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`);
-            gradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+            const glowColor = isSearchMatch && !selectedNodes.has(node) && highlightedNodeId !== node.id 
+                ? { r: 255, g: 255, b: 0 } // Желтое свечение для результатов поиска
+                : rgb;
+
+            gradient.addColorStop(0, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.6)`);
+            gradient.addColorStop(0.3, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.3)`);
+            gradient.addColorStop(0.6, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.1)`);
+            gradient.addColorStop(1, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0)`);
 
             ctx.beginPath();
             ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI);

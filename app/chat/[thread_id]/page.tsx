@@ -57,6 +57,7 @@ export default function ChatPage() {
     const [input, setInput] = useState<string>('');
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     useEffect(() => {
         if (!!currentGraphData) {
@@ -118,10 +119,7 @@ export default function ChatPage() {
                 handleCardData={setCardData}
             />
             <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
-                <ChatLeftPanel
-                    activeLeftTab={activeLeftTab}
-                    setActiveLeftTab={setActiveLeftTab}
-                />
+                <ChatLeftPanel activeLeftTab={activeLeftTab} setActiveLeftTab={setActiveLeftTab} />
 
                 <section className="flex-1 flex flex-col overflow-hidden min-h-0">
                     <div className="flex-1 overflow-y-auto min-h-0">
@@ -154,6 +152,8 @@ export default function ChatPage() {
                     setIsOpenGraphModal={setIsOpenGraphModal}
                     scrollToCardId={scrollToCardId}
                     setScrollToCardId={setScrollToCardId}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
                 />
             </main>
 
