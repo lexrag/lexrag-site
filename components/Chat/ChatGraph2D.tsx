@@ -57,11 +57,7 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
-    const { 
-        trackGraphNodeClick, 
-        trackGraphNodeExpansion, 
-        trackGraphZoom,
-    } = useSegment();
+    const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
@@ -190,49 +186,10 @@ const ChatGraph2D = ({
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
-    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
-        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
-
-        Object.values(layerDataMap).forEach((layerData: any) => {
-            if (layerData.links) {
-                layerData.links.forEach((link: any) => {
-                    const linkType = getLinkType(link);
-                    if (!linkTypesMap.has(linkType)) {
-                        linkTypesMap.set(linkType, { count: 0, examples: [] });
-                    }
-                    const existing = linkTypesMap.get(linkType)!;
-                    existing.count++;
-                    if (existing.examples.length < 3) {
-                        existing.examples.push(link);
-                    }
-                });
-            }
-        });
-
-        expandedData.links.forEach((link: any) => {
-            const linkType = getLinkType(link);
-            if (!linkTypesMap.has(linkType)) {
-                linkTypesMap.set(linkType, { count: 0, examples: [] });
-            }
-            const existing = linkTypesMap.get(linkType)!;
-            existing.count++;
-            if (existing.examples.length < 3) {
-                existing.examples.push(link);
-            }
-        });
-
-        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
-            id: type,
-            label: getLinkTypeLabel(type),
-            enabled: true,
-            color: getLinkTypeColor(type, index),
-            count: data.count,
-        }));
-
-        return linkTypes.sort((a, b) => b.count - a.count);
-    }, []);
-
     const getLinkType = (link: any): string => {
+        if (link.parentChild) {
+            return 'PARENT_CHILD';
+        }
         if (link.relationType) {
             return link.relationType;
         }
@@ -247,6 +204,7 @@ const ChatGraph2D = ({
 
     const getLinkTypeLabel = (type: string): string => {
         const labelMap: Record<string, string> = {
+            PARENT_CHILD: 'Parent-Child',
             CITES: 'Citations',
             REFERENCED_BY: 'References',
             PART_OF: 'Part of',
@@ -277,6 +235,7 @@ const ChatGraph2D = ({
         ];
 
         const colorMap: Record<string, string> = {
+            PARENT_CHILD: '#10b981',
             CITES: '#3b82f6',
             REFERENCED_BY: '#ef4444',
             PART_OF: '#10b981',
@@ -291,6 +250,70 @@ const ChatGraph2D = ({
 
         return colorMap[type] || colors[index % colors.length];
     };
+
+    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
+
+        linkTypesMap.set('PARENT_CHILD', { count: 0, examples: [] });
+
+        const processLinks = (links: any[], source: string) => {
+            links.forEach((link: any) => {
+                const linkType = getLinkType(link);
+                if (!linkTypesMap.has(linkType)) {
+                    linkTypesMap.set(linkType, { count: 0, examples: [] });
+                }
+                const existing = linkTypesMap.get(linkType)!;
+                existing.count++;
+                if (existing.examples.length < 3) {
+                    existing.examples.push({ ...link, source_info: source });
+                }
+            });
+        };
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.links) {
+                processLinks(layerData.links, 'layer');
+            }
+        });
+
+        processLinks(expandedData.links, 'expanded');
+
+        const countParentChildLinks = (nodes: any[]) => {
+            nodes.forEach((node: any) => {
+                if (node.parentId) {
+                    const existing = linkTypesMap.get('PARENT_CHILD')!;
+                    existing.count++;
+                    if (existing.examples.length < 3) {
+                        existing.examples.push({
+                            id: `${node.id}-${node.parentId}`,
+                            source: node.id,
+                            target: node.parentId,
+                            type: 'PARENT_CHILD',
+                            parentChild: true,
+                        });
+                    }
+                }
+            });
+        };
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.nodes) {
+                countParentChildLinks(layerData.nodes);
+            }
+        });
+
+        countParentChildLinks(expandedData.nodes);
+
+        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
+            id: type,
+            label: getLinkTypeLabel(type),
+            enabled: true,
+            color: getLinkTypeColor(type, index),
+            count: data.count,
+        }));
+
+        return linkTypes.sort((a, b) => b.count - a.count);
+    }, []);
 
     useEffect(() => {
         const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
@@ -484,7 +507,7 @@ const ChatGraph2D = ({
 
     const getNodeType = (node: any): string => {
         if (node.labels && node.labels.length > 0) {
-            return node.labels[0]; // Use the first label as the main type
+            return node.labels[0];
         }
         return 'default';
     };
@@ -697,13 +720,39 @@ const ChatGraph2D = ({
         }
 
         const visibleNodeIds = new Set(processedNodes.map((node) => node.id));
+        const allLinks = new Map();
+
+        const createParentChildLinks = (nodes: any[], source: string) => {
+            nodes.forEach((node) => {
+                if (node.parentId && visibleNodeIds.has(node.parentId) && visibleNodeIds.has(node.id)) {
+                    const linkKey = `${node.id}-${node.parentId}`;
+
+                    if (!allLinks.has(linkKey)) {
+                        const parentChildLink = {
+                            id: linkKey,
+                            source: node.id,
+                            target: node.parentId,
+                            type: 'PARENT_CHILD',
+                            relationType: 'PARENT_CHILD',
+                            parentChild: true,
+                            source_type: source,
+                        };
+
+                        if (isLinkVisible(parentChildLink)) {
+                            allLinks.set(linkKey, parentChildLink);
+                        }
+                    }
+                }
+            });
+        };
 
         const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
-        const allLinks = new Map();
 
         sortedEnabledLayers.forEach((layer) => {
             const layerData = layerDataMap[layer.id];
             if (!layerData) return;
+
+            createParentChildLinks(layerData.nodes, `layer-${layer.id}`);
 
             if (layerData.links) {
                 layerData.links.forEach((link: any) => {
@@ -711,7 +760,6 @@ const ChatGraph2D = ({
                         const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                         const targetId = typeof link.target === 'object' ? link.target.id : link.target;
 
-                        // Check if both nodes (source and target) are visible
                         if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                             const linkKey = `${sourceId}-${targetId}`;
                             if (!allLinks.has(linkKey)) {
@@ -720,6 +768,8 @@ const ChatGraph2D = ({
                                     id: linkKey,
                                     source: sourceId,
                                     target: targetId,
+                                    parentChild: false,
+                                    source_type: 'explicit',
                                 });
                             }
                         }
@@ -728,12 +778,13 @@ const ChatGraph2D = ({
             }
         });
 
+        createParentChildLinks(expandedData.nodes, 'expanded');
+
         expandedData.links.forEach((link: any) => {
             if (isLinkVisible(link)) {
                 const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                 const targetId = typeof link.target === 'object' ? link.target.id : link.target;
 
-                // Check if both nodes (source and target) are visible
                 if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                     const linkKey = `${sourceId}-${targetId}`;
                     if (!allLinks.has(linkKey)) {
@@ -742,32 +793,12 @@ const ChatGraph2D = ({
                             id: linkKey,
                             source: sourceId,
                             target: targetId,
+                            parentChild: false,
+                            source_type: 'expanded',
                         });
                     }
                 }
             }
-        });
-
-        const parentChildLinks = new Map();
-
-        processedNodes.forEach((node) => {
-            if (node.labels?.includes('Paragraph') && node.parentId) {
-                const linkKey = `${node.id}-${node.parentId}`;
-
-                if (!allLinks.has(linkKey) && visibleNodeIds.has(node.parentId)) {
-                    parentChildLinks.set(linkKey, {
-                        id: linkKey,
-                        source: node.id,
-                        target: node.parentId,
-                        type: 'IS_PARAGRAPH_OF',
-                        relationType: 'IS_PARAGRAPH_OF',
-                    });
-                }
-            }
-        });
-
-        parentChildLinks.forEach((link, key) => {
-            allLinks.set(key, link);
         });
 
         return Array.from(allLinks.values());
@@ -826,7 +857,6 @@ const ChatGraph2D = ({
         };
     }, [processedNodes]);
 
-    // Cleanup timer on unmount
     useEffect(() => {
         return () => {
             if (clickTimer) {
@@ -900,21 +930,14 @@ const ChatGraph2D = ({
         }
 
         setSelectedNodes(new Set([node]));
-
-        trackGraphNodeClick(node, '2d', expandedNodes.has(node.id));
-
-        // Single click - select node
         console.log('Node selected:', node.id);
         handleScrollToCardId(node.id);
 
-        // Clear any existing timer
         if (clickTimer) {
             clearTimeout(clickTimer);
         }
 
-        // Set timer for potential double click
         const timer = setTimeout(() => {
-            // Single click confirmed - select node
             if (node.x !== undefined && node.y !== undefined) {
                 graphRef.current?.centerAt(node.x, node.y, 1000);
                 graphRef.current?.zoom(1.5, 1000);
@@ -928,7 +951,7 @@ const ChatGraph2D = ({
 
             setClickTimer(null);
             setLastClickedNode(null);
-        }, 300); // 300ms delay to detect double click
+        }, 300);
 
         setClickTimer(timer);
         setLastClickedNode(node.id);
@@ -960,7 +983,6 @@ const ChatGraph2D = ({
 
         console.log('Node double-clicked:', node.id, 'Currently expanded:', expandedNodes.has(node.id));
 
-        // Prevent clicking on already loading nodes
         if (loadingNodes.has(node.id)) {
             console.log('Node is currently loading, ignoring double-click');
             return;
@@ -1019,7 +1041,6 @@ const ChatGraph2D = ({
                     }
                 } else {
                     console.log('No children found for node:', node.id);
-                    // Mark node as expanded even if no children to prevent repeated API calls
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
                     trackGraphNodeExpansion(node, 'expand', 0);
                 }
@@ -1037,7 +1058,7 @@ const ChatGraph2D = ({
 
     const getNodeColor = (node: any) => {
         if (loadingNodes.has(node.id)) {
-            return { r: 245, g: 158, b: 11 }; // #f59e0b
+            return { r: 245, g: 158, b: 11 };
         }
 
         if (node.color && (!node.labels || node.labels.length === 0)) {
@@ -1051,23 +1072,18 @@ const ChatGraph2D = ({
         }
 
         if (node.labels) {
-            // Updated color mapping based on the provided table
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return { r: 217, g: 200, b: 174 }; // #D9C8AE
+                return { r: 217, g: 200, b: 174 };
             }
-
             if (node.labels.includes('Paragraph')) {
-                return { r: 141, g: 204, b: 147 }; // #8DCC93
+                return { r: 141, g: 204, b: 147 };
             }
-
             if (node.labels.includes('Court') || node.labels.includes('Tribunal')) {
-                return { r: 218, g: 113, b: 148 }; // #DA7194
+                return { r: 218, g: 113, b: 148 };
             }
-
             if (node.labels.includes('Judge') || node.labels.includes('Justice')) {
-                return { r: 201, g: 144, b: 192 }; // #C990C0
+                return { r: 201, g: 144, b: 192 };
             }
-
             if (
                 node.labels.includes('Party') ||
                 node.labels.includes('Plaintiff') ||
@@ -1075,18 +1091,16 @@ const ChatGraph2D = ({
                 node.labels.includes('Appellant') ||
                 node.labels.includes('Respondent')
             ) {
-                return { r: 236, g: 181, b: 201 }; // #ECB5C9
+                return { r: 236, g: 181, b: 201 };
             }
-
             if (
                 node.labels.includes('Act') ||
                 node.labels.includes('Law') ||
                 node.labels.includes('Statute') ||
                 node.labels.includes('Legislation')
             ) {
-                return { r: 247, g: 151, b: 103 }; // #F79767
+                return { r: 247, g: 151, b: 103 };
             }
-
             if (
                 node.labels.includes('Regulation') ||
                 node.labels.includes('Order') ||
@@ -1094,68 +1108,53 @@ const ChatGraph2D = ({
                 node.labels.includes('Resolution') ||
                 node.labels.includes('SubsidiaryLegislation')
             ) {
-                return { r: 236, g: 181, b: 201 }; // #ECB5C9
+                return { r: 236, g: 181, b: 201 };
             }
-
             if (node.labels.includes('Article') || node.labels.includes('Section')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Citation') || node.labels.includes('Reference')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Document') || node.labels.includes('Filing')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
-            // New labels from the table
             if (node.labels.includes('Resource')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Work')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Organization')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Person')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('Embeddable')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
-
             if (node.labels.includes('MasterExpression')) {
-                return { r: 241, g: 102, b: 103 }; // #F16667
+                return { r: 241, g: 102, b: 103 };
             }
-
             if (node.labels.includes('SubTopic')) {
-                return { r: 87, g: 199, b: 227 }; // #57C7E3
+                return { r: 87, g: 199, b: 227 };
             }
-
             if (node.labels.includes('Expression')) {
-                return { r: 241, g: 102, b: 103 }; // #F16667
+                return { r: 241, g: 102, b: 103 };
             }
-
             if (node.labels.includes('Topic')) {
-                return { r: 76, g: 142, b: 218 }; // #4C8EDA
+                return { r: 76, g: 142, b: 218 };
             }
-
             if (node.labels.includes('PartOfTheLegislation')) {
-                return { r: 255, g: 196, b: 84 }; // #FFC454
+                return { r: 255, g: 196, b: 84 };
             }
-
             if (node.labels.includes('SLOpening')) {
-                return { r: 165, g: 171, b: 182 }; // #A5ABB6
+                return { r: 165, g: 171, b: 182 };
             }
         }
 
-        return { r: 165, g: 171, b: 182 }; // Default #A5ABB6
+        return { r: 165, g: 171, b: 182 };
     };
 
     const getNodeSize = (node: any) => {
@@ -1261,6 +1260,19 @@ const ChatGraph2D = ({
             return '#00ffff';
         }
 
+        if (link.parentChild) {
+            // const sourceNode = processedNodes.find((n) => n.id === link.source);
+            const targetNode = processedNodes.find((n) => n.id === link.target);
+
+            if (targetNode?.labels?.includes('Act')) {
+                return '#F79767';
+            } else if (targetNode?.labels?.includes('CaseLaw')) {
+                return '#D9C8AE';
+            } else {
+                return '#10b981';
+            }
+        }
+
         const linkType = getLinkType(link);
         const filter = linkFilters.find((f) => f.id === linkType);
         if (filter) {
@@ -1277,6 +1289,10 @@ const ChatGraph2D = ({
 
         if (highlightedLinkId === link.id) {
             return 2;
+        }
+
+        if (link.parentChild) {
+            return 1.5;
         }
 
         return 0.5;
@@ -1302,25 +1318,6 @@ const ChatGraph2D = ({
 
         return '';
     };
-
-    // const formatSectionReference = (node: any): string => {
-    //     let result = '';
-
-    //     if (node.part) {
-    //         result += `Part ${node.part}`;
-    //     }
-
-    //     if (node.section) {
-    //         if (result) result += ', ';
-    //         result += `s ${node.section}`;
-    //     }
-
-    //     if (node.subsection) {
-    //         result += `(${node.subsection})`;
-    //     }
-
-    //     return result;
-    // };
 
     const getParagraphNumber = (nodeId: string) => {
         if (nodeId.includes('#[')) {
@@ -1395,17 +1392,24 @@ const ChatGraph2D = ({
     const getLinkLabel = (link: any) => {
         let label = '';
 
-        const linkType = getLinkType(link);
-        const linkTypeLabel = getLinkTypeLabel(linkType);
+        if (link.parentChild) {
+            label = 'Parent-Child Relationship';
+        } else {
+            const linkType = getLinkType(link);
+            const linkTypeLabel = getLinkTypeLabel(linkType);
+            label = linkTypeLabel;
 
-        label = linkTypeLabel;
-
-        if (link.relation && link.relation !== linkType) {
-            label += `\nRelation: ${link.relation}`;
+            if (link.relation && link.relation !== linkType) {
+                label += `\nRelation: ${link.relation}`;
+            }
         }
 
         if (link.weight !== undefined) {
             label += `\nWeight: ${link.weight}`;
+        }
+
+        if (link.source_type) {
+            label += `\nSource: ${link.source_type}`;
         }
 
         return label;
@@ -1438,12 +1442,6 @@ const ChatGraph2D = ({
         ctx.arc(node.x, node.y, nodeSize, 0, 2 * Math.PI, false);
         ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
         ctx.fill();
-
-        // if (selectedNodes.has(node)) {
-        //     ctx.strokeStyle = '#fbbf24';
-        //     ctx.lineWidth = 3;
-        //     ctx.stroke();
-        // }
 
         if (highlightedNodeId === node.id || selectedNodes.has(node)) {
             ctx.beginPath();
@@ -1515,7 +1513,7 @@ const ChatGraph2D = ({
             }}
             linkColor={getLinkColor}
             linkWidth={getLinkWidth}
-            linkDirectionalParticles={2}
+            linkDirectionalParticles={(link) => (link.parentChild ? 4 : 2)}
             linkDirectionalParticleSpeed={() => 0.005}
             nodeLabel={getNodeLabel}
             linkLabel={getLinkLabel}

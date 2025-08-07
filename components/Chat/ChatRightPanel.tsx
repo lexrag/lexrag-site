@@ -74,6 +74,7 @@ const ChatRightPanel = ({
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [isScrolling, setIsScrolling] = useState<boolean>(false);
 
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
     const [showNodeLabels, setShowNodeLabels] = useState<boolean>(graphView === '2d');
@@ -91,7 +92,6 @@ const ChatRightPanel = ({
         trackGraphViewChange,
     } = useSegment();
 
-    // Update showNodeLabels when graphView changes
     useEffect(() => {
         setShowNodeLabels(graphView === '2d');
     }, [graphView]);
@@ -106,6 +106,29 @@ const ChatRightPanel = ({
 
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
+    const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
+    const setNodeRef = useCallback(
+        (nodeId: string) => (el: HTMLElement | null) => {
+            if (el) {
+                nodeRefs.current[nodeId] = el;
+            } else {
+                delete nodeRefs.current[nodeId];
+            }
+        },
+        [],
+    );
+
+    const setAccordionTriggerRef = useCallback(
+        (groupId: string) => (el: HTMLButtonElement | null) => {
+            if (el) {
+                accordionTriggerRefs.current[groupId] = el;
+            } else {
+                delete accordionTriggerRefs.current[groupId];
+            }
+        },
+        [],
+    );
 
     const getNodeColor = (node: any): string => {
         if (loadingNodes.has(node.id)) {
@@ -234,8 +257,6 @@ const ChatRightPanel = ({
         [cardData.nodes],
     );
 
-    const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-
     const toggleContentExpansion = (nodeId: string) => {
         setExpandedContents((prev) => {
             const newSet = new Set(prev);
@@ -247,63 +268,6 @@ const ChatRightPanel = ({
             return newSet;
         });
     };
-
-    useEffect(() => {
-        if (!scrollToCardId || !cardData.nodes) return;
-
-        const scrollToCard = async () => {
-            const groupKey = findGroupByNodeId(scrollToCardId);
-            if (!groupKey) return;
-
-            setOpenAccordionItems((prev) => {
-                if (!prev.includes(groupKey)) {
-                    return [...prev, groupKey];
-                }
-                return prev;
-            });
-
-            setSelectedItem(scrollToCardId);
-            setSelectedGroup(groupKey);
-
-            const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
-            if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
-                zoomToNodeGraph({
-                    id: scrollToCardId,
-                    x: targetNode.x,
-                    y: targetNode.y,
-                    z: targetNode.z,
-                    duration: 1000,
-                });
-            }
-
-            setTimeout(() => {
-                let targetElement: HTMLElement | null = nodeRefs.current[scrollToCardId];
-
-                if (!targetElement) {
-                    targetElement =
-                        accordionTriggerRefs.current[scrollToCardId] || accordionTriggerRefs.current[groupKey];
-                }
-
-                if (targetElement && accordionContainerRef.current) {
-                    const containerRect = accordionContainerRef.current.getBoundingClientRect();
-                    const targetRect = targetElement.getBoundingClientRect();
-
-                    const scrollTop =
-                        accordionContainerRef.current.scrollTop +
-                        (targetRect.top - containerRect.top) -
-                        containerRect.height / 2 +
-                        targetRect.height / 2;
-
-                    accordionContainerRef.current.scrollTo({
-                        top: scrollTop,
-                        behavior: 'smooth',
-                    });
-                }
-            }, 100);
-        };
-
-        scrollToCard();
-    }, [scrollToCardId, cardData.nodes, findGroupByNodeId]);
 
     const parentNodesMap = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
@@ -533,6 +497,136 @@ const ChatRightPanel = ({
 
         return filtered;
     }, [groupedNodes, searchQuery, parentNodesMap]);
+
+    useEffect(() => {
+        if (!scrollToCardId || !cardData.nodes || isScrolling) return;
+
+        const scrollToCard = async () => {
+            setIsScrolling(true);
+
+            const groupKey = findGroupByNodeId(scrollToCardId);
+            if (!groupKey) {
+                setScrollToCardId('');
+                setIsScrolling(false);
+                return;
+            }
+
+            if (!filteredGroupedNodes[groupKey]) {
+                setScrollToCardId('');
+                setIsScrolling(false);
+                return;
+            }
+
+            setOpenAccordionItems((prev) => {
+                if (!prev.includes(groupKey)) {
+                    return [...prev, groupKey];
+                }
+                return prev;
+            });
+
+            setSelectedItem(scrollToCardId);
+            setSelectedGroup(groupKey);
+
+            const targetNode = cardData.nodes.find((node) => node.id === scrollToCardId);
+            if (targetNode && targetNode.x !== undefined && targetNode.y !== undefined) {
+                zoomToNodeGraph({
+                    id: scrollToCardId,
+                    x: targetNode.x,
+                    y: targetNode.y,
+                    z: targetNode.z,
+                    duration: 1000,
+                });
+            }
+
+            const waitForElement = (timeout = 5000): Promise<HTMLElement | null> => {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    let attempts = 0;
+                    const maxAttempts = 50;
+
+                    const checkElement = () => {
+                        attempts++;
+
+                        let element =
+                            nodeRefs.current[scrollToCardId] ||
+                            accordionTriggerRefs.current[scrollToCardId] ||
+                            accordionTriggerRefs.current[groupKey];
+
+                        if (!element && accordionContainerRef.current) {
+                            element = accordionContainerRef.current.querySelector(
+                                `[data-node-id="${scrollToCardId}"], [data-group-id="${groupKey}"]`,
+                            ) as HTMLElement;
+                        }
+
+                        if (element && element.offsetParent !== null) {
+                            if (document.contains(element)) {
+                                resolve(element);
+                                return;
+                            }
+                        }
+
+                        if (Date.now() - startTime > timeout || attempts >= maxAttempts) {
+                            resolve(null);
+                            return;
+                        }
+
+                        const delay = Math.min(50 * Math.pow(1.2, attempts), 200);
+                        setTimeout(checkElement, delay);
+                    };
+
+                    checkElement();
+                });
+            };
+
+            const targetElement = await waitForElement();
+
+            if (targetElement && accordionContainerRef.current) {
+                const container = accordionContainerRef.current;
+
+                if (container.scrollHeight <= container.clientHeight) {
+                    setIsScrolling(false);
+                    setTimeout(() => setScrollToCardId(''), 500);
+                    return;
+                }
+
+                const containerRect = container.getBoundingClientRect();
+                const targetRect = targetElement.getBoundingClientRect();
+
+                const containerScrollTop = container.scrollTop;
+                const targetRelativeTop = targetRect.top - containerRect.top;
+                const targetCenter = targetRelativeTop + targetRect.height / 2;
+                const containerCenter = containerRect.height / 2;
+
+                const newScrollTop = containerScrollTop + targetCenter - containerCenter;
+                const maxScrollTop = container.scrollHeight - container.clientHeight;
+                const finalScrollTop = Math.max(0, Math.min(newScrollTop, maxScrollTop));
+
+                const scrollDifference = Math.abs(finalScrollTop - containerScrollTop);
+                if (scrollDifference > 10) {
+                    container.scrollTo({
+                        top: finalScrollTop,
+                        behavior: 'smooth',
+                    });
+                }
+            }
+
+            setTimeout(() => {
+                setIsScrolling(false);
+                setScrollToCardId('');
+            }, 2000);
+        };
+
+        scrollToCard();
+    }, [scrollToCardId, cardData.nodes, findGroupByNodeId, filteredGroupedNodes, openAccordionItems, isScrolling]);
+
+    useEffect(() => {
+        if (scrollToCardId && searchQuery.trim()) {
+            const groupKey = findGroupByNodeId(scrollToCardId);
+            if (groupKey && !filteredGroupedNodes[groupKey]) {
+                setScrollToCardId('');
+            }
+        }
+    }, [searchQuery, scrollToCardId, filteredGroupedNodes, findGroupByNodeId]);
 
     useEffect(() => {
         if (searchQuery.trim()) {
@@ -1154,6 +1248,7 @@ const ChatRightPanel = ({
                                             <AccordionItem
                                                 key={parentId}
                                                 value={parentId}
+                                                data-group-id={parentId}
                                                 className={`transition-all duration-300 px-4 ${
                                                     selectedItem === parentId
                                                         ? 'border-l-2 border-l-primary bg-primary/10'
@@ -1162,7 +1257,10 @@ const ChatRightPanel = ({
                                                           : 'hover:bg-muted/30'
                                                 }`}
                                             >
-                                                <AccordionTrigger className="hover:no-underline [&>svg]:size-6">
+                                                <AccordionTrigger
+                                                    ref={setAccordionTriggerRef(parentId)}
+                                                    className="hover:no-underline [&>svg]:size-6"
+                                                >
                                                     <div className="text-left flex items-center gap-2 w-full">
                                                         <div
                                                             className="flex-1 min-w-0 cursor-pointer"
@@ -1221,9 +1319,8 @@ const ChatRightPanel = ({
                                                             return (
                                                                 <div
                                                                     key={node.id}
-                                                                    ref={(el) => {
-                                                                        nodeRefs.current[node.id] = el;
-                                                                    }}
+                                                                    data-node-id={node.id}
+                                                                    ref={setNodeRef(node.id)}
                                                                     className={`border-l-2 pl-2 pr-2 py-2 cursor-pointer transition-all duration-200 ${
                                                                         selectedItem === node.id
                                                                             ? 'bg-primary/15 border-l-primary shadow-sm scale-[1.02]'
