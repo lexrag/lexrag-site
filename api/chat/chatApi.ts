@@ -5,10 +5,10 @@ import { getConversationSnapshot } from '@/api/chat/getConversationSnapshot';
 import renderMessageMd from '@/utils/renderMessageMd';
 import { v4 as uuidv4 } from 'uuid';
 import { Conversation } from '@/types/Conversation';
+import { EvaluatorRun } from '@/types/EvaluatorRun';
 import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
-import { EvaluatorRun } from '@/types/EvaluatorRun';
 import { useSegment } from '@/hooks/use-segment';
 
 interface UseChatArgs {
@@ -61,7 +61,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
     }, [messages, currentResponseContent]);
 
     useEffect(() => {
-        if (!websocket || (!pathname.startsWith('/chat') && !pathname.startsWith("/evaluator"))) return;
+        if (!websocket || (!pathname.startsWith('/chat') && !pathname.startsWith('/evaluator'))) return;
 
         const handleMessage = async (event: MessageEvent) => {
             console.log('WebSocket message received:', event.data);
@@ -89,7 +89,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 const mappedKey = keyMap[key];
 
                 setCurrentGraphData((prevState) => ({
-                    ...prevState || {},
+                    ...(prevState || {}),
                     [mappedKey]: data.params[key],
                 }));
 
@@ -105,7 +105,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
 
             if (data.type === MessageTypes.token) {
                 setIsThinking(false);
-                
+
                 if (responseStartTimeRef.current === 0) {
                     responseStartTimeRef.current = Date.now();
                 }
@@ -117,7 +117,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 });
             }
 
-            if (data.type === MessageTypes.stop) {             
+            if (data.type === MessageTypes.stop) {
                 const html = await renderMessageMd(accumulatedContentRef.current);
                 const message: Message = {
                     ...data,
@@ -131,30 +131,33 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 };
 
                 const responseTime = responseStartTimeRef.current > 0 ? Date.now() - responseStartTimeRef.current : 0;
-                const hasGraph = !!(graphDataRef.current?.all_retrieved_nodes || graphDataRef.current?.relevant_retrieved_nodes);
-                const nodeCount = (graphDataRef.current?.all_retrieved_nodes?.nodes?.length || 0) + 
-                                (graphDataRef.current?.relevant_retrieved_nodes?.nodes?.length || 0);
-                
+                const hasGraph = !!(
+                    graphDataRef.current?.all_retrieved_nodes || graphDataRef.current?.relevant_retrieved_nodes
+                );
+                const nodeCount =
+                    (graphDataRef.current?.all_retrieved_nodes?.nodes?.length || 0) +
+                    (graphDataRef.current?.relevant_retrieved_nodes?.nodes?.length || 0);
+
                 trackChatResponse(
                     threadId || 'unknown',
                     accumulatedContentRef.current.length,
                     responseTime,
                     hasGraph,
-                    nodeCount
+                    nodeCount,
                 );
 
                 setMessages((prev) => [...prev, message]);
                 setCurrentResponseContent('');
                 accumulatedContentRef.current = '';
                 responseStartTimeRef.current = 0;
-                
+
                 if (setConversations && threadId !== 'new') {
                     setConversations((prevConversations) =>
                         prevConversations.map((conversation) =>
                             conversation.thread_id === threadId
                                 ? { ...conversation, isGenerating: false }
-                                : conversation
-                        )
+                                : conversation,
+                        ),
                     );
                 }
             }
@@ -162,10 +165,10 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
             if (data.name === 'evaluator') {
                 console.log('Evaluator message received:', data);
                 console.log('Current messages before update:', messages);
-                
-                if (data.service_message && data.service_message.type === "message") {
-                    const message = data.service_message.message
-                    const direction = message.role === "ai" ? "incoming" : "outgoing";
+
+                if (data.service_message && data.service_message.type === 'message') {
+                    const message = data.service_message.message;
+                    const direction = message.role === 'ai' ? 'incoming' : 'outgoing';
                     const html = await renderMessageMd(message.content);
 
                     const newMessage: Message = {
@@ -181,9 +184,9 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                         return updated;
                     });
                 }
-                
+
                 // Handle evaluator run data
-                if (data.service_message && data.service_message.type === "run" && setEvaluatorRun) {
+                if (data.service_message && data.service_message.type === 'run' && setEvaluatorRun) {
                     console.log('Setting evaluator run:', data.service_message.run);
                     if (data.service_message.run) {
                         setEvaluatorRun(data.service_message.run);
@@ -192,9 +195,9 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                         setEvaluatorRun(undefined);
                     }
                 }
-                
+
                 // Handle evaluator error
-                if (data.service_message && data.service_message.type === "error") {
+                if (data.service_message && data.service_message.type === 'error') {
                     console.error('Evaluator error received:', data.service_message.error);
                     const errorMessage: Message = {
                         html: `<div class="text-red-500">Error: ${data.service_message.error}</div>`,
@@ -212,7 +215,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
         if (threadId !== 'new' && pathname.startsWith('/chat')) {
             getConversationSnapshot(threadId as string).then(setMessages);
         }
-        
+
         // Initialize empty messages for evaluator paths
         if (pathname.startsWith('/evaluator/') && threadId) {
             console.log('Initializing empty messages for evaluator with threadId:', threadId);
@@ -225,7 +228,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [websocket, pathname, threadId, setConversations, setEvaluatorRun]);
 
-    const sendMessage = (input: string, isNew: boolean) => {
+    const sendMessage = (input: string, isNew: boolean, userDocuments: string[]) => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
 
         const outgoingMessage: Message = {
@@ -243,6 +246,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 content: input,
                 is_new: isNew,
                 thread_id: threadId,
+                user_documents: userDocuments,
             }),
         );
 

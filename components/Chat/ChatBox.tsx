@@ -4,9 +4,9 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
+import { useSegment } from '@/hooks/use-segment';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { TypingAnimation } from '../magicui/typing-animation';
-import { useSegment } from '@/hooks/use-segment';
 
 interface ChatBoxProps {
     messages: Message[];
@@ -14,7 +14,7 @@ interface ChatBoxProps {
     status: string | null;
     currentResponseContent: string;
     copiedMessageId: string | null;
-    sendMessage: (input: string, isNew: boolean) => void;
+    sendMessage: (input: string, isNew: boolean, userDocuments: string[]) => void;
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
@@ -120,11 +120,11 @@ const ChatBox = ({
                                                 if (parsed.content) copyText = parsed.content;
                                                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
-                                            
+
                                             trackMessageCopied(msg.id, msg.direction === 'incoming' ? 'ai' : 'user');
-                                            
+
                                             trackContentCopied(msg.id, 'message', copyText.length);
-                                            
+
                                             copyToClipboard(msg.id, copyText);
                                         }}
                                     >

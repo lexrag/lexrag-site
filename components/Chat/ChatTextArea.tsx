@@ -1,12 +1,13 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
 import { useSegment } from '@/hooks/use-segment';
+import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
+import { useChatContext } from './ChatProvider';
 
 export interface ChatTextAreaProps {
     input: string;
     setInput: (text: string) => void;
-    sendMessage: (message: string, isNew: boolean) => void;
+    sendMessage: (message: string, isNew: boolean, userDocuments: string[]) => void;
     activeMsgType: string | null;
     toggleMsgType: (msgType: string) => void;
 }
@@ -15,20 +16,17 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
     const { trackChatQuestion } = useSegment();
+    const { selectedUserDocuments } = useChatContext();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            
+
             if (input.trim()) {
-                trackChatQuestion(
-                    input.trim(),
-                    pathname.split('/').pop() || 'new',
-                    isNewConversation
-                );
+                trackChatQuestion(input.trim(), pathname.split('/').pop() || 'new', isNewConversation);
             }
-            
-            sendMessage(input, isNewConversation);
+
+            sendMessage(input, isNewConversation, selectedUserDocuments);
             setInput('');
         }
     };
