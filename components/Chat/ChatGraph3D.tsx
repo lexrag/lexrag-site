@@ -6,7 +6,7 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
 import { useSegment } from '@/hooks/use-segment';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
@@ -16,7 +16,7 @@ let CSS2DObject: any = null;
 
 if (typeof window !== 'undefined') {
     // @ts-expect-error - Dynamic import for CSS2DRenderer from Three.js
-    import('three/examples/jsm/renderers/CSS2DRenderer.js').then(module => {
+    import('three/examples/jsm/renderers/CSS2DRenderer.js').then((module) => {
         CSS2DRenderer = module.CSS2DRenderer;
         CSS2DObject = module.CSS2DObject;
     });
@@ -95,6 +95,7 @@ const ChatGraph3D = ({
         up: { x: number; y: number; z: number };
     } | null>(null);
     const cameraStateInitializedRef = useRef<boolean>(false);
+    const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
 
     const [selectedNodes, setSelectedNodes] = useState<Set<any>>(new Set());
     const [selectedLinks, setSelectedLinks] = useState<Set<any>>(new Set());
@@ -295,49 +296,10 @@ const ChatGraph3D = ({
         setLayerDataMap(newLayerDataMap);
     }, [data, layers]);
 
-    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
-        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
-
-        Object.values(layerDataMap).forEach((layerData: any) => {
-            if (layerData.links) {
-                layerData.links.forEach((link: any) => {
-                    const linkType = getLinkType(link);
-                    if (!linkTypesMap.has(linkType)) {
-                        linkTypesMap.set(linkType, { count: 0, examples: [] });
-                    }
-                    const existing = linkTypesMap.get(linkType)!;
-                    existing.count++;
-                    if (existing.examples.length < 3) {
-                        existing.examples.push(link);
-                    }
-                });
-            }
-        });
-
-        expandedData.links.forEach((link: any) => {
-            const linkType = getLinkType(link);
-            if (!linkTypesMap.has(linkType)) {
-                linkTypesMap.set(linkType, { count: 0, examples: [] });
-            }
-            const existing = linkTypesMap.get(linkType)!;
-            existing.count++;
-            if (existing.examples.length < 3) {
-                existing.examples.push(link);
-            }
-        });
-
-        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
-            id: type,
-            label: getLinkTypeLabel(type),
-            enabled: true,
-            color: getLinkTypeColor(type, index),
-            count: data.count,
-        }));
-
-        return linkTypes.sort((a, b) => b.count - a.count);
-    }, []);
-
     const getLinkType = (link: any): string => {
+        if (link.parentChild) {
+            return 'PARENT_CHILD';
+        }
         if (link.relationType) {
             return link.relationType;
         }
@@ -352,6 +314,7 @@ const ChatGraph3D = ({
 
     const getLinkTypeLabel = (type: string): string => {
         const labelMap: Record<string, string> = {
+            PARENT_CHILD: 'Parent-Child',
             CITES: 'Citations',
             REFERENCED_BY: 'References',
             PART_OF: 'Part of',
@@ -382,6 +345,7 @@ const ChatGraph3D = ({
         ];
 
         const colorMap: Record<string, string> = {
+            PARENT_CHILD: '#10b981',
             CITES: '#3b82f6',
             REFERENCED_BY: '#ef4444',
             PART_OF: '#10b981',
@@ -397,11 +361,78 @@ const ChatGraph3D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isLinkVisible = useCallback((link: any): boolean => {
-        const linkType = getLinkType(link);
-        const filter = linkFilters.find((f) => f.id === linkType);
-        return filter ? filter.enabled : true;
-    }, [linkFilters]);
+    const getAllLinkTypes = useCallback((layerDataMap: any, expandedData: any): GraphLinkFilter[] => {
+        const linkTypesMap = new Map<string, { count: number; examples: any[] }>();
+
+        linkTypesMap.set('PARENT_CHILD', { count: 0, examples: [] });
+
+        const processLinks = (links: any[], source: string) => {
+            links.forEach((link: any) => {
+                const linkType = getLinkType(link);
+                if (!linkTypesMap.has(linkType)) {
+                    linkTypesMap.set(linkType, { count: 0, examples: [] });
+                }
+                const existing = linkTypesMap.get(linkType)!;
+                existing.count++;
+                if (existing.examples.length < 3) {
+                    existing.examples.push({ ...link, source_info: source });
+                }
+            });
+        };
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.links) {
+                processLinks(layerData.links, 'layer');
+            }
+        });
+
+        processLinks(expandedData.links, 'expanded');
+
+        const countParentChildLinks = (nodes: any[]) => {
+            nodes.forEach((node: any) => {
+                if (node.parentId) {
+                    const existing = linkTypesMap.get('PARENT_CHILD')!;
+                    existing.count++;
+                    if (existing.examples.length < 3) {
+                        existing.examples.push({
+                            id: `${node.id}-${node.parentId}`,
+                            source: node.id,
+                            target: node.parentId,
+                            type: 'PARENT_CHILD',
+                            parentChild: true,
+                        });
+                    }
+                }
+            });
+        };
+
+        Object.values(layerDataMap).forEach((layerData: any) => {
+            if (layerData.nodes) {
+                countParentChildLinks(layerData.nodes);
+            }
+        });
+
+        countParentChildLinks(expandedData.nodes);
+
+        const linkTypes: GraphLinkFilter[] = Array.from(linkTypesMap.entries()).map(([type, data], index) => ({
+            id: type,
+            label: getLinkTypeLabel(type),
+            enabled: true,
+            color: getLinkTypeColor(type, index),
+            count: data.count,
+        }));
+
+        return linkTypes.sort((a, b) => b.count - a.count);
+    }, []);
+
+    const isLinkVisible = useCallback(
+        (link: any): boolean => {
+            const linkType = getLinkType(link);
+            const filter = linkFilters.find((f) => f.id === linkType);
+            return filter ? filter.enabled : true;
+        },
+        [linkFilters],
+    );
 
     const getAllNodeTypes = useCallback((layerDataMap: any, expandedData: any): GraphNodeFilter[] => {
         const nodeTypesMap = new Map<string, { count: number; examples: any[] }>();
@@ -555,11 +586,14 @@ const ChatGraph3D = ({
         return colorMap[type] || colors[index % colors.length];
     };
 
-    const isNodeVisible = useCallback((node: any): boolean => {
-        const nodeType = getNodeType(node);
-        const filter = nodeFilters.find((f) => f.id === nodeType);
-        return filter ? filter.enabled : true;
-    }, [nodeFilters]);
+    const isNodeVisible = useCallback(
+        (node: any): boolean => {
+            const nodeType = getNodeType(node);
+            const filter = nodeFilters.find((f) => f.id === nodeType);
+            return filter ? filter.enabled : true;
+        },
+        [nodeFilters],
+    );
 
     useEffect(() => {
         const newLinkTypes = getAllLinkTypes(layerDataMap, expandedData);
@@ -621,17 +655,15 @@ const ChatGraph3D = ({
         }
     }, [layerDataMap, expandedData, setNodeFilters, getAllNodeTypes]);
 
-    const processedData = useMemo(() => {
+    const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
         if (enabledLayers.length === 0) {
-            return { nodes: [], links: [] };
+            return [];
         }
 
         const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
-
         const allNodes = new Map();
-        const allLinks = new Map();
 
         sortedEnabledLayers.forEach((layer) => {
             const layerData = layerDataMap[layer.id];
@@ -641,32 +673,125 @@ const ChatGraph3D = ({
                 if (!isNodeVisible(node)) return;
 
                 const existingNode = allNodes.get(node.id);
+
+                let nodeData = {
+                    ...node,
+                    color: node.layerColor || layer.color,
+                    layerId: layer.id,
+                    layerName: layer.name,
+                };
+
                 if (existingNode) {
-                    allNodes.set(node.id, {
+                    nodeData = {
                         ...existingNode,
-                        ...node,
-                        color: node.layerColor || layer.color,
-                        layerId: layer.id,
-                        layerName: layer.name,
-                    });
-                } else {
-                    allNodes.set(node.id, {
-                        ...node,
-                        color: node.layerColor || layer.color,
-                        layerId: layer.id,
-                        layerName: layer.name,
-                    });
+                        ...nodeData,
+                    };
+                }
+
+                const savedPosition = nodePositionsRef.current[node.id];
+                if (savedPosition) {
+                    nodeData = {
+                        ...nodeData,
+                        x: savedPosition.x,
+                        y: savedPosition.y,
+                        vx: savedPosition.vx,
+                        vy: savedPosition.vy,
+                        fx: savedPosition.fx,
+                        fy: savedPosition.fy,
+                    };
+                }
+
+                allNodes.set(node.id, nodeData);
+            });
+        });
+
+        expandedData.nodes.forEach((node: any) => {
+            if (!isNodeVisible(node)) return;
+
+            const existingNode = allNodes.get(node.id);
+
+            let nodeData = {
+                ...node,
+                color: node.layerColor || '#d3d3d3',
+                layerId: 'expanded',
+                layerName: 'Expanded',
+            };
+
+            if (existingNode) {
+                nodeData = {
+                    ...existingNode,
+                    ...nodeData,
+                };
+            }
+
+            const savedPosition = nodePositionsRef.current[node.id];
+            if (savedPosition) {
+                nodeData = {
+                    ...nodeData,
+                    x: savedPosition.x,
+                    y: savedPosition.y,
+                    vx: savedPosition.vx,
+                    vy: savedPosition.vy,
+                    fx: savedPosition.fx,
+                    fy: savedPosition.fy,
+                };
+            }
+
+            allNodes.set(node.id, nodeData);
+        });
+
+        return Array.from(allNodes.values());
+    }, [layerDataMap, layers, expandedData, isNodeVisible]);
+
+    const processedLinks = useMemo(() => {
+        const enabledLayers = layers.filter((layer) => layer.enabled);
+
+        if (enabledLayers.length === 0) {
+            return [];
+        }
+
+        const visibleNodeIds = new Set(processedNodes.map((node) => node.id));
+        const allLinks = new Map();
+
+        const createParentChildLinks = (nodes: any[], source: string) => {
+            nodes.forEach((node) => {
+                if (node.parentId && visibleNodeIds.has(node.parentId) && visibleNodeIds.has(node.id)) {
+                    const linkKey = `${node.id}-${node.parentId}`;
+
+                    if (!allLinks.has(linkKey)) {
+                        const parentChildLink = {
+                            id: linkKey,
+                            source: node.id,
+                            target: node.parentId,
+                            type: 'PARENT_CHILD',
+                            relationType: 'PARENT_CHILD',
+                            parentChild: true,
+                            source_type: source,
+                        };
+
+                        if (isLinkVisible(parentChildLink)) {
+                            allLinks.set(linkKey, parentChildLink);
+                        }
+                    }
                 }
             });
+        };
+
+        const sortedEnabledLayers = enabledLayers.sort((a, b) => a.priority - b.priority);
+
+        sortedEnabledLayers.forEach((layer) => {
+            const layerData = layerDataMap[layer.id];
+            if (!layerData) return;
+
+            createParentChildLinks(layerData.nodes, `layer-${layer.id}`);
 
             if (layerData.links) {
                 layerData.links.forEach((link: any) => {
                     if (isLinkVisible(link)) {
                         const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                         const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                        
-                        // Check if both nodes (source and target) are visible
-                        if (allNodes.has(sourceId) && allNodes.has(targetId)) {
+
+                        if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                             const linkKey = `${sourceId}-${targetId}`;
                             if (!allLinks.has(linkKey)) {
                                 allLinks.set(linkKey, {
@@ -674,6 +799,8 @@ const ChatGraph3D = ({
                                     id: linkKey,
                                     source: sourceId,
                                     target: targetId,
+                                    parentChild: false,
+                                    source_type: 'explicit',
                                 });
                             }
                         }
@@ -682,36 +809,14 @@ const ChatGraph3D = ({
             }
         });
 
-        // Add expanded data
-        expandedData.nodes.forEach((node: any) => {
-            if (!isNodeVisible(node)) return;
-
-            const existingNode = allNodes.get(node.id);
-            if (existingNode) {
-                allNodes.set(node.id, {
-                    ...existingNode,
-                    ...node,
-                    color: node.layerColor || '#d3d3d3',
-                    layerId: 'expanded',
-                    layerName: 'Expanded',
-                });
-            } else {
-                allNodes.set(node.id, {
-                    ...node,
-                    color: node.layerColor || '#d3d3d3',
-                    layerId: 'expanded',
-                    layerName: 'Expanded',
-                });
-            }
-        });
+        createParentChildLinks(expandedData.nodes, 'expanded');
 
         expandedData.links.forEach((link: any) => {
             if (isLinkVisible(link)) {
                 const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                 const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                
-                // Check if both nodes (source and target) are visible
-                if (allNodes.has(sourceId) && allNodes.has(targetId)) {
+
+                if (visibleNodeIds.has(sourceId) && visibleNodeIds.has(targetId)) {
                     const linkKey = `${sourceId}-${targetId}`;
                     if (!allLinks.has(linkKey)) {
                         allLinks.set(linkKey, {
@@ -719,30 +824,37 @@ const ChatGraph3D = ({
                             id: linkKey,
                             source: sourceId,
                             target: targetId,
+                            parentChild: false,
+                            source_type: 'expanded',
                         });
                     }
                 }
             }
         });
 
-        return {
-            nodes: Array.from(allNodes.values()),
-            links: Array.from(allLinks.values()),
-        };
-    }, [layerDataMap, layers, expandedData, isLinkVisible, isNodeVisible]);
+        return Array.from(allLinks.values());
+    }, [layerDataMap, layers, expandedData, processedNodes, isLinkVisible]);
+
+    const processedData = useMemo(
+        () => ({
+            nodes: processedNodes,
+            links: processedLinks,
+        }),
+        [processedNodes, processedLinks],
+    );
 
     const applyForces = useCallback(() => {
         const fg = graphRef.current;
         if (!fg || !fg.d3Force) return;
 
         const nodeCount = processedData?.nodes?.length || 0;
-        
+
         // Dynamically adjust forces based on the number of nodes
-        const chargeStrength = Math.max(-40, -25 - (nodeCount * 0.3));
-        const linkDistance = Math.max(5, 7 + (nodeCount * 1.05));
+        const chargeStrength = Math.max(-40, -25 - nodeCount * 0.3);
+        const linkDistance = Math.max(5, 7 + nodeCount * 1.05);
         const collideRadius = (d: any) => {
             const nodeSize = getNodeSize(d);
-            return nodeSize + Math.max(5, 10 - (nodeCount * 0.02));
+            return nodeSize + Math.max(5, 10 - nodeCount * 0.02);
         };
 
         fg.d3Force('charge')?.strength(chargeStrength);
@@ -758,32 +870,33 @@ const ChatGraph3D = ({
         const nodeCount = processedData?.nodes?.length || 0;
         const containerWidth = dimensions.width;
         const containerHeight = dimensions.height;
-        
+
         // Base distance calculation based on container size
         let baseDistance = Math.min(containerWidth, containerHeight) * 0.15;
-        
+
         // Adjust based on node count
         if (nodeCount > 0) {
             // More nodes = closer zoom to fit them all
-            const nodeCountFactor = Math.max(0.4, 1 - (nodeCount * 0.008));
+            const nodeCountFactor = Math.max(0.4, 1 - nodeCount * 0.008);
             baseDistance *= nodeCountFactor;
         }
-        
+
         // Calculate average node size to adjust zoom
         if (processedData?.nodes && processedData.nodes.length > 0) {
-            const avgNodeSize = processedData.nodes.reduce((sum, node) => {
-                return sum + getNodeSize(node);
-            }, 0) / processedData.nodes.length;
-            
+            const avgNodeSize =
+                processedData.nodes.reduce((sum, node) => {
+                    return sum + getNodeSize(node);
+                }, 0) / processedData.nodes.length;
+
             // Larger nodes need more space
             const nodeSizeFactor = Math.max(0.6, Math.min(2.0, avgNodeSize / 18));
             baseDistance *= nodeSizeFactor;
         }
-        
+
         // Ensure minimum and maximum bounds
         const minDistance = 60; // Было 80, стало 60
         const maxDistance = Math.min(containerWidth, containerHeight) * 0.95;
-        
+
         return Math.max(minDistance, Math.min(maxDistance, baseDistance));
     }, [processedData, dimensions]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -797,14 +910,14 @@ const ChatGraph3D = ({
 
         // Create a map of connections for each node
         const nodeConnections = new Map();
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
             nodeConnections.set(node.id, []);
         });
 
-        links.forEach(link => {
+        links.forEach((link) => {
             const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
             const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-            
+
             if (nodeConnections.has(sourceId)) {
                 nodeConnections.get(sourceId).push(targetId);
             }
@@ -817,14 +930,16 @@ const ChatGraph3D = ({
             if (node.x === undefined || node.y === undefined || node.z === undefined) {
                 // If the node has connections, try to place it closer to the connected nodes
                 const connections = nodeConnections.get(node.id) || [];
-                
+
                 if (connections.length > 0) {
                     // Find the average position of the connected nodes
-                    let avgX = 0, avgY = 0, avgZ = 0;
+                    let avgX = 0,
+                        avgY = 0,
+                        avgZ = 0;
                     let connectedCount = 0;
-                    
+
                     connections.forEach((connectedId: string) => {
-                        const connectedNode = nodes.find(n => n.id === connectedId);
+                        const connectedNode = nodes.find((n) => n.id === connectedId);
                         if (connectedNode && connectedNode.x !== undefined) {
                             avgX += connectedNode.x;
                             avgY += connectedNode.y;
@@ -832,21 +947,21 @@ const ChatGraph3D = ({
                             connectedCount++;
                         }
                     });
-                    
+
                     if (connectedCount > 0) {
                         // Place the node near the connected nodes
                         const offset = radius * 0.2;
-                        node.x = (avgX / connectedCount) + (Math.random() - 0.5) * offset;
-                        node.y = (avgY / connectedCount) + (Math.random() - 0.5) * offset;
-                        node.z = (avgZ / connectedCount) + (Math.random() - 0.5) * offset;
+                        node.x = avgX / connectedCount + (Math.random() - 0.5) * offset;
+                        node.y = avgY / connectedCount + (Math.random() - 0.5) * offset;
+                        node.z = avgZ / connectedCount + (Math.random() - 0.5) * offset;
                         return;
                     }
                 }
-                
+
                 // If there are no connections or the connected nodes are not yet placed, use spherical distribution
                 const phi = Math.acos(-1 + (2 * index) / nodes.length);
                 const theta = Math.sqrt(nodes.length * Math.PI) * phi;
-                
+
                 // Add a small randomness to prevent perfect symmetry
                 const randomOffset = 0.2;
                 const randomX = (Math.random() - 0.5) * radius * randomOffset;
@@ -1631,6 +1746,18 @@ const ChatGraph3D = ({
             return '#00ffff';
         }
 
+        if (link.parentChild) {
+            const targetNode = processedData?.nodes?.find((n) => n.id === link.target);
+
+            if (targetNode?.labels?.includes('Act')) {
+                return '#F79767';
+            } else if (targetNode?.labels?.includes('CaseLaw')) {
+                return '#D9C8AE';
+            } else {
+                return '#10b981';
+            }
+        }
+
         const linkType = getLinkType(link);
         const filter = linkFilters.find((f) => f.id === linkType);
         if (filter) {
@@ -1642,14 +1769,18 @@ const ChatGraph3D = ({
 
     const getLinkWidth = (link: any) => {
         if (selectedLinks.has(link)) {
-            return 3;
-        }
-
-        if (highlightedLinkId === link.id) {
             return 2.5;
         }
 
-        return 1.5;
+        if (highlightedLinkId === link.id) {
+            return 2;
+        }
+
+        if (link.parentChild) {
+            return 1.5;
+        }
+
+        return 0.5;
     };
 
     const extractActCode = (node: any): string => {
@@ -1737,67 +1868,75 @@ const ChatGraph3D = ({
     const getLinkLabel = (link: any) => {
         let label = '';
 
-        const linkType = getLinkType(link);
-        const linkTypeLabel = getLinkTypeLabel(linkType);
-        
-        label = linkTypeLabel;
+        if (link.parentChild) {
+            label = 'Parent-Child Relationship';
+        } else {
+            const linkType = getLinkType(link);
+            const linkTypeLabel = getLinkTypeLabel(linkType);
+            label = linkTypeLabel;
 
-        if (link.relation && link.relation !== linkType) {
-            label += `\nRelation: ${link.relation}`;
+            if (link.relation && link.relation !== linkType) {
+                label += `\nRelation: ${link.relation}`;
+            }
         }
 
         if (link.weight !== undefined) {
             label += `\nWeight: ${link.weight}`;
         }
 
+        if (link.source_type) {
+            label += `\nSource: ${link.source_type}`;
+        }
+
         return label;
     };
 
     // Function to create text objects in nodes
-    const createNodeTextObject = useCallback((node: any) => {
-        if (!CSS2DObject || !showNodeLabels) return null;
+    const createNodeTextObject = useCallback(
+        (node: any) => {
+            if (!CSS2DObject || !showNodeLabels) return null;
 
-        const nodeEl = document.createElement('div');
-        const label = getNodeDisplayLabel(node);
-        
-        if (!label) return null;
+            const nodeEl = document.createElement('div');
+            const label = getNodeDisplayLabel(node);
 
-        const nodeSize = getNodeSize(node);
-        const fontSize = Math.max(8, Math.min(12, nodeSize * 0.5));
-        const textColor = resolvedTheme === 'dark' ? '#ffffff' : '#000000';
-        
-        let textAlign = 'center';
-        let textX = 0;
-        let textY = 0;
-        
-        if (nodeSize < 20) {
-            textAlign = 'left';
-            textX = nodeSize + 5;
-            textY = 0;
-        }
-        
-        let backgroundColor = 'transparent';
-        let padding = '2px 6px';
-        
-        if (nodeSize < 20) {
-            backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
-            padding = '2px 4px';
-        } else if (label.length > 10) {
-            backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
-            padding = '2px 6px';
-        }
-        
-        let borderColor = resolvedTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
-        let boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-        
-        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
-            borderColor = '#fbbf24';
-            boxShadow = '0 0 8px rgba(251, 191, 36, 0.6)';
-        }
-        
-        nodeEl.textContent = label;
-        nodeEl.className = 'node-label';
-        nodeEl.style.cssText = `
+            if (!label) return null;
+
+            const nodeSize = getNodeSize(node);
+            const fontSize = Math.max(8, Math.min(12, nodeSize * 0.5));
+            const textColor = resolvedTheme === 'dark' ? '#ffffff' : '#000000';
+
+            let textAlign = 'center';
+            let textX = 0;
+            let textY = 0;
+
+            if (nodeSize < 20) {
+                textAlign = 'left';
+                textX = nodeSize + 5;
+                textY = 0;
+            }
+
+            let backgroundColor = 'transparent';
+            let padding = '2px 6px';
+
+            if (nodeSize < 20) {
+                backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+                padding = '2px 4px';
+            } else if (label.length > 10) {
+                backgroundColor = resolvedTheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+                padding = '2px 6px';
+            }
+
+            let borderColor = resolvedTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
+            let boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+
+            if (highlightedNodeId === node.id || selectedNodes.has(node)) {
+                borderColor = '#fbbf24';
+                boxShadow = '0 0 8px rgba(251, 191, 36, 0.6)';
+            }
+
+            nodeEl.textContent = label;
+            nodeEl.className = 'node-label';
+            nodeEl.style.cssText = `
             font-size: ${fontSize}px;
             font-family: Arial, sans-serif;
             color: ${textColor};
@@ -1813,8 +1952,10 @@ const ChatGraph3D = ({
             border: 1px solid ${borderColor};
         `;
 
-        return new CSS2DObject(nodeEl);
-    }, [resolvedTheme, showNodeLabels, highlightedNodeId, selectedNodes]); // eslint-disable-line react-hooks/exhaustive-deps
+            return new CSS2DObject(nodeEl);
+        },
+        [resolvedTheme, showNodeLabels, highlightedNodeId, selectedNodes],
+    ); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Function to get the displayed node text
     const getNodeDisplayLabel = (node: any): string => {
@@ -1902,10 +2043,8 @@ const ChatGraph3D = ({
             cooldownTime={15000}
             enableNodeDrag={true}
             enableNavigationControls={true}
-            // opacity of nodes and links
             nodeOpacity={1}
             linkOpacity={0.2}
-            // Additional parameters for better distribution
             d3AlphaDecay={0.01}
             d3VelocityDecay={0.4}
             warmupTicks={300}
