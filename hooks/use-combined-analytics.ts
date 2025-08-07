@@ -1,11 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { useAnalytics } from './use-analytics';
 import { useSegment } from './use-segment';
 
 export const useCombinedAnalytics = () => {
-    const analytics = useAnalytics();
     const segment = useSegment();
     const isInitialized = useRef(false);
 
@@ -17,42 +15,37 @@ export const useCombinedAnalytics = () => {
 
     const trackContentView = useCallback(
         (contentId: string, contentType: string, contentTitle: string) => {
-            analytics.trackContentView(contentId, contentType, contentTitle);
             segment.trackContentView(contentId, contentType, contentTitle);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const stopTrackingContent = useCallback(
         (contentId: string, contentType: string) => {
-            analytics.stopTrackingContent(contentId, contentType);
             segment.stopTrackingContent(contentId, contentType);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackGraphNodeClick = useCallback(
         (node: any, graphView: '2d' | '3d', isExpanded: boolean = false) => {
-            analytics.trackGraphNodeClick(node, graphView, isExpanded);
             segment.trackGraphNodeClick(node, graphView, isExpanded);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackGraphNodeExpansion = useCallback(
         (node: any, expansionType: 'expand' | 'collapse', childNodeCount: number = 0) => {
-            analytics.trackGraphNodeExpansion(node, expansionType, childNodeCount);
             segment.trackGraphNodeExpansion(node, expansionType, childNodeCount);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackChatQuestion = useCallback(
         (question: string, sessionId: string, isNewConversation: boolean = false) => {
-            analytics.trackChatQuestion(question, sessionId, isNewConversation);
             segment.trackChatQuestion(question, sessionId, isNewConversation);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackChatResponse = useCallback(
@@ -63,18 +56,16 @@ export const useCombinedAnalytics = () => {
             hasGraph: boolean = false,
             nodeCount: number = 0,
         ) => {
-            analytics.trackChatResponse(sessionId, responseLength, responseTime, hasGraph, nodeCount);
             segment.trackChatResponse(sessionId, responseLength, responseTime, hasGraph, nodeCount);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackAccordionInteraction = useCallback(
         (accordionId: string, accordionType: string, expansionType: 'expand' | 'collapse', itemCount: number = 0) => {
-            analytics.trackAccordionInteraction(accordionId, accordionType, expansionType, itemCount);
             segment.trackAccordionInteraction(accordionId, accordionType, expansionType, itemCount);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackAuth = useCallback(
@@ -83,10 +74,9 @@ export const useCombinedAnalytics = () => {
             method: 'email' | 'google' | 'linkedin',
             success: boolean = true,
         ) => {
-            analytics.trackAuth(action, method, success);
             segment.trackAuth(action, method, success);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackSubscription = useCallback(
@@ -97,15 +87,13 @@ export const useCombinedAnalytics = () => {
             amount: number,
             invoiceId?: string,
         ) => {
-            analytics.trackSubscription(action, planId, planName, amount, invoiceId);
             segment.trackSubscription(action, planId, planName, amount, invoiceId);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackCustomEvent = useCallback(
         (action: string, category: string, label?: string, value?: number, customParameters?: Record<string, any>) => {
-            analytics.trackEvent(action, category, label, value, customParameters);
             const segmentProperties = {
                 category,
                 label,
@@ -114,69 +102,61 @@ export const useCombinedAnalytics = () => {
             };
             segment.trackEvent(action, segmentProperties);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackPageView = useCallback(
         (pagePath: string, pageTitle: string) => {
-            analytics.trackPageView(pagePath, pageTitle);
             segment.trackPageView(pagePath, pageTitle);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackFeatureAccessed = useCallback(
         (featureName: string, featureType: string) => {
-            analytics.trackFeatureAccessed(featureName, featureType);
             segment.trackFeatureAccessed(featureName, featureType);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackMessageCopied = useCallback(
         (messageId: string, messageType: 'user' | 'ai') => {
-            analytics.trackMessageCopied(messageId, messageType);
             segment.trackMessageCopied(messageId, messageType);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackGraphViewChange = useCallback(
         (fromView: '2d' | '3d', toView: '2d' | '3d') => {
-            analytics.trackGraphViewChange(fromView, toView);
             segment.trackGraphViewChange(fromView, toView);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackGraphZoom = useCallback(
         (zoomType: 'fit' | 'node' | 'manual', targetId?: string) => {
-            analytics.trackGraphZoom(zoomType, targetId);
             segment.trackGraphZoom(zoomType, targetId);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackGraphFilterChange = useCallback(
         (filterType: 'node' | 'link' | 'layer', filterId: string, enabled: boolean) => {
-            analytics.trackGraphFilterChange(filterType, filterId, enabled);
             segment.trackGraphFilterChange(filterType, filterId, enabled);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackContentCopied = useCallback(
         (contentId: string, contentType: string, contentLength: number) => {
-            analytics.trackContentCopied(contentId, contentType, contentLength);
             segment.trackContentCopied(contentId, contentType, contentLength);
         },
-        [analytics, segment],
+        [segment],
     );
 
     const trackSessionStart = useCallback(() => {
-        analytics.trackSessionStart();
         segment.trackSessionStart();
-    }, [analytics, segment]);
+    }, [segment]);
 
     const identifyUser = useCallback(
         async (userId: string, userProperties?: Record<string, any>) => {
@@ -243,8 +223,8 @@ export const useCombinedAnalytics = () => {
     );
 
     const isAnalyticsAvailable = useCallback(() => {
-        return analytics.isAnalyticsAvailable();
-    }, [analytics]);
+        return segment.isAnalyticsAvailable();
+    }, [segment]);
 
     const isSegmentAvailable = useCallback(() => {
         return segment.isSegmentAvailable();
@@ -282,16 +262,17 @@ export const useCombinedAnalytics = () => {
         isAnalyticsAvailable,
         isSegmentAvailable,
 
-        analytics,
+        // Для совместимости
+        analytics: segment,
         segment,
 
-        EVENT_CATEGORIES: analytics.EVENT_CATEGORIES,
-        EVENT_ACTIONS: analytics.EVENT_ACTIONS,
-        CUSTOM_DIMENSIONS: analytics.CUSTOM_DIMENSIONS,
-        LEGAL_CONTENT_TYPES: analytics.LEGAL_CONTENT_TYPES,
-        NODE_TYPES: analytics.NODE_TYPES,
+        EVENT_CATEGORIES: segment.EVENT_CATEGORIES,
+        EVENT_ACTIONS: segment.EVENT_ACTIONS,
+        CUSTOM_DIMENSIONS: segment.CUSTOM_DIMENSIONS,
+        LEGAL_CONTENT_TYPES: segment.LEGAL_CONTENT_TYPES,
+        NODE_TYPES: segment.NODE_TYPES,
 
-        contentTimeTracker: analytics.contentTimeTracker,
+        contentTimeTracker: segment.contentTimeTracker,
         segmentContentTimeTracker: segment.segmentContentTimeTracker,
     };
 };

@@ -153,6 +153,14 @@ export const useSegment = () => {
         await identifyUser(userId, userProperties);
     }, []);
 
+    const isAnalyticsAvailable = useCallback(() => {
+        return isSegmentAvailable();
+    }, []);
+
+    const isMixpanelAvailable = useCallback(() => {
+        return isSegmentAvailable();
+    }, []);
+
     return {
         trackEvent: trackCustomEvent,
         trackPageView,
@@ -200,7 +208,15 @@ export const useSegment = () => {
         NODE_TYPES,
 
         segmentContentTimeTracker,
+
+        isAnalyticsAvailable,
+        isMixpanelAvailable,
+        contentTimeTracker: segmentContentTimeTracker,
+        mixpanelContentTimeTracker: segmentContentTimeTracker,
     };
 };
+
+export const useAnalytics = useSegment;
+export const useMixpanel = useSegment;
 
 export default useSegment;

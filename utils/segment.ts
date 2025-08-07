@@ -3,6 +3,9 @@ import { AnalyticsBrowser } from '@segment/analytics-next';
 declare global {
     interface Window {
         analytics: typeof AnalyticsBrowser;
+        gtag: (...args: any[]) => void;
+        dataLayer: any[];
+        mixpanel: any;
     }
 }
 
@@ -112,6 +115,14 @@ export const isSegmentAvailable = (): boolean => {
     return typeof window !== 'undefined' && typeof AnalyticsBrowser !== 'undefined';
 };
 
+export const isGtagAvailable = (): boolean => {
+    return isSegmentAvailable();
+};
+
+export const isMixpanelAvailable = (): boolean => {
+    return isSegmentAvailable();
+};
+
 let analytics: any = null;
 let isInitialized = false;
 
@@ -128,6 +139,9 @@ export const initializeSegment = () => {
         isInitialized = true;
     }
 };
+
+export const initializeAnalytics = initializeSegment;
+export const initializeMixpanelAnalytics = initializeSegment;
 
 export const getUserId = async (): Promise<string | null> => {
     try {
@@ -641,4 +655,11 @@ export default {
     CUSTOM_DIMENSIONS,
     LEGAL_CONTENT_TYPES,
     NODE_TYPES,
+
+    isGtagAvailable,
+    isMixpanelAvailable,
+    initializeAnalytics,
+    initializeMixpanelAnalytics,
+    contentTimeTracker: segmentContentTimeTracker,
+    mixpanelContentTimeTracker: segmentContentTimeTracker,
 };
