@@ -6,11 +6,10 @@ import { initializeSegment, segmentContentTimeTracker } from '@/utils/segment';
 interface SegmentAnalyticsContextType {
     segmentContentTimeTracker: typeof segmentContentTimeTracker;
     isSegmentAvailable: boolean;
-    // Добавляем функции для совместимости с удаленными провайдерами
     isAnalyticsAvailable: boolean;
     isMixpanelAvailable: boolean;
-    contentTimeTracker: typeof segmentContentTimeTracker; // Алиас для совместимости
-    mixpanelContentTimeTracker: typeof segmentContentTimeTracker; // Алиас для совместимости
+    contentTimeTracker: typeof segmentContentTimeTracker;
+    mixpanelContentTimeTracker: typeof segmentContentTimeTracker;
 }
 
 const SegmentAnalyticsContext = createContext<SegmentAnalyticsContextType | undefined>(undefined);

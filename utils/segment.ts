@@ -134,6 +134,7 @@ export const initializeSegment = () => {
 
         analytics.ready(() => {
             console.log('Segment Analytics initialized');
+            analytics.page();
         });
 
         isInitialized = true;
@@ -594,10 +595,26 @@ export const trackLinkedInConversion = async (
 
 export const initializeSegmentAnalytics = async () => {
     if (typeof window !== 'undefined') {
+        // Инициализируем Segment (включая начальный page call)
         initializeSegment();
+        
+        // Ждем инициализации Segment
+        await new Promise<void>((resolve) => {
+            if (analytics && analytics.ready) {
+                analytics.ready(() => {
+                    resolve();
+                });
+            } else {
+                // Fallback: ждем немного и продолжаем
+                setTimeout(resolve, 1000);
+            }
+        });
+
+        // Отправляем дополнительные события
         await trackSessionStart();
         await trackPageView(window.location.pathname, document.title);
 
+        // Настраиваем отслеживание изменений маршрута
         const originalPushState = history.pushState;
         const originalReplaceState = history.replaceState;
 
