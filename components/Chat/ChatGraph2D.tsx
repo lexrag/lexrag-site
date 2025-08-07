@@ -57,11 +57,7 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
-    const { 
-        trackGraphNodeClick, 
-        trackGraphNodeExpansion, 
-        trackGraphZoom,
-    } = useSegment();
+    const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
