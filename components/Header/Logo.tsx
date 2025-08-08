@@ -10,35 +10,35 @@ export const Logo = () => {
     if (isHomePage) {
         return (
             <Image
-                className="max-h-[16px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo-dark.svg"
+                className="max-h-[30px] transition-transform duration-300 hover:scale-105"
+                src="/media/LEXRAG__Landscape_sRGB_Two_Tone.svg"
                 alt="lexrag logo dark"
-                width={80}
-                height={16}
+                width={130}
+                height={30}
                 priority
-                style={{ width: '80px', height: '16px' }}
+                style={{ width: '130px', height: '30px' }}
             />
         );
     }
     return (
         <>
             <Image
-                className="dark:hidden max-h-[16px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo.svg"
+                className="dark:hidden max-h-[30px] transition-transform duration-300 hover:scale-105"
+                src="/media/LEXRAG__Landscape_sRGB_White.svg"
                 alt="lexrag logo light"
-                width={80}
-                height={16}
+                width={130}
+                height={30}
                 priority
-                style={{ width: '80px', height: '16px' }}
+                style={{ width: '130px', height: '30px' }}
             />
             <Image
-                className="hidden dark:block max-h-[16px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo-dark.svg"
+                className="hidden dark:block max-h-[30px] transition-transform duration-300 hover:scale-105"
+                src="/media/LEXRAG__Landscape_sRGB_Two_Tone.svg"
                 alt="lexrag logo dark"
-                width={80}
-                height={16}
+                width={130}
+                height={30}
                 priority
-                style={{ width: '80px', height: '16px' }}
+                style={{ width: '130px', height: '30px' }}
             />
         </>
     );
