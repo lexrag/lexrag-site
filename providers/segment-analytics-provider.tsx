@@ -6,6 +6,8 @@ import { initializeSegment, segmentContentTimeTracker } from '@/utils/segment';
 interface SegmentAnalyticsContextType {
     segmentContentTimeTracker: typeof segmentContentTimeTracker;
     isSegmentAvailable: boolean;
+    isAnalyticsAvailable: boolean;
+    contentTimeTracker: typeof segmentContentTimeTracker;
 }
 
 const SegmentAnalyticsContext = createContext<SegmentAnalyticsContextType | undefined>(undefined);
@@ -27,6 +29,9 @@ export const SegmentAnalyticsProvider: React.FC<SegmentAnalyticsProviderProps> =
     const value: SegmentAnalyticsContextType = {
         segmentContentTimeTracker,
         isSegmentAvailable,
+        // Для совместимости с удаленными провайдерами
+        isAnalyticsAvailable: isSegmentAvailable,
+        contentTimeTracker: segmentContentTimeTracker,
     };
 
     return <SegmentAnalyticsContext.Provider value={value}>{children}</SegmentAnalyticsContext.Provider>;

@@ -153,6 +153,10 @@ export const useSegment = () => {
         await identifyUser(userId, userProperties);
     }, []);
 
+    const isAnalyticsAvailable = useCallback(() => {
+        return isSegmentAvailable();
+    }, []);
+
     return {
         trackEvent: trackCustomEvent,
         trackPageView,
@@ -200,7 +204,12 @@ export const useSegment = () => {
         NODE_TYPES,
 
         segmentContentTimeTracker,
+
+        isAnalyticsAvailable,
+        contentTimeTracker: segmentContentTimeTracker,
     };
 };
+
+export const useAnalytics = useSegment;
 
 export default useSegment;

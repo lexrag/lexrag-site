@@ -16,9 +16,13 @@ export const getMeClient = async () => {
 
         if (response.ok) {
             return await response.json();
+        } else if (response.status === 401) {
+            return null;
         }
     } catch (error) {
-        console.error('Error fetching /auth/me:', error);
+        if (error instanceof Error && !error.message.includes('401')) {
+            console.error('Error fetching /auth/me:', error);
+        }
     }
 
     return null;
