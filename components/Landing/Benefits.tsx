@@ -1,5 +1,7 @@
 'use client';
 
+import { H4, PBase } from '../ui/typography';
+
 const Benefits = () => {
     return (
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-4 sm:gap-0 mb-20">
@@ -42,9 +44,9 @@ const Benefits = () => {
                     />
 
                     <div className="flex justify-center items-center mb-4">
-                        <div className="text-lg font-semibold text-black dark:text-white">{item.title}</div>
+                        <H4 className="text-black dark:text-white">{item.title}</H4>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 text-[16px] max-w-[80%]">{item.description}</p>
+                    <PBase className="text-gray-700 dark:text-gray-300 max-w-[80%]">{item.description}</PBase>
                 </div>
             ))}
         </div>

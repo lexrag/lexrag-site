@@ -1,4 +1,5 @@
 import CurveUp from "@/components/Landing/CurveUp";
+import { H3, H4, PBase } from "@/components/ui/typography";
 
 const UseCases = () => {
     return (
@@ -7,12 +8,12 @@ const UseCases = () => {
 
             <div className="bg-[#13263C] min-h-[60vh] py-10">
                 <div className="text-center mb-10">
-                    <h3 className="text-white text-2xl md:text-4xl mb-5 font-semibold">
+                    <H3 className="text-white mb-5">
                         Use Cases
-                    </h3>
-                    <p className="font-medium text-gray-400 dark:text-gray-400 transition-colors duration-300">
+                    </H3>
+                    <PBase className="font-medium text-gray-400 dark:text-gray-400 transition-colors duration-300">
                         Power every legal task — from research to risk — with retrieval-augmented AI<br/>
-                    </p>
+                    </PBase>
                 </div>
 
                 <div className="pr-[10%] pl-[10%] grid grid-cols-1 gap-10 sm:grid-cols-4 sm:gap-0">
@@ -58,13 +59,13 @@ const UseCases = () => {
                     />
 
                     <div className="flex justify-center items-center mb-4">
-                        <div className="text-lg font-semibold text-white dark:text-white">
+                        <H4 className="text-white dark:text-white">
                             {item.title}
-                        </div>
+                        </H4>
                     </div>
-                    <p className="text-gray-400 dark:text-gray-400 text-[16px] max-w-[80%]">
+                    <PBase className="text-gray-400 dark:text-gray-400 max-w-[80%]">
                         {item.description}
-                    </p>
+                    </PBase>
                 </div>
             ))}
                 </div>

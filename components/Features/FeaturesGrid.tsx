@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { H4, PBase } from '@/components/ui/typography';
 
 // type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
 
@@ -91,12 +92,12 @@ const ProductFeatures = ({
                                                 />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className={cn('text-md font-medium mb-px', colors.icon_color)}>
+                                                <H4 className={cn('mb-px', colors.icon_color)}>
                                                     {feat.title}
-                                                </span>
-                                                <span className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                                </H4>
+                                                <PBase className="text-2sm dark:text-gray-400 light:text-gray-500">
                                                     {feat.subtitle}
-                                                </span>
+                                                </PBase>
                                             </div>
                                         </div>
 
@@ -113,9 +114,9 @@ const ProductFeatures = ({
                                     </div>
 
                                     {showDescription && (
-                                        <p className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                        <PBase className="text-2sm dark:text-gray-400 light:text-gray-500">
                                             {feat.description}
-                                        </p>
+                                        </PBase>
                                     )}
 
                                     {showBottomBadges && (

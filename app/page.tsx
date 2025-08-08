@@ -5,6 +5,7 @@ import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
+import { H3, PBase } from '@/components/ui/typography';
 
 export const metadata: Metadata = {
     title: 'LEXRAG',
@@ -31,20 +32,20 @@ const LandingPage = () => {
                 <section id="product-features" className="">
                     {/* TODO: keep sections title separately for reuse */}
                     <div className="text-center mb-10">
-                        <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-gray-900 dark:text-white">
+                        <H3 className="pt-28 mb-2 transition-colors duration-300 text-gray-900 dark:text-white">
                             Product Features
-                        </h3>
-                        <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
+                        </H3>
+                        <PBase className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
                             Explore legal data like never before — through graphs, vectors, and intelligent query
                             breakdowns
-                        </p>
+                        </PBase>
                     </div>
                     <ProductFeatures
                         gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
                         showDescription={true}
                         showSideBadges={false}
                         showBottomBadges={true}
-                        maxHeightBeforeShowAll={500}
+                        maxHeightBeforeShowAll={650}
                     />
                 </section>
             </main>

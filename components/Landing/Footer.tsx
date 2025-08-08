@@ -6,6 +6,7 @@ import { Linkedin, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Logo } from '@/components/Header/Logo';
 import { WordRotate } from '@/components/magicui/word-rotate';
+import { H4 } from '@/components/ui/typography';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -44,8 +45,9 @@ const Footer = () => {
                             <div className="flex items-center mb-3">
                                 <Logo />
                             </div>
-                            <div className="italic font-medium text-base text-muted-foreground mb-4">
+                            <div className="italic font-medium text-muted-foreground mb-4">
                                 <WordRotate
+                                    as="span"
                                     words={['Structure the law', 'Retrieve with purpose', 'Answer with confidence']}
                                 />
                             </div>
@@ -77,9 +79,9 @@ const Footer = () => {
                                     transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
                                     viewport={{ once: true }}
                                 >
-                                    <h3 className="font-medium text-base mb-4 capitalize text-muted-foreground/80">
+                                    <H4 className="font-medium mb-4 capitalize text-muted-foreground/80">
                                         {category}
-                                    </h3>
+                                    </H4>
                                     <ul className="text-base space-y-2">
                                         {items.map((item, index) => (
                                             <li key={index}>
@@ -101,7 +103,7 @@ const Footer = () => {
                 <Separator className="my-6 bg-border/50" />
 
                 <div className="flex flex-col md:flex-row justify-between items-center">
-                    <div className="flex order-2 md:order-1 gap-2 font-normal text-2sm">
+                    <div className="flex order-2 md:order-1 gap-2 font-normal">
                         <span className="text-neutral-600 dark:text-neutral-600">© {currentYear}</span>
                         <span className="text-neutral-600 dark:text-neutral-600">
                             LEXRAG PTE. LTD. All rights reserved

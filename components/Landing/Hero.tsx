@@ -4,6 +4,7 @@ import CurveDown from '@/components/Landing/CurveDown';
 import { AuroraText } from '@/components/magicui/aurora-text';
 import { DotPattern } from '@/components/magicui/dot-pattern';
 import { ShinyButton } from '@/components/magicui/shiny-button';
+import { H1 } from '@/components/ui/typography';
 
 const LandingHeading = () => {
     return (
@@ -63,7 +64,7 @@ const LandingHeading = () => {
         </div>
 
 <div className="relative text-center flex flex-col items-center justify-center">
-  <h1
+  <H1
     className=""
     style={{
       lineHeight: '70px',
@@ -77,7 +78,7 @@ const LandingHeading = () => {
     <span className="text-white tracking-wide font-semibold text-4xl md:text-4xl mb-5 transition-all duration-300">
       legal AI with graph-vector context
     </span>
-  </h1>
+  </H1>
 
   <Link href="/chat/new" passHref>
     <div className="mt-4">
