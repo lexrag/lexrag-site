@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, type MotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import '@/components/ui/css-variables.css';
 
 const animationProps: MotionProps = {
     initial: { '--x': '100%', scale: 0.8 },
@@ -43,7 +44,7 @@ export const ShinyButton = React.forwardRef<HTMLButtonElement, ShinyButtonProps>
                 {...props}
             >
                 <span
-                    className="relative block size-full text-sm tracking-wide text-primary-foreground"
+                    className="relative block size-full text-sm tracking-wide"
                     style={{
                         maskImage:
                             'linear-gradient(-75deg,var(--primary) calc(var(--x) + 20%),transparent calc(var(--x) + 30%),var(--primary) calc(var(--x) + 100%))',
