@@ -1,5 +1,4 @@
 import { ReactNode, Suspense } from 'react';
-import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { TooltipsProvider } from '@/providers/tooltips-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -12,7 +11,6 @@ import { UserProvider } from '@/providers/user-provider';
 import { SegmentAnalyticsProvider } from '@/providers/segment-analytics-provider';
 import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
     title: {
@@ -35,7 +33,12 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html className="h-full" suppressHydrationWarning>
-            <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+                <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+            </head>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans')}>
                 <QueryProvider>
                     <ThemeProvider>
                         <TooltipsProvider>

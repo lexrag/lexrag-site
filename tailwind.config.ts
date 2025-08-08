@@ -33,7 +33,8 @@ const config: Config = {
                 '2xl': '1.5rem',
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['Instrument Sans', 'Inter', 'system-ui', 'sans-serif'],
+                'instrument-sans': ['Instrument Sans', 'Inter', 'system-ui', 'sans-serif'],
             },
             keyframes: {
                 "accordion-down": {

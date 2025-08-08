@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+/* Override Next.js default fonts */
+@layer base {
+  html {
+    font-family: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+  }
+}
+
 /* 1. Global base layer */
 @import './base/reset.css';
 
