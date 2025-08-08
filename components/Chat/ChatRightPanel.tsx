@@ -14,9 +14,10 @@ import {
     LetterText,
     Link,
     ListFilterPlus,
+    Tags,
 } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter, GraphNodeFilter, NodesTagsFilters } from '@/types/Graph';
 import { useSegment } from '@/hooks/use-segment';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -42,6 +43,8 @@ interface ChatRightPanelProps {
     setGraphLinkFilters: Dispatch<SetStateAction<GraphLinkFilter[]>>;
     graphNodeFilters: GraphNodeFilter[];
     setGraphNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
+    nodesTagsFilters: NodesTagsFilters;
+    setNodesTagsFilters: Dispatch<SetStateAction<NodesTagsFilters>>;
     cardData: CardData;
     graphView: string;
     setGraphView: (view: string) => void;
@@ -61,6 +64,8 @@ const ChatRightPanel = ({
     setGraphLinkFilters,
     graphNodeFilters,
     setGraphNodeFilters,
+    nodesTagsFilters,
+    setNodesTagsFilters,
     cardData,
     graphView,
     setGraphView,
@@ -464,11 +469,11 @@ const ChatRightPanel = ({
     };
 
     const filteredGroupedNodes = useMemo(() => {
-        if (!searchQuery.trim()) {
-            return groupedNodes;
-        }
-
         const searchLower = searchQuery.toLowerCase().trim();
+
+        const hasTopicFilter = nodesTagsFilters.topic.selected.length !== nodesTagsFilters.topic.options.length;
+        const hasConceptFilter = nodesTagsFilters.concept.selected.length !== nodesTagsFilters.concept.options.length;
+
         const filtered: { [key: string]: any[] } = {};
 
         Object.entries(groupedNodes).forEach(([parentId, nodes]) => {
@@ -499,8 +504,30 @@ const ChatRightPanel = ({
             }
         });
 
+        if (hasTopicFilter || hasConceptFilter) {
+            Object.entries(filtered).map(([parentId, nodes]) => {
+                const filteredNodesByTags = nodes.filter((node: any) => {
+                    const matchesTopicFilter = nodesTagsFilters.topic.selected.some((selected: string) =>
+                        node?.topics?.includes(selected),
+                    );
+
+                    const matchesConceptFilter = nodesTagsFilters.concept.selected.some((selected: string) =>
+                        node?.concepts?.includes(selected),
+                    );
+
+                    return matchesTopicFilter || matchesConceptFilter;
+                });
+
+                if (!!!filteredNodesByTags.length) {
+                    delete filtered[parentId];
+                } else {
+                    filtered[parentId] = filteredNodesByTags;
+                }
+            });
+        }
+
         return filtered;
-    }, [groupedNodes, searchQuery, parentNodesMap]);
+    }, [groupedNodes, searchQuery, parentNodesMap, nodesTagsFilters]);
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes || isScrolling) return;
@@ -945,6 +972,7 @@ const ChatRightPanel = ({
                                                 })}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
+
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <div
@@ -1104,6 +1132,7 @@ const ChatRightPanel = ({
                                                 </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
+
                                         <div className="flex items-center gap-1">
                                             <div
                                                 className={`flex items-center justify-center w-8 h-8 rounded-md border transition-colors cursor-pointer ${
@@ -1159,12 +1188,12 @@ const ChatRightPanel = ({
                                     isGraphCollapsed ? 'flex-1' : 'flex-1'
                                 }`}
                             >
-                                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border gap-2">
                                     <Input
                                         placeholder="Search..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="flex-1 mr-2"
+                                        className="flex-1"
                                     />
                                     <div
                                         className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
@@ -1177,6 +1206,141 @@ const ChatRightPanel = ({
                                             <ChevronUp className="size-4" />
                                         )}
                                     </div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <div
+                                                className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                                                title="Toggle Tags Filters"
+                                            >
+                                                <Tags className="size-4" />
+                                            </div>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            className="w-80 max-h-60 overflow-y-auto"
+                                            align="end"
+                                            side="bottom"
+                                            sideOffset={5}
+                                        >
+                                            <DropdownMenuLabel className="flex justify-between items-center py-2">
+                                                <span>Tags Filters</span>
+                                            </DropdownMenuLabel>
+
+                                            <DropdownMenuSeparator />
+
+                                            <div className="flex gap-2 p-2">
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setNodesTagsFilters((prev) => {
+                                                            const allSelected = Object.entries(prev).reduce(
+                                                                (acc, [label, value]) => {
+                                                                    acc[label as keyof NodesTagsFilters] = {
+                                                                        ...value,
+                                                                        selected: [...value.options],
+                                                                    };
+                                                                    return acc;
+                                                                },
+                                                                {} as NodesTagsFilters,
+                                                            );
+                                                            return allSelected;
+                                                        });
+                                                    }}
+                                                >
+                                                    All
+                                                </Button>
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setNodesTagsFilters((prev) => {
+                                                            const noneSelected = Object.entries(prev).reduce(
+                                                                (acc, [label, value]) => {
+                                                                    acc[label as keyof NodesTagsFilters] = {
+                                                                        ...value,
+                                                                        selected: [],
+                                                                    };
+                                                                    return acc;
+                                                                },
+                                                                {} as NodesTagsFilters,
+                                                            );
+                                                            return noneSelected;
+                                                        });
+                                                    }}
+                                                >
+                                                    None
+                                                </Button>
+                                            </div>
+
+                                            <DropdownMenuSeparator />
+
+                                            {(
+                                                Object.entries(nodesTagsFilters) as [
+                                                    keyof NodesTagsFilters,
+                                                    NodesTagsFilters[keyof NodesTagsFilters],
+                                                ][]
+                                            ).map(([label, tags]) => {
+                                                const textColor =
+                                                    label === 'concept'
+                                                        ? 'text-blue-800 dark:text-blue-300'
+                                                        : 'text-green-800 dark:text-green-300';
+
+                                                const checkboxColor =
+                                                    label === 'concept' ? 'accent-blue-500' : 'accent-green-500';
+
+                                                return (
+                                                    <div key={label} className="px-2 pb-2">
+                                                        <div className="text-xs text-muted-foreground font-medium uppercase px-1 pb-1">
+                                                            {label}
+                                                        </div>
+                                                        {tags.options.map((item) => {
+                                                            const isSelected = tags.selected.includes(item);
+                                                            const handleToggle = () => {
+                                                                setNodesTagsFilters((prev) => ({
+                                                                    ...prev,
+                                                                    [label]: {
+                                                                        ...prev[label],
+                                                                        selected: isSelected
+                                                                            ? prev[label].selected.filter(
+                                                                                  (i) => i !== item,
+                                                                              )
+                                                                            : [...prev[label].selected, item],
+                                                                    },
+                                                                }));
+                                                            };
+
+                                                            return (
+                                                                <div
+                                                                    key={item}
+                                                                    className={`flex items-center gap-2 p-2 mx-1 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors`}
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        handleToggle();
+                                                                    }}
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={isSelected}
+                                                                        onChange={handleToggle}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className={`cursor-pointer ${checkboxColor}`}
+                                                                    />
+                                                                    <span className={`flex-1 text-sm ${textColor}`}>
+                                                                        {item}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })}
+
+                                                        <DropdownMenuSeparator />
+                                                    </div>
+                                                );
+                                            })}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
 
                                 {searchQuery.trim() && Object.keys(filteredGroupedNodes).length === 0 && (

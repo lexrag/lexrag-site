@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useChat } from '@/api/chat/chatApi';
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter, GraphNodeFilter, NodesTagsFilters } from '@/types/Graph';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
 import ChatBox from '@/components/Chat/ChatBox';
 import ChatGraphModal from '@/components/Chat/ChatGraphModal';
@@ -53,6 +53,12 @@ export default function ChatPage() {
     ]);
     const [graphLinkFilters, setGraphLinkFilters] = useState<GraphLinkFilter[]>([]);
     const [graphNodeFilters, setGraphNodeFilters] = useState<GraphNodeFilter[]>([]);
+
+    const [nodesTagsFilters, setNodesTagsFilters] = useState<NodesTagsFilters>({
+        concept: { options: [], selected: [] },
+        topic: { options: [], selected: [] },
+    });
+
     const [cardData, setCardData] = useState<CardData>({ nodes: [], links: [] });
     const [input, setInput] = useState<string>('');
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
@@ -68,6 +74,32 @@ export default function ChatPage() {
         const message = [...messages].reverse().find(({ direction }) => direction === 'incoming');
         setCurrentMessage(message);
     }, [messages, currentGraphData]);
+
+    useEffect(() => {
+        if (cardData) {
+            const uniqConcepts = new Set<string>();
+            const uniqTopics = new Set<string>();
+
+            cardData.nodes.forEach((node) => {
+                node?.concepts?.forEach((c: string) => uniqConcepts.add(c));
+                node?.topics?.forEach((t: string) => uniqTopics.add(t));
+            });
+
+            const conceptsArray = Array.from(uniqConcepts);
+            const topicsArray = Array.from(uniqTopics);
+
+            setNodesTagsFilters((prev) => ({
+                concept: {
+                    options: conceptsArray,
+                    selected: prev.concept.selected.length > 0 ? prev.concept.selected : conceptsArray,
+                },
+                topic: {
+                    options: topicsArray,
+                    selected: prev.topic.selected.length > 0 ? prev.topic.selected : topicsArray,
+                },
+            }));
+        }
+    }, [cardData]);
 
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));
@@ -146,6 +178,8 @@ export default function ChatPage() {
                     setGraphLinkFilters={setGraphLinkFilters}
                     graphNodeFilters={graphNodeFilters}
                     setGraphNodeFilters={setGraphNodeFilters}
+                    nodesTagsFilters={nodesTagsFilters}
+                    setNodesTagsFilters={setNodesTagsFilters}
                     graphView={graphView}
                     setGraphView={setGraphView}
                     cardData={cardData}
