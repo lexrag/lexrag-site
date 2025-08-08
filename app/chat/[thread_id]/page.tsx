@@ -117,6 +117,7 @@ export default function ChatPage() {
                 currentMessage={currentMessage}
                 cardData={cardData}
                 handleCardData={setCardData}
+                searchQuery={searchQuery}
             />
             <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
                 <ChatLeftPanel activeLeftTab={activeLeftTab} setActiveLeftTab={setActiveLeftTab} />
