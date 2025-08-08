@@ -22,6 +22,17 @@ export interface GraphNodeFilter {
     count: number;
 }
 
+export interface NodesTagsFilters {
+    concept: {
+        options: string[];
+        selected: string[];
+    };
+    topic: {
+        options: string[];
+        selected: string[];
+    };
+}
+
 export interface GraphData {
     all_retrieved_nodes?: any;
     all_retrieved_nodes_with_neighbors?: any;
