@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteSession } from '@/utils/auth/deleteSession';
 import { useUser } from '@/providers/user-provider';
+import { clearSegmentCache } from '@/utils/segment';
 
 export const useLogOut = () => {
     const router = useRouter();
@@ -14,6 +15,8 @@ export const useLogOut = () => {
 
         await deleteSession();
         setUser(null);
+        
+        clearSegmentCache();
 
         router.push('/');
     }, [router, setUser]);

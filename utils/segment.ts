@@ -1,4 +1,6 @@
 import { AnalyticsBrowser } from '@segment/analytics-next';
+import { getMeClient } from '@/api/auth/getMeClient';
+import { getCurrentSubscription } from '@/api/tariffs/getCurrentSubscription';
 
 declare global {
     interface Window {
@@ -144,63 +146,88 @@ export const initializeSegment = () => {
 export const initializeAnalytics = initializeSegment;
 export const initializeMixpanelAnalytics = initializeSegment;
 
+let userDataCache: { userId: string | null; userType: string; timestamp: number } | null = null;
+const CACHE_DURATION = 5 * 60 * 1000;
+
+const isCacheValid = (): boolean => {
+    return !!(userDataCache && (Date.now() - userDataCache.timestamp) < CACHE_DURATION);
+};
+
+const clearCache = (): void => {
+    userDataCache = null;
+};
+
+export const clearSegmentCache = (): void => {
+    clearCache();
+};
+
 export const getUserId = async (): Promise<string | null> => {
+    if (isCacheValid() && userDataCache?.userId) {
+        return userDataCache.userId;
+    }
+
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            return null;
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            return userData.id?.toString() || null;
+        const userData = await getMeClient();
+        
+        if (userData && userData.id) {
+            const userId = userData.id.toString();
+            
+            userDataCache = {
+                userId,
+                userType: userDataCache?.userType || 'free',
+                timestamp: Date.now()
+            };
+            
+            return userId;
         }
     } catch (error) {
+        if (error instanceof Error && (error.message.includes('401') || error.message.includes('No token found'))) {
+            clearCache();
+            return null;
+        }
         console.error('Error getting user ID for Segment:', error);
     }
+    
     return null;
 };
 
 export const getUserType = async (): Promise<string> => {
+    if (isCacheValid() && userDataCache?.userType) {
+        return userDataCache.userType;
+    }
+
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            return 'free';
-        }
+        const subscriptionData = await getCurrentSubscription();
+        
+        if (subscriptionData && subscriptionData.status === 'active') {
+            const tariffId = subscriptionData.tariff_id;
+            const planName = subscriptionData.detail?.toLowerCase() || '';
 
-        const subscriptionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/subscriptions/any`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (subscriptionResponse.ok) {
-            const subscriptionData = await subscriptionResponse.json();
-            if (subscriptionData && subscriptionData.status === 'active') {
-                const tariffId = subscriptionData.tariff_id;
-                const planName = subscriptionData.detail?.toLowerCase() || '';
-
-                if (planName.includes('premium') || tariffId === 'premium') {
-                    return 'premium';
-                } else if (planName.includes('enterprise') || tariffId === 'enterprise') {
-                    return 'enterprise';
-                } else if (planName.includes('advanced') || tariffId === 'advanced') {
-                    return 'advanced';
-                } else {
-                    return 'standard';
-                }
+            let userType = 'standard';
+            if (planName.includes('premium') || tariffId === 'premium') {
+                userType = 'premium';
+            } else if (planName.includes('enterprise') || tariffId === 'enterprise') {
+                userType = 'enterprise';
+            } else if (planName.includes('advanced') || tariffId === 'advanced') {
+                userType = 'advanced';
             }
+
+            userDataCache = {
+                userId: userDataCache?.userId || null,
+                userType,
+                timestamp: Date.now()
+            };
+
+            return userType;
         }
     } catch (error) {
+        if (error instanceof Error && (error.message.includes('401') || error.message.includes('No token found'))) {
+            clearCache();
+            return 'free';
+        }
         console.error('Error getting user type for Segment:', error);
     }
+    
     return 'free';
 };
 
@@ -256,6 +283,10 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
 
         analytics.track(eventName, eventProperties);
     } catch (error) {
+        // Don't log errors for unauthenticated users - this is expected
+        if (error instanceof Error && error.message.includes('401')) {
+            return;
+        }
         console.error('Error tracking event in Segment:', error);
     }
 };
@@ -610,23 +641,37 @@ export const initializeSegmentAnalytics = async () => {
             }
         });
 
-        // Отправляем дополнительные события
-        await trackSessionStart();
-        await trackPageView(window.location.pathname, document.title);
+        try {
+            // Отправляем дополнительные события с обработкой ошибок
+            await trackSessionStart();
+            await trackPageView(window.location.pathname, document.title);
 
-        // Настраиваем отслеживание изменений маршрута
-        const originalPushState = history.pushState;
-        const originalReplaceState = history.replaceState;
+            // Настраиваем отслеживание изменений маршрута
+            const originalPushState = history.pushState;
+            const originalReplaceState = history.replaceState;
 
-        history.pushState = function (...args) {
-            originalPushState.apply(history, args);
-            trackPageView(window.location.pathname, document.title);
-        };
+            history.pushState = function (...args) {
+                originalPushState.apply(history, args);
+                trackPageView(window.location.pathname, document.title).catch((error) => {
+                    if (error instanceof Error && !error.message?.includes('401')) {
+                        console.error('Error tracking pushState page view:', error);
+                    }
+                });
+            };
 
-        history.replaceState = function (...args) {
-            originalReplaceState.apply(history, args);
-            trackPageView(window.location.pathname, document.title);
-        };
+            history.replaceState = function (...args) {
+                originalReplaceState.apply(history, args);
+                trackPageView(window.location.pathname, document.title).catch((error) => {
+                    if (error instanceof Error && !error.message?.includes('401')) {
+                        console.error('Error tracking replaceState page view:', error);
+                    }
+                });
+            };
+        } catch (error) {
+            if (error instanceof Error && !error.message?.includes('401')) {
+                console.error('Error in initializeSegmentAnalytics:', error);
+            }
+        }
     }
 };
 
@@ -679,4 +724,5 @@ export default {
     initializeMixpanelAnalytics,
     contentTimeTracker: segmentContentTimeTracker,
     mixpanelContentTimeTracker: segmentContentTimeTracker,
+    clearSegmentCache,
 };
