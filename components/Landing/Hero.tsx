@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import CurveDown from '@/components/Landing/CurveDown';
 import { AuroraText } from '@/components/magicui/aurora-text';
 import { DotPattern } from '@/components/magicui/dot-pattern';
 import { ShinyButton } from '@/components/magicui/shiny-button';
@@ -10,7 +9,7 @@ const LandingHeading = () => {
     return (
         <>
             <div className="relative h-[55vh] lg:h-[65vh] flex justify-center items-center">
-                <div className="absolute inset-0 bg-[#13263C]"></div>
+                <div className="absolute inset-0"></div>
                 {/* Dot Pattern */}
                 <DotPattern
                     className={cn(
@@ -27,39 +26,17 @@ const LandingHeading = () => {
 
                 <div
                     className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40"
-                    style={{
-                        backgroundImage: 'url(/media/images/singapore_1.png)',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundSize: 'contain',
-                        backgroundPosition: 'center bottom',
-                        backgroundBlendMode: 'multiply',
-                    }}
                 >
                     <div
                         className="absolute inset-0 opacity-90"
-                        style={{
-                            background:
-                                'linear-gradient(to bottom, rgba(19, 38, 60, 0.9) 0%, rgba(19, 38, 60, 0.95) 100%)',
-                        }}
                     ></div>
                 </div>
 
         <div
           className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40"
-          style={{
-            backgroundImage: 'url(/media/images/singapore_1.svg)',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'contain',
-            backgroundPosition: 'center bottom',
-            backgroundBlendMode: 'multiply',
-          }}
         >
           <div
             className="absolute inset-0 opacity-90"
-            style={{
-              background:
-                'linear-gradient(to bottom, rgba(19, 38, 60, 0.9) 0%, rgba(19, 38, 60, 0.95) 100%)',
-            }}
           ></div>
         </div>
 
@@ -89,7 +66,6 @@ const LandingHeading = () => {
   </Link>
 </div>
       </div>
-      <CurveDown />
     </>
   );
 };

@@ -1,12 +1,10 @@
-import CurveUp from "@/components/Landing/CurveUp";
 import { H3, H4, PBase } from "@/components/ui/typography";
 
 const UseCases = () => {
     return (
         <>
-            <CurveUp />
 
-            <div className="bg-[#13263C] min-h-[60vh] py-10">
+            <div className="min-h-[60vh] py-10">
                 <div className="text-center mb-10">
                     <H3 className="text-white mb-5">
                         Use Cases
