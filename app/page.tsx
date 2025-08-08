@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 const LandingPage = () => {
     return (
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] min-h-screen">
             <Header className="" />
 
             <main className="">
