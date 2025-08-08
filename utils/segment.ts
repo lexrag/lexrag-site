@@ -7,7 +7,6 @@ declare global {
         analytics: typeof AnalyticsBrowser;
         gtag: (...args: any[]) => void;
         dataLayer: any[];
-        mixpanel: any;
     }
 }
 
@@ -121,10 +120,6 @@ export const isGtagAvailable = (): boolean => {
     return isSegmentAvailable();
 };
 
-export const isMixpanelAvailable = (): boolean => {
-    return isSegmentAvailable();
-};
-
 let analytics: any = null;
 let isInitialized = false;
 
@@ -144,7 +139,6 @@ export const initializeSegment = () => {
 };
 
 export const initializeAnalytics = initializeSegment;
-export const initializeMixpanelAnalytics = initializeSegment;
 
 let userDataCache: { userId: string | null; userType: string; timestamp: number } | null = null;
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -719,10 +713,7 @@ export default {
     NODE_TYPES,
 
     isGtagAvailable,
-    isMixpanelAvailable,
     initializeAnalytics,
-    initializeMixpanelAnalytics,
     contentTimeTracker: segmentContentTimeTracker,
-    mixpanelContentTimeTracker: segmentContentTimeTracker,
     clearSegmentCache,
 };

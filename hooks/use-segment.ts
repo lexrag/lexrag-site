@@ -157,10 +157,6 @@ export const useSegment = () => {
         return isSegmentAvailable();
     }, []);
 
-    const isMixpanelAvailable = useCallback(() => {
-        return isSegmentAvailable();
-    }, []);
-
     return {
         trackEvent: trackCustomEvent,
         trackPageView,
@@ -210,13 +206,10 @@ export const useSegment = () => {
         segmentContentTimeTracker,
 
         isAnalyticsAvailable,
-        isMixpanelAvailable,
         contentTimeTracker: segmentContentTimeTracker,
-        mixpanelContentTimeTracker: segmentContentTimeTracker,
     };
 };
 
 export const useAnalytics = useSegment;
-export const useMixpanel = useSegment;
 
 export default useSegment;
