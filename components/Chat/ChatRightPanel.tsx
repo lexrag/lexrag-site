@@ -877,6 +877,7 @@ const ChatRightPanel = ({
                                     setNodeFilters={setGraphNodeFilters}
                                     showNodeLabels={showNodeLabels}
                                     searchQuery={searchQuery}
+                                    nodesTagsFilters={nodesTagsFilters}
                                 />
                             )}
                             {graphView === '3d' && (

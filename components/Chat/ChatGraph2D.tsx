@@ -6,7 +6,14 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
+import {
+    GraphData,
+    GraphLayer,
+    GraphLinkFilter,
+    GraphNodeFilter,
+    GraphNodePosition,
+    NodesTagsFilters,
+} from '@/types/Graph';
 import { useSegment } from '@/hooks/use-segment';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
@@ -34,6 +41,7 @@ interface ChatGraph2DProps {
     setNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     showNodeLabels?: boolean;
     searchQuery: string;
+    nodesTagsFilters: NodesTagsFilters;
 }
 
 const ChatGraph2D = ({
@@ -57,6 +65,7 @@ const ChatGraph2D = ({
     setNodeFilters,
     showNodeLabels = true,
     searchQuery,
+    nodesTagsFilters,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
     const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
@@ -203,21 +212,24 @@ const ChatGraph2D = ({
         };
     }, []);
 
-    const nodeMatchesSearch = useCallback((node: any, searchLower: string): boolean => {
-        const nodeInfo = getNodeDisplayInfo(node);
+    const nodeMatchesSearch = useCallback(
+        (node: any, searchLower: string): boolean => {
+            const nodeInfo = getNodeDisplayInfo(node);
 
-        return (
-            nodeInfo.title.toLowerCase().includes(searchLower) ||
-            nodeInfo.content.toLowerCase().includes(searchLower) ||
-            (nodeInfo.citation && nodeInfo.citation.toLowerCase().includes(searchLower)) ||
-            (nodeInfo.functionalObject && nodeInfo.functionalObject.toLowerCase().includes(searchLower)) ||
-            (nodeInfo.functionalRole && nodeInfo.functionalRole.toLowerCase().includes(searchLower)) ||
-            (nodeInfo.topics &&
-                nodeInfo.topics.some((topic: string) => topic.toLowerCase().includes(searchLower))) ||
-            (nodeInfo.concepts &&
-                nodeInfo.concepts.some((concept: string) => concept.toLowerCase().includes(searchLower)))
-        );
-    }, [getNodeDisplayInfo]);
+            return (
+                nodeInfo.title.toLowerCase().includes(searchLower) ||
+                nodeInfo.content.toLowerCase().includes(searchLower) ||
+                (nodeInfo.citation && nodeInfo.citation.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.functionalObject && nodeInfo.functionalObject.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.functionalRole && nodeInfo.functionalRole.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.topics &&
+                    nodeInfo.topics.some((topic: string) => topic.toLowerCase().includes(searchLower))) ||
+                (nodeInfo.concepts &&
+                    nodeInfo.concepts.some((concept: string) => concept.toLowerCase().includes(searchLower)))
+            );
+        },
+        [getNodeDisplayInfo],
+    );
 
     useEffect(() => {
         if (!data) return;
@@ -693,67 +705,83 @@ const ChatGraph2D = ({
         [nodeFilters],
     );
 
-    const getSearchFilteredNodes = useCallback((allNodes: any[]): any[] => {
-        if (!searchQuery.trim()) {
-            return allNodes;
-        }
+    const getSearchFilteredNodes = useCallback(
+        (allNodes: any[]): any[] => {
+            const searchLower = searchQuery.toLowerCase().trim();
 
-        const searchLower = searchQuery.toLowerCase().trim();
-        const matchingNodes = new Set<string>();
-        const nodesToInclude = new Set<string>();
+            const hasTopicFilter = nodesTagsFilters.topic.selected.length !== nodesTagsFilters.topic.options.length;
+            const hasConceptFilter =
+                nodesTagsFilters.concept.selected.length !== nodesTagsFilters.concept.options.length;
 
-        const nodesByParent = new Map<string | null, any[]>();
-        const nodeMap = new Map<string, any>();
+            const matchingNodes = new Set<string>();
+            const nodesToInclude = new Set<string>();
 
-        allNodes.forEach((node) => {
-            nodeMap.set(node.id, node);
-            const parentId = node.parentId || null;
-            if (!nodesByParent.has(parentId)) {
-                nodesByParent.set(parentId, []);
-            }
-            nodesByParent.get(parentId)!.push(node);
-        });
+            const nodesByParent = new Map<string | null, any[]>();
+            const nodeMap = new Map<string, any>();
 
-        allNodes.forEach((node) => {
-            if (nodeMatchesSearch(node, searchLower)) {
-                matchingNodes.add(node.id);
-                
-                nodesToInclude.add(node.id);
-                
-                if (!node.parentId) {
-                    const children = nodesByParent.get(node.id) || [];
-                    children.forEach((child) => {
-                        nodesToInclude.add(child.id);
-                    });
-                } else {
-                    const parent = nodeMap.get(node.parentId);
-                    if (parent) {
-                        nodesToInclude.add(parent.id);
-                        
-                        const siblings = nodesByParent.get(node.parentId) || [];
-                        siblings.forEach((sibling) => {
-                            nodesToInclude.add(sibling.id);
-                        });
+            allNodes.forEach((node) => {
+                nodeMap.set(node.id, node);
+                const parentId = node.parentId || null;
+                if (!nodesByParent.has(parentId)) {
+                    nodesByParent.set(parentId, []);
+                }
+                nodesByParent.get(parentId)!.push(node);
+            });
+
+            const nodeMatches = (node: any) => {
+                const info = getNodeDisplayInfo(node);
+
+                const matchesSearch =
+                    info.title.toLowerCase().includes(searchLower) ||
+                    info.content.toLowerCase().includes(searchLower) ||
+                    (info.citation && info.citation.toLowerCase().includes(searchLower)) ||
+                    (info.functionalObject && info.functionalObject.toLowerCase().includes(searchLower)) ||
+                    (info.functionalRole && info.functionalRole.toLowerCase().includes(searchLower)) ||
+                    (info.topics && info.topics.some((t: string) => t.toLowerCase().includes(searchLower))) ||
+                    (info.concepts && info.concepts.some((c: string) => c.toLowerCase().includes(searchLower)));
+
+                const matchesTopicFilter =
+                    !hasTopicFilter || info.topics?.some((t: string) => nodesTagsFilters.topic.selected.includes(t));
+                const matchesConceptFilter =
+                    !hasConceptFilter ||
+                    info.concepts?.some((c: string) => nodesTagsFilters.concept.selected.includes(c));
+
+                return matchesSearch && (matchesTopicFilter || matchesConceptFilter);
+            };
+
+            allNodes.forEach((node) => {
+                if (nodeMatches(node)) {
+                    matchingNodes.add(node.id);
+                    nodesToInclude.add(node.id);
+
+                    if (!node.parentId) {
+                        const children = nodesByParent.get(node.id) || [];
+                        children.forEach((child) => nodesToInclude.add(child.id));
+                    } else {
+                        const parent = nodeMap.get(node.parentId);
+                        if (parent) {
+                            nodesToInclude.add(parent.id);
+                            const siblings = nodesByParent.get(node.parentId) || [];
+                            siblings.forEach((sibling) => nodesToInclude.add(sibling.id));
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        nodesByParent.forEach((children, parentId) => {
-            if (parentId) {
-                const parent = nodeMap.get(parentId);
-                if (parent && nodeMatchesSearch(parent, searchLower)) {
-                    matchingNodes.add(parent.id);
-                    nodesToInclude.add(parent.id);
-                    children.forEach((child) => {
-                        nodesToInclude.add(child.id);
-                    });
+            nodesByParent.forEach((children, parentId) => {
+                if (parentId) {
+                    const parent = nodeMap.get(parentId);
+                    if (parent && nodeMatches(parent)) {
+                        nodesToInclude.add(parent.id);
+                        children.forEach((child) => nodesToInclude.add(child.id));
+                    }
                 }
-            }
-        });
+            });
 
-        return allNodes.filter((node) => nodesToInclude.has(node.id));
-    }, [searchQuery, nodeMatchesSearch]);
+            return allNodes.filter((node) => nodesToInclude.has(node.id));
+        },
+        [searchQuery, nodesTagsFilters],
+    );
 
     const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -841,7 +869,7 @@ const ChatGraph2D = ({
         });
 
         const allNodesArray = Array.from(allNodes.values());
-        
+
         return getSearchFilteredNodes(allNodesArray);
     }, [layerDataMap, layers, expandedData, isNodeVisible, getSearchFilteredNodes]);
 
@@ -998,8 +1026,13 @@ const ChatGraph2D = ({
         };
     }, [clickTimer]);
 
+    const lastCardDataRef = useRef<string | null>(null);
+
     useEffect(() => {
-        if (processedData) {
+        const serialized = JSON.stringify(processedData);
+
+        if (serialized !== lastCardDataRef.current) {
+            lastCardDataRef.current = serialized;
             handleCardData(processedData);
         }
     }, [processedData, handleCardData]);
@@ -1552,16 +1585,17 @@ const ChatGraph2D = ({
         const rgb = getNodeColor(node);
 
         const isSearchMatch = searchQuery.trim() && nodeMatchesSearch(node, searchQuery.toLowerCase().trim());
-        
+
         if (highlightedNodeId === node.id || selectedNodes.has(node) || isSearchMatch) {
             ctx.save();
 
             const glowRadius = nodeSize * (isSearchMatch ? 4.5 : 3.5);
             const gradient = ctx.createRadialGradient(node.x, node.y, nodeSize, node.x, node.y, glowRadius);
 
-            const glowColor = isSearchMatch && !selectedNodes.has(node) && highlightedNodeId !== node.id 
-                ? { r: 255, g: 255, b: 0 } // Желтое свечение для результатов поиска
-                : rgb;
+            const glowColor =
+                isSearchMatch && !selectedNodes.has(node) && highlightedNodeId !== node.id
+                    ? { r: 255, g: 255, b: 0 } 
+                    : rgb;
 
             gradient.addColorStop(0, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.6)`);
             gradient.addColorStop(0.3, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.3)`);

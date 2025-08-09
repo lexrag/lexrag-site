@@ -64,6 +64,7 @@ export default function ChatPage() {
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [isTagsConstructed, setIsTagsConstructed] = useState<boolean>(false);
 
     useEffect(() => {
         if (!!currentGraphData) {
@@ -76,7 +77,7 @@ export default function ChatPage() {
     }, [messages, currentGraphData]);
 
     useEffect(() => {
-        if (cardData) {
+        if (!!cardData.nodes.length && !isTagsConstructed) {
             const uniqConcepts = new Set<string>();
             const uniqTopics = new Set<string>();
 
@@ -98,6 +99,8 @@ export default function ChatPage() {
                     selected: prev.topic.selected.length > 0 ? prev.topic.selected : topicsArray,
                 },
             }));
+
+            setIsTagsConstructed(true);
         }
     }, [cardData]);
 
