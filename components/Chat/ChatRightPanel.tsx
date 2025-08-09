@@ -82,7 +82,6 @@ const ChatRightPanel = ({
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [isGraphCollapsed, setIsGraphCollapsed] = useState<boolean>(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
-    // const [searchQuery, setSearchQuery] = useState<string>('');
     const [isScrolling, setIsScrolling] = useState<boolean>(false);
 
     const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(false);
@@ -391,11 +390,9 @@ const ChatRightPanel = ({
 
         cardData.nodes.forEach((node) => {
             const groupKey = node.parentId || node.id;
-
             if (!groups[groupKey]) {
                 groups[groupKey] = [];
             }
-
             if (node.parentId) {
                 groups[groupKey].push(node);
             }
@@ -404,8 +401,9 @@ const ChatRightPanel = ({
         const filteredGroups: { [key: string]: any[] } = {};
         Object.keys(groups).forEach((groupKey) => {
             const hasParent = parentNodesMap[groupKey] !== undefined;
+            const hasChildren = groups[groupKey].length > 0;
 
-            if (hasParent) {
+            if (hasParent || hasChildren) {
                 filteredGroups[groupKey] = groups[groupKey];
             }
         });
