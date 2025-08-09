@@ -3,6 +3,8 @@
 import { useCallback, useEffect } from 'react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { googleSignIn } from '@/api/auth/googleSignIn';
+import { identifyUser } from '@/lib/user-analytics';
+import { getMeClient } from '@/api/auth/getMeClient';
 import Loading from '@/app/loading';
 
 const OauthCallback = () => {
@@ -17,6 +19,14 @@ const OauthCallback = () => {
         if (!result.success) {
             console.log('error', result.error);
         } else {
+            try {
+                const userData = await getMeClient();
+                if (userData) {
+                    await identifyUser(userData);
+                }
+            } catch (error) {
+                console.error('Error identifying user after OAuth:', error);
+            }
             redirect('/chat/new');
         }
     }, [code]);

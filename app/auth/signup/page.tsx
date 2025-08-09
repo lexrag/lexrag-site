@@ -17,10 +17,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/common/icons';
 import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
-import { useSegment } from '@/hooks/use-segment';
+// Removed deprecated useSegment import
 
 export default function Page() {
-    const { trackAuth, trackLinkedInConversion } = useSegment();
+    // Removed deprecated useSegment hook
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -40,7 +40,7 @@ export default function Page() {
     });
 
     async function googleButtonOnClick() {
-        trackAuth('sign_up', 'google', true);
+        // Removed old tracking
         const result = await getGoogleAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);
@@ -48,8 +48,7 @@ export default function Page() {
     }
 
     async function linkedinButtonOnClick() {
-        trackAuth('sign_up', 'linkedin', true);
-        trackLinkedInConversion('signup');
+        // Removed old tracking
         
         const result = await getLinkedinAuthLink();
         if (result.success) {
@@ -73,12 +72,12 @@ export default function Page() {
         });
 
         if (!response.success) {
-            trackAuth('sign_up', 'email', false);
+            // Removed old tracking
             setError(response.error);
             return;
         }
 
-        trackAuth('sign_up', 'email', true);
+        // Removed old tracking
 
         const verificationCodeResult = await sendVerificationCode(email);
 

@@ -7,7 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
-import { useSegment } from '@/hooks/use-segment';
+import { track_node_expanded, track_node_collapsed, track_graph_zoomed } from '@/lib/analytics';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -57,7 +57,7 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
-    const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
+
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
@@ -812,9 +812,47 @@ const ChatGraph2D = ({
         [processedNodes, processedLinks],
     );
 
+    // Track zoom level changes for interactive events (wheel, drag)
+    useEffect(() => {
+        let lastZoomLevel = 1;
+        let intervalId: NodeJS.Timeout | null = null;
+        let isInitialized = false;
+
+        const startZoomTracking = () => {
+            if (isInitialized || !graphRef.current) return;
+            
+            isInitialized = true;
+
+            // Initialize with current zoom level
+            const initialZoom = graphRef.current.zoom();
+            if (initialZoom) {
+                lastZoomLevel = initialZoom;
+            }
+
+            intervalId = setInterval(() => {
+                if (!graphRef.current) return;
+
+                const currentZoom = graphRef.current.zoom();
+                if (currentZoom && Math.abs(currentZoom - lastZoomLevel) > 0.05) {
+                    track_graph_zoomed({ zoom_type: 'manual' }).catch(console.error);
+                    lastZoomLevel = currentZoom;
+                }
+            }, 100);
+        };
+
+        const timer = setTimeout(startZoomTracking, 1500);
+
+        return () => {
+            clearTimeout(timer);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [processedNodes]);
+
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
-            trackGraphZoom('fit');
+            track_graph_zoomed({ zoom_type: 'fit' }).catch(console.error);
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
             setHighlightedLinkId(null);
@@ -831,7 +869,7 @@ const ChatGraph2D = ({
                 payload.y = targetNode.y;
             }
 
-            trackGraphZoom('node', payload.id);
+            track_graph_zoomed({ zoom_type: 'node', target_id: payload.id }).catch(console.error);
 
             graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
             graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
@@ -991,7 +1029,12 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                trackGraphNodeExpansion(node, 'collapse', 0);
+                track_node_collapsed({
+                    node_id: node.id,
+                    node_type: node.labels?.[0] || 'unknown',
+                    expansion_type: 'collapse',
+                    child_node_count: 0
+                }).catch(console.error);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1031,18 +1074,33 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+                        track_node_expanded({
+                            node_id: node.id,
+                            node_type: node.labels?.[0] || 'unknown',
+                            expansion_type: 'expand',
+                            child_node_count: filteredNewNodes.length
+                        }).catch(console.error);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        trackGraphNodeExpansion(node, 'expand', 0);
+                        track_node_expanded({
+                            node_id: node.id,
+                            node_type: node.labels?.[0] || 'unknown',
+                            expansion_type: 'expand',
+                            child_node_count: 0
+                        }).catch(console.error);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    trackGraphNodeExpansion(node, 'expand', 0);
+                    track_node_expanded({
+                        node_id: node.id,
+                        node_type: node.labels?.[0] || 'unknown',
+                        expansion_type: 'expand',
+                        child_node_count: 0
+                    }).catch(console.error);
                 }
             }
         } catch (error) {

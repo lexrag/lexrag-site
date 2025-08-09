@@ -7,6 +7,7 @@ export const getCurrentSubscription = async () => {
 
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/subscriptions/any`, {
+            credentials: 'include',
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',

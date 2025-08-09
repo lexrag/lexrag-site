@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { CardData } from '@/types/Chat';
 import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
-import { useSegment } from '@/hooks/use-segment';
+import { track_graph_filter_changed, track_graph_view_changed } from '@/lib/analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import {
     DropdownMenu,
@@ -84,25 +84,13 @@ const ChatRightPanel = ({
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
-    const {
-        trackAccordionInteraction,
-        trackContentView,
-        stopTrackingContent,
-        trackGraphFilterChange,
-        trackGraphViewChange,
-    } = useSegment();
+    // Removed deprecated useSegment hook
 
     useEffect(() => {
         setShowNodeLabels(graphView === '2d');
     }, [graphView]);
 
-    useEffect(() => {
-        return () => {
-            if (selectedItem) {
-                stopTrackingContent(selectedItem, 'unknown');
-            }
-        };
-    }, [selectedItem, stopTrackingContent]);
+    // Removed old content tracking
 
     const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({});
     const accordionContainerRef = useRef<HTMLDivElement | null>(null);
@@ -677,9 +665,7 @@ const ChatRightPanel = ({
             setScrollToCardId(nodeId);
         }
 
-        const contentType = node.labels?.[0] || 'unknown';
-        const contentTitle = node.content || node.id;
-        trackContentView(nodeId, contentType, contentTitle);
+        // Removed old content view tracking
 
         if (node.x !== undefined && node.y !== undefined) {
             zoomToNodeGraph({
@@ -774,7 +760,7 @@ const ChatRightPanel = ({
         const currentFilter = graphLinkFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        trackGraphFilterChange('link', filterId, newEnabled);
+        track_graph_filter_changed({ filter_type: 'link', filter_id: filterId, enabled: newEnabled }).catch(console.error);
 
         setGraphLinkFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -783,7 +769,7 @@ const ChatRightPanel = ({
 
     const handleAllLinkFilters = (enabled: boolean) => {
         graphLinkFilters.forEach((filter) => {
-            trackGraphFilterChange('link', filter.id, enabled);
+            track_graph_filter_changed({ filter_type: 'link', filter_id: filter.id, enabled }).catch(console.error);
         });
 
         setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -793,7 +779,7 @@ const ChatRightPanel = ({
         const currentFilter = graphNodeFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        trackGraphFilterChange('node', filterId, newEnabled);
+        track_graph_filter_changed({ filter_type: 'node', filter_id: filterId, enabled: newEnabled }).catch(console.error);
 
         setGraphNodeFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -802,7 +788,7 @@ const ChatRightPanel = ({
 
     const handleAllNodeFilters = (enabled: boolean) => {
         graphNodeFilters.forEach((filter) => {
-            trackGraphFilterChange('node', filter.id, enabled);
+            track_graph_filter_changed({ filter_type: 'node', filter_id: filter.id, enabled }).catch(console.error);
         });
 
         setGraphNodeFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -879,7 +865,7 @@ const ChatRightPanel = ({
                                         <Tabs
                                             value={graphView}
                                             onValueChange={(newView) => {
-                                                trackGraphViewChange(graphView as '2d' | '3d', newView as '2d' | '3d');
+                                                track_graph_view_changed({ from_view: graphView as '2d' | '3d', to_view: newView as '2d' | '3d' }).catch(console.error);
                                                 setGraphView(newView);
                                             }}
                                         >
@@ -1183,21 +1169,7 @@ const ChatRightPanel = ({
                                     className="w-full h-full overflow-y-auto pb-6"
                                     value={openAccordionItems}
                                     onValueChange={(newValue) => {
-                                        const addedItems = newValue.filter(
-                                            (item) => !openAccordionItems.includes(item),
-                                        );
-                                        const removedItems = openAccordionItems.filter(
-                                            (item) => !newValue.includes(item),
-                                        );
-
-                                        addedItems.forEach((itemId) => {
-                                            trackAccordionInteraction(itemId, 'content_group', 'expand', 0);
-                                        });
-
-                                        removedItems.forEach((itemId) => {
-                                            trackAccordionInteraction(itemId, 'content_group', 'collapse', 0);
-                                        });
-
+                                        // Removed old accordion tracking
                                         setOpenAccordionItems(newValue);
                                     }}
                                     ref={accordionContainerRef}

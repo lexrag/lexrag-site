@@ -9,7 +9,7 @@ import { GraphData } from '@/types/Graph';
 import { Message } from '@/types/Message';
 import { MessageTypes } from '@/types/MessageTypes';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
-import { useSegment } from '@/hooks/use-segment';
+import { track } from '@/lib/analytics';
 
 interface UseChatArgs {
     websocket: WebSocket | null;
@@ -18,7 +18,6 @@ interface UseChatArgs {
 }
 
 export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseChatArgs) => {
-    const { trackChatResponse } = useSegment();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isThinking, setIsThinking] = useState<boolean>(false);
     const [currentResponseContent, setCurrentResponseContent] = useState<string>('');
@@ -135,13 +134,13 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 const nodeCount = (graphDataRef.current?.all_retrieved_nodes?.nodes?.length || 0) + 
                                 (graphDataRef.current?.relevant_retrieved_nodes?.nodes?.length || 0);
                 
-                trackChatResponse(
-                    threadId || 'unknown',
-                    accumulatedContentRef.current.length,
-                    responseTime,
+                track('chat_response_received', {
+                    session_id: threadId || 'unknown',
+                    response_length: accumulatedContentRef.current.length,
+                    response_time_ms: responseTime,
                     hasGraph,
                     nodeCount
-                );
+                });
 
                 setMessages((prev) => [...prev, message]);
                 setCurrentResponseContent('');

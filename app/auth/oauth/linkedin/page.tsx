@@ -3,13 +3,13 @@
 import { useCallback, useEffect } from 'react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { linkedinSignIn } from '@/api/auth/linkedinSignIn';
-import { useSegment } from '@/hooks/use-segment';
+import { identifyUser } from '@/lib/user-analytics';
+import { getMeClient } from '@/api/auth/getMeClient';
 import Loading from '@/app/loading';
 
 const OauthCallback = () => {
     const searchParams = useSearchParams();
     const token = searchParams.get('token');
-    const { trackAuth, trackLinkedInConversion } = useSegment();
 
     const handleLinkedInSignIn = useCallback(async () => {
         if (!token) return;
@@ -18,15 +18,18 @@ const OauthCallback = () => {
 
         if (!result.success) {
             console.log('error', result.error);
-            trackAuth('sign_in', 'linkedin', false);
         } else {
-            trackAuth('sign_in', 'linkedin', true);
-            
-            trackLinkedInConversion('signin');
-            
+            try {
+                const userData = await getMeClient();
+                if (userData) {
+                    await identifyUser(userData);
+                }
+            } catch (error) {
+                console.error('Error identifying user after OAuth:', error);
+            }
             redirect('/chat/new');
         }
-    }, [token, trackAuth, trackLinkedInConversion]);
+    }, [token]);
 
     useEffect(() => {
         if (token !== undefined) {
