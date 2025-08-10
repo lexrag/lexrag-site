@@ -1,49 +1,47 @@
-import { NextResponse } from 'next/server';
+/* All comments in code strictly in English */
+export const runtime = 'nodejs';
 
-// Proxy frontend analytics beacons to backend analytics endpoint.
-// Accepts JSON: { event: string, properties: object }
-export async function POST(request: Request) {
+export async function POST(req: Request) {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!apiBase) {
+        // Sampled log to avoid noise when misconfigured
+        if (Math.random() < 0.01) {
+            console.error('[analytics/beacon] missing NEXT_PUBLIC_API_BASE_URL');
+        }
+        return new Response('', { status: 204 });
+    }
+
+    const backendUrl = `${apiBase.replace(/\/$/, '')}/analytics/beacon`;
+    const body = await req.text(); // keep raw for pass-through
+
+    const headers = new Headers();
+    headers.set('content-type', 'application/json');
+
+    // Forward cookies for session-based auth
+    const cookies = req.headers.get('cookie');
+    if (cookies) headers.set('cookie', cookies);
+
+    // Forward Authorization if present (e.g., Bearer <token>)
+    const auth = req.headers.get('authorization');
+    if (auth) headers.set('authorization', auth);
+
     try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
-        if (!apiBase) {
-            return NextResponse.json({ error: 'API base URL is not configured' }, { status: 500 });
-        }
-
-        let payload: any;
-        try {
-            payload = await request.json();
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
-        }
-
-        if (!payload || typeof payload.event !== 'string' || !payload.event) {
-            return NextResponse.json({ error: 'Missing or invalid "event"' }, { status: 400 });
-        }
-
-        // Pass-through to backend beacon endpoint
-        const backendUrl = `${apiBase.replace(/\/$/, '')}/analytics/beacon`;
-        const resp = await fetch(backendUrl, {
+        const res = await fetch(backendUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            // Keepalive not supported on server fetch; server has stable network
+            headers,
+            body,
+            // Server-to-server; CORS not needed here
         });
-
-        if (!resp.ok) {
-            const text = await resp.text();
-            return NextResponse.json({ error: 'Upstream error', details: text }, { status: resp.status });
+        // Mirror backend status; expected 204
+        const text = await res.text();
+        return new Response(text, { status: res.status });
+    } catch (e) {
+        // Sampled error logging to observe persistent backend failures
+        if (Math.random() < 0.01) {
+            console.error('[analytics/beacon] proxy error', e);
         }
-
-        // Return upstream response as-is if JSON, otherwise ok
-        const contentType = resp.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-            const data = await resp.json();
-            return NextResponse.json(data, { status: resp.status });
-        }
-        return new NextResponse(null, { status: resp.status });
-    } catch (err: any) {
-        return NextResponse.json({ error: 'Unexpected error', details: String(err?.message || err) }, { status: 500 });
+        // Do not throw to client; swallow to avoid UI errors
+        return new Response('', { status: 204 });
     }
 }
-
 
