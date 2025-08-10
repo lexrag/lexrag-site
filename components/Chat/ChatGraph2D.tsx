@@ -836,10 +836,14 @@ const ChatGraph2D = ({
 
                 const currentZoom = graphRef.current.zoom();
                 if (currentZoom && Math.abs(currentZoom - lastZoomLevel) > 0.05) {
-                    track_graph_zoomed({
-                        thread_id: threadId || 'unknown',
-                        zoom_type: 'manual',
-                    }).catch(console.error);
+                    try {
+                        track_graph_zoomed({
+                            thread_id: threadId || 'unknown',
+                            zoom_type: 'manual',
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
                     lastZoomLevel = currentZoom;
                 }
             }, 100);
@@ -857,10 +861,14 @@ const ChatGraph2D = ({
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
-            track_graph_zoomed({
-                thread_id: threadId || 'unknown',
-                zoom_type: 'fit',
-            }).catch(console.error);
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'fit',
+                });
+            } catch (e) {
+                console.error(e);
+            }
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
             setHighlightedLinkId(null);
@@ -877,11 +885,15 @@ const ChatGraph2D = ({
                 payload.y = targetNode.y;
             }
 
-            track_graph_zoomed({
-                thread_id: threadId || 'unknown',
-                zoom_type: 'node',
-                target_id: payload.id,
-            }).catch(console.error);
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'node',
+                    target_id: payload.id,
+                });
+            } catch (e) {
+                console.error(e);
+            }
 
             graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
             graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
@@ -1573,6 +1585,10 @@ const ChatGraph2D = ({
                     thread_id: threadId || 'unknown',
                     graph_view: '2d',
                 }}
+                disablePulses={true}
+                minThresholdMs={3000}
+                finalMinThresholdMs={5000}
+                sampleOneOutOf={10}
             />
 
             <ForceGraph2D

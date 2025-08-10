@@ -4,8 +4,11 @@ import { track } from '@/lib/analytics';
 interface UseTimeOnViewOptions {
     areaId: string;
     extra?: Record<string, any>;
-    minThresholdMs?: number; // Minimum time to track (default: 1000ms)
-    pulseIntervalMs?: number; // How often to send "pulse" events (default: 30000ms)
+    minThresholdMs?: number; // Minimum time to track (default: 3000ms)
+    pulseIntervalMs?: number; // How often to send "pulse" events (default: 60000ms)
+    finalMinThresholdMs?: number; // Minimum time required to send final event (default: same as minThresholdMs)
+    disablePulses?: boolean; // Disable periodic pulses (default: from env or false)
+    sampleOneOutOf?: number; // Sample pulses: send for 1 out of N sessions (default: from env or 1)
 }
 
 interface TimeOnViewControls {
@@ -22,14 +25,26 @@ interface TimeOnViewControls {
 export function useTimeOnView({
     areaId,
     extra = {},
-    minThresholdMs = 1000,
-    pulseIntervalMs = 30000,
+    minThresholdMs = 3000,
+    pulseIntervalMs = 60000,
+    finalMinThresholdMs,
+    disablePulses,
+    sampleOneOutOf,
 }: UseTimeOnViewOptions): TimeOnViewControls {
+    // Read client-side env flags
+    const ENV_DISABLE_PULSES =
+        typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES === 'true';
+    const rawSample =
+        (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES) || '1';
+    const ENV_SAMPLE_ONE_OUT_OF = Number.parseInt(rawSample, 10);
+
     const startTimeRef = useRef<number | null>(null);
     const totalTimeRef = useRef<number>(0);
     const isPausedRef = useRef<boolean>(false);
     const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
     const lastPulseTimeRef = useRef<number>(0);
+    const hasFlushedFinalRef = useRef<boolean>(false);
+    const isSampledRef = useRef<boolean>(true);
 
     const sendTimeSpentEvent = useCallback(
         (spentMs: number, isFinal: boolean = false) => {
@@ -56,7 +71,10 @@ export function useTimeOnView({
                 const elapsed = now - startTimeRef.current + totalTimeRef.current;
 
                 if (elapsed - lastPulseTimeRef.current >= pulseIntervalMs) {
-                    sendTimeSpentEvent(elapsed, false);
+                    // Only send pulse if sampled and pulses are enabled
+                    if (isSampledRef.current) {
+                        sendTimeSpentEvent(elapsed, false);
+                    }
                     lastPulseTimeRef.current = elapsed;
                 }
             }
@@ -69,7 +87,19 @@ export function useTimeOnView({
         startTimeRef.current = Date.now();
         lastPulseTimeRef.current = 0;
         isPausedRef.current = false;
-        startPulseTimer();
+        // Decide sampling for this session (pulses only)
+        const oneOutOf = Number.isFinite(sampleOneOutOf || NaN)
+            ? (sampleOneOutOf as number)
+            : Number.isFinite(ENV_SAMPLE_ONE_OUT_OF) && ENV_SAMPLE_ONE_OUT_OF > 0
+              ? ENV_SAMPLE_ONE_OUT_OF
+              : 1;
+        isSampledRef.current = oneOutOf <= 1 ? true : Math.random() < 1 / oneOutOf;
+
+        // Respect disable flag (prop takes precedence over env)
+        const pulsesDisabled = typeof disablePulses === 'boolean' ? disablePulses : ENV_DISABLE_PULSES;
+        if (!pulsesDisabled) {
+            startPulseTimer();
+        }
     }, [startPulseTimer]);
 
     const stop = useCallback(() => {
@@ -78,8 +108,14 @@ export function useTimeOnView({
         const endTime = Date.now();
         const spentMs = endTime - startTimeRef.current + totalTimeRef.current;
 
-        // Send final event
-        sendTimeSpentEvent(spentMs, true);
+        // Send final event once per session and mark flushed
+        if (!hasFlushedFinalRef.current) {
+            const minFinal = typeof finalMinThresholdMs === 'number' ? finalMinThresholdMs : minThresholdMs;
+            if (spentMs >= (minFinal || 0)) {
+                sendTimeSpentEvent(spentMs, true);
+                hasFlushedFinalRef.current = true;
+            }
+        }
 
         // Cleanup
         if (pulseTimerRef.current) {
@@ -129,21 +165,64 @@ export function useTimeOnView({
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [pause, resume]);
 
-    // Handle page unload
+    // Reliable final flush on pagehide/visibilitychange using sendBeacon
     useEffect(() => {
-        const handleBeforeUnload = () => {
-            if (startTimeRef.current) {
-                const endTime = Date.now();
-                const spentMs = endTime - startTimeRef.current + totalTimeRef.current;
-                sendTimeSpentEvent(spentMs, true);
+        const buildPayload = () => {
+            if (!startTimeRef.current) return null;
+            const endTime = Date.now();
+            const spentMs = endTime - startTimeRef.current + totalTimeRef.current;
+            const minFinal = typeof finalMinThresholdMs === 'number' ? finalMinThresholdMs : minThresholdMs;
+            if (spentMs < (minFinal || 0)) return null;
+            return {
+                event: 'content_time_spent',
+                properties: {
+                    area_id: areaId,
+                    spent_ms: spentMs,
+                    is_final: true,
+                    ...extra,
+                },
+            };
+        };
+
+        const flushFinal = () => {
+            if (hasFlushedFinalRef.current) return;
+            const payload = buildPayload();
+            if (!payload) return;
+            try {
+                const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                // comments in code strictly in English
+                // Server endpoint should forward to Segment and/or handle appropriately
+                navigator.sendBeacon('/api/analytics/beacon', blob);
+                hasFlushedFinalRef.current = true;
+            } catch {
+                // Fallback: fire-and-forget request with keepalive
+                try {
+                    fetch('/api/analytics/beacon', {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                        keepalive: true,
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                    hasFlushedFinalRef.current = true;
+                } catch {
+                    // Intentionally ignore errors
+                }
             }
         };
 
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }, [sendTimeSpentEvent]);
+        const onPageHide = () => flushFinal();
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') flushFinal();
+        };
 
-    // Cleanup on unmount
+        window.addEventListener('pagehide', onPageHide);
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
+        return () => {
+            window.removeEventListener('pagehide', onPageHide);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+        };
+    }, [areaId, extra, minThresholdMs, finalMinThresholdMs]);
     useEffect(() => {
         return () => {
             if (startTimeRef.current) {

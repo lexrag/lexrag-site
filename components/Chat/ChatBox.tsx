@@ -95,8 +95,15 @@ const ChatBox = ({
 
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto md:px-4 px-2 min-h-0">
-            {/* Track time spent in chat */}
-            <ContentTimeTracker areaId="chat_main" extra={{ thread_id: threadId || 'unknown' }} />
+            {/* Track time spent in chat - conservative defaults */}
+            <ContentTimeTracker
+                areaId="chat_main"
+                extra={{ thread_id: threadId || 'unknown' }}
+                disablePulses={true}
+                minThresholdMs={3000}
+                finalMinThresholdMs={5000}
+                sampleOneOutOf={10}
+            />
 
             <div className="scrollable flex-1 overflow-y-auto space-y-2 md:pb-4 pb-20 min-h-0">
                 <div className="flex flex-col">

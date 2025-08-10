@@ -31,7 +31,9 @@ function getUtmFromUrl(search: string): Partial<MarketingContext> {
     // UTM parameters
     ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach((key) => {
         const value = params.get(key);
-        if (value && key in utm) {
+        // comments in code strictly in English
+        // Persist key if it exists in the URL, regardless of initial object shape
+        if (value) {
             (utm as any)[key] = value;
         }
     });
@@ -54,7 +56,9 @@ function getLinkedInFromUrl(search: string): Partial<MarketingContext> {
 
     ['li_lead_id', 'li_campaign_id', 'li_ad_id', 'li_placement'].forEach((key) => {
         const value = params.get(key);
-        if (value && key in linkedin) {
+        // comments in code strictly in English
+        // Persist key if it exists in the URL, regardless of initial object shape
+        if (value) {
             (linkedin as any)[key] = value;
         }
     });

@@ -2,14 +2,18 @@
 
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { page } from '@/lib/analytics';
+import { pageOncePerLocation } from '@/lib/analytics';
+import { persistMarketingContextFromUrl } from '@/lib/marketing-context';
 
 function PageTrackerInner() {
     const pathname = usePathname();
     const search = useSearchParams();
 
     useEffect(() => {
-        page();
+        // comments in code strictly in English
+        // Persist marketing context synchronously for the first page view, then send page()
+        persistMarketingContextFromUrl();
+        pageOncePerLocation();
     }, [pathname, search]);
 
     return null;

@@ -1167,10 +1167,14 @@ const ChatGraph3D = ({
                 const zoomDelta = Math.abs(currentZoomLevel - lastZoomLevel);
 
                 if (zoomDelta > 15 && now - lastEventTime > 200) {
-                    track_graph_zoomed({
-                        thread_id: threadId || 'unknown',
-                        zoom_type: 'manual',
-                    }).catch(console.error);
+                    try {
+                        track_graph_zoomed({
+                            thread_id: threadId || 'unknown',
+                            zoom_type: 'manual',
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
                     lastZoomLevel = currentZoomLevel;
                     lastEventTime = now;
                     lastEventType = 'zoom';
@@ -1216,10 +1220,14 @@ const ChatGraph3D = ({
                         Math.abs(currentRotation.x - lastRotation.x) + Math.abs(currentRotation.y - lastRotation.y);
 
                     if (rotationDelta > 0.01 && now - lastEventTime > 200 && lastEventType !== 'zoom') {
-                        track_graph_zoomed({
-                            thread_id: threadId || 'unknown',
-                            zoom_type: 'manual',
-                        }).catch(console.error);
+                        try {
+                            track_graph_zoomed({
+                                thread_id: threadId || 'unknown',
+                                zoom_type: 'manual',
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
                         lastRotation = currentRotation;
                         lastEventTime = now;
                         lastEventType = 'rotation';
@@ -1240,10 +1248,14 @@ const ChatGraph3D = ({
 
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(async () => {
-            track_graph_zoomed({
-                thread_id: threadId || 'unknown',
-                zoom_type: 'fit',
-            }).catch(console.error);
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'fit',
+                });
+            } catch (e) {
+                console.error(e);
+            }
             await animateCameraAndRotation();
 
             setTimeout(() => {
@@ -1389,11 +1401,15 @@ const ChatGraph3D = ({
 
         setSelectedNodes(new Set([node]));
 
-        track_node_clicked({
-            thread_id: threadId || 'unknown',
-            target_id: node.id,
-            node_type: node.labels?.[0] || 'unknown',
-        }).catch(console.error);
+        try {
+            track_node_clicked({
+                thread_id: threadId || 'unknown',
+                target_id: node.id,
+                node_type: node.labels?.[0] || 'unknown',
+            });
+        } catch (e) {
+            console.error(e);
+        }
 
         // Single click - select node
         console.log('Node selected:', node.id);

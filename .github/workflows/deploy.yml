@@ -25,9 +25,17 @@ env:
     NEXT_PUBLIC_API_BASE_URL: https://api.lexrag.com
     NEXT_PUBLIC_VERIFICATION_CODE_TTL: 30
     NEXT_PUBLIC_JWT_EXPIRATION_MINUTES: 60
-    SEGMENT_WRITE_KEY: 8MIbGPXtsepP3Fw9BH1Kg27lp3dPTBWe
+    NEXT_PUBLIC_BASE_URL: https://lexrag.com
+    NEXT_PUBLIC_BASE_PATH: ''
     NEXT_PUBLIC_SEGMENT_ENABLED: true
     NEXT_PUBLIC_SEGMENT_DEBUG: false
+    NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND: false
+    NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED: 1
+    NEXT_PUBLIC_ANALYTICS_VIA_BEACON: true
+    NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES: true
+    NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES: 10
+    # Optional explicit override for analytics handoff endpoint. If not set, uses `${NEXT_PUBLIC_API_BASE_URL}/auth/analytics/link`.
+    NEXT_PUBLIC_ANALYTICS_HANDOFF_URL: ''
 
 jobs:
     deploy:
@@ -81,8 +89,19 @@ jobs:
                   echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
                   docker build \
                     --build-arg NEXT_PUBLIC_API_BASE_URL=${{env.NEXT_PUBLIC_API_BASE_URL}} \
+                    --build-arg NEXT_PUBLIC_BASE_URL=${{env.NEXT_PUBLIC_BASE_URL}} \
+                    --build-arg NEXT_PUBLIC_BASE_PATH=${{env.NEXT_PUBLIC_BASE_PATH}} \
                     --build-arg NEXT_PUBLIC_VERIFICATION_CODE_TTL=${{env.NEXT_PUBLIC_VERIFICATION_CODE_TTL}} \
                     --build-arg NEXT_PUBLIC_JWT_EXPIRATION_MINUTES=${{env.NEXT_PUBLIC_JWT_EXPIRATION_MINUTES}} \
+                     --build-arg NEXT_PUBLIC_SEGMENT_WRITE_KEY=${{secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY}} \
+                     --build-arg NEXT_PUBLIC_SEGMENT_ENABLED=${{env.NEXT_PUBLIC_SEGMENT_ENABLED}} \
+                     --build-arg NEXT_PUBLIC_SEGMENT_DEBUG=${{env.NEXT_PUBLIC_SEGMENT_DEBUG}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=${{env.NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=${{env.NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_HANDOFF_URL=${{env.NEXT_PUBLIC_ANALYTICS_HANDOFF_URL}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_VIA_BEACON=${{env.NEXT_PUBLIC_ANALYTICS_VIA_BEACON}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=${{env.NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES}} \
+                     --build-arg NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=${{env.NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES}} \
                     -t $IMAGE_URI .
                   docker push $IMAGE_URI
 

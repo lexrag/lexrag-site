@@ -1,4 +1,4 @@
-import { identify } from './analytics';
+import { identify, alias, getAnonymousId } from './analytics';
 import type { UserAnalyticsProfile } from './analytics-types';
 
 let cachedUserProfile: UserAnalyticsProfile | null = null;
@@ -25,6 +25,18 @@ export async function identifyUser(userOrId: UserAnalyticsProfile | string | num
 
         if (profile) {
             cachedUserProfile = profile;
+        }
+
+        // comments in code strictly in English
+        // Backend does not expose alias handoff endpoint. As a fallback, optionally send frontend alias
+        try {
+            const anonymousId = await getAnonymousId();
+            if (anonymousId && anonymousId !== 'anonymous') {
+                // Best-effort alias on the client (gated by FE_IDENTIFY_ENABLED)
+                await alias(userId);
+            }
+        } catch (e) {
+            console.warn('Failed to perform frontend alias fallback:', e);
         }
 
         await identify(userId);

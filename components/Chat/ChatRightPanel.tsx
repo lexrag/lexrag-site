@@ -776,12 +776,16 @@ const ChatRightPanel = ({
         const currentFilter = graphLinkFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        track_graph_filter_changed({
+        try {
+            track_graph_filter_changed({
             thread_id: threadId,
             filter_type: 'link',
             filter_id: filterId,
             enabled: newEnabled,
-        }).catch(console.error);
+            });
+        } catch (e) {
+            console.error(e);
+        }
 
         setGraphLinkFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -790,12 +794,16 @@ const ChatRightPanel = ({
 
     const handleAllLinkFilters = (enabled: boolean) => {
         graphLinkFilters.forEach((filter) => {
-            track_graph_filter_changed({
-                thread_id: threadId,
-                filter_type: 'link',
-                filter_id: filter.id,
-                enabled,
-            }).catch(console.error);
+            try {
+                track_graph_filter_changed({
+                    thread_id: threadId,
+                    filter_type: 'link',
+                    filter_id: filter.id,
+                    enabled,
+                });
+            } catch (e) {
+                console.error(e);
+            }
         });
 
         setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -805,12 +813,16 @@ const ChatRightPanel = ({
         const currentFilter = graphNodeFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        track_graph_filter_changed({
+        try {
+            track_graph_filter_changed({
             thread_id: threadId,
             filter_type: 'node',
             filter_id: filterId,
             enabled: newEnabled,
-        }).catch(console.error);
+            });
+        } catch (e) {
+            console.error(e);
+        }
 
         setGraphNodeFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -819,12 +831,16 @@ const ChatRightPanel = ({
 
     const handleAllNodeFilters = (enabled: boolean) => {
         graphNodeFilters.forEach((filter) => {
-            track_graph_filter_changed({
-                thread_id: threadId,
-                filter_type: 'node',
-                filter_id: filter.id,
-                enabled,
-            }).catch(console.error);
+            try {
+                track_graph_filter_changed({
+                    thread_id: threadId,
+                    filter_type: 'node',
+                    filter_id: filter.id,
+                    enabled,
+                });
+            } catch (e) {
+                console.error(e);
+            }
         });
 
         setGraphNodeFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -903,11 +919,17 @@ const ChatRightPanel = ({
                                         <Tabs
                                             value={graphView}
                                             onValueChange={(newView) => {
-                                                track_graph_view_changed({
-                                                    thread_id: threadId,
-                                                    from_view: graphView as '2d' | '3d',
-                                                    to_view: newView as '2d' | '3d',
-                                                }).catch(console.error);
+                                                // comments in code strictly in English
+                                                // Avoid chaining .catch on possibly undefined result; track_* returns void
+                                                try {
+                                                    track_graph_view_changed({
+                                                        thread_id: threadId,
+                                                        from_view: graphView as '2d' | '3d',
+                                                        to_view: newView as '2d' | '3d',
+                                                    });
+                                                } catch (e) {
+                                                    console.error(e);
+                                                }
                                                 setGraphView(newView);
                                             }}
                                         >

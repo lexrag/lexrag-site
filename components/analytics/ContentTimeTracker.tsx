@@ -8,6 +8,9 @@ interface ContentTimeTrackerProps {
     extra?: Record<string, any>;
     minThresholdMs?: number;
     pulseIntervalMs?: number;
+    finalMinThresholdMs?: number;
+    disablePulses?: boolean;
+    sampleOneOutOf?: number;
     autoStart?: boolean; // Whether to start tracking automatically on mount
 }
 
@@ -18,8 +21,11 @@ interface ContentTimeTrackerProps {
 export default function ContentTimeTracker({
     areaId,
     extra = {},
-    minThresholdMs = 1000,
-    pulseIntervalMs = 30000,
+    minThresholdMs = 3000,
+    pulseIntervalMs = 60000,
+    finalMinThresholdMs,
+    disablePulses,
+    sampleOneOutOf,
     autoStart = true,
 }: ContentTimeTrackerProps) {
     const { start, stop } = useTimeOnView({
@@ -27,6 +33,9 @@ export default function ContentTimeTracker({
         extra,
         minThresholdMs,
         pulseIntervalMs,
+        finalMinThresholdMs,
+        disablePulses,
+        sampleOneOutOf,
     });
 
     useEffect(() => {
