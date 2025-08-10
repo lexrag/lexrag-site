@@ -4,6 +4,7 @@ export const uploadUserDocuments = async (file: File) => {
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user-documents/upload`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             accept: 'application/json',
             Authorization: `Bearer ${localStorage.getItem('token')}`,

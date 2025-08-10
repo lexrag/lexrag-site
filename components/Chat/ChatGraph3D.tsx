@@ -7,7 +7,7 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
-import { useSegment } from '@/hooks/use-segment';
+import { track_node_clicked, track_node_expanded, track_node_collapsed, track_graph_zoomed } from '@/lib/analytics';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
@@ -72,11 +72,7 @@ const ChatGraph3D = ({
     showNodeLabels = true,
 }: ChatGraph3DProps) => {
     const { resolvedTheme } = useTheme();
-    const { 
-        trackGraphNodeClick, 
-        trackGraphNodeExpansion, 
-        trackGraphZoom
-    } = useSegment();
+    // Removed deprecated useSegment hook
 
     const graphRef = useRef<any>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -894,7 +890,7 @@ const ChatGraph3D = ({
         }
 
         // Ensure minimum and maximum bounds
-        const minDistance = 60; // Было 80, стало 60
+        const minDistance = 60;
         const maxDistance = Math.min(containerWidth, containerHeight) * 0.95;
 
         return Math.max(minDistance, Math.min(maxDistance, baseDistance));
@@ -1102,8 +1098,137 @@ const ChatGraph3D = ({
         });
     }, []);
 
+    // Track camera zoom and rotation changes for interactive events
+    useEffect(() => {
+        let lastZoomLevel = 1;
+        let lastRotation = { x: 0, y: 0 };
+        let intervalId: NodeJS.Timeout | null = null;
+        let isInitialized = false;
+        let lastEventTime = 0;
+        let lastEventType = '';
+
+        const startInteractionTracking = () => {
+            if (isInitialized || !graphRef.current) return;
+            
+            isInitialized = true;
+
+            const camera = graphRef.current.camera();
+            const controls = graphRef.current.controls();
+            
+            if (camera) {
+                lastZoomLevel = camera.position.distanceTo({ x: 0, y: 0, z: 0 });
+            }
+
+            if (controls) {
+                // Initialize rotation tracking - try multiple methods
+                if (controls.getAzimuthalAngle && controls.getPolarAngle) {
+                    lastRotation = { 
+                        x: controls.getAzimuthalAngle(),
+                        y: controls.getPolarAngle()
+                    };
+                } else if (camera && camera.rotation) {
+                    lastRotation = {
+                        x: camera.rotation.y,
+                        y: camera.rotation.x
+                    };
+                } else if (controls.object && controls.object.rotation) {
+                    lastRotation = {
+                        x: controls.object.rotation.y,
+                        y: controls.object.rotation.x
+                    };
+                } else if (controls.target && camera) {
+                    const target = controls.target;
+                    const position = camera.position;
+                    lastRotation = {
+                        x: Math.atan2(position.x - target.x, position.z - target.z),
+                        y: Math.atan2(
+                            Math.sqrt((position.x - target.x) ** 2 + (position.z - target.z) ** 2),
+                            position.y - target.y
+                        )
+                    };
+                }
+            }
+
+            intervalId = setInterval(() => {
+                const currentCamera = graphRef.current?.camera();
+                const currentControls = graphRef.current?.controls();
+                
+                if (!currentCamera || !currentControls) return;
+
+                const now = Date.now();
+
+                // Track zoom changes (avoid false positives during rotation)
+                const currentZoomLevel = currentCamera.position.distanceTo({ x: 0, y: 0, z: 0 });
+                const zoomDelta = Math.abs(currentZoomLevel - lastZoomLevel);
+                
+                if (zoomDelta > 15 && (now - lastEventTime > 200)) {
+                    track_graph_zoomed({ zoom_type: 'manual' }).catch(console.error);
+                    lastZoomLevel = currentZoomLevel;
+                    lastEventTime = now;
+                    lastEventType = 'zoom';
+                }
+
+                // Track rotation changes - try multiple methods
+                let currentRotation = { x: 0, y: 0 };
+                let hasRotationData = false;
+                
+                if (currentControls.getAzimuthalAngle && currentControls.getPolarAngle) {
+                    currentRotation = { 
+                        x: currentControls.getAzimuthalAngle(),
+                        y: currentControls.getPolarAngle()
+                    };
+                    hasRotationData = true;
+                } else if (currentCamera.rotation) {
+                    currentRotation = {
+                        x: currentCamera.rotation.y,
+                        y: currentCamera.rotation.x
+                    };
+                    hasRotationData = true;
+                } else if (currentControls.object && currentControls.object.rotation) {
+                    currentRotation = {
+                        x: currentControls.object.rotation.y,
+                        y: currentControls.object.rotation.x
+                    };
+                    hasRotationData = true;
+                } else if (currentControls.target) {
+                    const target = currentControls.target;
+                    const position = currentCamera.position;
+                    currentRotation = {
+                        x: Math.atan2(position.x - target.x, position.z - target.z),
+                        y: Math.atan2(
+                            Math.sqrt((position.x - target.x) ** 2 + (position.z - target.z) ** 2),
+                            position.y - target.y
+                        )
+                    };
+                    hasRotationData = true;
+                }
+                
+                if (hasRotationData) {
+                    const rotationDelta = Math.abs(currentRotation.x - lastRotation.x) + Math.abs(currentRotation.y - lastRotation.y);
+                    
+                    if (rotationDelta > 0.01 && (now - lastEventTime > 200) && lastEventType !== 'zoom') {
+                        track_graph_zoomed({ zoom_type: 'manual' }).catch(console.error);
+                        lastRotation = currentRotation;
+                        lastEventTime = now;
+                        lastEventType = 'rotation';
+                    }
+                }
+            }, 100);
+        };
+
+        const timer = setTimeout(startInteractionTracking, 1500);
+
+        return () => {
+            clearTimeout(timer);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [processedData]);
+
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(async () => {
+            track_graph_zoomed({ zoom_type: 'fit' }).catch(console.error);
             await animateCameraAndRotation();
 
             setTimeout(() => {
@@ -1118,7 +1243,7 @@ const ChatGraph3D = ({
             const targetNode = processedData.nodes.find((node) => node.id === payload.id);
             if (!targetNode) return;
 
-            trackGraphZoom('node', payload.id);
+            track_graph_zoomed({ zoom_type: 'node', target_id: payload.id }).catch(console.error);
 
             const nodeX = targetNode.x || payload.x || 0;
             const nodeY = targetNode.y || payload.y || 0;
@@ -1245,7 +1370,13 @@ const ChatGraph3D = ({
 
         setSelectedNodes(new Set([node]));
 
-        trackGraphNodeClick(node, '3d', expandedNodes.has(node.id));
+        track_node_clicked({ 
+            node_id: node.id, 
+            node_type: node.labels?.[0] || 'unknown', 
+            node_labels: node.labels?.join(',') || '',
+            graph_view: '3d', 
+            is_expanded: expandedNodes.has(node.id)
+        }).catch(console.error);
 
         // Single click - select node
         console.log('Node selected:', node.id);
@@ -1329,7 +1460,12 @@ const ChatGraph3D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                trackGraphNodeExpansion(node, 'collapse', 0);
+                track_node_collapsed({ 
+                    node_id: node.id, 
+                    node_type: node.labels?.[0] || 'unknown', 
+                    expansion_type: 'collapse', 
+                    child_node_count: 0 
+                }).catch(console.error);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1396,7 +1532,12 @@ const ChatGraph3D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+                        track_node_expanded({ 
+                            node_id: node.id, 
+                            node_type: node.labels?.[0] || 'unknown', 
+                            expansion_type: 'expand', 
+                            child_node_count: filteredNewNodes.length 
+                        }).catch(console.error);
 
                         setTimeout(() => {
                             const optimalDistance = calculateOptimalZoomDistance();
@@ -1407,13 +1548,23 @@ const ChatGraph3D = ({
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        trackGraphNodeExpansion(node, 'expand', 0);
+                        track_node_expanded({ 
+                            node_id: node.id, 
+                            node_type: node.labels?.[0] || 'unknown', 
+                            expansion_type: 'expand', 
+                            child_node_count: 0 
+                        }).catch(console.error);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     // Mark node as expanded even if no children to prevent repeated API calls
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    trackGraphNodeExpansion(node, 'expand', 0);
+                    track_node_expanded({ 
+                        node_id: node.id, 
+                        node_type: node.labels?.[0] || 'unknown', 
+                        expansion_type: 'expand', 
+                        child_node_count: 0 
+                    }).catch(console.error);
                 }
             }
         } catch (error) {

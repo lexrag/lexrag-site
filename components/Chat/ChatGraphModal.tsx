@@ -489,7 +489,7 @@ const ChatGraphModal = ({
         const hasSidebar = !!data && Object.entries(groupedNodes).length > 0 && window.innerWidth >= 768;
         const sidebarWidth = hasSidebar ? Math.max(modalWidth * 0.4, 300) : 0;
         const graphWidth = Math.max(modalWidth - sidebarWidth, 400);
-        const graphHeight = modalHeight; // Используем всю высоту модального окна
+        const graphHeight = modalHeight;
         
         return {
             modalWidth,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
-import { useSegment } from '@/hooks/use-segment';
+import { track_question_submitted } from '@/lib/analytics';
 
 export interface ChatTextAreaProps {
     input: string;
@@ -14,18 +14,25 @@ export interface ChatTextAreaProps {
 const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
-    const { trackChatQuestion } = useSegment();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             
             if (input.trim()) {
-                trackChatQuestion(
-                    input.trim(),
-                    pathname.split('/').pop() || 'new',
-                    isNewConversation
-                );
+                const questionLength = input.trim().length;
+                const wordCount = input.trim().split(/\s+/).length;
+                const complexity = questionLength > 200 ? 'high' : questionLength > 100 ? 'medium' : 'low';
+                
+                track_question_submitted({
+                    chat_session_id: pathname.split('/').pop() || 'new',
+                    is_new_conversation: isNewConversation,
+                    question_length: questionLength,
+                    word_count: wordCount,
+                    query_complexity: complexity,
+                }).catch((error) => {
+                    console.error('Error tracking question submitted:', error);
+                });
             }
             
             sendMessage(input, isNewConversation);

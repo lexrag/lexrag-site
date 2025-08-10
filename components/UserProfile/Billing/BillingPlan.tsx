@@ -12,10 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import CancelPlanDialog from './Plans/CancelPlanDialog';
-import { useSegment } from '@/hooks/use-segment';
+import { track_subscription_cancelled } from '@/lib/analytics';
 
 const BillingPlan = () => {
-    const { trackSubscription } = useSegment();
     const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -29,13 +28,13 @@ const BillingPlan = () => {
                 setError(null);
                 const sub = await getCurrentSubscription();
                 
-                // Проверяем, есть ли ошибка в ответе (detail обычно содержит сообщение об ошибке)
+
                 if (sub.detail && typeof sub.detail === 'string' && sub.detail.includes('error')) {
                     setCurrentSubscription(null);
                 } else if (sub.status === 'pending') {
                     setCurrentSubscription(null);
                 } else {
-                    // Если есть данные подписки, устанавливаем их
+
                     setCurrentSubscription(sub);
                 }
             } catch (err) {
@@ -54,12 +53,13 @@ const BillingPlan = () => {
             await cancelSubscription();
             
             if (currentSubscription?.tariff) {
-                trackSubscription(
-                    'cancelled',
-                    currentSubscription.tariff_id,
-                    currentSubscription.tariff.name,
-                    currentSubscription.tariff.price || 0
-                );
+                track_subscription_cancelled({
+                    plan_id: currentSubscription.tariff_id,
+                    plan_name: currentSubscription.tariff.name,
+                    amount: currentSubscription.tariff.price || 0
+                }).catch((error) => {
+                    console.error('Error tracking subscription cancellation:', error);
+                });
             }
             
             setDialogOpen(false);
