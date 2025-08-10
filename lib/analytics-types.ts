@@ -1,77 +1,164 @@
 export interface UserAnalyticsProfile {
-  id: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  userType?: 'standard' | 'admin';
-  status?: 'active' | 'inactive';
-  isSocialNetworkUser?: boolean;
-  isActive?: boolean;
-  isEmailTwoFactorEnabled?: boolean;
+    id: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    userType?: 'standard' | 'admin';
+    status?: 'active' | 'inactive';
+    isSocialNetworkUser?: boolean;
+    isActive?: boolean;
+    isEmailTwoFactorEnabled?: boolean;
 }
 
+// Graph interaction events
 export interface GraphViewChangeProps {
-  from_view: '2d' | '3d';
-  to_view: '2d' | '3d';
+    thread_id: string;
+    from_view: '2d' | '3d';
+    to_view: '2d' | '3d';
 }
 
 export interface NodeClickProps {
-  node_id: string;
-  node_type?: string;
-  node_labels?: string;
-  graph_view?: '2d' | '3d';
-  is_expanded?: boolean;
+    thread_id: string;
+    target_id: string;
+    node_type?: string;
 }
 
 export interface NodeExpansionProps {
-  node_id: string;
-  node_type?: string;
-  expansion_type: 'expand' | 'collapse';
-  child_node_count?: number;
+    thread_id: string;
+    target_id: string;
+    by_user: boolean;
 }
 
 export interface GraphZoomProps {
-  zoom_type: 'fit' | 'node' | 'manual';
-  target_id?: string;
+    thread_id: string;
+    zoom_type: 'canvas' | 'node' | 'pinch' | 'manual' | 'fit';
+    scale?: number;
+    target_id?: string;
 }
 
 export interface GraphFilterProps {
-  filter_type: 'node' | 'link' | 'layer';
-  filter_id: string;
-  enabled: boolean;
+    thread_id: string;
+    filter_type: 'node' | 'link' | 'layer';
+    filter_id: string;
+    enabled: boolean;
 }
 
+// Chat and conversation events
 export interface QuestionSubmittedProps {
-  chat_session_id: string;
-  is_new_conversation?: boolean;
-  question_length?: number;
-  word_count?: number;
-  query_complexity?: 'low' | 'medium' | 'high';
+    thread_id?: string;
+    length: number;
+    has_files?: boolean;
 }
 
 export interface ConversationLoadedProps {
-  thread_id: string;
-  messages_count: number;
+    thread_id: string;
+    extra_properties?: Record<string, any>;
 }
 
+// Copy and content events
+export interface MessageCopiedProps {
+    thread_id: string;
+    message_id: string;
+}
+
+export interface ContentCopiedProps {
+    content_type: 'answer' | 'cite' | 'code';
+    length: number;
+}
+
+// Billing and subscription events
 export interface SubscriptionCancelledProps {
-  plan_id: string;
-  plan_name: string;
-  amount: number;
-  currency?: string;
+    reason?: string;
+    plan_id?: string;
+    plan_name?: string;
+    amount?: number;
 }
 
-export interface BaseEventProperties {
-  meta?: {
-    source?: string;
+// Feature usage events
+export interface FeatureUsedProps {
+    feature: string;
+    variant?: string;
+}
+
+// Error and help events
+export interface ErrorOccurredProps {
+    error_type: string;
+    error_message?: string;
+    context?: string;
+}
+
+export interface HelpRequestedProps {
+    help_type: string;
+    context?: string;
+}
+
+// Search events
+export interface SearchPerformedProps {
+    query: string;
+    results_count: number;
+    search_type?: string;
+}
+
+// File events
+export interface FileUploadedProps {
+    file_type: string;
+    file_size: number;
+    success: boolean;
+}
+
+export interface DownloadInitiatedProps {
+    content_type: string;
+    format?: string;
+}
+
+// Share events
+export interface ShareActionProps {
+    content_type: string;
+    share_method: string;
+    success: boolean;
+}
+
+// Preference events
+export interface PreferenceChangedProps {
+    preference: string;
+    old_value?: any;
+    new_value: any;
+}
+
+// Tutorial and onboarding events
+export interface TutorialStepProps {
+    tutorial_name: string;
+    step_number: number;
+    total_steps: number;
+}
+
+export interface OnboardingCompletedProps {
+    onboarding_type: string;
+    steps_completed: number;
+    time_spent_ms: number;
+}
+
+// Content time tracking
+export interface ContentTimeSpentProps {
+    area_id: string;
+    spent_ms: number;
+    is_final: boolean;
     [key: string]: any;
-  };
-  debug_mode?: boolean;
-  [key: string]: any;
+}
+
+// Base event properties (common to all events)
+export interface BaseEventProperties {
+    meta?: {
+        source?: string;
+        [key: string]: any;
+    };
+    debug_mode?: boolean;
+    marketing?: Record<string, any>;
+    [key: string]: any;
 }
 
 export interface AnalyticsConfig {
-  writeKey: string;
-  enabled: boolean;
-  debug: boolean;
+    writeKey: string;
+    enabled: boolean;
+    debug: boolean;
 }

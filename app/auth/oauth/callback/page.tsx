@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect } from 'react';
 import { redirect, useSearchParams } from 'next/navigation';
+import { getMeClient } from '@/api/auth/getMeClient';
 import { googleSignIn } from '@/api/auth/googleSignIn';
 import { identifyUser } from '@/lib/user-analytics';
-import { getMeClient } from '@/api/auth/getMeClient';
 import Loading from '@/app/loading';
 
 const OauthCallback = () => {

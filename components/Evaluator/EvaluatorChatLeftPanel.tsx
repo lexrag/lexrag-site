@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getRuns } from '@/api/evaluator/getRuns';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
-import Link from 'next/link';
-
 
 const EvaluatorChatLeftPanel = () => {
     const [runs, setRuns] = useState<EvaluatorRun[]>([]);
@@ -22,14 +21,14 @@ const EvaluatorChatLeftPanel = () => {
             <div>
                 {runs.map((run) => (
                     <Link key={run?.thread_id} href={`/evaluator/${run.thread_id}`}>
-                        <div className={"border-1 rounded p-2 m-2 overflow-hidden"}>
-                            <h4 className={"whitespace-nowrap"}>{run?.thread_id}</h4>
+                        <div className={'border-1 rounded p-2 m-2 overflow-hidden'}>
+                            <h4 className={'whitespace-nowrap'}>{run?.thread_id}</h4>
                         </div>
                     </Link>
                 ))}
             </div>
         </section>
     );
-}
+};
 
 export default EvaluatorChatLeftPanel;

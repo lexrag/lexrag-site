@@ -4,5 +4,5 @@ import { ReactNode } from 'react';
 import ChatProvider from '@/components/Chat/ChatProvider';
 
 export default function Layout({ children }: { children: ReactNode }) {
-    return <ChatProvider mode={"chat"}>{children}</ChatProvider>;
+    return <ChatProvider mode={'chat'}>{children}</ChatProvider>;
 }

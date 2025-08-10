@@ -47,7 +47,7 @@ export const getPaymentHistory = async ({
 
         const data = await response.json();
         console.log('Payment history data:', data);
-        
+
         return data;
     } catch (error) {
         console.error('Error fetching payment history:', error);

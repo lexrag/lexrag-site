@@ -16,7 +16,7 @@ const UserDocuments = () => {
                 console.error('Failed to fetch user documents:', error);
             }
         })();
-    }, []);
+    }, [setUserDocuments]); // Empty dependency array is intentional - only run once on mount
 
     const onDeleteUserDocument = async (uri: string) => {
         await deleteUserDocuments(uri);

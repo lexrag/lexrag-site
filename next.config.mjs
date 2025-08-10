@@ -5,7 +5,7 @@ const nextConfig = {
     images: {},
     output: 'standalone',
     reactStrictMode: false,
-    devIndicators: false
+    devIndicators: false,
 };
 
 export default nextConfig;

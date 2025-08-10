@@ -12,11 +12,7 @@ export interface ChatTextAreaMobileProps {
     toggleMsgType: (msgType: string) => void;
 }
 
-const ChatTextAreaMobile = ({ 
-    input, 
-    setInput, 
-    sendMessage
-}: ChatTextAreaMobileProps) => {
+const ChatTextAreaMobile = ({ input, setInput, sendMessage }: ChatTextAreaMobileProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
 
@@ -47,4 +43,4 @@ const ChatTextAreaMobile = ({
     );
 };
 
-export default ChatTextAreaMobile; 
+export default ChatTextAreaMobile;

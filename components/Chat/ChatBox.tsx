@@ -4,8 +4,11 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
+import { track_message_copied, track_node_clicked } from '@/lib/analytics';
+import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { TypingAnimation } from '../magicui/typing-animation';
+
 // Removed deprecated useSegment import
 
 interface ChatBoxProps {
@@ -18,6 +21,7 @@ interface ChatBoxProps {
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
+    threadId?: string; // Add thread_id prop
 }
 
 const ChatBox = ({
@@ -30,6 +34,7 @@ const ChatBox = ({
     copyToClipboard,
     handleCurrentMessage,
     setScrollToCardId,
+    threadId,
 }: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
@@ -76,6 +81,13 @@ const ChatBox = ({
         if (target.tagName === 'A' && !!href) {
             const id = decodeExceptSpace(href);
 
+            // Track node click event
+            track_node_clicked({
+                thread_id: threadId || 'unknown',
+                target_id: id,
+                node_type: 'message_link',
+            });
+
             zoomToNodeGraph({ id });
             setScrollToCardId(id);
         }
@@ -83,6 +95,9 @@ const ChatBox = ({
 
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto md:px-4 px-2 min-h-0">
+            {/* Track time spent in chat */}
+            <ContentTimeTracker areaId="chat_main" extra={{ thread_id: threadId || 'unknown' }} />
+
             <div className="scrollable flex-1 overflow-y-auto space-y-2 md:pb-4 pb-20 min-h-0">
                 <div className="flex flex-col">
                     {messages.map((msg, i) => (
@@ -120,9 +135,13 @@ const ChatBox = ({
                                                 if (parsed.content) copyText = parsed.content;
                                                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
-                                            
-                                            // Removed old tracking calls
-                                            
+
+                                            // Track message copy event
+                                            track_message_copied({
+                                                thread_id: threadId || 'unknown',
+                                                message_id: msg.id,
+                                            });
+
                                             copyToClipboard(msg.id, copyText);
                                         }}
                                     >
@@ -177,6 +196,7 @@ const ChatBox = ({
                     sendMessage={sendMessage}
                     activeMsgType={activeMsgType}
                     toggleMsgType={toggleMsgType}
+                    threadId={threadId}
                 />
             </div>
         </div>

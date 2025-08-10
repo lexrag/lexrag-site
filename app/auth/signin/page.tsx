@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getGoogleAuthLink } from '@/api/auth/getGoogleAuthLink';
 import { getLinkedinAuthLink } from '@/api/auth/getLinkedinAuthLink';
+import { getMeClient } from '@/api/auth/getMeClient';
 import { signIn } from '@/api/auth/signIn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Eye, EyeOff, LoaderCircleIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { identifyUser } from '@/lib/user-analytics';
 import { Alert, AlertIcon, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,8 +22,6 @@ import ReusableDialog from '@/components/common/ReusableDialog';
 import Reset2FAModal from '@/components/UserProfile/Security/components/Reset2FAModal';
 import TwoFactorVerifyStep from '@/components/UserProfile/Security/components/TwoFactorVerifyStep';
 import { getSigninSchema, SigninSchemaType } from '../forms/signin-schema';
-import { identifyUser } from '@/lib/user-analytics';
-import { getMeClient } from '@/api/auth/getMeClient';
 
 export default function Page() {
     const router = useRouter();
@@ -82,7 +82,7 @@ export default function Page() {
                 setError(response.error);
             }
         } else {
-            // SignIn response doesn't contain user, using fallback  
+            // SignIn response doesn't contain user, using fallback
             try {
                 const userData = await getMeClient();
                 if (userData) {

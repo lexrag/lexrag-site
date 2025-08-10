@@ -8,9 +8,9 @@ import {
     FileText,
     Globe,
     Moon,
-    Sun,
     Settings,
     Shield,
+    Sun,
     User,
     UserCircle,
     Users,
@@ -189,7 +189,12 @@ export function UserDropdownMenu({ trigger }: { trigger: ReactNode }) {
                     {theme === 'dark' ? <Sun /> : <Moon />}
                     <div className="flex items-center gap-2 justify-between grow">
                         {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                        <Switch size="sm" shape="square" checked={theme === 'dark'} onCheckedChange={handleThemeToggle} />
+                        <Switch
+                            size="sm"
+                            shape="square"
+                            checked={theme === 'dark'}
+                            onCheckedChange={handleThemeToggle}
+                        />
                     </div>
                 </DropdownMenuItem>
                 <div className="p-2 mt-1">

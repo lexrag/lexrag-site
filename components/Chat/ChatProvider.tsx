@@ -48,7 +48,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
             }
         };
         fetchConversations();
-    }, []);
+    }, []); // Empty dependency array is intentional - only run once on mount
 
     useEffect(() => {
         const connectWebSocket = () => {
@@ -109,7 +109,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
             if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, []); // Empty dependency array is intentional - only run once on mount
 
     return (
         <ChatSocketContext.Provider

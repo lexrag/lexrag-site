@@ -9,6 +9,7 @@ import { Metadata, Viewport } from 'next';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { UserProvider } from '@/providers/user-provider';
+import MarketingBootstrap from '@/components/analytics/MarketingBootstrap';
 import PageTracker from '@/components/analytics/PageTracker';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                         <TooltipsProvider>
                             <UserProvider>
                                 <PageTracker />
+                                <MarketingBootstrap />
                                 <Suspense>{children}</Suspense>
                                 <Toaster />
                             </UserProvider>

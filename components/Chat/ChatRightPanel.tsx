@@ -49,6 +49,7 @@ interface ChatRightPanelProps {
     setIsOpenGraphModal: (open: boolean) => void;
     scrollToCardId: string;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
+    threadId: string;
 }
 
 const ChatRightPanel = ({
@@ -66,6 +67,7 @@ const ChatRightPanel = ({
     setIsOpenGraphModal,
     scrollToCardId,
     setScrollToCardId,
+    threadId,
 }: ChatRightPanelProps) => {
     const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
     const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -273,93 +275,96 @@ const ChatRightPanel = ({
         return parents;
     }, [cardData.nodes]);
 
-    const getGroupInfo = (parentId: string, nodes: any[]) => {
-        const parentNode = parentNodesMap[parentId];
+    const getGroupInfo = useCallback(
+        (parentId: string, nodes: any[]) => {
+            const parentNode = parentNodesMap[parentId];
 
-        if (parentNode) {
-            if (parentNode.labels?.includes('CaseLaw')) {
+            if (parentNode) {
+                if (parentNode.labels?.includes('CaseLaw')) {
+                    return {
+                        displayName: parentNode.content || 'Case',
+                        type: 'case',
+                        citation: parentNode.neutralCitation,
+                        date: parentNode.date,
+                    };
+                } else if (parentNode.labels?.includes('Act')) {
+                    return {
+                        displayName: parentNode.content || 'Act',
+                        type: 'act',
+                        citation: null,
+                        date: parentNode.date,
+                    };
+                } else if (parentNode.labels?.includes('Resource')) {
+                    return {
+                        displayName: parentNode.content || 'Regulations',
+                        type: 'subsidiary',
+                        citation: null,
+                        date: parentNode.date,
+                    };
+                }
+            }
+
+            const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
+            if (caseNode) {
                 return {
-                    displayName: parentNode.content || 'Case',
+                    displayName: caseNode.content || 'Case',
                     type: 'case',
-                    citation: parentNode.neutralCitation,
-                    date: parentNode.date,
-                };
-            } else if (parentNode.labels?.includes('Act')) {
-                return {
-                    displayName: parentNode.content || 'Act',
-                    type: 'act',
-                    citation: null,
-                    date: parentNode.date,
-                };
-            } else if (parentNode.labels?.includes('Resource')) {
-                return {
-                    displayName: parentNode.content || 'Regulations',
-                    type: 'subsidiary',
-                    citation: null,
-                    date: parentNode.date,
+                    citation: caseNode.neutralCitation,
+                    date: caseNode.date,
                 };
             }
-        }
 
-        const caseNode = nodes.find((node) => node.labels?.includes('CaseLaw'));
-        if (caseNode) {
-            return {
-                displayName: caseNode.content || 'Case',
-                type: 'case',
-                citation: caseNode.neutralCitation,
-                date: caseNode.date,
-            };
-        }
+            const actNode = nodes.find((node) => node.labels?.includes('Act'));
+            if (actNode) {
+                return {
+                    displayName: actNode.content || 'Act',
+                    type: 'act',
+                    citation: null,
+                    date: actNode.date,
+                };
+            }
 
-        const actNode = nodes.find((node) => node.labels?.includes('Act'));
-        if (actNode) {
+            if (parentId.includes('sso.agc.gov.sg/Act/')) {
+                return {
+                    displayName: parentId.split('/').pop() || 'Act',
+                    type: 'act',
+                    citation: null,
+                    date: null,
+                };
+            } else if (parentId.includes('sso.agc.gov.sg/SL/')) {
+                return {
+                    displayName: parentId.split('/').pop() || 'Regulations',
+                    type: 'subsidiary',
+                    citation: null,
+                    date: null,
+                };
+            } else if (parentId.includes('lawnet.com/openlaw/cases/')) {
+                return {
+                    displayName: parentId.split('/').pop() || 'Case',
+                    type: 'case',
+                    citation: null,
+                    date: null,
+                };
+            }
+
+            const firstNode = nodes[0];
             return {
-                displayName: actNode.content || 'Act',
-                type: 'act',
+                displayName: firstNode?.content || parentId.split('/').pop() || 'Document',
+                type: 'custom',
                 citation: null,
-                date: actNode.date,
+                date: firstNode?.date || null,
             };
-        }
+        },
+        [parentNodesMap],
+    );
 
-        if (parentId.includes('sso.agc.gov.sg/Act/')) {
-            return {
-                displayName: parentId.split('/').pop() || 'Act',
-                type: 'act',
-                citation: null,
-                date: null,
-            };
-        } else if (parentId.includes('sso.agc.gov.sg/SL/')) {
-            return {
-                displayName: parentId.split('/').pop() || 'Regulations',
-                type: 'subsidiary',
-                citation: null,
-                date: null,
-            };
-        } else if (parentId.includes('lawnet.com/openlaw/cases/')) {
-            return {
-                displayName: parentId.split('/').pop() || 'Case',
-                type: 'case',
-                citation: null,
-                date: null,
-            };
-        }
-
-        const firstNode = nodes[0];
-        return {
-            displayName: firstNode?.content || parentId.split('/').pop() || 'Document',
-            type: 'custom',
-            citation: null,
-            date: firstNode?.date || null,
-        };
-    };
-
-    const getParagraphNumber = (nodeId: string) => {
+    const getParagraphNumber = useCallback((nodeId: string) => {
         if (nodeId.includes('#[')) {
             const match = nodeId.match(/#\[(\d+)\]/);
             return match ? match[1] : null;
         }
         return null;
-    };
+    }, []);
 
     const groupedNodes = useMemo(() => {
         if (!cardData.nodes || cardData.nodes.length === 0) {
@@ -406,46 +411,49 @@ const ChatRightPanel = ({
         return `${first}(${rest.join(')(')})`;
     };
 
-    const getNodeDisplayInfo = (node: any) => {
-        const paragraphNum = getParagraphNumber(node.id);
-        let title = node.labels?.[0] || 'Node';
+    const getNodeDisplayInfo = useCallback(
+        (node: any) => {
+            const paragraphNum = getParagraphNumber(node.id);
+            let title = node.labels?.[0] || 'Node';
 
-        if (paragraphNum) {
-            title = `§ ${paragraphNum}`;
-        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
-            title = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
-        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
-            title = 'Subsidiary Legislation';
-        } else if (node.labels?.includes('PartOfTheLegislation')) {
-            title = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
-        } else if (node.heading) {
-            title = node.heading;
-        } else if (node.name) {
-            title = node.name;
-        }
+            if (paragraphNum) {
+                title = `§ ${paragraphNum}`;
+            } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+                title = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
+            } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+                title = 'Subsidiary Legislation';
+            } else if (node.labels?.includes('PartOfTheLegislation')) {
+                title = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
+            } else if (node.heading) {
+                title = node.heading;
+            } else if (node.name) {
+                title = node.name;
+            }
 
-        let subtitle = null;
-        const subtitleParts = [];
+            let subtitle = null;
+            const subtitleParts = [];
 
-        if (node.score !== undefined) {
-            subtitleParts.push(`Score: ${node.score.toFixed(3)}`);
-        }
+            if (node.score !== undefined) {
+                subtitleParts.push(`Score: ${node.score.toFixed(3)}`);
+            }
 
-        if (subtitleParts.length > 0) {
-            subtitle = subtitleParts.join(' • ');
-        }
+            if (subtitleParts.length > 0) {
+                subtitle = subtitleParts.join(' • ');
+            }
 
-        return {
-            title,
-            subtitle,
-            citation: node.neutralCitation || null,
-            content: node.content || '',
-            topics: node.topics || [],
-            concepts: node.concepts || [],
-            functionalObject: node.functionalObject || null,
-            functionalRole: node.functionalRole || null,
-        };
-    };
+            return {
+                title,
+                subtitle,
+                citation: node.neutralCitation || null,
+                content: node.content || '',
+                topics: node.topics || [],
+                concepts: node.concepts || [],
+                functionalObject: node.functionalObject || null,
+                functionalRole: node.functionalRole || null,
+            };
+        },
+        [getParagraphNumber],
+    );
 
     const filteredGroupedNodes = useMemo(() => {
         if (!searchQuery.trim()) {
@@ -484,7 +492,7 @@ const ChatRightPanel = ({
         });
 
         return filtered;
-    }, [groupedNodes, searchQuery, parentNodesMap]);
+    }, [groupedNodes, searchQuery, getGroupInfo, getNodeDisplayInfo]);
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes || isScrolling) return;
@@ -605,7 +613,15 @@ const ChatRightPanel = ({
         };
 
         scrollToCard();
-    }, [scrollToCardId, cardData.nodes, findGroupByNodeId, filteredGroupedNodes, openAccordionItems, isScrolling]);
+    }, [
+        scrollToCardId,
+        cardData.nodes,
+        findGroupByNodeId,
+        filteredGroupedNodes,
+        openAccordionItems,
+        isScrolling,
+        setScrollToCardId,
+    ]);
 
     useEffect(() => {
         if (scrollToCardId && searchQuery.trim()) {
@@ -614,7 +630,7 @@ const ChatRightPanel = ({
                 setScrollToCardId('');
             }
         }
-    }, [searchQuery, scrollToCardId, filteredGroupedNodes, findGroupByNodeId]);
+    }, [searchQuery, scrollToCardId, filteredGroupedNodes, findGroupByNodeId, setScrollToCardId]);
 
     useEffect(() => {
         if (searchQuery.trim()) {
@@ -760,7 +776,12 @@ const ChatRightPanel = ({
         const currentFilter = graphLinkFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        track_graph_filter_changed({ filter_type: 'link', filter_id: filterId, enabled: newEnabled }).catch(console.error);
+        track_graph_filter_changed({
+            thread_id: threadId,
+            filter_type: 'link',
+            filter_id: filterId,
+            enabled: newEnabled,
+        }).catch(console.error);
 
         setGraphLinkFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -769,7 +790,12 @@ const ChatRightPanel = ({
 
     const handleAllLinkFilters = (enabled: boolean) => {
         graphLinkFilters.forEach((filter) => {
-            track_graph_filter_changed({ filter_type: 'link', filter_id: filter.id, enabled }).catch(console.error);
+            track_graph_filter_changed({
+                thread_id: threadId,
+                filter_type: 'link',
+                filter_id: filter.id,
+                enabled,
+            }).catch(console.error);
         });
 
         setGraphLinkFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -779,7 +805,12 @@ const ChatRightPanel = ({
         const currentFilter = graphNodeFilters.find((f) => f.id === filterId);
         const newEnabled = !currentFilter?.enabled;
 
-        track_graph_filter_changed({ filter_type: 'node', filter_id: filterId, enabled: newEnabled }).catch(console.error);
+        track_graph_filter_changed({
+            thread_id: threadId,
+            filter_type: 'node',
+            filter_id: filterId,
+            enabled: newEnabled,
+        }).catch(console.error);
 
         setGraphNodeFilters((prevFilters) =>
             prevFilters.map((filter) => (filter.id === filterId ? { ...filter, enabled: newEnabled } : filter)),
@@ -788,7 +819,12 @@ const ChatRightPanel = ({
 
     const handleAllNodeFilters = (enabled: boolean) => {
         graphNodeFilters.forEach((filter) => {
-            track_graph_filter_changed({ filter_type: 'node', filter_id: filter.id, enabled }).catch(console.error);
+            track_graph_filter_changed({
+                thread_id: threadId,
+                filter_type: 'node',
+                filter_id: filter.id,
+                enabled,
+            }).catch(console.error);
         });
 
         setGraphNodeFilters((prevFilters) => prevFilters.map((filter) => ({ ...filter, enabled })));
@@ -818,6 +854,7 @@ const ChatRightPanel = ({
                                     data={currentMessage}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    threadId={threadId}
                                     expandedNodes={expandedNodes}
                                     setExpandedNodes={setExpandedNodes}
                                     nodeHierarchy={nodeHierarchy}
@@ -841,6 +878,7 @@ const ChatRightPanel = ({
                                     layers={graphLayers}
                                     handleCardData={handleCardData}
                                     handleScrollToCardId={setScrollToCardId}
+                                    threadId={threadId}
                                     isOrbitEnabled={isOrbitEnabled}
                                     setIsOrbitEnabled={setIsOrbitEnabled}
                                     expandedNodes={expandedNodes}
@@ -865,7 +903,11 @@ const ChatRightPanel = ({
                                         <Tabs
                                             value={graphView}
                                             onValueChange={(newView) => {
-                                                track_graph_view_changed({ from_view: graphView as '2d' | '3d', to_view: newView as '2d' | '3d' }).catch(console.error);
+                                                track_graph_view_changed({
+                                                    thread_id: threadId,
+                                                    from_view: graphView as '2d' | '3d',
+                                                    to_view: newView as '2d' | '3d',
+                                                }).catch(console.error);
                                                 setGraphView(newView);
                                             }}
                                         >

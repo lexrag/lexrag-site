@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
 import { Menu } from 'lucide-react';
 import { CardData } from '@/types/Chat';
@@ -16,6 +17,7 @@ import ChatRightSheet from '@/components/Chat/ChatRightSheet';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 
 export default function ChatPage() {
+    const { thread_id } = useParams();
     const { socket, setConversations } = useChatContext();
     useViewportHeight();
     const {
@@ -118,10 +120,7 @@ export default function ChatPage() {
                 handleCardData={setCardData}
             />
             <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0 relative">
-                <ChatLeftPanel
-                    activeLeftTab={activeLeftTab}
-                    setActiveLeftTab={setActiveLeftTab}
-                />
+                <ChatLeftPanel activeLeftTab={activeLeftTab} setActiveLeftTab={setActiveLeftTab} />
 
                 <section className="flex-1 flex flex-col overflow-hidden min-h-0">
                     <div className="flex-1 overflow-y-auto min-h-0">
@@ -135,6 +134,7 @@ export default function ChatPage() {
                             copyToClipboard={copyToClipboard}
                             handleCurrentMessage={setCurrentMessage}
                             setScrollToCardId={setScrollToCardId}
+                            threadId={thread_id as string}
                         />
                     </div>
                 </section>
@@ -154,6 +154,7 @@ export default function ChatPage() {
                     setIsOpenGraphModal={setIsOpenGraphModal}
                     scrollToCardId={scrollToCardId}
                     setScrollToCardId={setScrollToCardId}
+                    threadId={thread_id as string}
                 />
             </main>
 
@@ -165,6 +166,7 @@ export default function ChatPage() {
                     sendMessage={sendMessage}
                     activeMsgType={activeMsgType}
                     toggleMsgType={toggleMsgType}
+                    threadId={thread_id as string}
                 />
             </div>
         </div>

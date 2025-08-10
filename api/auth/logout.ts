@@ -1,6 +1,6 @@
 export const logout = async (): Promise<{ success: boolean; error?: string }> => {
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
         return { success: true };
     }
@@ -11,7 +11,7 @@ export const logout = async (): Promise<{ success: boolean; error?: string }> =>
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         });
 
@@ -22,22 +22,22 @@ export const logout = async (): Promise<{ success: boolean; error?: string }> =>
         }
 
         const data = await response.json().catch(() => ({}));
-        return { 
-            success: false, 
-            error: data?.detail || data?.message || 'Logout failed' 
+        return {
+            success: false,
+            error: data?.detail || data?.message || 'Logout failed',
         };
     } catch (error) {
         if (error instanceof TypeError && error.message === 'Failed to fetch') {
             console.error('Logout API error: CORS or Network issue:', error);
-            return { 
-                success: false, 
-                error: 'CORS or network error - backend may be unavailable' 
+            return {
+                success: false,
+                error: 'CORS or network error - backend may be unavailable',
             };
         } else {
             console.error('Logout API error:', error);
-            return { 
-                success: false, 
-                error: 'Network error during logout' 
+            return {
+                success: false,
+                error: 'Network error during logout',
             };
         }
     }

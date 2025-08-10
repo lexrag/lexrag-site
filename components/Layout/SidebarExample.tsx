@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Sidebar } from './Sidebar';
 import { MessageSquare, Settings, User } from 'lucide-react';
+import { Sidebar } from './Sidebar';
 
 // Example of using the universal Sidebar
 export function SidebarExample() {
@@ -17,7 +17,7 @@ export function SidebarExample() {
     const menu = (
         <div className="p-4">
             <div className="space-y-2">
-                <div 
+                <div
                     className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                         activeTab === 'chats' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                     }`}
@@ -26,7 +26,7 @@ export function SidebarExample() {
                     <MessageSquare className="h-4 w-4" />
                     <span>Chats</span>
                 </div>
-                <div 
+                <div
                     className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                         activeTab === 'settings' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                     }`}
@@ -35,7 +35,7 @@ export function SidebarExample() {
                     <Settings className="h-4 w-4" />
                     <span>Settings</span>
                 </div>
-                <div 
+                <div
                     className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                         activeTab === 'profile' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                     }`}
@@ -54,13 +54,5 @@ export function SidebarExample() {
         </div>
     );
 
-    return (
-        <Sidebar
-            header={header}
-            menu={menu}
-            footer={footer}
-            width="w-64"
-            zIndex="z-20"
-        />
-    );
-} 
+    return <Sidebar header={header} menu={menu} footer={footer} width="w-64" zIndex="z-20" />;
+}

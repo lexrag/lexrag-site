@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { Message } from '@/types/Message';
 import Spinner from '@/components/ui/spinner';
 
-
 interface EvaluatorChatBoxProps {
     messages: Message[] | [];
     onStartClick: () => void;
@@ -14,7 +13,7 @@ interface EvaluatorChatBoxProps {
 
 interface isThinkingObj {
     isThinking: boolean;
-    direction: "incoming" | "outgoing";
+    direction: 'incoming' | 'outgoing';
     count: number;
 }
 
@@ -26,16 +25,16 @@ const EvaluatorChatBox = ({
     connectionError,
 }: EvaluatorChatBoxProps) => {
     const [isThinkingObj, setIsThinkingObj] = useState<isThinkingObj | null>(null);
-    
+
     // Removed empty useEffect that was causing issues
 
     useEffect(() => {
         if (messages.length === 0) return;
-        
-        const lastMsg = messages[messages.length - 1];
-        const direction = lastMsg?.direction === "incoming" ? "outgoing" : "incoming";
 
-        setIsThinkingObj(prev => ({
+        const lastMsg = messages[messages.length - 1];
+        const direction = lastMsg?.direction === 'incoming' ? 'outgoing' : 'incoming';
+
+        setIsThinkingObj((prev) => ({
             direction,
             isThinking: true,
             count: (prev?.count || 0) + 1,
@@ -43,38 +42,45 @@ const EvaluatorChatBox = ({
 
         // Stop thinking after 6 messages
         if (messages.length >= 6) {
-            setIsThinkingObj(prev => prev ? {...prev, isThinking: false} : null);
+            setIsThinkingObj((prev) => (prev ? { ...prev, isThinking: false } : null));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages.length]);
 
     const onStartClickOverride = () => {
         setIsThinkingObj({
-            direction: "outgoing",
+            direction: 'outgoing',
             isThinking: true,
             count: 0,
-        })
+        });
         onStartClick();
-    }
+    };
 
     const onMessageClick = (index: number) => {
-        if (index % 2 !== 0) { // only applicable for AI messages
+        if (index % 2 !== 0) {
+            // only applicable for AI messages
             setSelectedMsgIdx(index);
         }
-    }
+    };
 
     return (
         <div className={'flex flex-col w-full h-full'}>
             {connectionError && (
                 <div className={'h-full flex flex-col justify-center items-center'}>
-                    <div className={'text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800'}>
+                    <div
+                        className={
+                            'text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800'
+                        }
+                    >
                         <h1 className={'text-xl font-bold text-red-600 dark:text-red-400 mb-2'}>Connection Error</h1>
                         <p className={'text-red-600 dark:text-red-400'}>{connectionError}</p>
-                        <p className={'text-sm text-red-500 dark:text-red-400 mt-2'}>Please try refreshing the page or contact support.</p>
+                        <p className={'text-sm text-red-500 dark:text-red-400 mt-2'}>
+                            Please try refreshing the page or contact support.
+                        </p>
                     </div>
                 </div>
             )}
-            
+
             {!connectionError && (!messages || messages.length === 0) && (
                 <div className={'h-full flex flex-col justify-center items-center'}>
                     <h1 className={'text-xl font-bold'}>Press "start" to start a synthetic conversation</h1>
@@ -130,7 +136,7 @@ const EvaluatorChatBox = ({
                         'flex-shrink-0 fixed bottom-2 w-[90%] md:w-2/4 flex items-center justify-center'
                     }
                 >
-                    {(!isSent && messages.length === 0) && (
+                    {!isSent && messages.length === 0 && (
                         <button
                             className={'cursor-pointer w-full h-full'}
                             onClick={onStartClickOverride}
@@ -143,13 +149,14 @@ const EvaluatorChatBox = ({
                     {(isSent || messages.length > 0) && (
                         <button
                             className={'cursor-pointer w-full h-full'}
-                            onClick={() => {redirect("/evaluator")}}
+                            onClick={() => {
+                                redirect('/evaluator');
+                            }}
                             //disabled={messages.length > 0}
                         >
                             Restart
                         </button>
                     )}
-
                 </div>
             </div>
         </div>

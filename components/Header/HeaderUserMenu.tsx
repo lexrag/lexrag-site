@@ -68,11 +68,7 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
                 <DropdownMenuItem asChild className="rounded-none" onSelect={(event) => event.preventDefault()}>
                     <div className="w-full px-4 py-2 flex items-center justify-between" onClick={handleThemeToggle}>
                         <span className="flex items-center gap-2">
-                            {resolvedTheme === 'dark' ? (
-                                <Sun />
-                            ) : (
-                                <Moon />
-                            )}
+                            {resolvedTheme === 'dark' ? <Sun /> : <Moon />}
                             {resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode'}
                         </span>
                         <Switch size="sm" checked={resolvedTheme === 'dark'} />

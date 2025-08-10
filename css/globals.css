@@ -19,95 +19,98 @@
 
 /* 6. Mobile viewport height support */
 :root {
-  --vh: 1vh;
+    --vh: 1vh;
 }
 
 /* Mobile viewport height fix */
 @supports (height: 100dvh) {
-  :root {
-    --vh: 1dvh;
-  }
+    :root {
+        --vh: 1dvh;
+    }
 }
 
 /* Fallback for older browsers */
 @supports not (height: 100dvh) {
-  :root {
-    --vh: 1vh;
-  }
+    :root {
+        --vh: 1vh;
+    }
 }
 
 /* Safe area support */
 @supports (padding: max(0px)) {
-  :root {
-    --safe-area-inset-bottom: env(safe-area-inset-bottom);
-  }
+    :root {
+        --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    }
 }
 
 /* 7. Mobile-specific styles */
 @media (max-width: 768px) {
-  /* Prevent zoom on input focus */
-  input, textarea, select {
-    font-size: 16px !important;
-  }
-  
-  /* Prevent horizontal scroll */
-  body {
-    overflow-x: hidden;
-  }
-  
-  /* TODO: make sure this is not too big */
-  /* Better touch targets */
-  /* button:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]), 
+    /* Prevent zoom on input focus */
+    input,
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+
+    /* Prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* TODO: make sure this is not too big */
+    /* Better touch targets */
+    /* button:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]), 
   [role="button"]:not([role="checkbox"]):not([data-slot="checkbox"]):not([data-slot="switch"]) {
     min-height: 44px;
     min-width: 44px;
   } */
-  
-  /* Prevent viewport issues on mobile */
-  html, body {
-    height: 100%;
-  }
-  
-    /* Better scrolling on mobile */
-  /* .scrollable {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  } */
-  
-  /* Ensure proper scrolling for chat containers */
-  /* .overflow-y-auto {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  } */
-  
-  /* Prevent mobile keyboard issues */
-  .chat-input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--background);
-    z-index: 50;
-    padding-bottom: env(safe-area-inset-bottom);
-    margin: 0;
-    border-radius: 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Ensure input stays above keyboard */
-  @media (max-height: 600px) {
-    .chat-input-container {
-      position: fixed;
-      bottom: 0;
+
+    /* Prevent viewport issues on mobile */
+    html,
+    body {
+        height: 100%;
     }
-  }
+
+    /* Better scrolling on mobile */
+    /* .scrollable {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  } */
+
+    /* Ensure proper scrolling for chat containers */
+    /* .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  } */
+
+    /* Prevent mobile keyboard issues */
+    .chat-input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--background);
+        z-index: 50;
+        padding-bottom: env(safe-area-inset-bottom);
+        margin: 0;
+        border-radius: 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure input stays above keyboard */
+    @media (max-height: 600px) {
+        .chat-input-container {
+            position: fixed;
+            bottom: 0;
+        }
+    }
 }
 
 .message-text .message-link {
-  text-decoration: underline;
-  color: #1d4ed8;
+    text-decoration: underline;
+    color: #1d4ed8;
 }
 
 .dark .message-text .message-link {
-  color: #60a5fa;
+    color: #60a5fa;
 }

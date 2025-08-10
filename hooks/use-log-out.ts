@@ -4,15 +4,18 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/api/auth/logout';
 import { deleteSession } from '@/utils/auth/deleteSession';
-import { useUser } from '@/providers/user-provider';
-import { analyticsReset } from '@/lib/analytics';
+import { analyticsReset, track_logout_clicked } from '@/lib/analytics';
 import { clearUserCache } from '@/lib/user-analytics';
+import { useUser } from '@/providers/user-provider';
 
 export const useLogOut = () => {
     const router = useRouter();
     const { setUser } = useUser();
 
     const logOut = useCallback(async () => {
+        // Track logout click before making any API calls
+        track_logout_clicked();
+
         try {
             const result = await logout();
             if (result.success) {
@@ -31,7 +34,7 @@ export const useLogOut = () => {
             console.warn('⚠️ deleteSession fallback failed:', error);
         }
         setUser(null);
-        
+
         try {
             clearUserCache();
             await analyticsReset();

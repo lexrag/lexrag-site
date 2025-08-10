@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/common/icons';
 import { getSignupSchema, SignupSchemaType } from '../forms/signup-schema';
+
 // Removed deprecated useSegment import
 
 export default function Page() {
@@ -49,7 +50,7 @@ export default function Page() {
 
     async function linkedinButtonOnClick() {
         // Removed old tracking
-        
+
         const result = await getLinkedinAuthLink();
         if (result.success) {
             window.location.replace(result.redirect_url);

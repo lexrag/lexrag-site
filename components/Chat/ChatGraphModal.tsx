@@ -1,18 +1,15 @@
 'use client';
 
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDirection } from '@radix-ui/react-direction';
-import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
-import { CardData } from '@/types/Chat';
-import {
-    Dialog,
-    DialogContent,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Globe, Layers, Fullscreen, Link } from 'lucide-react';
 import { zoomToFitGraph } from '@/events/zoom-to-fit';
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
+import { useDirection } from '@radix-ui/react-direction';
+import { Fullscreen, Globe, Layers, Link } from 'lucide-react';
+import { CardData } from '@/types/Chat';
+import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Button } from '../ui/button';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -21,10 +18,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import ChatGraph2D from './ChatGraph2D';
 import ChatGraph3D from './ChatGraph3D';
-import { Button } from '../ui/button';
 
 interface ChatGraphModalProps {
     open: boolean;
@@ -42,20 +38,20 @@ interface ChatGraphModalProps {
     cardData: CardData;
 }
 
-const ChatGraphModal = ({ 
-    open, 
-    onOpenChange, 
-    graphView, 
-    setGraphView, 
-    graphLayers, 
-    setGraphLayers, 
-    data, 
+const ChatGraphModal = ({
+    open,
+    onOpenChange,
+    graphView,
+    setGraphView,
+    graphLayers,
+    setGraphLayers,
+    data,
     graphLinkFilters,
     setGraphLinkFilters,
     graphNodeFilters,
     setGraphNodeFilters,
     handleCardData,
-    cardData 
+    cardData,
 }: ChatGraphModalProps) => {
     const direction = useDirection();
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
@@ -318,13 +314,13 @@ const ChatGraphModal = ({
     const handleGroupClick = (groupKey: string) => {
         const isCurrentlySelected = selectedItem === groupKey;
         const isCurrentlyOpen = openAccordionItems.includes(groupKey);
-        
+
         setSelectedItem(isCurrentlySelected ? null : groupKey);
         setSelectedGroup(isCurrentlySelected ? null : groupKey);
 
         setOpenAccordionItems((prev) => {
             if (isCurrentlyOpen) {
-                return prev.filter(item => item !== groupKey);
+                return prev.filter((item) => item !== groupKey);
             } else {
                 return [...prev, groupKey];
             }
@@ -440,7 +436,7 @@ const ChatGraphModal = ({
                 default:
                     return 'text-gray-800 dark:text-gray-200';
             }
-        }
+        };
 
         return (
             <div className="flex flex-wrap gap-2 mb-2">
@@ -448,15 +444,14 @@ const ChatGraphModal = ({
                     {`legal ${type}s`}
                 </span>
                 <div className="flex flex-wrap gap-1 mb-2">
-
-                {items.map((item, index) => (
-                    <span
-                    key={index}
-                    className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
-                    >
-                        {item}
-                    </span>
-                ))}
+                    {items.map((item, index) => (
+                        <span
+                            key={index}
+                            className={`px-2 py-0.5 text-xs font-medium rounded-md border ${getBadgeColor(type)}`}
+                        >
+                            {item}
+                        </span>
+                    ))}
                 </div>
             </div>
         );
@@ -485,25 +480,25 @@ const ChatGraphModal = ({
     const modalDimensions = useMemo(() => {
         const modalWidth = window.innerWidth * 0.95;
         const modalHeight = window.innerHeight * 0.9;
-        
+
         const hasSidebar = !!data && Object.entries(groupedNodes).length > 0 && window.innerWidth >= 768;
         const sidebarWidth = hasSidebar ? Math.max(modalWidth * 0.4, 300) : 0;
         const graphWidth = Math.max(modalWidth - sidebarWidth, 400);
         const graphHeight = modalHeight;
-        
+
         return {
             modalWidth,
             modalHeight,
             graphWidth,
             graphHeight,
             sidebarWidth,
-            hasSidebar
+            hasSidebar,
         };
     }, [data, groupedNodes]);
 
     useEffect(() => {
         const handleResize = () => {
-            setScrollToCardId(prev => prev);
+            setScrollToCardId((prev) => prev);
         };
 
         window.addEventListener('resize', handleResize);
@@ -514,20 +509,24 @@ const ChatGraphModal = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="w-[95vw] h-[90vh] max-w-none p-0 border-0" dir={direction}>
                 <DialogTitle className="sr-only">Chat Graph</DialogTitle>
-                <Tabs value={graphView} onValueChange={setGraphView} className="w-full h-full flex flex-col border-0 p-0">
+                <Tabs
+                    value={graphView}
+                    onValueChange={setGraphView}
+                    className="w-full h-full flex flex-col border-0 p-0"
+                >
                     <div className="flex-1 flex overflow-hidden p-0">
-                        <div 
-                            className="h-full relative overflow-hidden"
-                            style={{ width: modalDimensions.graphWidth }}
-                        >
-                            <TabsContent value="2d" className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0">
+                        <div className="h-full relative overflow-hidden" style={{ width: modalDimensions.graphWidth }}>
+                            <TabsContent
+                                value="2d"
+                                className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0"
+                            >
                                 <div className="relative w-full h-full">
-                                    <ChatGraph2D 
+                                    <ChatGraph2D
                                         height={modalDimensions.graphHeight}
                                         width={modalDimensions.graphWidth}
-                                        data={data} 
-                                        layers={graphLayers} 
-                                        handleCardData={handleCardData} 
+                                        data={data}
+                                        layers={graphLayers}
+                                        handleCardData={handleCardData}
                                         handleScrollToCardId={setScrollToCardId}
                                         expandedNodes={expandedNodes}
                                         setExpandedNodes={setExpandedNodes}
@@ -543,16 +542,20 @@ const ChatGraphModal = ({
                                         setNodeFilters={setGraphNodeFilters}
                                         showNodeLabels={showNodeLabels}
                                     />
-                                    
+
                                     {/* Control buttons overlay for 2D */}
                                     <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
                                         <TabsList className="grid w-fit grid-cols-2 bg-background/80 backdrop-blur-sm border border-input shadow-sm">
-                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
-                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
+                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">
+                                                2D
+                                            </TabsTrigger>
+                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">
+                                                3D
+                                            </TabsTrigger>
                                         </TabsList>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <div 
+                                                <div
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
                                                     title="Toggle Graph Layers"
                                                 >
@@ -667,8 +670,18 @@ const ChatGraphModal = ({
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
                                                     title="Toggle Node Filters"
                                                 >
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                    <svg
+                                                        className="h-4 w-4"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                                        />
                                                     </svg>
                                                 </div>
                                             </DropdownMenuTrigger>
@@ -747,8 +760,18 @@ const ChatGraphModal = ({
                                             }`}
                                             title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
                                         >
-                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            <svg
+                                                className="h-4 w-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                                                />
                                             </svg>
                                         </div>
                                         <div
@@ -761,14 +784,17 @@ const ChatGraphModal = ({
                                     </div>
                                 </div>
                             </TabsContent>
-                            <TabsContent value="3d" className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0">
+                            <TabsContent
+                                value="3d"
+                                className="w-full h-full m-0 data-[state=inactive]:hidden border-0 p-0"
+                            >
                                 <div className="relative w-full h-full">
-                                    <ChatGraph3D 
+                                    <ChatGraph3D
                                         height={modalDimensions.graphHeight}
                                         width={modalDimensions.graphWidth}
-                                        data={data} 
-                                        layers={graphLayers} 
-                                        handleCardData={handleCardData} 
+                                        data={data}
+                                        layers={graphLayers}
+                                        handleCardData={handleCardData}
                                         handleScrollToCardId={setScrollToCardId}
                                         isOrbitEnabled={isOrbitEnabled}
                                         setIsOrbitEnabled={setIsOrbitEnabled}
@@ -786,16 +812,20 @@ const ChatGraphModal = ({
                                         setNodeFilters={setGraphNodeFilters}
                                         showNodeLabels={showNodeLabels}
                                     />
-                                    
+
                                     {/* Control buttons overlay for 3D */}
                                     <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
                                         <TabsList className="grid w-fit grid-cols-2 bg-background/80 backdrop-blur-sm border border-input shadow-sm">
-                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">2D</TabsTrigger>
-                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">3D</TabsTrigger>
+                                            <TabsTrigger value="2d" title="Switch to 2D Graph View">
+                                                2D
+                                            </TabsTrigger>
+                                            <TabsTrigger value="3d" title="Switch to 3D Graph View">
+                                                3D
+                                            </TabsTrigger>
                                         </TabsList>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <div 
+                                                <div
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
                                                     title="Toggle Graph Layers"
                                                 >
@@ -914,8 +944,18 @@ const ChatGraphModal = ({
                                                     className="flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer shadow-sm"
                                                     title="Toggle Node Filters"
                                                 >
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                    <svg
+                                                        className="h-4 w-4"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                                        />
                                                     </svg>
                                                 </div>
                                             </DropdownMenuTrigger>
@@ -1005,8 +1045,18 @@ const ChatGraphModal = ({
                                             }`}
                                             title={showNodeLabels ? 'Hide Node Labels' : 'Show Node Labels'}
                                         >
-                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            <svg
+                                                className="h-4 w-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                                                />
                                             </svg>
                                         </div>
                                         <div
@@ -1022,7 +1072,7 @@ const ChatGraphModal = ({
                         </div>
 
                         {modalDimensions.hasSidebar && (
-                            <div 
+                            <div
                                 className="h-full border-l flex flex-col bg-background relative z-10 pt-4"
                                 style={{ width: modalDimensions.sidebarWidth }}
                             >
@@ -1034,7 +1084,12 @@ const ChatGraphModal = ({
                                         title="Close modal"
                                     >
                                         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
                                         </svg>
                                     </button>
                                 </div>
@@ -1060,7 +1115,8 @@ const ChatGraphModal = ({
                                                         (node.id.includes('/Act/') || node.id.includes('/SL/'))
                                                     ) {
                                                         return (
-                                                            node.labels?.includes('Act') || node.labels?.includes('CaseLaw')
+                                                            node.labels?.includes('Act') ||
+                                                            node.labels?.includes('CaseLaw')
                                                         );
                                                     }
 
@@ -1077,7 +1133,8 @@ const ChatGraphModal = ({
                                                 nodes.length === 0 &&
                                                 !allGroupNodes.some(
                                                     (node) =>
-                                                        node.labels?.includes('CaseLaw') || node.labels?.includes('Act'),
+                                                        node.labels?.includes('CaseLaw') ||
+                                                        node.labels?.includes('Act'),
                                                 )
                                             ) {
                                                 return null;
@@ -1123,7 +1180,7 @@ const ChatGraphModal = ({
                                                 >
                                                     <AccordionTrigger className="hover:no-underline px-4">
                                                         <div className="text-left flex items-center gap-2 w-full">
-                                                            <div 
+                                                            <div
                                                                 className="flex-1 min-w-0 cursor-pointer"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
@@ -1138,7 +1195,8 @@ const ChatGraphModal = ({
                                                                         {getTypeLabel(groupInfo.type)}
                                                                     </span>
                                                                     <span className="text-sm text-muted-foreground">
-                                                                        ({nodes.length} node{nodes.length !== 1 ? 's' : ''})
+                                                                        ({nodes.length} node
+                                                                        {nodes.length !== 1 ? 's' : ''})
                                                                     </span>
                                                                 </div>
                                                                 <div
@@ -1190,7 +1248,8 @@ const ChatGraphModal = ({
                                                                                 <div
                                                                                     className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
                                                                                     style={{
-                                                                                        backgroundColor: node.layerColor,
+                                                                                        backgroundColor:
+                                                                                            node.layerColor,
                                                                                     }}
                                                                                 />
                                                                             )}
@@ -1216,31 +1275,44 @@ const ChatGraphModal = ({
                                                                                             )}
                                                                                             {nodeInfo.citation && (
                                                                                                 <span>
-                                                                                                    — {nodeInfo.citation}
+                                                                                                    —{' '}
+                                                                                                    {nodeInfo.citation}
                                                                                                 </span>
                                                                                             )}
                                                                                         </div>
                                                                                     )}
                                                                                 </div>
-                                                                                <div className='flex gap-1'>
-                                                                                {/* Functional Object */}
-                                                                                {nodeInfo.functionalObject && (
-                                                                                    <div className="w-full text-xs text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600">
-                                                                                       {nodeInfo.functionalRole && (<div className="font-medium mb-1 text-gray-800 dark:text-gray-200">
-                                                                                            {nodeInfo.functionalRole}
-                                                                                        </div>)}
-                                                                                        {nodeInfo.functionalObject}
-                                                                                    </div>
-                                                                                )}
-                                                                                {((nodeInfo.topics?.length > 0) || (nodeInfo.concepts?.length > 0)) && (
-                                                                                <div className='w-full flex flex-col bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600'>
-                                                                                {/* Topics badges */}
-                                                                                {renderBadges(nodeInfo.topics, 'topic')}
+                                                                                <div className="flex gap-1">
+                                                                                    {/* Functional Object */}
+                                                                                    {nodeInfo.functionalObject && (
+                                                                                        <div className="w-full text-xs text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600">
+                                                                                            {nodeInfo.functionalRole && (
+                                                                                                <div className="font-medium mb-1 text-gray-800 dark:text-gray-200">
+                                                                                                    {
+                                                                                                        nodeInfo.functionalRole
+                                                                                                    }
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {nodeInfo.functionalObject}
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {(nodeInfo.topics?.length > 0 ||
+                                                                                        nodeInfo.concepts?.length >
+                                                                                            0) && (
+                                                                                        <div className="w-full flex flex-col bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md mb-2 border border-gray-200 dark:border-gray-600">
+                                                                                            {/* Topics badges */}
+                                                                                            {renderBadges(
+                                                                                                nodeInfo.topics,
+                                                                                                'topic',
+                                                                                            )}
 
-                                                                                {/* Concepts badges */}
-                                                                                {renderBadges(nodeInfo.concepts, 'concept')}
-                                                                                </div>)}
-
+                                                                                            {/* Concepts badges */}
+                                                                                            {renderBadges(
+                                                                                                nodeInfo.concepts,
+                                                                                                'concept',
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
 
                                                                                 {nodeInfo.content && (

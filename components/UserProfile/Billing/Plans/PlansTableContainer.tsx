@@ -31,7 +31,7 @@ const PlansTableContainer = () => {
 
     const handleChangePlan = async (newTariffId: string) => {
         if (!currentSubscription) return;
-        
+
         try {
             if (currentSubscription.status === 'pending') {
                 setLoading(true);
@@ -64,7 +64,7 @@ const PlansTableContainer = () => {
 
     const handleConfirmChangePlan = async () => {
         if (!currentSubscription || !nextTariffId) return;
-        
+
         try {
             setLoading(true);
             await cancelSubscription();
@@ -89,7 +89,7 @@ const PlansTableContainer = () => {
 
     const handleConfirmCancelOnlyPlan = async () => {
         if (!currentSubscription) return;
-        
+
         try {
             setLoading(true);
             await cancelSubscription();

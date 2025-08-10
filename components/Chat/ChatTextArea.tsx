@@ -1,7 +1,8 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
 import { track_question_submitted } from '@/lib/analytics';
+import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
+import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
 
 export interface ChatTextAreaProps {
     input: string;
@@ -9,32 +10,31 @@ export interface ChatTextAreaProps {
     sendMessage: (message: string, isNew: boolean) => void;
     activeMsgType: string | null;
     toggleMsgType: (msgType: string) => void;
+    threadId?: string; // Add thread_id prop
 }
 
-const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType }: ChatTextAreaProps) => {
+const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType, threadId }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            
+
             if (input.trim()) {
                 const questionLength = input.trim().length;
-                const wordCount = input.trim().split(/\s+/).length;
-                const complexity = questionLength > 200 ? 'high' : questionLength > 100 ? 'medium' : 'low';
-                
+                // const wordCount = input.trim().split(/\s+/).length;
+                // const complexity = questionLength > 200 ? 'high' : questionLength > 100 ? 'medium' : 'low';
+
                 track_question_submitted({
-                    chat_session_id: pathname.split('/').pop() || 'new',
-                    is_new_conversation: isNewConversation,
-                    question_length: questionLength,
-                    word_count: wordCount,
-                    query_complexity: complexity,
+                    thread_id: threadId || pathname.split('/').pop() || 'new',
+                    length: questionLength,
+                    has_files: false, // TODO: Add file detection logic
                 }).catch((error) => {
                     console.error('Error tracking question submitted:', error);
                 });
             }
-            
+
             sendMessage(input, isNewConversation);
             setInput('');
         }
@@ -56,6 +56,15 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
 
     return (
         <div className="flex flex-col w-full mt-2 md:p-3 p-2 rounded-md border bg-background border-border hover:shadow-lg transition-shadow min-h-[72px] md:min-h-[72px] min-h-[60px] flex-shrink-0 chat-input-container">
+            {/* Track time spent in chat input */}
+            <ContentTimeTracker
+                areaId="chat_input"
+                extra={{
+                    thread_id: threadId || pathname.split('/').pop() || 'unknown',
+                    is_new_conversation: isNewConversation,
+                }}
+            />
+
             <textarea
                 className="flex-1 w-full md:p-3 p-2 bg-transparent text-foreground 
                    focus:ring-0 focus:outline-none overflow-y-auto resize-none 

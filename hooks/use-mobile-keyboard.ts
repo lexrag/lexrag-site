@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface UseMobileKeyboardOptions {
     onKeyboardShow?: () => void;
@@ -17,9 +17,10 @@ export function useMobileKeyboard(options: UseMobileKeyboardOptions = {}) {
     const { onKeyboardShow, onKeyboardHide, enableAutoScroll = true } = options;
 
     // Determine if this is a mobile device
-    const isMobile = typeof window !== 'undefined' && 
+    const isMobile =
+        typeof window !== 'undefined' &&
         (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-         window.innerWidth <= 768);
+            window.innerWidth <= 768);
 
     // Track changes in viewport
     const handleResize = useCallback(() => {
@@ -35,12 +36,12 @@ export function useMobileKeyboard(options: UseMobileKeyboardOptions = {}) {
         if (currentHeight < initialViewportHeight) {
             const heightDifference = initialViewportHeight - currentHeight;
             setKeyboardHeight(heightDifference);
-            
+
             if (!isKeyboardVisible) {
                 setIsKeyboardVisible(true);
                 onKeyboardShow?.();
             }
-        } 
+        }
         // If the height has increased - the keyboard has hidden
         else if (currentHeight >= initialViewportHeight) {
             if (isKeyboardVisible) {
@@ -80,7 +81,7 @@ export function useMobileKeyboard(options: UseMobileKeyboardOptions = {}) {
             setTimeout(() => {
                 activeElement.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'center'
+                    block: 'center',
                 });
             }, 300);
         }
@@ -117,6 +118,6 @@ export function useMobileKeyboard(options: UseMobileKeyboardOptions = {}) {
         isMobile,
         scrollToActiveElement,
         handleInputFocus,
-        handleInputBlur
+        handleInputBlur,
     };
-} 
+}

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
 
-
-type TabsType = "avatar" | "evaluations";
-const tabs = ["Avatar", "Evaluations"];
+type TabsType = 'avatar' | 'evaluations';
+const tabs = ['Avatar', 'Evaluations'];
 
 interface EvaluatorChatRightPanelProps {
     thisRun?: EvaluatorRun;
@@ -11,11 +10,13 @@ interface EvaluatorChatRightPanelProps {
 }
 
 const EvaluatorChatRightPanel = ({ thisRun, currentMsgIdx }: EvaluatorChatRightPanelProps) => {
-    const [currentTab, setCurrentTab] = useState<TabsType>("avatar");
+    const [currentTab, setCurrentTab] = useState<TabsType>('avatar');
     const evaluation = thisRun?.evaluations?.[Math.floor((currentMsgIdx || 0) / 2)];
     const hasEvaluations = thisRun?.evaluations && thisRun.evaluations.length > 0;
 
-    useEffect(() => {console.log(Math.floor((currentMsgIdx || 0) / 2))}, [currentMsgIdx]);
+    useEffect(() => {
+        console.log(Math.floor((currentMsgIdx || 0) / 2));
+    }, [currentMsgIdx]);
 
     return (
         <div className={'h-full w-1/4 hidden md:flex flex-col p-5 overflow-y-scroll'}>
@@ -34,26 +35,32 @@ const EvaluatorChatRightPanel = ({ thisRun, currentMsgIdx }: EvaluatorChatRightP
                 ))}
             </div>
 
-            {currentTab === 'avatar' && thisRun?.avatar && typeof thisRun.avatar === 'object' && Object.keys(thisRun.avatar).length > 0 && (
-                <div className="mt-4">
-                    {Object.entries(thisRun.avatar).map(([key, value]) => (
-                        <div key={key} className={"flex flex-col justify-center border-b-2 mb-6"}>
-                            <div className={'pr-5'}>
-                                <h3 className={'text-lg font-bold'}>
-                                    {key.charAt(0).toUpperCase() + key.slice(1).replace("_", " ")}
-                                </h3>
+            {currentTab === 'avatar' &&
+                thisRun?.avatar &&
+                typeof thisRun.avatar === 'object' &&
+                Object.keys(thisRun.avatar).length > 0 && (
+                    <div className="mt-4">
+                        {Object.entries(thisRun.avatar).map(([key, value]) => (
+                            <div key={key} className={'flex flex-col justify-center border-b-2 mb-6'}>
+                                <div className={'pr-5'}>
+                                    <h3 className={'text-lg font-bold'}>
+                                        {key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}
+                                    </h3>
+                                </div>
+                                <p>{value}</p>
                             </div>
-                            <p>{value}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
-            
-            {currentTab === 'avatar' && (!thisRun?.avatar || typeof thisRun.avatar !== 'object' || Object.keys(thisRun.avatar || {}).length === 0) && (
-                <div className={'flex flex-col justify-center items-center mt-4'}>
-                    <p className={'text-gray-500'}>No avatar data available yet.</p>
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+
+            {currentTab === 'avatar' &&
+                (!thisRun?.avatar ||
+                    typeof thisRun.avatar !== 'object' ||
+                    Object.keys(thisRun.avatar || {}).length === 0) && (
+                    <div className={'flex flex-col justify-center items-center mt-4'}>
+                        <p className={'text-gray-500'}>No avatar data available yet.</p>
+                    </div>
+                )}
 
             {currentTab === 'evaluations' && hasEvaluations && evaluation && evaluation.characteristics && (
                 <div className={'flex flex-col justify-center items-center'}>
@@ -80,7 +87,7 @@ const EvaluatorChatRightPanel = ({ thisRun, currentMsgIdx }: EvaluatorChatRightP
                     ))}
                 </div>
             )}
-            
+
             {currentTab === 'evaluations' && !hasEvaluations && (
                 <div className={'flex flex-col justify-center items-center mt-4'}>
                     <p className={'text-gray-500'}>No evaluations available yet.</p>
@@ -88,6 +95,6 @@ const EvaluatorChatRightPanel = ({ thisRun, currentMsgIdx }: EvaluatorChatRightP
             )}
         </div>
     );
-}
+};
 
 export default EvaluatorChatRightPanel;
