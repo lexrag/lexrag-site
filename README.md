@@ -1,199 +1,131 @@
 # LEXRAG Marketing Site
 
-Маркетинговый сайт для LEXRAG, развернутый на AWS S3 + CloudFront.
+Revolutionary legal research and analysis platform powered by GraphRAG technology.
 
-## 🚀 Быстрый старт
+## 🚀 Quick Start
 
-### Локальная разработка
+### Prerequisites
+- Node.js 22.x
+- npm or yarn
+
+### Installation
 ```bash
-# Установка зависимостей
 npm install
-
-# Запуск в режиме разработки на порту 3001
-npm run dev
 ```
 
-Сайт будет доступен по адресу: http://localhost:3001
+### Environment Setup
 
-### Сборка
-```bash
-# Сборка статического сайта
-npm run build
-
-# Сборка для продакшена
-npm run build:staging
-```
-
-## 🌐 Деплой
-
-### Автоматический деплой
-```bash
-# Установите переменные окружения
-export CLOUDFRONT_DISTRIBUTION_ID=your_distribution_id
-export AWS_DEFAULT_REGION=us-east-1
-
-# Запустите деплой
-./deploy.sh
-```
-
-### Ручной деплой
-```bash
-# Сборка
-npm run build
-
-# Синхронизация с S3
-aws s3 sync ./out/ s3://lexrag-marketing-site/
-
-# Инвалидация CloudFront
-aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
-```
-
-## 🏗️ Архитектура
-
-- **Фронтенд**: Next.js 15 с статическим экспортом
-- **Хостинг**: AWS S3 + CloudFront
-- **Домен**: lexrag.com
-- **Локальный порт**: 3001
-
-## 📁 Структура проекта
-
-```
-├── app/                    # Next.js App Router
-│   ├── (general)/         # Общие страницы
-│   │   ├── features/      # Страницы функций
-│   │   ├── services/      # Страница услуг
-│   │   ├── company/       # О компании
-│   │   ├── use-cases/     # Примеры использования
-│   │   ├── faq/           # Часто задаваемые вопросы
-│   │   └── technology/    # Технологии
-│   ├── terms-and-conditions/  # Правовые документы
-│   └── layout.tsx         # Корневой layout
-├── components/             # React компоненты
-│   ├── Header/            # Шапка сайта
-│   ├── Landing/           # Лендинг компоненты
-│   ├── Features/          # Компоненты функций
-│   ├── Layout/            # Компоненты макета
-│   └── ui/                # UI компоненты
-├── css/                   # Стили
-├── public/                # Статические файлы
-└── deploy.sh              # Скрипт деплоя
-```
-
-## 🔧 Конфигурация
-
-### Переменные окружения
-Скопируйте `env.marketing.example` в `.env.local` и настройте:
+Create a `.env.local` file in the root directory with the following variables:
 
 ```bash
-# AWS Configuration
-AWS_DEFAULT_REGION=us-east-1
-CLOUDFRONT_DISTRIBUTION_ID=your_cloudfront_distribution_id
+# App URLs
+NEXT_PUBLIC_APP_URL=https://app.lexrag.com
+NEXT_PUBLIC_APP_URL_DEV=http://localhost:3000
 
-# Next.js Configuration
+# Base URL for marketing site
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 NEXT_PUBLIC_BASE_PATH=
+
+# Analytics configuration
+NEXT_PUBLIC_ANALYTICS_VIA_BEACON=false
+NEXT_PUBLIC_SEGMENT_ENABLED=true
+NEXT_PUBLIC_SEGMENT_WRITE_KEY=YOUR_SEGMENT_WRITE_KEY_HERE
+NEXT_PUBLIC_SEGMENT_DEBUG=true
+NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=true
+NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=1
+NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=false
+NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=1
+
+# Build Configuration
+NODE_ENV=development
 ```
 
-### Next.js конфигурация
-- `output: 'export'` - статический экспорт
-- `trailingSlash: true` - совместимость с S3
-- Порт разработки: 3001
-
-## 📱 Доступные страницы
-
-### Основные страницы
-- **Главная** (`/`) - Лендинг с функциями продукта
-- **Features** (`/features`) - Все функции продукта
-- **Services** (`/services`) - Наши услуги
-- **Company** (`/company`) - О компании
-- **Use Cases** (`/use-cases`) - Примеры использования
-- **FAQ** (`/faq`) - Часто задаваемые вопросы
-
-### Технологии
-- **Technology** (`/technology/graphrag`) - О технологии GraphRAG
-
-### Правовые документы
-- **Terms & Conditions** (`/terms-and-conditions/`) - Правовые документы
-- **Privacy Policy** (`/terms-and-conditions/privacy-policy/`)
-- **Cookie Policy** (`/terms-and-conditions/cookie-policy/`)
-- **Refund Policy** (`/terms-and-conditions/refund-cancellation/`)
-- **Data Processing** (`/terms-and-conditions/data-processing-agreement/`)
-- **EULA** (`/terms-and-conditions/end-user-license/`)
-
-## 🚨 Важные замечания
-
-1. **Статический сайт**: Все страницы генерируются статически
-2. **Нет API**: API endpoints перенесены в app.lexrag.com
-3. **Нет авторизации**: Функции авторизации в app.lexrag.com
-4. **S3 совместимость**: Используйте `trailingSlash: true`
-
-## 🔄 CI/CD
-
-Для автоматизации деплоя добавьте в ваш CI/CD pipeline:
-
-```yaml
-- name: Deploy to S3
-  run: |
-    export CLOUDFRONT_DISTRIBUTION_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-    export AWS_DEFAULT_REGION=us-east-1
-    ./deploy.sh
-```
-
-## 🧪 Тестирование
-
-### Локальное тестирование
+### Development
 ```bash
-# Запуск в режиме разработки
 npm run dev
-
-# Проверка доступности страниц
-curl http://localhost:3001
-curl http://localhost:3001/features
-curl http://localhost:3001/services
-curl http://localhost:3001/company
-curl http://localhost:3001/use-cases
-curl http://localhost:3001/faq
-curl http://localhost:3001/technology/graphrag
 ```
 
-### Проверка сборки
+### Build
 ```bash
-# Сборка проекта
 npm run build
-
-# Проверка статических файлов
-ls -la out/
 ```
 
-## 🚀 Деплой на продакшен
+### Production Deployment
 
-1. **Настройка AWS CLI**:
-   ```bash
-   aws configure
-   # Введите ваш AWS Access Key ID, Secret Access Key, и регион us-east-1
-   ```
+The site is configured for static export and deployment to S3 + CloudFront via GitHub Actions.
 
-2. **Настройка переменных окружения**:
-   ```bash
-   export CLOUDFRONT_DISTRIBUTION_ID=your_distribution_id
-   export AWS_DEFAULT_REGION=us-east-1
-   ```
+## 📁 Project Structure
 
-3. **Запуск деплоя**:
-   ```bash
-   ./deploy.sh
-   ```
+- `app/` - Next.js app router pages
+- `components/` - React components
+- `lib/` - Utility functions and configurations
+- `css/` - Global styles and themes
+- `public/` - Static assets
 
-4. **Проверка результата**:
-   - Откройте https://lexrag.com
-   - Проверьте все страницы
-   - Убедитесь, что CloudFront инвалидация прошла успешно
+## 🔧 Configuration
 
-## 📞 Поддержка
+### App URLs
+- **Production**: `https://app.lexrag.com`
+- **Development**: `http://localhost:3000`
 
-При возникновении проблем обращаться к команде DevOps или создавать issue в репозитории.
+### Analytics
+- Uses Segment for analytics
+- Beacon mode disabled for marketing site
+- Frontend identity management enabled
 
-## 🔗 Полезные ссылки
+## 🚀 Deployment
 
-- [Next.js Static Export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
-- [AWS S3 Sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html)
-- [CloudFront Invalidation](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CreateInvalidation.html)
+### GitHub Actions Workflow
+- **File**: `.github/workflows/deploy.yml`
+- **Target**: S3 + CloudFront
+- **Distribution ID**: `E1D0DAN3LWZ4ER`
+
+### Environment Variables in CI/CD
+- `NEXT_PUBLIC_APP_URL`: Production app URL
+- `NEXT_PUBLIC_BASE_URL`: Production site URL
+- `NEXT_PUBLIC_SEGMENT_ENABLED`: Analytics enabled
+- `NEXT_PUBLIC_ANALYTICS_VIA_BEACON`: Beacon disabled
+
+## 📊 Features
+
+- **Homepage**: Hero section, benefits, use cases
+- **Features**: Detailed feature descriptions
+- **Technology**: GraphRAG technology overview
+- **Company**: About us, mission, vision
+- **Services**: Service offerings
+- **FAQ**: Frequently asked questions
+
+## 🎨 Design System
+
+- **Framework**: Tailwind CSS
+- **Components**: shadcn/ui
+- **Icons**: Keenicons
+- **Typography**: Instrument Sans
+- **Theme**: Light/Dark mode support
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Optimized for all screen sizes
+- Touch-friendly interactions
+- Progressive Web App ready
+
+## 🔍 SEO & Performance
+
+- Static site generation
+- Optimized images and assets
+- Meta tags and structured data
+- Sitemap and robots.txt
+- Core Web Vitals optimization
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is proprietary software owned by LEXRAG.
