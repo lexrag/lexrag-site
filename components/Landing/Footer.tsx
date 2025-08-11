@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Logo } from '@/components/Header/Logo';
 import { WordRotate } from '@/components/magicui/word-rotate';
 import { H4 } from '@/components/ui/typography';
+import '@/components/ui/css-variables.css';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -31,7 +32,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="bg-background relative overflow-hidden">
+        <footer className="bg-[var(--Brand-Primary-Axis-Indigo)] relative overflow-hidden px-[10%]">
             <div className="container px-6 mx-auto pt-14 pb-6 border-b border-border/50">
                 <div className="flex flex-col lg:flex-row justify-between items-start">
                     {/* Logo and description - Left side */}
@@ -43,9 +44,9 @@ const Footer = () => {
                             viewport={{ once: true }}
                         >
                             <div className="flex items-center mb-3">
-                                <Logo />
+                                <Logo variant='white' />
                             </div>
-                            <div className="italic font-medium text-muted-foreground mb-4">
+                            <div className="italic font-medium text-white mb-4">
                                 <WordRotate
                                     as="span"
                                     words={['Structure the law', 'Retrieve with purpose', 'Answer with confidence']}
@@ -58,7 +59,7 @@ const Footer = () => {
                                         href={social.href}
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className="size-9 border border-border/60 text-muted-foreground rounded-md flex items-center justify-center hover:text-foreground transition-colors"
+                                        className="size-9 border bg-white border-border/60 text-[var(--Brand-Primary-Axis-Indigo)] rounded-full flex items-center justify-center hover:bg-emerald-500 hover:border-emerald-500 transition-colors"
                                         aria-label={social.label}
                                     >
                                         <social.icon className="size-4" />
@@ -79,7 +80,7 @@ const Footer = () => {
                                     transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
                                     viewport={{ once: true }}
                                 >
-                                    <H4 className="font-medium mb-4 capitalize text-muted-foreground/80">
+                                    <H4 className="font-medium mb-4 capitalize text-white">
                                         {category}
                                     </H4>
                                     <ul className="text-base space-y-2">
@@ -87,7 +88,7 @@ const Footer = () => {
                                             <li key={index}>
                                                 <Link
                                                     href={item.href}
-                                                    className="text-gray-600 dark:text-gray-300 hover:text-primary"
+                                                    className="text-white hover:text-emerald-500"
                                                 >
                                                     {item.label}
                                                 </Link>
@@ -104,8 +105,8 @@ const Footer = () => {
 
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="flex order-2 md:order-1 gap-2 font-normal">
-                        <span className="text-neutral-600 dark:text-neutral-600">© {currentYear}</span>
-                        <span className="text-neutral-600 dark:text-neutral-600">
+                        <span className="text-white">© {currentYear}</span>
+                        <span className="text-white">
                             LEXRAG PTE. LTD. All rights reserved
                         </span>
                     </div>
