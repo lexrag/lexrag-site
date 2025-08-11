@@ -12,7 +12,7 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
             <div className="relative z-10 flex flex-col items-center">
                 <img
                     src={`/media/images/${item.img}.svg`}
-                    className="dark:hidden max-h-32 mb-6"
+                    className="max-h-32 mb-6"
                     alt={`${item.title}`}
                 />
 

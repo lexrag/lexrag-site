@@ -13,7 +13,7 @@ const UseCases = () => {
                     <div className="row-span-2 flex flex-col items-center justify-center text-center rounded-[24px] bg-gradient-to-b from-[#694AFF] to-[#D6B9FA] transition-colors">
                         <img
                             src="/media/images/pc-ai-connections.svg"
-                            className="dark:hidden max-h-96 mb-6"
+                            className="max-h-96 mb-6"
                             alt="AI-Powered Legal Research light"
                         />
                         <div className="flex flex-col gap-4">
@@ -30,7 +30,7 @@ const UseCases = () => {
                     <div className="p-8 pt-16 flex gap-4 items-center justify-center text-center rounded-[24px] bg-gradient-to-b from-[#694AFF] to-[#D6B9FA] transition-colors">
                         <img
                             src="/media/images/research.svg"
-                            className="dark:hidden max-h-32 mb-6"
+                            className="max-h-32 mb-6"
                             alt="Early Case Assessment & Guidance light"
                         />
                         <div className="flex flex-col mb-4 text-left">
@@ -46,7 +46,7 @@ const UseCases = () => {
                         <div className="pt-8 pb-4 pr-4 flex flex-col items-center justify-center text-left rounded-[24px] bg-gradient-to-b from-[#694AFF] to-[#D6B9FA] transition-colors">
                             <img
                                 src="/media/images/storage.svg"
-                                className="dark:hidden max-h-32 mb-6"
+                                className="max-h-32 mb-6"
                                 alt="Legal Knowledge & Compliance Storage light"
                             />
                             <div className="flex flex-col gap-8">
@@ -65,7 +65,7 @@ const UseCases = () => {
                         <div className="pt-8 pb-4 pr-4 flex flex-col items-center justify-center text-left rounded-[24px] bg-gradient-to-b from-[#694AFF] to-[#D6B9FA] transition-colors">
                             <img
                                 src="/media/images/cloud.svg"
-                                className="dark:hidden max-h-32 mb-6"
+                                className="max-h-32 mb-6"
                                 alt="Flexible & Scalable"
                             />
                             <div className="flex flex-col gap-8">

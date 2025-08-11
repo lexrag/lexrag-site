@@ -66,19 +66,19 @@ const badgeVariants = cva(
                 variant: 'success',
                 appearance: 'outline',
                 className:
-                    'border bg-violet-50 text-purple-700 border-purple-200 dark:text-purple-600 dark:bg-purple-950/50 dark:border-purple-950',
+                    'border bg-violet-50 text-purple-700 border-purple-200',
             },
             {
                 variant: 'warning',
                 appearance: 'outline',
                 className:
-                    'border bg-emerald-100 text-emerald-700 border-emerald-200 dark:text-emerald-600 dark:bg-emerald-950/50 dark:border-emerald-950',
+                    'border bg-emerald-100 text-emerald-700 border-emerald-200',
             },
             {
                 variant: 'info',
                 appearance: 'outline',
                 className:
-                    'border bg-violet-200 text-violet-700 border-violet-200 dark:text-violet-600 dark:bg-violet-950/50 dark:border-violet-950',
+                    'border bg-violet-200 text-violet-700 border-violet-200',
             },
             {
                 variant: 'mono',
@@ -105,17 +105,17 @@ const badgeVariants = cva(
             {
                 variant: 'success',
                 appearance: 'light',
-                className: 'border bg-violet-50 border-0 text-purple-700 dark:text-purple-600 dark:bg-purple-950/50',
+                className: 'border bg-violet-50 border-0 text-purple-700',
             },
             {
                 variant: 'warning',
                 appearance: 'light',
-                className: 'border bg-emerald-100 border-0 text-emerald-700 dark:text-emerald-600 dark:bg-emerald-950/50',
+                className: 'border bg-emerald-100 border-0 text-emerald-700',
             },
             {
                 variant: 'info',
                 appearance: 'light',
-                className: 'border bg-violet-200 border-0 text-violet-700 dark:text-violet-600 dark:bg-violet-950/50',
+                className: 'border bg-violet-200 border-0 text-violet-700',
             },
             {
                 variant: 'mono',
