@@ -5,7 +5,6 @@ import '@/css/globals.css';
 import { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/providers/theme-provider';
 
-
 export const metadata: Metadata = {
     title: {
         template: '%s | LEXRAG',
@@ -34,22 +33,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet" />
             </head>
             <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans')}>
-                <QueryProvider>
-                    <ThemeProvider>
-                        <TooltipsProvider>
-                            <UserProvider>
-                                <PageTracker />
-                                {/** comments in code strictly in English
-                                 * MarketingBootstrap is intentionally disabled; PageTracker persists marketing
-                                 * just before pageOncePerLocation() to avoid duplicate init calls.
-                                 */}
-                                {/** <MarketingBootstrap /> */}
-                                <Suspense>{children}</Suspense>
-                                <Toaster />
-                            </UserProvider>
-                        </TooltipsProvider>
-                    </ThemeProvider>
-                </QueryProvider>
+                <ThemeProvider>
+                    <Suspense>{children}</Suspense>
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );

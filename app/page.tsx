@@ -5,7 +5,7 @@ import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
-import { H3, PBase } from '@/components/ui/typography';
+import { H3 } from '@/components/ui/typography';
 import '@/components/ui/css-variables.css';
 
 export const metadata: Metadata = {

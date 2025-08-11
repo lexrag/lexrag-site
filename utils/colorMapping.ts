@@ -24,6 +24,11 @@ export const badgeColorMapping: Record<
     suspended: 'warning',
 };
 
+// Function to get badge color variant
+export const getBadgeColor = (value: string): 'primary' | 'success' | 'warning' | 'info' | 'destructive' | 'secondary' => {
+    return badgeColorMapping[value] || 'secondary';
+};
+
 export const getFeatureTextColor = (index: number): string => {
     const colors = [
         'text-blue-600',

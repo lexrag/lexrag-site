@@ -2,10 +2,10 @@
     "name": "lexrag-marketing",
     "version": "9.2.2",
     "private": true,
-  "engines": {
-    "node": ">=22 <23"
-  },
-  "packageManager": "npm@10",
+    "engines": {
+        "node": ">=22 <23"
+    },
+    "packageManager": "npm@10",
     "scripts": {
         "dev": "next dev --port 3001 --turbopack",
         "build": "next build",
@@ -48,6 +48,7 @@
         "@radix-ui/react-toggle-group": "^1.1.10",
         "@radix-ui/react-tooltip": "^1.2.7",
         "@remixicon/react": "^4.6.0",
+        "@segment/analytics-next": "^1.81.1",
         "class-variance-authority": "^0.7.1",
         "classnames": "^2.5.1",
         "clsx": "^2.1.1",
