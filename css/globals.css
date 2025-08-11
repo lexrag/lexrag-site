@@ -121,3 +121,13 @@
 .dark .message-text .message-link {
     color: #60a5fa;
 }
+
+/* Hide scrollbars for horizontally scrollable containers */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+}
