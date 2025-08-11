@@ -20,17 +20,17 @@ type ParagraphProps = {
 };
 
 const headingStyles = {
-    h1: 'text-[96px] md:text-[56px] sm:text-[48px] font-normal leading-[110%] md:leading-[110%] sm:leading-[120%] tracking-[0]',
-    h2: 'text-[64px] md:text-[48px] sm:text-[32px] font-normal leading-[110%] md:leading-[110%] sm:leading-[120%] tracking-[0]',
-    h3: 'text-[36px] md:text-[36px] sm:text-[24px] font-medium leading-[110%] md:leading-[110%] sm:leading-[120%] tracking-[0]',
-    h4: 'text-[24px] md:text-[24px] sm:text-[20px] font-semibold leading-[110%] md:leading-[110%] sm:leading-[120%] tracking-[0]',
+    h1: 'text-[48px] sm:text-[56px] md:text-[96px] font-normal leading-[120%] sm:leading-[110%] md:leading-[110%] tracking-[0]',
+    h2: 'text-[32px] sm:text-[48px] md:text-[64px] font-normal leading-[120%] sm:leading-[120%] md:leading-[110%] tracking-[0]',
+    h3: 'text-[24px] sm:text-[36px] md:text-[36px] font-medium leading-[120%] sm:leading-[110%] md:leading-[110%] tracking-[0]',
+    h4: 'text-[20px] sm:text-[24px] md:text-[24px] font-semibold leading-[130%] sm:leading-[110%] md:leading-[110%] tracking-[0]',
 };
 
 const paragraphStyles = {
-    xl: 'text-[36px] md:text-[24px] sm:text-[20px] font-normal leading-[120%] md:leading-[120%] sm:leading-[130%] tracking-[0] mb-6 md:mb-6 sm:mb-6',
-    lg: 'text-[26px] md:text-[26px] sm:text-[16px] font-normal leading-[130%] md:leading-[130%] sm:leading-[130%] tracking-[0] mb-3 md:mb-3 sm:mb-3',
-    base: 'text-[16px] md:text-[16px] sm:text-[14px] font-normal leading-[130%] md:leading-[130%] sm:leading-[130%] tracking-[0] mb-1 md:mb-1 sm:mb-1',
-    sm: 'text-[12px] md:text-[12px] sm:text-[12px] font-normal leading-[130%] md:leading-[130%] sm:leading-[130%] tracking-[0]',
+    xl: 'text-[20px] sm:text-[24px] md:text-[36px] font-normal leading-[130%] sm:leading-[120%] md:leading-[120%] tracking-[0] mb-6',
+    lg: 'text-[16px] sm:text-[26px] md:text-[26px] font-normal leading-[130%] sm:leading-[130%] md:leading-[130%] tracking-[0] mb-3',
+    base: 'text-[14px] sm:text-[16px] md:text-[16px] font-normal leading-[130%] sm:leading-[130%] md:leading-[130%] tracking-[0] mb-1',
+    sm: 'text-[12px] sm:text-[12px] md:text-[12px] font-normal leading-[130%] sm:leading-[130%] md:leading-[130%] tracking-[0]',
 };
 
 export const Heading: React.FC<HeadingProps> = ({ 
