@@ -1,27 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { getBadgeColor, getCategoryColorScheme } from '@/utils/colorMapping';
-import { motion } from 'framer-motion';
+import { getCategoryColorScheme } from '@/utils/colorMapping';
 import { cn } from '@/lib/utils';
 import { H4, PSM } from '@/components/ui/typography';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-
-// type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
-
-// interface FeatureData {
-//     key: string;
-//     title: string;
-//     subtitle: string;
-//     description: string;
-//     icon: string;
-//     link: string;
-//     category: FeatureCategory | string;
-//     plan: string;
-// }
 
 interface ProductFeaturesProps {
     gridClassName?: string;
@@ -38,20 +22,14 @@ const ProductFeatures = ({
     showBottomBadges = true,
     maxHeightBeforeShowAll = 500,
 }: ProductFeaturesProps) => {
-    const [showAll, setShowAll] = useState(false);
-    const pathname = usePathname();
-
-    const toggleShowAll = () => setShowAll(!showAll);
-
-    const currentPage = pathname.split('/').filter(Boolean).pop() || '';
-    const visibleFeats = combinedFeaturesData.filter((feat) => feat.key !== currentPage);
+    const visibleFeats = combinedFeaturesData;
 
     return (
         <div className="relative pb-4">
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{
-                    maxHeight: showAll ? 'none' : `${maxHeightBeforeShowAll}px`,
+                    maxHeight: `${maxHeightBeforeShowAll}px`,
                 }}
             >
                 <div className={gridClassName}>
@@ -59,11 +37,9 @@ const ProductFeatures = ({
                         const colors = getCategoryColorScheme(feat.category);
 
                         return (
-                            <motion.a
+                            <a
                                 key={index}
                                 href={feat.link}
-                                whileHover={{ y: -8 }}
-                                transition={{ duration: 0.3 }}
                                 className="group block"
                             >
                                 <div
@@ -93,18 +69,22 @@ const ProductFeatures = ({
                                             </div>
                                             <div className="flex flex-col">
                                                 <H4 className={cn('mb-px', colors.icon_color)}>{feat.title}</H4>
-                                                <PSM className="text-2sm text-gray-500">
-                                                    {feat.subtitle}
-                                                </PSM>
+                                                <PSM className="text-2sm text-gray-500">{feat.subtitle}</PSM>
                                             </div>
                                         </div>
 
                                         {showSideBadges && (
-                                            <div className="flex flex-col items-start gap-3">
-                                                <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
+                                            <div className="flex items-center gap-2">
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="text-xs px-2 py-1"
+                                                >
                                                     {feat.category}
                                                 </Badge>
-                                                <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="text-xs px-2 py-1"
+                                                >
                                                     {feat.plan}
                                                 </Badge>
                                             </div>
@@ -112,45 +92,36 @@ const ProductFeatures = ({
                                     </div>
 
                                     {showDescription && (
-                                        <PSM className="text-2sm text-gray-500">
-                                            {feat.description}
-                                        </PSM>
+                                        <p className="text-2sm text-gray-500">{feat.description}</p>
                                     )}
 
                                     {showBottomBadges && (
                                         <div className="flex w-full items-center justify-start gap-3">
-                                            <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
+                                            <Badge
+                                                variant="secondary"
+                                                className="text-xs px-2 py-1"
+                                            >
                                                 {feat.category}
                                             </Badge>
-                                            <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
+                                            <Badge
+                                                variant="secondary"
+                                                className="text-xs px-2 py-1"
+                                            >
                                                 {feat.plan}
                                             </Badge>
                                         </div>
                                     )}
                                 </div>
-                            </motion.a>
+                            </a>
                         );
                     })}
                 </div>
             </div>
-
-            {visibleFeats.length > 0 && (
-                <div className="text-center mt-8">
-                    <Button
-                        onClick={toggleShowAll}
-                        className="border border-white/20 
-                            shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]
-                            rounded-[73.553px]
-                            bg-white/10 backdrop-blur-sm
-                            hover:bg-[var(--Brand-Primary-Phase-Green)]
-                            hover:backdrop-blur-md
-                            transition-all
-                            text-[var(--Brand-Primary-Midnight-Core)] duration-300"
-                    >
-                        {showAll ? 'Show Less' : 'Show All'}
-                    </Button>
-                </div>
-            )}
+            <div className="text-center mt-8">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    Show All
+                </Button>
+            </div>
         </div>
     );
 };
