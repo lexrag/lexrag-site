@@ -782,7 +782,7 @@ const ChatGraph2D = ({
 
             return allNodes.filter((node) => nodesToInclude.has(node.id));
         },
-        [searchQuery, nodesTagsFilters],
+        [searchQuery, nodesTagsFilters, getNodeDisplayInfo],
     );
 
     const processedNodes = useMemo(() => {

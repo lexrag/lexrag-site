@@ -104,7 +104,7 @@ export default function ChatPage() {
 
             setIsTagsConstructed(true);
         }
-    }, [cardData]);
+    }, [cardData, isTagsConstructed]);
 
     const toggleMsgType = (type: string) => {
         setActiveMsgType((prev) => (prev === type ? null : type));

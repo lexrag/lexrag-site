@@ -521,7 +521,7 @@ const ChatRightPanel = ({
         }
 
         return filtered;
-    }, [groupedNodes, searchQuery, getGroupInfo, getNodeDisplayInfo, parentNodesMap, nodesTagsFilters]);
+    }, [groupedNodes, searchQuery, getGroupInfo, getNodeDisplayInfo, nodesTagsFilters]);
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes || isScrolling) return;

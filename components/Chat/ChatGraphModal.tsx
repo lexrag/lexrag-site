@@ -6,7 +6,7 @@ import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { useDirection } from '@radix-ui/react-direction';
 import { Fullscreen, Globe, Layers, Link } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, NodesTagsFilters } from '@/types/Graph';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Button } from '../ui/button';
@@ -106,6 +106,21 @@ const ChatGraphModal = ({
     );
 
     const accordionTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
+    const nodesTagsFilters = useMemo<NodesTagsFilters>(() => {
+        const topics = new Set<string>();
+        const concepts = new Set<string>();
+        (cardData.nodes || []).forEach((n: any) => {
+            (n.topics || []).forEach((t: string) => topics.add(t));
+            (n.concepts || []).forEach((c: string) => concepts.add(c));
+        });
+        const topicOptions = Array.from(topics);
+        const conceptOptions = Array.from(concepts);
+        return {
+            topic: { options: topicOptions, selected: topicOptions },
+            concept: { options: conceptOptions, selected: conceptOptions },
+        };
+    }, [cardData.nodes]);
 
     useEffect(() => {
         if (!scrollToCardId || !cardData.nodes) return;
@@ -541,6 +556,8 @@ const ChatGraphModal = ({
                                         nodeFilters={graphNodeFilters}
                                         setNodeFilters={setGraphNodeFilters}
                                         showNodeLabels={showNodeLabels}
+                                        searchQuery=""
+                                        nodesTagsFilters={nodesTagsFilters}
                                     />
 
                                     {/* Control buttons overlay for 2D */}
