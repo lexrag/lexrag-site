@@ -2,11 +2,12 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
 import { track_question_submitted } from '@/lib/analytics';
+import { useChatContext } from './ChatProvider';
 
 export interface ChatTextAreaProps {
     input: string;
     setInput: (text: string) => void;
-    sendMessage: (message: string, isNew: boolean) => void;
+    sendMessage: (message: string, isNew: boolean, userDocuments: string[]) => void;
     activeMsgType: string | null;
     toggleMsgType: (msgType: string) => void;
 }
@@ -14,11 +15,12 @@ export interface ChatTextAreaProps {
 const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
+    const { selectedUserDocuments } = useChatContext();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            
+
             if (input.trim()) {
                 const questionLength = input.trim().length;
                 const wordCount = input.trim().split(/\s+/).length;
@@ -34,8 +36,8 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
                     console.error('Error tracking question submitted:', error);
                 });
             }
-            
-            sendMessage(input, isNewConversation);
+
+            sendMessage(input, isNewConversation, selectedUserDocuments);
             setInput('');
         }
     };
