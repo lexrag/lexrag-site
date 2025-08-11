@@ -21,11 +21,18 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                 className,
             )}
         >
-            <div className="h-12 px-6 py-8 inline-flex justify-center items-center gap-2 border-[0.1] rounded-full bg-[rgba(255,255,255,0.1)] shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] backdrop-blur-[2.78px]">
-                <div className="flex w-full pr-5 items-center">
+            <div
+                className={cn(
+                    'h-12 px-0 py-0 inline-flex justify-center items-center gap-2 rounded-full',
+                    'lg:px-6 lg:py-8 lg:border lg:border-[rgba(255,255,255,0.3)] lg:bg-[rgba(255,255,255,0.1)] lg:shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] lg:backdrop-blur-[2.78px]',
+                )}
+            >
+                <div className="flex w-full pr-0 lg:pr-5 items-center">
                     <Logo />
                 </div>
-                <HeaderNavigation />
+                <div className="hidden lg:block">
+                    <HeaderNavigation />
+                </div>
             </div>
             <div className="flex gap-8">
                 <HeaderCornerMenu />
