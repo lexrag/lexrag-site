@@ -51,7 +51,7 @@ const ProductFeatures = ({
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{
-                    maxHeight: showAll ? '2000px' : `${maxHeightBeforeShowAll}px`,
+                    maxHeight: showAll ? 'none' : `${maxHeightBeforeShowAll}px`,
                 }}
             >
                 <div className={gridClassName}>
