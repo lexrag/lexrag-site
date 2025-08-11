@@ -5,12 +5,13 @@ import PageTitle from '@/components/Layout/PageTitle';
 import FeaturePageTemplate from '@/components/Features/FeaturePageTemplate';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 
+export const dynamic = 'force-static';
+export const dynamicParams = false;
+
 export const metadata: Metadata = {
     title: 'Feature Details - LEXRAG',
     description: 'Detailed information about LEXRAG features and capabilities',
 };
-
-// Generate static params for all features
 export async function generateStaticParams() {
     return combinedFeaturesData.map((feature) => ({
         feature: feature.key,

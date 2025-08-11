@@ -4,6 +4,7 @@ import Footer from '@/components/Landing/Footer';
 import PageTitle from '@/components/Layout/PageTitle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Database, BarChart3, FileText, Users, Shield } from 'lucide-react';
+import { getAppUrl } from '@/lib/app-config';
 
 export const metadata: Metadata = {
     title: 'Services - LEXRAG',
@@ -80,6 +81,8 @@ const services = [
 ];
 
 const ServicesPage = () => {
+    const appUrl = getAppUrl();
+    
     return (
         <div className="overflow-y-auto">
             <Header className="" />
@@ -131,7 +134,7 @@ const ServicesPage = () => {
                             Ready to transform your legal practice with AI-powered insights?
                         </p>
                         <a 
-                            href="https://app.lexrag.com" 
+                            href={appUrl}
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"

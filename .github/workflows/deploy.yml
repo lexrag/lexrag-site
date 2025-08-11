@@ -11,7 +11,7 @@ on:
 env:
     AWS_REGION: ap-southeast-1
     S3_BUCKET: lexrag-site
-    CLOUDFRONT_DISTRIBUTION_ID: E1D0DAN3LWZ4ER
+    CLOUDFRONT_DISTRIBUTION_ID: E1KNCYS7QKEZ5Q
 
 jobs:
     deploy:
@@ -49,7 +49,7 @@ jobs:
                   npm run build
               env:
                   NEXT_PUBLIC_APP_URL: https://app.lexrag.com
-                  NEXT_PUBLIC_BASE_URL: https://d1wnoermrdhxcv.cloudfront.net
+                  NEXT_PUBLIC_BASE_URL: https://d26ppb9osin3vx.cloudfront.net
                   NEXT_PUBLIC_SEGMENT_ENABLED: true
                   NEXT_PUBLIC_SEGMENT_DEBUG: false
                   NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${{ secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY }}
@@ -71,5 +71,5 @@ jobs:
             - name: Deploy complete
               run: |
                   echo "✅ Deployment completed successfully!"
-                  echo "🌐 Site URL: https://d1wnoermrdhxcv.cloudfront.net"
+                  echo "🌐 Site URL: https://d26ppb9osin3vx.cloudfront.net"
                   echo "📊 CloudFront Distribution: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"

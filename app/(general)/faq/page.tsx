@@ -3,20 +3,22 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import PageTitle from '@/components/Layout/PageTitle';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { getAppUrl } from '@/lib/app-config';
+
+interface FAQ {
+    question: string;
+    answer: string | ((appUrl: string) => string);
+}
 
 export const metadata: Metadata = {
     title: 'FAQ - LEXRAG',
     description: 'Frequently asked questions about LEXRAG and our legal technology solutions',
 };
 
-const faqs = [
+const faqs: FAQ[] = [
     {
-        question: "What is LEXRAG?",
-        answer: "LEXRAG is an AI-powered legal research and analysis platform that uses GraphRAG technology to provide comprehensive legal insights. We combine graph databases with retrieval-augmented generation to deliver accurate, contextual legal information."
-    },
-    {
-        question: "How does GraphRAG technology work?",
-        answer: "GraphRAG combines graph databases with AI language models. The graph structure maps relationships between legal documents, while the AI retrieves relevant information and generates comprehensive answers. This approach ensures accuracy and provides context that traditional search methods miss."
+        question: "What is LEXRAG and how does it work?",
+        answer: "LEXRAG is an AI-powered legal research and analysis platform that uses GraphRAG technology to provide intelligent insights from legal documents. Our system creates knowledge graphs from legal texts, enabling users to ask complex questions and receive accurate, contextual answers with source citations."
     },
     {
         question: "What types of legal documents can LEXRAG analyze?",
@@ -48,11 +50,15 @@ const faqs = [
     },
     {
         question: "How can I get started with LEXRAG?",
-        answer: "You can start by visiting our application at app.lexrag.com to explore the platform. We offer free trials and demos to help you understand how LEXRAG can benefit your legal practice."
+        answer: function(appUrl: string) {
+            return `You can start by visiting our application at ${appUrl} to explore the platform. We offer free trials and demos to help you understand how LEXRAG can benefit your legal practice.`;
+        }
     }
 ];
 
 const FAQPage = () => {
+    const appUrl = getAppUrl();
+    
     return (
         <div className="overflow-y-auto">
             <Header className="" />
@@ -79,7 +85,7 @@ const FAQPage = () => {
                                         {faq.question}
                                     </AccordionTrigger>
                                     <AccordionContent className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                                        {faq.answer}
+                                        {typeof faq.answer === 'function' ? faq.answer(appUrl) : faq.answer}
                                     </AccordionContent>
                                 </AccordionItem>
                             ))}
@@ -92,7 +98,7 @@ const FAQPage = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <a 
-                                href="https://app.lexrag.com" 
+                                href={appUrl}
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"

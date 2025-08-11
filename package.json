@@ -12,7 +12,7 @@
         "start": "next start --port 3001",
         "build:staging": "cp .env.staging .env.local && next build",
         "build:static": "next build && next export",
-        "deploy": "npm run build && aws s3 sync ./out/ s3://lexrag-marketing-site/ && aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'",
+        "deploy": "npm run build && aws s3 sync ./out/ s3://lexrag-site/ && aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'",
         "lint": "tsc --noEmit && eslint .",
         "format": "prettier --write ."
     },

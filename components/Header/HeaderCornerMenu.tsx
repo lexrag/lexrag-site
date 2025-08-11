@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import SigninButton from '@/components/Header/SigninButton';
 import { getAppUrl } from '@/lib/app-config';
 import { trackButtonClick } from '@/lib/analytics-events';
+import { Button } from '@/components/ui/button';
 
 const HeaderCornerMenu = () => {
     const handleGoToApp = () => {
@@ -22,14 +22,7 @@ const HeaderCornerMenu = () => {
             <div className="flex items-center gap-5">
                 <div className="h-[40%] border-r-2 border-gray-200" />
                 <div className="tab">
-                    <Button 
-                        variant="outline" 
-                        className="flex items-center gap-2"
-                        onClick={handleGoToApp}
-                    >
-                        Go to App
-                        <ExternalLink className="size-4" />
-                    </Button>
+                <SigninButton />
                 </div>
             </div>
         </div>

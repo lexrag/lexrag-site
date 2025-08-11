@@ -1,12 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Allows overriding basePath via env at build time (kept empty by default)
+
     basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
-    images: {},
+    images: {
+        unoptimized: true,
+    },
     output: 'export',
     trailingSlash: true,
     reactStrictMode: false,
     devIndicators: false,
+
+    assetPrefix: process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : '',
 };
 
 export default nextConfig;
