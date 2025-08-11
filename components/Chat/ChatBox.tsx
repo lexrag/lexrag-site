@@ -4,9 +4,12 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { Copy, CopyCheck, Network } from 'lucide-react';
 import { Message } from '@/types/Message';
+import { track_message_copied, track_node_clicked } from '@/lib/analytics';
+import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
 import ChatTextArea from '@/components/Chat/ChatTextArea';
 import { TypingAnimation } from '../magicui/typing-animation';
-import { useSegment } from '@/hooks/use-segment';
+
+// Removed deprecated useSegment import
 
 interface ChatBoxProps {
     messages: Message[];
@@ -18,6 +21,7 @@ interface ChatBoxProps {
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
+    threadId?: string; // Add thread_id prop
 }
 
 const ChatBox = ({
@@ -30,13 +34,14 @@ const ChatBox = ({
     copyToClipboard,
     handleCurrentMessage,
     setScrollToCardId,
+    threadId,
 }: ChatBoxProps) => {
     const [input, setInput] = useState<string>('');
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
     const [activeMsgType, setActiveMsgType] = useState<string | null>('semantic_graph');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const { trackMessageCopied, trackContentCopied } = useSegment();
+    // Removed deprecated useSegment hook
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -76,6 +81,13 @@ const ChatBox = ({
         if (target.tagName === 'A' && !!href) {
             const id = decodeExceptSpace(href);
 
+            // Track node click event
+            track_node_clicked({
+                thread_id: threadId || 'unknown',
+                target_id: id,
+                node_type: 'message_link',
+            });
+
             zoomToNodeGraph({ id });
             setScrollToCardId(id);
         }
@@ -83,6 +95,16 @@ const ChatBox = ({
 
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto md:px-4 px-2 min-h-0">
+            {/* Track time spent in chat - conservative defaults */}
+            <ContentTimeTracker
+                areaId="chat_main"
+                extra={{ thread_id: threadId || 'unknown' }}
+                disablePulses={true}
+                minThresholdMs={3000}
+                finalMinThresholdMs={5000}
+                sampleOneOutOf={10}
+            />
+
             <div className="scrollable flex-1 overflow-y-auto space-y-2 md:pb-4 pb-20 min-h-0">
                 <div className="flex flex-col">
                     {messages.map((msg, i) => (
@@ -120,11 +142,13 @@ const ChatBox = ({
                                                 if (parsed.content) copyText = parsed.content;
                                                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             } catch (_) {}
-                                            
-                                            trackMessageCopied(msg.id, msg.direction === 'incoming' ? 'ai' : 'user');
-                                            
-                                            trackContentCopied(msg.id, 'message', copyText.length);
-                                            
+
+                                            // Track message copy event
+                                            track_message_copied({
+                                                thread_id: threadId || 'unknown',
+                                                message_id: msg.id,
+                                            });
+
                                             copyToClipboard(msg.id, copyText);
                                         }}
                                     >
@@ -179,6 +203,7 @@ const ChatBox = ({
                     sendMessage={sendMessage}
                     activeMsgType={activeMsgType}
                     toggleMsgType={toggleMsgType}
+                    threadId={threadId}
                 />
             </div>
         </div>

@@ -1,13 +1,6 @@
 'use client';
 
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { APP_SETTINGS } from '@/config/settings.config';
 import { Settings } from '@/config/types';
 
@@ -20,9 +13,7 @@ type SettingsContextType = {
     settings: Settings;
 };
 
-const SettingsContext = createContext<SettingsContextType | undefined>(
-    undefined,
-);
+const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_PREFIX = 'app_settings_';
 
@@ -44,10 +35,7 @@ function setToPath(obj: any, path: string, value: any): Settings {
 function storeLeaf(path: string, value: unknown) {
     if (!isBrowser()) return;
     try {
-        localStorage.setItem(
-            `${LOCAL_STORAGE_PREFIX}${path}`,
-            JSON.stringify(value),
-        );
+        localStorage.setItem(`${LOCAL_STORAGE_PREFIX}${path}`, JSON.stringify(value));
     } catch (err) {
         console.error('LocalStorage write error:', err);
     }
@@ -64,12 +52,8 @@ function getLeafFromStorage(path: string): any {
     }
 }
 
-export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
-                                                                              children,
-                                                                          }) => {
-    const [settings, setSettings] = useState<Settings>(
-        structuredClone(APP_SETTINGS),
-    );
+export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [settings, setSettings] = useState<Settings>(structuredClone(APP_SETTINGS));
 
     // Load settings from localStorage after mount
     useEffect(() => {
@@ -113,11 +97,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
         [getOption, setOption, storeOption, settings],
     );
 
-    return (
-        <SettingsContext.Provider value={contextValue}>
-            {children}
-        </SettingsContext.Provider>
-    );
+    return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;
 };
 
 export const useSettings = () => {

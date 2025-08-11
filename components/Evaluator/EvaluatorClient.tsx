@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useChat } from '@/api/chat/chatApi';
+import { getRun } from '@/api/evaluator/getRun';
+import { EvaluatorRun } from '@/types/EvaluatorRun';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import EvaluatorChatBox from '@/components/Evaluator/EvaluatorChatBox';
 import EvaluatorChatLeftPanel from '@/components/Evaluator/EvaluatorChatLeftPanel';
 import EvaluatorChatRightPanel from '@/components/Evaluator/EvaluatorChatRightPanel';
-import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { EvaluatorRun } from '@/types/EvaluatorRun';
-import { getRun } from '@/api/evaluator/getRun';
 
 interface EvaluatorClientProps {
     onStartClick: () => void;
@@ -23,8 +23,8 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
     const { messages } = useChat({ websocket: socket, setEvaluatorRun: setThisRun });
 
     const threadId = useMemo(() => {
-        const id = pathname.replace("/evaluator/", "").trim();
-        const result = id === "" || id === pathname ? null : id;
+        const id = pathname.replace('/evaluator/', '').trim();
+        const result = id === '' || id === pathname ? null : id;
         console.log('Extracted threadId from pathname:', result);
         return result;
     }, [pathname]);
@@ -34,20 +34,20 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
     useEffect(() => {
         if (!socket || socket.readyState !== WebSocket.OPEN) return;
         if (!threadId || sentOnce.current) return;
-        
+
         // Check if threadId looks like a valid UUID
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!uuidRegex.test(threadId)) {
             console.log('Thread ID is not a valid UUID, skipping WebSocket send:', threadId);
             return;
         }
-        
+
         // Only skip if we have conversation data from API and no new messages
         if (thisRun?.conversation && thisRun.conversation.length > 0 && messages.length === 0) {
             console.log('Skipping WebSocket send - conversation already loaded from API and no new messages');
             return;
         }
-        
+
         const payload = JSON.stringify({ thread_id: threadId });
         socket.send(payload);
         sentOnce.current = true;
@@ -57,13 +57,13 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
     const getCurrentRun = async () => {
         try {
             if (!threadId) return;
-            
+
             // Check if threadId looks like a valid UUID
             const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
             if (!uuidRegex.test(threadId)) {
                 return;
             }
-            
+
             console.log('Fetching run for threadId:', threadId);
             const currentRun = await getRun(threadId);
             // Always set the run, even if conversation is empty
@@ -76,11 +76,11 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
                 user_id: 0,
                 avatar: {},
                 conversation: [],
-                evaluations: []
+                evaluations: [],
             };
             setThisRun(emptyRun);
         }
-    }
+    };
 
     useEffect(() => {
         if (threadId) {
@@ -92,7 +92,7 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
                     user_id: 0,
                     avatar: {},
                     conversation: [],
-                    evaluations: []
+                    evaluations: [],
                 };
                 setThisRun(emptyRun);
                 // Try to fetch existing data from API
@@ -134,7 +134,7 @@ const EvaluatorClient = ({ onStartClick }: EvaluatorClientProps) => {
 
             <EvaluatorChatRightPanel thisRun={thisRun || undefined} currentMsgIdx={selectedMsgIdx} />
         </main>
-    )
+    );
 };
 
 export default EvaluatorClient;

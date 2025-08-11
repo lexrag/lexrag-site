@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { getPhoneNumberCode } from '@/api/user/getPhoneNumberCode';
+import { verifyPhoneNumber } from '@/api/user/verifyPhoneNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { useForm } from 'react-hook-form';
@@ -9,8 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import ReusableDialog from '@/components/common/ReusableDialog';
-import { getPhoneNumberCode } from '@/api/user/getPhoneNumberCode';
-import { verifyPhoneNumber } from '@/api/user/verifyPhoneNumber';
 
 interface ChangePhoneNumberFlowProps {
     onSuccess?: (phone: string) => void;
@@ -123,7 +123,11 @@ const ChangePhoneNumberFlow = ({
                                     <FormItem>
                                         <FormLabel>Phone Number</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder="e.g. +1234567890" disabled={loading || parentLoading} />
+                                            <Input
+                                                {...field}
+                                                placeholder="e.g. +1234567890"
+                                                disabled={loading || parentLoading}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -131,11 +135,22 @@ const ChangePhoneNumberFlow = ({
                             />
                             {error && <div className="text-destructive text-xs mt-1">{error}</div>}
                             <div className="flex gap-2 mt-4">
-                                <Button type="button" variant="outline" className="w-full" onClick={handleCancel} disabled={loading || parentLoading}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full"
+                                    onClick={handleCancel}
+                                    disabled={loading || parentLoading}
+                                >
                                     Cancel
                                 </Button>
-                                <Button type="submit" variant="primary" className="w-full" disabled={loading || parentLoading}>
-                                    {(loading || parentLoading) ? 'Processing...' : 'Next'}
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    className="w-full"
+                                    disabled={loading || parentLoading}
+                                >
+                                    {loading || parentLoading ? 'Processing...' : 'Next'}
                                 </Button>
                             </div>
                         </form>
@@ -155,7 +170,11 @@ const ChangePhoneNumberFlow = ({
                                     <FormItem>
                                         <FormLabel>Enter Code</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder="Enter code" disabled={loading || parentLoading} />
+                                            <Input
+                                                {...field}
+                                                placeholder="Enter code"
+                                                disabled={loading || parentLoading}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -163,11 +182,22 @@ const ChangePhoneNumberFlow = ({
                             />
                             {error && <div className="text-destructive text-xs mt-1">{error}</div>}
                             <div className="flex gap-2 mt-4">
-                                <Button type="button" variant="outline" className="w-full" onClick={handleCancel} disabled={loading || parentLoading}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full"
+                                    onClick={handleCancel}
+                                    disabled={loading || parentLoading}
+                                >
                                     Back
                                 </Button>
-                                <Button type="submit" variant="primary" className="w-full" disabled={loading || parentLoading}>
-                                    {(loading || parentLoading) ? 'Processing...' : 'Validate'}
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    className="w-full"
+                                    disabled={loading || parentLoading}
+                                >
+                                    {loading || parentLoading ? 'Processing...' : 'Validate'}
                                 </Button>
                             </div>
                         </form>

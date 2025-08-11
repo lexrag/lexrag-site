@@ -1,5 +1,5 @@
-import countries from "i18n-iso-countries";
-import enLocale from "i18n-iso-countries/langs/en.json";
+import countries from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
 
 countries.registerLocale(enLocale);
 
@@ -29,7 +29,7 @@ export const LANGUAGE_OPTIONS = [
 
 const countryCodes = Object.keys(countries.getNames('en'));
 const countryList = countryCodes.map((code) => ({
-  value: code,
-  label: countries.getNames('en')[code]
+    value: code,
+    label: countries.getNames('en')[code],
 }));
 export const COUNTRY_OPTIONS = countryList.sort((a, b) => a.label.localeCompare(b.label));

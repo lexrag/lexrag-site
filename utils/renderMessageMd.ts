@@ -10,10 +10,7 @@ const addAttributesToLinks = () => {
             if (node.tagName === 'a') {
                 node.properties = {
                     ...node.properties,
-                    className: [
-                        ...(node.properties.className || []),
-                        'message-link'
-                    ]
+                    className: [...(node.properties.className || []), 'message-link'],
                 };
             }
         });

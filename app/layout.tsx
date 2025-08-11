@@ -8,8 +8,8 @@ import { Metadata, Viewport } from 'next';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { UserProvider } from '@/providers/user-provider';
-import { SegmentAnalyticsProvider } from '@/providers/segment-analytics-provider';
-import { PageViewTracker } from '@/components/analytics/PageViewTracker';
+// import MarketingBootstrap from '@/components/analytics/MarketingBootstrap';
+import PageTracker from '@/components/analytics/PageTracker';
 
 
 export const metadata: Metadata = {
@@ -43,11 +43,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     <ThemeProvider>
                         <TooltipsProvider>
                             <UserProvider>
-                                <SegmentAnalyticsProvider>
-                                    <PageViewTracker />
-                                    <Suspense>{children}</Suspense>
-                                    <Toaster />
-                                </SegmentAnalyticsProvider>
+                                <PageTracker />
+                                {/** comments in code strictly in English
+                                 * MarketingBootstrap is intentionally disabled; PageTracker persists marketing
+                                 * just before pageOncePerLocation() to avoid duplicate init calls.
+                                 */}
+                                {/** <MarketingBootstrap /> */}
+                                <Suspense>{children}</Suspense>
+                                <Toaster />
                             </UserProvider>
                         </TooltipsProvider>
                     </ThemeProvider>

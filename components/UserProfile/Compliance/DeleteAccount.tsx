@@ -27,10 +27,7 @@ const DeleteAccount = () => {
                     </Button>
                 </div>
             </div>
-            <DeleteAccountDialog
-                open={deleteAccountOpen}
-                onOpenChange={setDeleteAccountOpen}
-            />
+            <DeleteAccountDialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen} />
         </>
     );
 };

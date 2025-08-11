@@ -85,9 +85,7 @@ export interface DataGridProps<TData extends object> {
     };
 }
 
-const DataGridContext = createContext<
-    DataGridContextProps<any> | undefined
->(undefined);
+const DataGridContext = createContext<DataGridContextProps<any> | undefined>(undefined);
 
 function useDataGrid() {
     const context = useContext(DataGridContext);

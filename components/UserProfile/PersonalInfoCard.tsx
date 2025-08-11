@@ -102,11 +102,7 @@ const PersonalInfoCard = ({ user }: { user: User }) => {
 
     return (
         <CardWrapper title="Personal Information">
-            <AvatarRow 
-                label="Photo" 
-                userId={user.id.toString()}
-                userName={user.first_name}
-            >
+            <AvatarRow label="Photo" userId={user.id.toString()} userName={user.first_name}>
                 150x150px JPEG, PNG Image
             </AvatarRow>
             <InputRow label="First Name" value={firstName} id="first_name" onChange={setFirstName} />

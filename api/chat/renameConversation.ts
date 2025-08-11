@@ -17,4 +17,4 @@ const renameConversation = async (threadId: string, newTitle: string): Promise<o
     }
 };
 
-export default renameConversation; 
+export default renameConversation;

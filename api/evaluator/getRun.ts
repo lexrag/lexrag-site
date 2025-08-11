@@ -1,7 +1,7 @@
 import renderMessageMd from '@/utils/renderMessageMd';
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from '@/types/Message';
 import { EvaluatorRun } from '@/types/EvaluatorRun';
+import { Message } from '@/types/Message';
 
 export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
     if (!threadId) {
@@ -25,7 +25,7 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
 
     if (!response.ok) {
         console.error('API Error:', response.status, response.statusText, data);
-        
+
         // For 404, return empty run instead of throwing
         if (response.status === 404) {
             console.log('Run not found, returning empty structure for threadId:', threadId);
@@ -34,10 +34,10 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
                 user_id: 0,
                 avatar: {},
                 conversation: [],
-                evaluations: []
+                evaluations: [],
             };
         }
-        
+
         // For other errors, also return empty structure instead of throwing
         console.warn('API error, returning empty structure:', response.status, response.statusText);
         return {
@@ -45,7 +45,7 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
             user_id: 0,
             avatar: {},
             conversation: [],
-            evaluations: []
+            evaluations: [],
         };
     }
 
@@ -53,7 +53,7 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
     if (!data.run) {
         console.error('No run data in response:', data);
         console.log('Response structure:', Object.keys(data));
-        
+
         // Check if the data itself is the run (without .run wrapper)
         if (data.thread_id || data.conversation || data.evaluations) {
             console.log('Data appears to be run data directly, not wrapped in .run');
@@ -62,33 +62,33 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
                 user_id: data.user_id || 0,
                 avatar: data.avatar || {},
                 conversation: data.conversation || [],
-                evaluations: data.evaluations || []
+                evaluations: data.evaluations || [],
             };
         }
-        
+
         // Return a default structure instead of throwing
         return {
             thread_id: parseInt(threadId) || 0,
             user_id: 0,
             avatar: {},
             conversation: [],
-            evaluations: []
+            evaluations: [],
         };
     }
-    
+
     if (!data.run.conversation) {
         console.warn('No conversation in run data:', data.run);
         // Return run data with empty conversation
         return {
             ...data.run,
-            conversation: []
+            conversation: [],
         };
     }
 
     const messages = [];
 
     for (const msg of data.run.conversation) {
-        const direction = msg.role === "ai" ? "incoming" : "outgoing";
+        const direction = msg.role === 'ai' ? 'incoming' : 'outgoing';
         const html = await renderMessageMd(msg.content);
 
         const newMessage: Message = {
@@ -104,5 +104,5 @@ export const getRun = async (threadId: string): Promise<EvaluatorRun> => {
     return {
         ...data.run,
         conversation: messages,
-    }
+    };
 };

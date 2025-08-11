@@ -32,7 +32,7 @@ export async function decrypt(token: string): Promise<JwtPayload | null> {
             return payload;
         }
     } catch {
-        console.log("Failed to verify session");
+        console.log('Failed to verify session');
     }
 
     return null;

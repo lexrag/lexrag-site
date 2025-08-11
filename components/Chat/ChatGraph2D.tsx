@@ -7,7 +7,8 @@ import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
 import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
-import { useSegment } from '@/hooks/use-segment';
+import { track_graph_zoomed, track_node_collapsed, track_node_expanded } from '@/lib/analytics';
+import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -18,6 +19,7 @@ interface ChatGraph2DProps {
     data: GraphData;
     handleCardData: Dispatch<SetStateAction<any>>;
     handleScrollToCardId: Dispatch<SetStateAction<string>>;
+    threadId?: string; // Add thread_id prop
 
     expandedNodes: Set<string>;
     setExpandedNodes: Dispatch<SetStateAction<Set<string>>>;
@@ -42,6 +44,7 @@ const ChatGraph2D = ({
     layers,
     handleCardData,
     handleScrollToCardId,
+    threadId,
     expandedNodes,
     setExpandedNodes,
     nodeHierarchy,
@@ -57,7 +60,6 @@ const ChatGraph2D = ({
     showNodeLabels = true,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
-    const { trackGraphNodeExpansion, trackGraphZoom } = useSegment();
 
     const graphRef = useRef<any>(null);
     const nodePositionsRef = useRef<Record<string, GraphNodePosition>>({});
@@ -92,7 +94,7 @@ const ChatGraph2D = ({
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
         return () => window.removeEventListener('resize', updateDimensions);
-    }, [width, height]);
+    }, [width, height]); // width and height are stable props
 
     const saveNodePosition = (node: any) => {
         if (node && node.x !== undefined && node.y !== undefined) {
@@ -812,9 +814,61 @@ const ChatGraph2D = ({
         [processedNodes, processedLinks],
     );
 
+    // Track zoom level changes for interactive events (wheel, drag)
+    useEffect(() => {
+        let lastZoomLevel = 1;
+        let intervalId: NodeJS.Timeout | null = null;
+        let isInitialized = false;
+
+        const startZoomTracking = () => {
+            if (isInitialized || !graphRef.current) return;
+
+            isInitialized = true;
+
+            // Initialize with current zoom level
+            const initialZoom = graphRef.current.zoom();
+            if (initialZoom) {
+                lastZoomLevel = initialZoom;
+            }
+
+            intervalId = setInterval(() => {
+                if (!graphRef.current) return;
+
+                const currentZoom = graphRef.current.zoom();
+                if (currentZoom && Math.abs(currentZoom - lastZoomLevel) > 0.05) {
+                    try {
+                        track_graph_zoomed({
+                            thread_id: threadId || 'unknown',
+                            zoom_type: 'manual',
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
+                    lastZoomLevel = currentZoom;
+                }
+            }, 100);
+        };
+
+        const timer = setTimeout(startZoomTracking, 1500);
+
+        return () => {
+            clearTimeout(timer);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [processedNodes, threadId]);
+
     useEffect(() => {
         const unsubscribeZoomToFit = subscribeToZoomToFitGraph(() => {
-            trackGraphZoom('fit');
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'fit',
+                });
+            } catch (e) {
+                console.error(e);
+            }
             graphRef.current?.zoomToFit(300);
             setHighlightedNodeId(null);
             setHighlightedLinkId(null);
@@ -831,7 +885,15 @@ const ChatGraph2D = ({
                 payload.y = targetNode.y;
             }
 
-            trackGraphZoom('node', payload.id);
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'node',
+                    target_id: payload.id,
+                });
+            } catch (e) {
+                console.error(e);
+            }
 
             graphRef.current.centerAt(payload.x, payload.y, payload.duration || 1000);
             graphRef.current.zoom(payload.zoomLevel || 1, payload.duration || 1000);
@@ -855,7 +917,7 @@ const ChatGraph2D = ({
             unsubscribeZoomToFit();
             unsubscribeZoomToNode();
         };
-    }, [processedNodes]);
+    }, [processedNodes, threadId, setHighlightedNodeId, setHighlightedLinkId, setisZooming, zoomTimeoutRef]); // threadId is used in track_graph_zoomed calls
 
     useEffect(() => {
         return () => {
@@ -892,7 +954,7 @@ const ChatGraph2D = ({
                 fg.zoomToFit(300);
             }, 500);
         }
-    }, [processedNodes]);
+    }, [processedNodes]); // processedNodes is stable and only changes when needed
 
     useEffect(() => {
         if (graphRef.current && processedLinks.length >= 0) {
@@ -991,7 +1053,11 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                trackGraphNodeExpansion(node, 'collapse', 0);
+                track_node_collapsed({
+                    thread_id: threadId || 'unknown',
+                    target_id: node.id,
+                    by_user: true,
+                }).catch(console.error);
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1031,18 +1097,30 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        trackGraphNodeExpansion(node, 'expand', filteredNewNodes.length);
+                        track_node_expanded({
+                            thread_id: threadId || 'unknown',
+                            target_id: node.id,
+                            by_user: true,
+                        }).catch(console.error);
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        trackGraphNodeExpansion(node, 'expand', 0);
+                        track_node_expanded({
+                            thread_id: threadId || 'unknown',
+                            target_id: node.id,
+                            by_user: true,
+                        }).catch(console.error);
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    trackGraphNodeExpansion(node, 'expand', 0);
+                    track_node_expanded({
+                        thread_id: threadId || 'unknown',
+                        target_id: node.id,
+                        by_user: true,
+                    }).catch(console.error);
                 }
             }
         } catch (error) {
@@ -1499,35 +1577,50 @@ const ChatGraph2D = ({
     };
 
     return (
-        <ForceGraph2D
-            ref={graphRef}
-            width={width || dimensions.width}
-            height={height || dimensions.height}
-            graphData={processedData}
-            backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
-            nodeCanvasObject={nodeCanvasObject}
-            nodeCanvasObjectMode={() => 'replace'}
-            nodeVal={(node) => {
-                const nodeSize = getNodeSize(node);
-                return nodeSize * 2;
-            }}
-            linkColor={getLinkColor}
-            linkWidth={getLinkWidth}
-            linkDirectionalParticles={(link) => (link.parentChild ? 4 : 2)}
-            linkDirectionalParticleSpeed={() => 0.005}
-            nodeLabel={getNodeLabel}
-            linkLabel={getLinkLabel}
-            onNodeClick={handleNodeClick}
-            onLinkClick={handleLinkClick}
-            onNodeHover={handleNodeHover}
-            onLinkHover={handleLinkHover}
-            onNodeDrag={handleNodeDrag}
-            onNodeDragEnd={handleNodeDragEnd}
-            onEngineStop={handleEngineStop}
-            onBackgroundClick={handleBackgroundClick}
-            cooldownTicks={100}
-            cooldownTime={15000}
-        />
+        <div className="relative">
+            {/* Track time spent viewing graph */}
+            <ContentTimeTracker
+                areaId="chat_graph_2d"
+                extra={{
+                    thread_id: threadId || 'unknown',
+                    graph_view: '2d',
+                }}
+                disablePulses={true}
+                minThresholdMs={3000}
+                finalMinThresholdMs={5000}
+                sampleOneOutOf={10}
+            />
+
+            <ForceGraph2D
+                ref={graphRef}
+                width={width || dimensions.width}
+                height={height || dimensions.height}
+                graphData={processedData}
+                backgroundColor={resolvedTheme === 'dark' ? '#09090b' : '#fff'}
+                nodeCanvasObject={nodeCanvasObject}
+                nodeCanvasObjectMode={() => 'replace'}
+                nodeVal={(node) => {
+                    const nodeSize = getNodeSize(node);
+                    return nodeSize * 2;
+                }}
+                linkColor={getLinkColor}
+                linkWidth={getLinkWidth}
+                linkDirectionalParticles={(link) => (link.parentChild ? 4 : 2)}
+                linkDirectionalParticleSpeed={() => 0.005}
+                nodeLabel={getNodeLabel}
+                linkLabel={getLinkLabel}
+                onNodeClick={handleNodeClick}
+                onLinkClick={handleLinkClick}
+                onNodeHover={handleNodeHover}
+                onLinkHover={handleLinkHover}
+                onNodeDrag={handleNodeDrag}
+                onNodeDragEnd={handleNodeDragEnd}
+                onEngineStop={handleEngineStop}
+                onBackgroundClick={handleBackgroundClick}
+                cooldownTicks={100}
+                cooldownTime={15000}
+            />
+        </div>
     );
 };
 

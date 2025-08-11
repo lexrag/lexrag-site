@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
 import { useChat } from '@/api/chat/chatApi';
 import { useChatContext } from '@/components/Chat/ChatProvider';
 import EvaluatorChatBox from '@/components/Evaluator/EvaluatorChatBox';
 import EvaluatorChatLeftPanel from '@/components/Evaluator/EvaluatorChatLeftPanel';
 import EvaluatorChatRightPanel from '@/components/Evaluator/EvaluatorChatRightPanel';
-
 
 interface EvaluatorEmptyClientProps {
     onStartClick: () => void;
@@ -14,7 +13,7 @@ interface EvaluatorEmptyClientProps {
 const EvaluatorEmptyClient = ({ onStartClick }: EvaluatorEmptyClientProps) => {
     const { socket, connectionError } = useChatContext();
     useChat({ websocket: socket });
-    
+
     return (
         <main className="flex flex-1 overflow-hidden pb-2 z-40 md:pt-0 pt-2 min-h-0">
             <EvaluatorChatLeftPanel />
@@ -33,7 +32,7 @@ const EvaluatorEmptyClient = ({ onStartClick }: EvaluatorEmptyClientProps) => {
 
             <EvaluatorChatRightPanel thisRun={undefined} currentMsgIdx={undefined} />
         </main>
-    )
+    );
 };
 
 export default EvaluatorEmptyClient;
