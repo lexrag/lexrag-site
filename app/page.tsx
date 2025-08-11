@@ -5,9 +5,8 @@ import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { H3, PBase } from '@/components/ui/typography';
+import '@/components/ui/css-variables.css';
 
 export const metadata: Metadata = {
     title: 'LEXRAG',
@@ -15,15 +14,15 @@ export const metadata: Metadata = {
 
 const LandingPage = () => {
     return (
-        <div className="overflow-y-auto">
-            <Header className="" />
+        <div className="overflow-y-auto bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] min-h-screen">
+            <Header className="px-[10%]" />
 
-            <main className="">
+            <main className="px-[10%]">
                 <section>
                     <Hero />
                 </section>
 
-                <section id="benefits" className="pr-[10%] pl-[10%]">
+                <section id="benefits" className="pl-6">
                     <Benefits />
                 </section>
 
@@ -32,29 +31,18 @@ const LandingPage = () => {
                 </section>
 
                 <section id="product-features" className="">
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-gray-900 dark:text-white">
+                    {/* TODO: keep sections title separately for reuse */}
+                    <div className="mb-10">
+                        <H3 className="mb-2 transition-colors duration-300 text-[var(--Brand-Primary-Midnight-Core)] pl-8">
                             Product Features
-                        </h3>
-                        <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                            Explore legal data like never before — through graphs, vectors, and intelligent query
-                            breakdowns
-                        </p>
-                        <div className="mt-6">
-                            <Link href="/features">
-                                <Button className="flex items-center gap-2">
-                                    View All Features
-                                    <ArrowRight className="size-4" />
-                                </Button>
-                            </Link>
-                        </div>
+                        </H3>
                     </div>
                     <ProductFeatures
-                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
+                        gridClassName="grid grid-cols-1 md:grid-cols-4 gap-4 min-h-[230px]"
                         showDescription={true}
                         showSideBadges={false}
                         showBottomBadges={true}
-                        maxHeightBeforeShowAll={500}
+                        maxHeightBeforeShowAll={650}
                     />
                 </section>
             </main>

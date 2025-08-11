@@ -1,12 +1,10 @@
 import { ReactNode, Suspense } from 'react';
-import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import '@/css/globals.css';
 import { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/providers/theme-provider';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
     title: {
@@ -30,11 +28,28 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html className="h-full" suppressHydrationWarning>
-            <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
-                <ThemeProvider>
-                    <Suspense>{children}</Suspense>
-                    <Toaster />
-                </ThemeProvider>
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+                <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+            </head>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans')}>
+                <QueryProvider>
+                    <ThemeProvider>
+                        <TooltipsProvider>
+                            <UserProvider>
+                                <PageTracker />
+                                {/** comments in code strictly in English
+                                 * MarketingBootstrap is intentionally disabled; PageTracker persists marketing
+                                 * just before pageOncePerLocation() to avoid duplicate init calls.
+                                 */}
+                                {/** <MarketingBootstrap /> */}
+                                <Suspense>{children}</Suspense>
+                                <Toaster />
+                            </UserProvider>
+                        </TooltipsProvider>
+                    </ThemeProvider>
+                </QueryProvider>
             </body>
         </html>
     );

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { getBadgeColor, getCategoryColorScheme } from '@/utils/colorMapping';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { H4, PSM } from '@/components/ui/typography';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -50,7 +51,7 @@ const ProductFeatures = ({
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{
-                    maxHeight: showAll ? '2000px' : `${maxHeightBeforeShowAll}px`,
+                    maxHeight: showAll ? 'none' : `${maxHeightBeforeShowAll}px`,
                 }}
             >
                 <div className={gridClassName}>
@@ -69,7 +70,7 @@ const ProductFeatures = ({
                                     className={cn(
                                         'relative overflow-hidden flex flex-col gap-5 p-5 lg:p-5 rounded-xl items-center justify-around',
                                         'border border-transparent shadow-md transition-all hover:shadow-lg',
-                                        'dark:bg-coal-300 light:bg-white',
+                                        'bg-blue-50',
                                         colors.border,
                                     )}
                                 >
@@ -91,12 +92,10 @@ const ProductFeatures = ({
                                                 />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className={cn('text-md font-medium mb-px', colors.icon_color)}>
-                                                    {feat.title}
-                                                </span>
-                                                <span className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                                <H4 className={cn('mb-px', colors.icon_color)}>{feat.title}</H4>
+                                                <PSM className="text-2sm text-gray-500">
                                                     {feat.subtitle}
-                                                </span>
+                                                </PSM>
                                             </div>
                                         </div>
 
@@ -113,9 +112,9 @@ const ProductFeatures = ({
                                     </div>
 
                                     {showDescription && (
-                                        <p className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                        <PSM className="text-2sm text-gray-500">
                                             {feat.description}
-                                        </p>
+                                        </PSM>
                                     )}
 
                                     {showBottomBadges && (
@@ -137,7 +136,17 @@ const ProductFeatures = ({
 
             {visibleFeats.length > 0 && (
                 <div className="text-center mt-8">
-                    <Button onClick={toggleShowAll} className="transition-all duration-300">
+                    <Button
+                        onClick={toggleShowAll}
+                        className="border border-white/20 
+                            shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]
+                            rounded-[73.553px]
+                            bg-white/10 backdrop-blur-sm
+                            hover:bg-[var(--Brand-Primary-Phase-Green)]
+                            hover:backdrop-blur-md
+                            transition-all
+                            text-[var(--Brand-Primary-Midnight-Core)] duration-300"
+                    >
                         {showAll ? 'Show Less' : 'Show All'}
                     </Button>
                 </div>
