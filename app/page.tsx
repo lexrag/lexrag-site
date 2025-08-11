@@ -6,6 +6,7 @@ import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
 import { H3, PBase } from '@/components/ui/typography';
+import '@/components/ui/css-variables.css';
 
 export const metadata: Metadata = {
     title: 'LEXRAG',
@@ -14,14 +15,14 @@ export const metadata: Metadata = {
 const LandingPage = () => {
     return (
         <div className="overflow-y-auto bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] min-h-screen">
-            <Header className="" />
+            <Header className="px-[10%]" />
 
-            <main className="">
+            <main className="px-[10%]">
                 <section>
                     <Hero />
                 </section>
 
-                <section id="benefits" className="pr-[10%] pl-[10%]">
+                <section id="benefits" className="pl-6">
                     <Benefits />
                 </section>
 
@@ -31,17 +32,13 @@ const LandingPage = () => {
 
                 <section id="product-features" className="">
                     {/* TODO: keep sections title separately for reuse */}
-                    <div className="text-center mb-10">
-                        <H3 className="pt-28 mb-2 transition-colors duration-300 text-gray-900 dark:text-white">
+                    <div className="mb-10">
+                        <H3 className="mb-2 transition-colors duration-300 text-[var(--Brand-Primary-Midnight-Core)] pl-8">
                             Product Features
                         </H3>
-                        <PBase className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                            Explore legal data like never before — through graphs, vectors, and intelligent query
-                            breakdowns
-                        </PBase>
                     </div>
                     <ProductFeatures
-                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
+                        gridClassName="grid grid-cols-1 md:grid-cols-4 gap-4 min-h-[230px]"
                         showDescription={true}
                         showSideBadges={false}
                         showBottomBadges={true}
