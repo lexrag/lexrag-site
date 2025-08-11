@@ -6,6 +6,17 @@ import { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/providers/theme-provider';
 import SegmentProvider from '@/components/analytics/SegmentProvider';
 import ScrollTracker from '@/components/analytics/ScrollTracker';
+import { Instrument_Sans } from 'next/font/google';
+
+const instrumentSans = Instrument_Sans({
+    subsets: ['latin'],
+    weight: ['400', '500', '600'],
+    style: ['normal', 'italic'],
+    variable: '--font-instrument-sans',
+    display: 'swap',
+    preload: true,
+    fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+});
 
 export const metadata: Metadata = {
     title: {
@@ -32,9 +43,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-                <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet" />
             </head>
-            <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans')}>
+            <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans', instrumentSans.variable)}>
                 <ThemeProvider>
                     <SegmentProvider />
                     <ScrollTracker />
