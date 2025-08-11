@@ -51,13 +51,15 @@ const BillingPlan = () => {
             await cancelSubscription();
 
             if (currentSubscription?.tariff) {
-                track_subscription_cancelled({
-                    plan_id: currentSubscription.tariff_id,
-                    plan_name: currentSubscription.tariff.name,
-                    amount: currentSubscription.tariff.price || 0,
-                }).catch((error) => {
+                try {
+                    track_subscription_cancelled({
+                        plan_id: currentSubscription.tariff_id,
+                        plan_name: currentSubscription.tariff.name,
+                        amount: currentSubscription.tariff.price || 0,
+                    });
+                } catch (error) {
                     console.error('Error tracking subscription cancellation:', error);
-                });
+                }
             }
 
             setDialogOpen(false);

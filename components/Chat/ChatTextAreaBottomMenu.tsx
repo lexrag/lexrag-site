@@ -17,7 +17,7 @@ interface ChatTextAreaBottomMenuProps extends ChatTextAreaProps {
 
 const ChatTextAreaBottomMenu = (props: ChatTextAreaBottomMenuProps) => {
     const handleSendButtonClick = () => {
-        props.sendMessage(props.input, props.isNewConversation ?? false);
+        props.sendMessage(props.input, props.isNewConversation ?? false, []);
         props.setInput('');
     };
 

@@ -17,7 +17,7 @@ interface ChatBoxProps {
     status: string | null;
     currentResponseContent: string;
     copiedMessageId: string | null;
-    sendMessage: (input: string, isNew: boolean) => void;
+    sendMessage: (input: string, isNew: boolean, userDocuments: string[]) => void;
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
     setScrollToCardId: Dispatch<SetStateAction<string>>;
@@ -95,11 +95,12 @@ const ChatBox = ({
 
     return (
         <div className="flex flex-col h-full w-full max-w-6xl mx-auto md:px-4 px-2 min-h-0">
-            {/* Track time spent in chat - conservative defaults */}
+            {/* Track time spent in chat - pulses enabled with longer interval */}
             <ContentTimeTracker
                 areaId="chat_main"
                 extra={{ thread_id: threadId || 'unknown' }}
-                disablePulses={true}
+                disablePulses={false}
+                pulseIntervalMs={300000}
                 minThresholdMs={3000}
                 finalMinThresholdMs={5000}
                 sampleOneOutOf={10}

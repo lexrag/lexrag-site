@@ -6,8 +6,15 @@ import { getConversationExpandNodes } from '@/api/chat/getConversationExpandNode
 import { subscribeToZoomToFitGraph } from '@/events/zoom-to-fit';
 import { subscribeToZoomToNodeGraph } from '@/events/zoom-to-node';
 import { useTheme } from 'next-themes';
-import { GraphData, GraphLayer, GraphLinkFilter, GraphNodeFilter, GraphNodePosition } from '@/types/Graph';
-import { track_graph_zoomed, track_node_collapsed, track_node_expanded } from '@/lib/analytics';
+import {
+    GraphData,
+    GraphLayer,
+    GraphLinkFilter,
+    GraphNodeFilter,
+    GraphNodePosition,
+    NodesTagsFilters,
+} from '@/types/Graph';
+import { track_node_expanded, track_node_collapsed, track_graph_zoomed } from '@/lib/analytics';
 import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
@@ -35,6 +42,8 @@ interface ChatGraph2DProps {
     nodeFilters: GraphNodeFilter[];
     setNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     showNodeLabels?: boolean;
+    searchQuery: string;
+    nodesTagsFilters: NodesTagsFilters;
 }
 
 const ChatGraph2D = ({
@@ -58,6 +67,8 @@ const ChatGraph2D = ({
     nodeFilters,
     setNodeFilters,
     showNodeLabels = true,
+    searchQuery,
+    nodesTagsFilters,
 }: ChatGraph2DProps) => {
     const { resolvedTheme } = useTheme();
 
@@ -151,6 +162,76 @@ const ChatGraph2D = ({
             saveNodePosition(node);
         });
     };
+
+    const getNodeDisplayInfo = useCallback((node: any) => {
+        const getParagraphNumber = (nodeId: string) => {
+            if (nodeId.includes('#[')) {
+                const match = nodeId.match(/#\[(\d+)\]/);
+                return match ? match[1] : null;
+            }
+            return null;
+        };
+
+        const formatLegalPath = (legalPath: string) => {
+            if (!legalPath) return '';
+
+            const parts = legalPath.split(' -> ').map((part) => part.trim());
+            const pathParts = parts.slice(1).map((part) => part.replace(/-$/, ''));
+
+            if (pathParts.length === 0) return '';
+
+            const [first, ...rest] = pathParts;
+            if (rest.length === 0) return first;
+
+            return `${first}(${rest.join(')(')})`;
+        };
+
+        const paragraphNum = getParagraphNumber(node.id);
+        let title = node.labels?.[0] || 'Node';
+
+        if (paragraphNum) {
+            title = `§ ${paragraphNum}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('PartOfTheLegislation')) {
+            title = node.heading ? `${node.heading}` : `Regulation ${formatLegalPath(node.legalPath) || ''}`;
+        } else if (node.id.includes('/SL/') && node.labels?.includes('Resource')) {
+            title = 'Subsidiary Legislation';
+        } else if (node.labels?.includes('PartOfTheLegislation')) {
+            title = formatLegalPath(node.legalPath) || node.labels?.[0] || 'Section';
+        } else if (node.heading) {
+            title = node.heading;
+        } else if (node.name) {
+            title = node.name;
+        }
+
+        return {
+            title,
+            citation: node.neutralCitation || null,
+            content: node.content || '',
+            topics: node.topics || [],
+            concepts: node.concepts || [],
+            functionalObject: node.functionalObject || null,
+            functionalRole: node.functionalRole || null,
+        };
+    }, []);
+
+    const nodeMatchesSearch = useCallback(
+        (node: any, searchLower: string): boolean => {
+            const nodeInfo = getNodeDisplayInfo(node);
+
+            return (
+                nodeInfo.title.toLowerCase().includes(searchLower) ||
+                nodeInfo.content.toLowerCase().includes(searchLower) ||
+                (nodeInfo.citation && nodeInfo.citation.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.functionalObject && nodeInfo.functionalObject.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.functionalRole && nodeInfo.functionalRole.toLowerCase().includes(searchLower)) ||
+                (nodeInfo.topics &&
+                    nodeInfo.topics.some((topic: string) => topic.toLowerCase().includes(searchLower))) ||
+                (nodeInfo.concepts &&
+                    nodeInfo.concepts.some((concept: string) => concept.toLowerCase().includes(searchLower)))
+            );
+        },
+        [getNodeDisplayInfo],
+    );
 
     useEffect(() => {
         if (!data) return;
@@ -626,6 +707,84 @@ const ChatGraph2D = ({
         [nodeFilters],
     );
 
+    const getSearchFilteredNodes = useCallback(
+        (allNodes: any[]): any[] => {
+            const searchLower = searchQuery.toLowerCase().trim();
+
+            const hasTopicFilter = nodesTagsFilters.topic.selected.length !== nodesTagsFilters.topic.options.length;
+            const hasConceptFilter =
+                nodesTagsFilters.concept.selected.length !== nodesTagsFilters.concept.options.length;
+
+            const matchingNodes = new Set<string>();
+            const nodesToInclude = new Set<string>();
+
+            const nodesByParent = new Map<string | null, any[]>();
+            const nodeMap = new Map<string, any>();
+
+            allNodes.forEach((node) => {
+                nodeMap.set(node.id, node);
+                const parentId = node.parentId || null;
+                if (!nodesByParent.has(parentId)) {
+                    nodesByParent.set(parentId, []);
+                }
+                nodesByParent.get(parentId)!.push(node);
+            });
+
+            const nodeMatches = (node: any) => {
+                const info = getNodeDisplayInfo(node);
+
+                const matchesSearch =
+                    info.title.toLowerCase().includes(searchLower) ||
+                    info.content.toLowerCase().includes(searchLower) ||
+                    (info.citation && info.citation.toLowerCase().includes(searchLower)) ||
+                    (info.functionalObject && info.functionalObject.toLowerCase().includes(searchLower)) ||
+                    (info.functionalRole && info.functionalRole.toLowerCase().includes(searchLower)) ||
+                    (info.topics && info.topics.some((t: string) => t.toLowerCase().includes(searchLower))) ||
+                    (info.concepts && info.concepts.some((c: string) => c.toLowerCase().includes(searchLower)));
+
+                const matchesTopicFilter =
+                    !hasTopicFilter || info.topics?.some((t: string) => nodesTagsFilters.topic.selected.includes(t));
+                const matchesConceptFilter =
+                    !hasConceptFilter ||
+                    info.concepts?.some((c: string) => nodesTagsFilters.concept.selected.includes(c));
+
+                return matchesSearch && (matchesTopicFilter || matchesConceptFilter);
+            };
+
+            allNodes.forEach((node) => {
+                if (nodeMatches(node)) {
+                    matchingNodes.add(node.id);
+                    nodesToInclude.add(node.id);
+
+                    if (!node.parentId) {
+                        const children = nodesByParent.get(node.id) || [];
+                        children.forEach((child) => nodesToInclude.add(child.id));
+                    } else {
+                        const parent = nodeMap.get(node.parentId);
+                        if (parent) {
+                            nodesToInclude.add(parent.id);
+                            const siblings = nodesByParent.get(node.parentId) || [];
+                            siblings.forEach((sibling) => nodesToInclude.add(sibling.id));
+                        }
+                    }
+                }
+            });
+
+            nodesByParent.forEach((children, parentId) => {
+                if (parentId) {
+                    const parent = nodeMap.get(parentId);
+                    if (parent && nodeMatches(parent)) {
+                        nodesToInclude.add(parent.id);
+                        children.forEach((child) => nodesToInclude.add(child.id));
+                    }
+                }
+            });
+
+            return allNodes.filter((node) => nodesToInclude.has(node.id));
+        },
+        [searchQuery, nodesTagsFilters, getNodeDisplayInfo],
+    );
+
     const processedNodes = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
 
@@ -711,8 +870,10 @@ const ChatGraph2D = ({
             allNodes.set(node.id, nodeData);
         });
 
-        return Array.from(allNodes.values());
-    }, [layerDataMap, layers, expandedData, isNodeVisible]);
+        const allNodesArray = Array.from(allNodes.values());
+
+        return getSearchFilteredNodes(allNodesArray);
+    }, [layerDataMap, layers, expandedData, isNodeVisible, getSearchFilteredNodes]);
 
     const processedLinks = useMemo(() => {
         const enabledLayers = layers.filter((layer) => layer.enabled);
@@ -927,8 +1088,13 @@ const ChatGraph2D = ({
         };
     }, [clickTimer]);
 
+    const lastCardDataRef = useRef<string | null>(null);
+
     useEffect(() => {
-        if (processedData) {
+        const serialized = JSON.stringify(processedData);
+
+        if (serialized !== lastCardDataRef.current) {
+            lastCardDataRef.current = serialized;
             handleCardData(processedData);
         }
     }, [processedData, handleCardData]);
@@ -1053,11 +1219,15 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                track_node_collapsed({
-                    thread_id: threadId || 'unknown',
-                    target_id: node.id,
-                    by_user: true,
-                }).catch(console.error);
+                try {
+                    track_node_collapsed({
+                        thread_id: threadId || 'unknown',
+                        target_id: node.id,
+                        by_user: true,
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1097,30 +1267,42 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    track_node_expanded({
-                        thread_id: threadId || 'unknown',
-                        target_id: node.id,
-                        by_user: true,
-                    }).catch(console.error);
+                    try {
+                        track_node_expanded({
+                            thread_id: threadId || 'unknown',
+                            target_id: node.id,
+                            by_user: true,
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
             }
         } catch (error) {
@@ -1242,19 +1424,19 @@ const ChatGraph2D = ({
 
         if (node.labels) {
             if (node.labels.includes('CaseLaw') || node.labels.includes('Case')) {
-                return 40; // 80px diameter / 2
+                return 40;
             }
 
             if (node.labels.includes('Paragraph')) {
-                return 10; // 20px diameter / 2
+                return 10;
             }
 
             if (node.labels.includes('Act')) {
-                return 40; // 80px diameter / 2
+                return 40;
             }
 
             if (node.labels.includes('PartOfTheLegislation')) {
-                return 10; // 20px diameter / 2
+                return 10;
             }
 
             if (
@@ -1290,11 +1472,11 @@ const ChatGraph2D = ({
                 node.labels.includes('SubsidiaryLegislation') ||
                 node.labels.includes('SLOpening')
             ) {
-                return 25; // 50px diameter / 2
+                return 25;
             }
         }
 
-        return 25; // Default 50px diameter / 2
+        return 25;
     };
 
     const handleNodeHover = (node: any) => {
@@ -1339,7 +1521,6 @@ const ChatGraph2D = ({
         }
 
         if (link.parentChild) {
-            // const sourceNode = processedNodes.find((n) => n.id === link.source);
             const targetNode = processedNodes.find((n) => n.id === link.target);
 
             if (targetNode?.labels?.includes('Act')) {
@@ -1497,16 +1678,23 @@ const ChatGraph2D = ({
         const nodeSize = getNodeSize(node);
         const rgb = getNodeColor(node);
 
-        if (highlightedNodeId === node.id || selectedNodes.has(node)) {
+        const isSearchMatch = searchQuery.trim() && nodeMatchesSearch(node, searchQuery.toLowerCase().trim());
+
+        if (highlightedNodeId === node.id || selectedNodes.has(node) || isSearchMatch) {
             ctx.save();
 
-            const glowRadius = nodeSize * 3.5;
+            const glowRadius = nodeSize * (isSearchMatch ? 4.5 : 3.5);
             const gradient = ctx.createRadialGradient(node.x, node.y, nodeSize, node.x, node.y, glowRadius);
 
-            gradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`);
-            gradient.addColorStop(0.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
-            gradient.addColorStop(0.6, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`);
-            gradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+            const glowColor =
+                isSearchMatch && !selectedNodes.has(node) && highlightedNodeId !== node.id
+                    ? { r: 255, g: 255, b: 0 } 
+                    : rgb;
+
+            gradient.addColorStop(0, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.6)`);
+            gradient.addColorStop(0.3, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.3)`);
+            gradient.addColorStop(0.6, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0.1)`);
+            gradient.addColorStop(1, `rgba(${glowColor.r}, ${glowColor.g}, ${glowColor.b}, 0)`);
 
             ctx.beginPath();
             ctx.arc(node.x, node.y, glowRadius, 0, 2 * Math.PI);
@@ -1578,14 +1766,15 @@ const ChatGraph2D = ({
 
     return (
         <div className="relative">
-            {/* Track time spent viewing graph */}
+            {/* Track time spent viewing graph - pulses enabled with longer interval */}
             <ContentTimeTracker
                 areaId="chat_graph_2d"
                 extra={{
                     thread_id: threadId || 'unknown',
                     graph_view: '2d',
                 }}
-                disablePulses={true}
+                disablePulses={false}
+                pulseIntervalMs={300000}
                 minThresholdMs={3000}
                 finalMinThresholdMs={5000}
                 sampleOneOutOf={10}

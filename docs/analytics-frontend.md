@@ -37,7 +37,7 @@ Aligned with Backend README: “Beacon Endpoint”, “Noise filtering”, “Ra
 - `hooks/use-time-on-view.ts`, `components/analytics/ContentTimeTracker.tsx`
   - Time-on-view tracking: event `content_time_spent` with `{ area_id, spent_ms, is_final, ...extra }`
   - Options: `minThresholdMs`, `finalMinThresholdMs`, `disablePulses`, `sampleOneOutOf`, `pulseIntervalMs`
-  - Conservative defaults (noise reduction)
+  - Default `pulseIntervalMs` is 60s; рекомендуем для большинства зон увеличить до 5 минут (300000 мс) и/или использовать sampling для снижения объёма. Финальное событие гарантированно отправляется на `pagehide`.
 
 ## Alignment with Backend README
 
@@ -62,6 +62,12 @@ Frontend (`.env` / `.env.example`):
   - `NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES`
   - `NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES`
 
+## Identity and Auth propagation
+
+- In beacon mode the frontend proxy forwards cookies and the `Authorization` header to the backend.
+- If `Authorization` is missing but a `token` cookie is present, the proxy synthesizes `Authorization: Bearer <token>` so the backend can associate events with the authenticated user.
+- Cookies are set with `Secure` only when the app runs over HTTPS. In local development over HTTP, the session cookie is non‑Secure so that the browser will send it and beacon events won’t appear anonymous.
+
 Backend — see README.md (`SEGMENT_*`, `ANALYTICS_*`, limits, idempotency)
 
 ## Usage Recommendations
@@ -73,7 +79,7 @@ Backend — see README.md (`SEGMENT_*`, `ANALYTICS_*`, limits, idempotency)
 
 3) For screen areas where time-on-view matters, add `ContentTimeTracker` with conservative thresholds
 
-4) Prefer typed `track_*` helpers from `lib/analytics.ts` over raw string event names
+4) Prefer typed `track_*` helpers from `lib/analytics.ts` over raw string event names. Эти хелперы синхронные (возвращают void); не используйте `.catch()`, при необходимости оборачивайте вызовы в `try/catch`.
 
 ## Examples
 
@@ -87,7 +93,8 @@ Time-on-view for a section:
 ```tsx
 <ContentTimeTracker
   areaId="chat_main"
-  disablePulses={true}
+  disablePulses={false}
+  pulseIntervalMs={300000}
   minThresholdMs={3000}
   finalMinThresholdMs={5000}
   sampleOneOutOf={10}
@@ -99,5 +106,7 @@ Time-on-view for a section:
 - In `VIA_BEACON` mode, `page()` on the frontend is disabled; implement page analytics on the backend if needed.
 - FE identify/alias are disabled by default and should be performed on the backend for identity consistency.
 - When offline, the frontend enqueues events only for direct Segment mode; for beacon mode, rely on backend delivery guarantees (and implement retries server-side if needed).
+- `track_*` helpers return `void` (not Promises). Do not use `.catch()`; wrap in `try/catch` for dev error handling if needed.
+- To reduce console noise during development, set `NEXT_PUBLIC_SEGMENT_DEBUG=false`.
 
 

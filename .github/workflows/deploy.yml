@@ -27,15 +27,13 @@ env:
     NEXT_PUBLIC_JWT_EXPIRATION_MINUTES: 60
     NEXT_PUBLIC_BASE_URL: https://lexrag.com
     NEXT_PUBLIC_BASE_PATH: ''
-    NEXT_PUBLIC_SEGMENT_ENABLED: true
+    NEXT_PUBLIC_SEGMENT_ENABLED: false
     NEXT_PUBLIC_SEGMENT_DEBUG: false
     NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND: false
     NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED: 1
     NEXT_PUBLIC_ANALYTICS_VIA_BEACON: true
     NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES: true
     NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES: 10
-    # Optional explicit override for analytics handoff endpoint. If not set, uses `${NEXT_PUBLIC_API_BASE_URL}/auth/analytics/link`.
-    NEXT_PUBLIC_ANALYTICS_HANDOFF_URL: ''
 
 jobs:
     deploy:
@@ -58,14 +56,14 @@ jobs:
                   echo "TAG=$TAG" >> $GITHUB_ENV
 
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
                   ref: ${{ env.BRANCH }}
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '23'
+                  node-version: '22.x'
 
             - name: Install dependencies and run lint
               run: |
@@ -98,12 +96,15 @@ jobs:
                      --build-arg NEXT_PUBLIC_SEGMENT_DEBUG=${{env.NEXT_PUBLIC_SEGMENT_DEBUG}} \
                      --build-arg NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=${{env.NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND}} \
                      --build-arg NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=${{env.NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED}} \
-                     --build-arg NEXT_PUBLIC_ANALYTICS_HANDOFF_URL=${{env.NEXT_PUBLIC_ANALYTICS_HANDOFF_URL}} \
                      --build-arg NEXT_PUBLIC_ANALYTICS_VIA_BEACON=${{env.NEXT_PUBLIC_ANALYTICS_VIA_BEACON}} \
                      --build-arg NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=${{env.NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES}} \
                      --build-arg NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=${{env.NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES}} \
                     -t $IMAGE_URI .
                   docker push $IMAGE_URI
+                  # Also tag and push by git SHA for rollbacks
+                  SHA_IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+                  docker tag $IMAGE_URI $SHA_IMAGE_URI
+                  docker push $SHA_IMAGE_URI
 
             - name: Render ECS task definition
               id: render-task-def

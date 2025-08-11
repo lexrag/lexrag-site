@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  # push:
+  #   branches: [ main ]
+  pull_request:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Show versions
+        run: |
+          node -v
+          npm -v
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Lint
+        run: |
+          if npm run | grep -q " lint"; then npm run lint; else echo "No lint script"; fi
+
+      - name: Test
+        run: |
+          if npm run | grep -q " test"; then npm test; else echo "No test script"; fi
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096

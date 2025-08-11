@@ -100,7 +100,7 @@ export function useTimeOnView({
         if (!pulsesDisabled) {
             startPulseTimer();
         }
-    }, [startPulseTimer]);
+    }, [startPulseTimer, sampleOneOutOf, ENV_SAMPLE_ONE_OUT_OF, disablePulses, ENV_DISABLE_PULSES]);
 
     const stop = useCallback(() => {
         if (!startTimeRef.current) return;
@@ -126,7 +126,7 @@ export function useTimeOnView({
         startTimeRef.current = null;
         totalTimeRef.current = 0;
         lastPulseTimeRef.current = 0;
-    }, [sendTimeSpentEvent]);
+    }, [sendTimeSpentEvent, finalMinThresholdMs, minThresholdMs]);
 
     const pause = useCallback(() => {
         if (!startTimeRef.current || isPausedRef.current) return;

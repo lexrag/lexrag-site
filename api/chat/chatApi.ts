@@ -227,7 +227,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [websocket, pathname, threadId, setConversations, setEvaluatorRun]);
 
-    const sendMessage = (input: string, isNew: boolean) => {
+    const sendMessage = (input: string, isNew: boolean, userDocuments: string[]) => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
 
         const outgoingMessage: Message = {
@@ -245,6 +245,7 @@ export const useChat = ({ websocket, setConversations, setEvaluatorRun }: UseCha
                 content: input,
                 is_new: isNew,
                 thread_id: threadId,
+                user_documents: userDocuments,
             }),
         );
 

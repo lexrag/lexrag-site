@@ -6,7 +6,7 @@ import { zoomToNodeGraph } from '@/events/zoom-to-node';
 import { useDirection } from '@radix-ui/react-direction';
 import { ArrowRight, Expand, Fullscreen, Layers, Link, X } from 'lucide-react';
 import { CardData } from '@/types/Chat';
-import { GraphLayer, GraphLinkFilter, GraphNodeFilter } from '@/types/Graph';
+import { GraphLayer, GraphLinkFilter, GraphNodeFilter, NodesTagsFilters } from '@/types/Graph';
 import ChatGraph2D from '@/components/Chat/ChatGraph2D';
 import ChatGraph3D from '@/components/Chat/ChatGraph3D';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
@@ -38,6 +38,7 @@ interface ChatRightSheetProps {
     setGraphNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     cardData: CardData;
     handleCardData: Dispatch<SetStateAction<CardData>>;
+    searchQuery: string;
 }
 
 const ChatRightSheet = ({
@@ -55,6 +56,7 @@ const ChatRightSheet = ({
     currentMessage,
     cardData,
     handleCardData,
+    searchQuery,
 }: ChatRightSheetProps) => {
     const direction = useDirection();
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
@@ -65,6 +67,21 @@ const ChatRightSheet = ({
     const [nodeHierarchy, setNodeHierarchy] = useState<Record<string, Set<string>>>({});
     const [expandedData, setExpandedData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
     const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
+    const nodesTagsFilters = useMemo<NodesTagsFilters>(() => {
+        const topics = new Set<string>();
+        const concepts = new Set<string>();
+        (cardData.nodes || []).forEach((n: any) => {
+            (n.topics || []).forEach((t: string) => topics.add(t));
+            (n.concepts || []).forEach((c: string) => concepts.add(c));
+        });
+        const topicOptions = Array.from(topics);
+        const conceptOptions = Array.from(concepts);
+        return {
+            topic: { options: topicOptions, selected: topicOptions },
+            concept: { options: conceptOptions, selected: conceptOptions },
+        };
+    }, [cardData.nodes]);
 
     // Update showNodeLabels when graphView changes
     useEffect(() => {
@@ -498,6 +515,8 @@ const ChatRightSheet = ({
                                     nodeFilters={graphNodeFilters}
                                     setNodeFilters={setGraphNodeFilters}
                                     showNodeLabels={showNodeLabels}
+                                    searchQuery={searchQuery}
+                                    nodesTagsFilters={nodesTagsFilters}
                                 />
                             )}
                             {graphView === '3d' && (
