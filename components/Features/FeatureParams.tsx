@@ -30,7 +30,7 @@ const FeatureParams = ({ rows, className }: FeatureParamsProps) => {
                 {rows.map((row, index) => (
                     <div key={index} className="flex items-center justify-between py-3 gap-3">
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center shrink-0 rounded-full border border-gray-300 w-7 h-7">
+                            <div className="flex items-center justify-center shrink-0 w-7 h-7">
                                 <i className={`ki-filled ${row.icon} text-base`} aria-hidden="true"></i>
                             </div>
                             <span className="text-sm text-muted-foreground">{row.label}</span>

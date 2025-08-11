@@ -86,7 +86,7 @@ const ProductFeatures = ({
                                     {/* Card content */}
                                     <div className="flex w-full items-center justify-between gap-4.5">
                                         <div className="flex items-start gap-4.5">
-                                            <div className="relative w-[44px] h-[44px] flex items-center justify-center border-[1px] light:bg-gray-200 rounded-full aspect-square">
+                                            <div className="relative w-[44px] h-[44px] flex items-center justify-center">
                                                 <i
                                                     className={cn('ki-duotone text-2xl', colors.icon_color, feat.icon)}
                                                 />

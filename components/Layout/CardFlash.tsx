@@ -58,7 +58,7 @@ const CardFlash = ({
                 <div className={cn('flex flex-col gap-3', !!imgSrc ? 'md:w-2/3' : 'w-full')}>
                     <div className="flex items-center gap-4">
                         {icon && (
-                            <div className="flex items-center justify-center rounded-full border border-gray-300 w-9 h-9">
+                            <div className="flex items-center justify-center w-9 h-9">
                                 <i className={`ki-filled ${icon} text-base`} aria-hidden="true"></i>
                             </div>
                         )}
