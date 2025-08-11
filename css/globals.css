@@ -21,7 +21,13 @@
 @import './components/leaflet.css';
 @import './components/rating.css';
 
-/* 5. Scoped shadcn/magicui theme */
+/* 5. Keenicons */
+@import '../components/keenicons/assets/duotone/style.css';
+@import '../components/keenicons/assets/filled/style.css';
+@import '../components/keenicons/assets/outline/style.css';
+@import '../components/keenicons/assets/solid/style.css';
+
+/* 6. Scoped shadcn/magicui theme */
 @import './themes/shadcn-theme.css';
 
 /* 6. Mobile viewport height support */
