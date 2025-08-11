@@ -1,14 +1,12 @@
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { AuroraText } from '@/components/magicui/aurora-text';
+import { H1, PLG } from '@/components/ui/typography';
 import { DotPattern } from '@/components/magicui/dot-pattern';
-import { ShinyButton } from '@/components/magicui/shiny-button';
-import { H1 } from '@/components/ui/typography';
+import '@/components/ui/css-variables.css';
 
 const LandingHeading = () => {
     return (
         <>
-            <div className="relative h-[55vh] lg:h-[65vh] flex justify-center items-center">
+            <div className="relative h-[55vh] lg:h-[65vh] flex items-center pl-6">
                 <div className="absolute inset-0"></div>
                 {/* Dot Pattern */}
                 <DotPattern
@@ -24,50 +22,24 @@ const LandingHeading = () => {
                     glow={true}
                 />
 
-                <div
-                    className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40"
-                >
-                    <div
-                        className="absolute inset-0 opacity-90"
-                    ></div>
+                <div className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40">
+                    <div className="absolute inset-0 opacity-90"></div>
                 </div>
 
-        <div
-          className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40"
-        >
-          <div
-            className="absolute inset-0 opacity-90"
-          ></div>
-        </div>
+                <div className="absolute inset-0 bg-no-repeat bg-contain bg-bottom opacity-40">
+                    <div className="absolute inset-0 opacity-90"></div>
+                </div>
 
-<div className="relative text-center flex flex-col items-center justify-center">
-  <H1
-    className=""
-    style={{
-      lineHeight: '70px',
-      textShadow: '1px 1px 4px rgba(0, 0, 0, 0.2)',
-    }}
-  >
-    <AuroraText className="text-4xl md:text-5xl font-bold tracking-tight">
-      Confidence in Every Decision
-    </AuroraText>
-    <br />
-    <span className="text-white tracking-wide font-semibold text-4xl md:text-4xl mb-5 transition-all duration-300">
-      legal AI with graph-vector context
-    </span>
-  </H1>
-
-  <Link href="/chat/new" passHref>
-    <div className="mt-4">
-      <ShinyButton className="bg-primary text-white px-5 py-3 border-none rounded-lg py-2 px-4 transition-transform duration-300 hover:scale-105 shadow">
-        Try LEXRAG
-      </ShinyButton>
-    </div>
-  </Link>
-</div>
-      </div>
-    </>
-  );
+                <div className="relative flex flex-col gap-4 text-[var(--Brand-Primary-Midnight-Core)]">
+                    <H1>
+                        Confidence in
+                        <br /> Every Decision
+                    </H1>
+                    <PLG>legal AI with graph-vector context</PLG>
+                </div>
+            </div>
+        </>
+    );
 };
 
 export default LandingHeading;
