@@ -12,6 +12,8 @@ interface ChatContextType {
     connectionError: string | null;
     userDocuments: UserDocuments[];
     setUserDocuments: React.Dispatch<React.SetStateAction<UserDocuments[]>>;
+    selectedUserDocuments: string[];
+    setSelectedUserDocuments: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const ChatSocketContext = createContext<ChatContextType | undefined>(undefined);
@@ -34,6 +36,7 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [connectionError, setConnectionError] = useState<string | null>(null);
     const [userDocuments, setUserDocuments] = useState<UserDocuments[]>([]);
+    const [selectedUserDocuments, setSelectedUserDocuments] = useState<string[]>([]);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = 5;
     const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -113,7 +116,16 @@ const ChatProvider = ({ mode, children }: ChatProviderProps) => {
 
     return (
         <ChatSocketContext.Provider
-            value={{ socket, conversations, setConversations, connectionError, userDocuments, setUserDocuments }}
+            value={{
+                socket,
+                conversations,
+                setConversations,
+                connectionError,
+                userDocuments,
+                setUserDocuments,
+                selectedUserDocuments,
+                setSelectedUserDocuments,
+            }}
         >
             {children}
         </ChatSocketContext.Provider>

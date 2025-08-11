@@ -17,7 +17,7 @@ interface ChatBoxProps {
     status: string | null;
     currentResponseContent: string;
     copiedMessageId: string | null;
-    sendMessage: (input: string, isNew: boolean) => void;
+    sendMessage: (input: string, isNew: boolean, userDocuments: string[]) => void;
     copyToClipboard: (messageId: string, text: string) => void;
     handleCurrentMessage: Dispatch<SetStateAction<any>>;
     setScrollToCardId: Dispatch<SetStateAction<string>>;

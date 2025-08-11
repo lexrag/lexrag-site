@@ -3,11 +3,13 @@ import { usePathname } from 'next/navigation';
 import { track_question_submitted } from '@/lib/analytics';
 import ContentTimeTracker from '@/components/analytics/ContentTimeTracker';
 import ChatTextAreaBottomMenu from '@/components/Chat/ChatTextAreaBottomMenu';
+import { useChatContext } from './ChatProvider';
+
 
 export interface ChatTextAreaProps {
     input: string;
     setInput: (text: string) => void;
-    sendMessage: (message: string, isNew: boolean) => void;
+    sendMessage: (message: string, isNew: boolean, userDocuments: string[]) => void;
     activeMsgType: string | null;
     toggleMsgType: (msgType: string) => void;
     threadId?: string; // Add thread_id prop
@@ -16,6 +18,7 @@ export interface ChatTextAreaProps {
 const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgType, threadId }: ChatTextAreaProps) => {
     const pathname = usePathname();
     const isNewConversation = pathname.includes('/new');
+    const { selectedUserDocuments } = useChatContext();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -37,7 +40,7 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
                 }
             }
 
-            sendMessage(input, isNewConversation);
+            sendMessage(input, isNewConversation, selectedUserDocuments);
             setInput('');
         }
     };

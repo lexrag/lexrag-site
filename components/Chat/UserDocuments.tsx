@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import deleteUserDocuments from '@/api/chat/deleteUserDocument';
 import { getUserDocuments } from '@/api/chat/getUserDocuments';
 import { Trash2 } from 'lucide-react';
+import { Checkbox } from '../ui/checkbox';
 import { useChatContext } from './ChatProvider';
 
 const UserDocuments = () => {
-    const { userDocuments, setUserDocuments } = useChatContext();
+    const { userDocuments, setUserDocuments, selectedUserDocuments, setSelectedUserDocuments } = useChatContext();
 
     useEffect(() => {
         (async () => {
@@ -21,6 +22,16 @@ const UserDocuments = () => {
     const onDeleteUserDocument = async (uri: string) => {
         await deleteUserDocuments(uri);
         setUserDocuments((prev) => prev.filter((c) => c.uri !== uri));
+
+        setSelectedUserDocuments((prev) => prev.filter((selectedUri) => selectedUri !== uri));
+    };
+
+    const handleCheckboxChange = (uri: string, checked: boolean) => {
+        if (checked) {
+            setSelectedUserDocuments((prev) => [...prev, uri]);
+        } else {
+            setSelectedUserDocuments((prev) => prev.filter((selectedUri) => selectedUri !== uri));
+        }
     };
 
     return (
@@ -28,8 +39,12 @@ const UserDocuments = () => {
             {userDocuments.map(({ filename, uri }, i) => (
                 <div
                     key={i}
-                    className={`group flex justify-between items-start px-4 py-3 rounded cursor-pointer hover:bg-muted transition-colors`}
+                    className={`group flex justify-between items-start gap-2 px-4 py-3 rounded cursor-pointer hover:bg-muted transition-colors`}
                 >
+                    <Checkbox
+                        checked={selectedUserDocuments?.includes(uri) || false}
+                        onCheckedChange={(checked) => handleCheckboxChange(uri, checked as boolean)}
+                    />
                     <div className="text-sm text-gray-800 dark:text-white flex-1 flex items-start gap-2 min-w-0">
                         <span className="flex-1 min-w-0 break-words leading-relaxed">{filename}</span>
                     </div>

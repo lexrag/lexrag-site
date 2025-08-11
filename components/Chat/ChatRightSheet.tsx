@@ -38,6 +38,7 @@ interface ChatRightSheetProps {
     setGraphNodeFilters: Dispatch<SetStateAction<GraphNodeFilter[]>>;
     cardData: CardData;
     handleCardData: Dispatch<SetStateAction<CardData>>;
+    searchQuery: string;
 }
 
 const ChatRightSheet = ({
@@ -55,6 +56,7 @@ const ChatRightSheet = ({
     currentMessage,
     cardData,
     handleCardData,
+    searchQuery,
 }: ChatRightSheetProps) => {
     const direction = useDirection();
     const [scrollToCardId, setScrollToCardId] = useState<string>('');
@@ -498,6 +500,7 @@ const ChatRightSheet = ({
                                     nodeFilters={graphNodeFilters}
                                     setNodeFilters={setGraphNodeFilters}
                                     showNodeLabels={showNodeLabels}
+                                    searchQuery={searchQuery}
                                 />
                             )}
                             {graphView === '3d' && (
