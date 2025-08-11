@@ -6,23 +6,11 @@ on:
             - main
             - feature/temporary_landing
     workflow_dispatch:
-        inputs:
-            branch:
-                description: 'Branch to deploy (e.g. main or feature/temporary_landing)'
-                required: true
-                default: 'main'
-            environment:
-                description: 'Environment to deploy to'
-                required: true
-                default: 'production'
-                type: choice
-                options:
-                    - production
-                    - staging
+        # Manual trigger for deployment
 
 env:
     AWS_REGION: ap-southeast-1
-    S3_BUCKET: lexrag-marketing-site
+    S3_BUCKET: lexrag-site-marketing
     CLOUDFRONT_DISTRIBUTION_ID: E1D0DAN3LWZ4ER
 
 jobs:
@@ -35,20 +23,8 @@ jobs:
             contents: read
 
         steps:
-            - name: Set branch
-              run: |
-                  BRANCH="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}"
-                  echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-
-            - name: Set environment
-              run: |
-                  ENVIRONMENT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}"
-                  echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
-
             - name: Checkout code
               uses: actions/checkout@v4
-              with:
-                  ref: ${{ env.BRANCH }}
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
@@ -68,39 +44,17 @@ jobs:
                   role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
                   aws-region: ${{ env.AWS_REGION }}
 
-            - name: Set environment variables
-              run: |
-                  if [ "${{ env.ENVIRONMENT }}" = "production" ]; then
-                      echo "NEXT_PUBLIC_APP_URL=https://app.lexrag.com" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_APP_URL_DEV=https://app.lexrag.com" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_BASE_URL=https://lexrag.com" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_SEGMENT_DEBUG=false" >> $GITHUB_ENV
-                      echo "NODE_ENV=production" >> $GITHUB_ENV
-                  else
-                      echo "NEXT_PUBLIC_APP_URL=https://app.lexrag.com" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_APP_URL_DEV=http://localhost:3000" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_BASE_URL=https://staging.lexrag.com" >> $GITHUB_ENV
-                      echo "NEXT_PUBLIC_SEGMENT_DEBUG=true" >> $GITHUB_ENV
-                      echo "NODE_ENV=staging" >> $GITHUB_ENV
-                  fi
-
             - name: Build static site
               run: |
                   npm run build
               env:
-                  NEXT_PUBLIC_APP_URL: ${{ env.NEXT_PUBLIC_APP_URL }}
-                  NEXT_PUBLIC_APP_URL_DEV: ${{ env.NEXT_PUBLIC_APP_URL_DEV }}
-                  NEXT_PUBLIC_BASE_URL: ${{ env.NEXT_PUBLIC_BASE_URL }}
-                  NEXT_PUBLIC_BASE_PATH: ''
+                  NEXT_PUBLIC_APP_URL: https://app.lexrag.com
+                  NEXT_PUBLIC_BASE_URL: https://d1wnoermrdhxcv.cloudfront.net
                   NEXT_PUBLIC_SEGMENT_ENABLED: true
-                  NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
+                  NEXT_PUBLIC_SEGMENT_DEBUG: false
                   NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${{ secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY }}
                   NEXT_PUBLIC_ANALYTICS_VIA_BEACON: false
-                  NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND: true
-                  NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED: 1
-                  NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES: false
-                  NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES: 1
-                  NODE_ENV: ${{ env.NODE_ENV }}
+                  NODE_ENV: production
 
             - name: Deploy to S3
               run: |
@@ -116,6 +70,6 @@ jobs:
 
             - name: Deploy complete
               run: |
-                  echo "✅ Deployment to ${{ env.ENVIRONMENT }} completed successfully!"
-                  echo "🌐 Site URL: ${{ env.NEXT_PUBLIC_BASE_URL }}"
+                  echo "✅ Deployment completed successfully!"
+                  echo "🌐 Site URL: https://d1wnoermrdhxcv.cloudfront.net"
                   echo "📊 CloudFront Distribution: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"
