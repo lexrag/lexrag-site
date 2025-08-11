@@ -15,29 +15,25 @@ npm install
 
 ### Environment Setup
 
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables:
 
 ```bash
 # App URLs
 NEXT_PUBLIC_APP_URL=https://app.lexrag.com
 NEXT_PUBLIC_APP_URL_DEV=http://localhost:3000
 
-# Base URL for marketing site
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+# Base URL for marketing site (CloudFront domain)
+NEXT_PUBLIC_BASE_URL=https://d1wnoermrdhxcv.cloudfront.net
 NEXT_PUBLIC_BASE_PATH=
 
 # Analytics configuration
 NEXT_PUBLIC_ANALYTICS_VIA_BEACON=false
 NEXT_PUBLIC_SEGMENT_ENABLED=true
 NEXT_PUBLIC_SEGMENT_WRITE_KEY=YOUR_SEGMENT_WRITE_KEY_HERE
-NEXT_PUBLIC_SEGMENT_DEBUG=true
-NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=true
-NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=1
-NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=false
-NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=1
+NEXT_PUBLIC_SEGMENT_DEBUG=false
 
 # Build Configuration
-NODE_ENV=development
+NODE_ENV=production
 ```
 
 ### Development
@@ -68,23 +64,32 @@ The site is configured for static export and deployment to S3 + CloudFront via G
 - **Production**: `https://app.lexrag.com`
 - **Development**: `http://localhost:3000`
 
+### Base URL
+- **Production**: `https://d1wnoermrdhxcv.cloudfront.net` (CloudFront)
+- **Development**: `http://localhost:3000`
+
 ### Analytics
 - Uses Segment for analytics
 - Beacon mode disabled for marketing site
-- Frontend identity management enabled
+- Production-ready configuration
 
 ## 🚀 Deployment
 
 ### GitHub Actions Workflow
 - **File**: `.github/workflows/deploy.yml`
 - **Target**: S3 + CloudFront
+- **S3 Bucket**: `lexrag-site`
 - **Distribution ID**: `E1D0DAN3LWZ4ER`
 
 ### Environment Variables in CI/CD
 - `NEXT_PUBLIC_APP_URL`: Production app URL
-- `NEXT_PUBLIC_BASE_URL`: Production site URL
+- `NEXT_PUBLIC_BASE_URL`: CloudFront domain
 - `NEXT_PUBLIC_SEGMENT_ENABLED`: Analytics enabled
 - `NEXT_PUBLIC_ANALYTICS_VIA_BEACON`: Beacon disabled
+
+### Required GitHub Secrets
+- `AWS_ROLE_ARN`: `arn:aws:iam::110266626277:role/GitHubDeployRole`
+- `NEXT_PUBLIC_SEGMENT_WRITE_KEY`: Your Segment write key
 
 ## 📊 Features
 

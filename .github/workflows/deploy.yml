@@ -10,7 +10,7 @@ on:
 
 env:
     AWS_REGION: ap-southeast-1
-    S3_BUCKET: lexrag-site-marketing
+    S3_BUCKET: lexrag-site
     CLOUDFRONT_DISTRIBUTION_ID: E1D0DAN3LWZ4ER
 
 jobs:

@@ -1,13 +1,16 @@
-name: ci
+name: CI - Build and Quality Check
 
 on:
+  pull_request:
+    branches: [ main ]
   # push:
   #   branches: [ main ]
-  pull_request:
 
 jobs:
   build_and_test:
+    name: Build and Quality Check
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,14 +30,19 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: |
-          if npm run | grep -q " lint"; then npm run lint; else echo "No lint script"; fi
-
-      - name: Test
-        run: |
-          if npm run | grep -q " test"; then npm test; else echo "No test script"; fi
+        run: npm run lint
 
       - name: Build
         run: npm run build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
+          NEXT_PUBLIC_APP_URL: https://app.lexrag.com
+          NEXT_PUBLIC_BASE_URL: https://d1wnoermrdhxcv.cloudfront.net
+          NEXT_PUBLIC_SEGMENT_ENABLED: true
+          NEXT_PUBLIC_SEGMENT_DEBUG: false
+          NEXT_PUBLIC_SEGMENT_WRITE_KEY: dummy_key_for_ci
+          NEXT_PUBLIC_ANALYTICS_VIA_BEACON: false
+          NODE_ENV: production
+
+      - name: Build Success
+        run: echo "✅ Build completed successfully!"
