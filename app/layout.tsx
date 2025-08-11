@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/sonner';
 import '@/css/globals.css';
 import { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/providers/theme-provider';
+import SegmentProvider from '@/components/analytics/SegmentProvider';
+import ScrollTracker from '@/components/analytics/ScrollTracker';
 
 export const metadata: Metadata = {
     title: {
@@ -34,6 +36,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </head>
             <body className={cn('antialiased flex h-full text-base text-foreground bg-background font-instrument-sans')}>
                 <ThemeProvider>
+                    <SegmentProvider />
+                    <ScrollTracker />
                     <Suspense>{children}</Suspense>
                     <Toaster />
                 </ThemeProvider>

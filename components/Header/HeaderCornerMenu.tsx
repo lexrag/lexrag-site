@@ -3,14 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { getAppUrl } from '@/lib/app-config';
-import { track } from '@/lib/analytics';
+import { trackButtonClick } from '@/lib/analytics-events';
 
 const HeaderCornerMenu = () => {
     const handleGoToApp = () => {
-        // Track the click event
-        track('go_to_app_clicked', {
-            source: 'header_corner_menu',
+        // Track the button click with marketing context
+        trackButtonClick('go_to_app', 'header_corner_menu', {
             app_url: getAppUrl(),
+            button_variant: 'outline',
         });
         
         // Open app in new tab
