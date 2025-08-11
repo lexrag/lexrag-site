@@ -5,6 +5,9 @@ import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'LEXRAG',
@@ -29,7 +32,6 @@ const LandingPage = () => {
                 </section>
 
                 <section id="product-features" className="">
-                    {/* TODO: keep sections title separately for reuse */}
                     <div className="text-center mb-10">
                         <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-gray-900 dark:text-white">
                             Product Features
@@ -38,6 +40,14 @@ const LandingPage = () => {
                             Explore legal data like never before — through graphs, vectors, and intelligent query
                             breakdowns
                         </p>
+                        <div className="mt-6">
+                            <Link href="/features">
+                                <Button className="flex items-center gap-2">
+                                    View All Features
+                                    <ArrowRight className="size-4" />
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                     <ProductFeatures
                         gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"

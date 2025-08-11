@@ -5,16 +5,15 @@ import { motion } from 'framer-motion';
 import { Linkedin, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Logo } from '@/components/Header/Logo';
-import { WordRotate } from '@/components/magicui/word-rotate';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
     const links = {
         product: [
             { label: 'Features', href: '/features' },
-            { label: 'Pricing', href: '/pricing' },
-            { label: 'API', href: 'https://api.lexrag.com/docs' },
-            { label: 'Documentation', href: '/docs' },
+            { label: 'Services', href: '/services' },
+            { label: 'Technology', href: '/technology/graphrag' },
+            { label: 'Use Cases', href: '/use-cases' },
         ],
         legal: [
             { label: 'Terms & Conditions', href: '/terms-and-conditions/terms-conditions' },
@@ -45,9 +44,7 @@ const Footer = () => {
                                 <Logo />
                             </div>
                             <div className="italic font-medium text-base text-muted-foreground mb-4">
-                                <WordRotate
-                                    words={['Structure the law', 'Retrieve with purpose', 'Answer with confidence']}
-                                />
+                                Structure the law • Retrieve with purpose • Answer with confidence
                             </div>
                             <div className="flex space-x-4">
                                 {socialLinks.map((social, index) => (

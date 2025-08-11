@@ -1,10 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { MegaMenuSubAccount } from '@/partials/mega-menu/mega-menu-sub-account';
-import { MENU_MEGA } from '@/config/menu.config';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useMenu } from '@/hooks/use-menu';
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -14,10 +11,6 @@ import {
 } from '@/components/ui/navigation-menu';
 
 export function MegaMenu() {
-    const pathname = usePathname();
-    const { hasActiveChild } = useMenu(pathname);
-    const myAccountItem = MENU_MEGA[2];
-
     const linkClass = `
     text-sm text-secondary-foreground font-medium bg-transparent
     hover:text-primary hover:bg-transparent 
@@ -32,10 +25,16 @@ export function MegaMenu() {
                 <NavigationMenuItem>
                     <NavigationMenuTrigger
                         className={cn(linkClass, 'relative')}
-                        data-active={hasActiveChild(myAccountItem.children) || undefined}
-                    ></NavigationMenuTrigger>
-                    <NavigationMenuContent className="p-0">
-                        <MegaMenuSubAccount items={MENU_MEGA} />
+                    >
+                        Menu
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="p-4">
+                        <div className="grid grid-cols-1 gap-2">
+                            <Link href="/features" className="text-sm hover:text-primary">Features</Link>
+                            <Link href="/services" className="text-sm hover:text-primary">Services</Link>
+                            <Link href="/technology/graphrag" className="text-sm hover:text-primary">Technology</Link>
+                            <Link href="/company" className="text-sm hover:text-primary">Company</Link>
+                        </div>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
             </NavigationMenuList>

@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lexrag.com';
 
@@ -18,28 +20,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 0.9,
         },
         {
-            url: `${baseUrl}/technology/graphrag`,
+            url: `${baseUrl}/services`,
             lastModified: new Date(),
             changeFrequency: 'weekly' as const,
             priority: 0.8,
         },
         {
-            url: `${baseUrl}/auth/signin`,
+            url: `${baseUrl}/company`,
             lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/use-cases`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/faq`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
             priority: 0.7,
         },
         {
-            url: `${baseUrl}/auth/signup`,
+            url: `${baseUrl}/technology/graphrag`,
             lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/auth/reset-password`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.6,
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
         },
         {
             url: `${baseUrl}/terms-and-conditions`,
@@ -83,59 +91,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'monthly' as const,
             priority: 0.5,
         },
-        {
-            url: `${baseUrl}/payment/success`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.4,
-        },
-        {
-            url: `${baseUrl}/payment/cancel`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.4,
-        },
     ];
 
     const dynamicRoutes: MetadataRoute.Sitemap = combinedFeaturesData.map((feature) => ({
-        url: `${baseUrl}/features/${feature.key}`,
+        url: `${baseUrl}${feature.link}`,
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
-        priority: 0.8,
+        priority: 0.7,
     }));
 
-    const profileRoutes = [
-        {
-            url: `${baseUrl}/profile`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.6,
-        },
-        {
-            url: `${baseUrl}/profile/settings`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
-        },
-        {
-            url: `${baseUrl}/profile/security`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
-        },
-        {
-            url: `${baseUrl}/profile/billing`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
-        },
-        {
-            url: `${baseUrl}/profile/compliance`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
-        },
-    ];
-
-    return [...staticRoutes, ...dynamicRoutes, ...profileRoutes];
+    return [...staticRoutes, ...dynamicRoutes];
 }

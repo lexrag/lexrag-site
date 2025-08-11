@@ -102,10 +102,10 @@ const ProductFeatures = ({
 
                                         {showSideBadges && (
                                             <div className="flex flex-col items-start gap-3">
-                                                <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
+                                                <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
                                                     {feat.category}
                                                 </Badge>
-                                                <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
+                                                <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
                                                     {feat.plan}
                                                 </Badge>
                                             </div>
@@ -120,10 +120,10 @@ const ProductFeatures = ({
 
                                     {showBottomBadges && (
                                         <div className="flex w-full items-center justify-start gap-3">
-                                            <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
+                                            <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
                                                 {feat.category}
                                             </Badge>
-                                            <Badge appearance="outline" variant={getBadgeColor(feat.category)}>
+                                            <Badge appearance="outline" variant={(getBadgeColor(feat.category) as any)}>
                                                 {feat.plan}
                                             </Badge>
                                         </div>

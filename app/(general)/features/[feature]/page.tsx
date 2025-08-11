@@ -1,5 +1,39 @@
+import { Metadata } from 'next';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Landing/Footer';
+import PageTitle from '@/components/Layout/PageTitle';
 import FeaturePageTemplate from '@/components/Features/FeaturePageTemplate';
+import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 
-export default function Page() {
-    return <FeaturePageTemplate />;
+export const dynamic = 'force-static';
+
+export async function generateStaticParams() {
+    return combinedFeaturesData.map((feature) => ({
+        feature: feature.key,
+    }));
 }
+
+export const metadata: Metadata = {
+    title: 'Feature Details - LEXRAG',
+    description: 'Detailed information about LEXRAG features and capabilities',
+};
+
+const FeatureDetailPage = () => {
+    return (
+        <div className="overflow-y-auto">
+            <Header className="" />
+
+            <main className="pt-20">
+                <PageTitle title="Feature Details" finalTitle="Features" />
+                
+                <section className="pb-20">
+                    <FeaturePageTemplate />
+                </section>
+            </main>
+
+            <Footer />
+        </div>
+    );
+};
+
+export default FeatureDetailPage;

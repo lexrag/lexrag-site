@@ -1,66 +1,199 @@
-# Metronic 9 | All-in-One Tailwind based HTML/React/Next.js Template for Modern Web Applications
+# LEXRAG Marketing Site
 
-## Getting Started
+Маркетинговый сайт для LEXRAG, развернутый на AWS S3 + CloudFront.
 
-The official [Metronic Next.js Documentation](https://docs.keenthemes.com/metronic-nextjs) will be released soon,
-alongside the stable Metronic release, expected within the next week.
+## 🚀 Быстрый старт
 
-### Prerequisites
-
-- Node.js 16.x or higher
-- Npm or Yarn
-- Tailwind CSS 4.x
-- React 19.x
-- Next.js 15.3.x
-- PostgreSQL 17.4.x
-
-## ReUI Components
-
-Metronic now leverages [ReUI](https://reui.io), our open-source React component library.
-
-Star the [ReUI on GitHub](https://github.com/keenthemes/reui) to help us grow the project and stay updated on new features!
-
-### Installation
-
-To set up the project dependencies, including those required for React 19, use the `--force` flag to resolve any dependency conflicts:
-
+### Локальная разработка
 ```bash
-npm install --force
-```
+# Установка зависимостей
+npm install
 
-### Database Deployment
-
-This will create the necessary tables in database for user authorization and user management apps :
-
-```bash
-npx prisma db push
-```
-
-Once your schema is deployed, you need to generate the Prisma Client:
-
-```bash
-npx prisma generate
-```
-
-### Development
-
-Start the development server:
-
-```bash
+# Запуск в режиме разработки на порту 3001
 npm run dev
 ```
 
-### Setting Up the Demo Layout
+Сайт будет доступен по адресу: http://localhost:3001
 
-Open `app/(protected)/layout.tsx` and change `Demo1Layout` to any demo, for example, `Demo5Layout` and you will switch entire app layout to the selected demo.
-
+### Сборка
 ```bash
-<Demo5Layout>
-	{children}
-</Demo5Layout>
+# Сборка статического сайта
+npm run build
+
+# Сборка для продакшена
+npm run build:staging
 ```
 
-### Reporting Issues
+## 🌐 Деплой
 
-If you encounter any issues or have suggestions for improvement, please contact us at [support@keenthemes.com](mailto:support@keenthemes.com).
-Include a detailed description of the issue or suggestion, and we will work to address it in the next stable release.
+### Автоматический деплой
+```bash
+# Установите переменные окружения
+export CLOUDFRONT_DISTRIBUTION_ID=your_distribution_id
+export AWS_DEFAULT_REGION=us-east-1
+
+# Запустите деплой
+./deploy.sh
+```
+
+### Ручной деплой
+```bash
+# Сборка
+npm run build
+
+# Синхронизация с S3
+aws s3 sync ./out/ s3://lexrag-marketing-site/
+
+# Инвалидация CloudFront
+aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+```
+
+## 🏗️ Архитектура
+
+- **Фронтенд**: Next.js 15 с статическим экспортом
+- **Хостинг**: AWS S3 + CloudFront
+- **Домен**: lexrag.com
+- **Локальный порт**: 3001
+
+## 📁 Структура проекта
+
+```
+├── app/                    # Next.js App Router
+│   ├── (general)/         # Общие страницы
+│   │   ├── features/      # Страницы функций
+│   │   ├── services/      # Страница услуг
+│   │   ├── company/       # О компании
+│   │   ├── use-cases/     # Примеры использования
+│   │   ├── faq/           # Часто задаваемые вопросы
+│   │   └── technology/    # Технологии
+│   ├── terms-and-conditions/  # Правовые документы
+│   └── layout.tsx         # Корневой layout
+├── components/             # React компоненты
+│   ├── Header/            # Шапка сайта
+│   ├── Landing/           # Лендинг компоненты
+│   ├── Features/          # Компоненты функций
+│   ├── Layout/            # Компоненты макета
+│   └── ui/                # UI компоненты
+├── css/                   # Стили
+├── public/                # Статические файлы
+└── deploy.sh              # Скрипт деплоя
+```
+
+## 🔧 Конфигурация
+
+### Переменные окружения
+Скопируйте `env.marketing.example` в `.env.local` и настройте:
+
+```bash
+# AWS Configuration
+AWS_DEFAULT_REGION=us-east-1
+CLOUDFRONT_DISTRIBUTION_ID=your_cloudfront_distribution_id
+
+# Next.js Configuration
+NEXT_PUBLIC_BASE_PATH=
+```
+
+### Next.js конфигурация
+- `output: 'export'` - статический экспорт
+- `trailingSlash: true` - совместимость с S3
+- Порт разработки: 3001
+
+## 📱 Доступные страницы
+
+### Основные страницы
+- **Главная** (`/`) - Лендинг с функциями продукта
+- **Features** (`/features`) - Все функции продукта
+- **Services** (`/services`) - Наши услуги
+- **Company** (`/company`) - О компании
+- **Use Cases** (`/use-cases`) - Примеры использования
+- **FAQ** (`/faq`) - Часто задаваемые вопросы
+
+### Технологии
+- **Technology** (`/technology/graphrag`) - О технологии GraphRAG
+
+### Правовые документы
+- **Terms & Conditions** (`/terms-and-conditions/`) - Правовые документы
+- **Privacy Policy** (`/terms-and-conditions/privacy-policy/`)
+- **Cookie Policy** (`/terms-and-conditions/cookie-policy/`)
+- **Refund Policy** (`/terms-and-conditions/refund-cancellation/`)
+- **Data Processing** (`/terms-and-conditions/data-processing-agreement/`)
+- **EULA** (`/terms-and-conditions/end-user-license/`)
+
+## 🚨 Важные замечания
+
+1. **Статический сайт**: Все страницы генерируются статически
+2. **Нет API**: API endpoints перенесены в app.lexrag.com
+3. **Нет авторизации**: Функции авторизации в app.lexrag.com
+4. **S3 совместимость**: Используйте `trailingSlash: true`
+
+## 🔄 CI/CD
+
+Для автоматизации деплоя добавьте в ваш CI/CD pipeline:
+
+```yaml
+- name: Deploy to S3
+  run: |
+    export CLOUDFRONT_DISTRIBUTION_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+    export AWS_DEFAULT_REGION=us-east-1
+    ./deploy.sh
+```
+
+## 🧪 Тестирование
+
+### Локальное тестирование
+```bash
+# Запуск в режиме разработки
+npm run dev
+
+# Проверка доступности страниц
+curl http://localhost:3001
+curl http://localhost:3001/features
+curl http://localhost:3001/services
+curl http://localhost:3001/company
+curl http://localhost:3001/use-cases
+curl http://localhost:3001/faq
+curl http://localhost:3001/technology/graphrag
+```
+
+### Проверка сборки
+```bash
+# Сборка проекта
+npm run build
+
+# Проверка статических файлов
+ls -la out/
+```
+
+## 🚀 Деплой на продакшен
+
+1. **Настройка AWS CLI**:
+   ```bash
+   aws configure
+   # Введите ваш AWS Access Key ID, Secret Access Key, и регион us-east-1
+   ```
+
+2. **Настройка переменных окружения**:
+   ```bash
+   export CLOUDFRONT_DISTRIBUTION_ID=your_distribution_id
+   export AWS_DEFAULT_REGION=us-east-1
+   ```
+
+3. **Запуск деплоя**:
+   ```bash
+   ./deploy.sh
+   ```
+
+4. **Проверка результата**:
+   - Откройте https://lexrag.com
+   - Проверьте все страницы
+   - Убедитесь, что CloudFront инвалидация прошла успешно
+
+## 📞 Поддержка
+
+При возникновении проблем обращаться к команде DevOps или создавать issue в репозитории.
+
+## 🔗 Полезные ссылки
+
+- [Next.js Static Export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
+- [AWS S3 Sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html)
+- [CloudFront Invalidation](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CreateInvalidation.html)

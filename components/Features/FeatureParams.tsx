@@ -10,16 +10,7 @@ interface FeatureParamsProps {
         icon: string;
         label: string;
         badge: string;
-        badgeColor:
-            | 'success'
-            | 'secondary'
-            | 'primary'
-            | 'destructive'
-            | 'info'
-            | 'mono'
-            | 'warning'
-            | null
-            | undefined;
+        badgeColor: string;
     }[];
     className?: string;
 }
@@ -45,7 +36,7 @@ const FeatureParams = ({ rows, className }: FeatureParamsProps) => {
                             <span className="text-sm text-muted-foreground">{row.label}</span>
                         </div>
 
-                        <Badge appearance="outline" variant={row.badgeColor || 'primary'} className="text-xs">
+                        <Badge appearance="outline" variant={(row.badgeColor as any) || 'primary'} className="text-xs">
                             {row.badge}
                         </Badge>
                     </div>

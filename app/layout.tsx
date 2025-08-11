@@ -1,24 +1,19 @@
 import { ReactNode, Suspense } from 'react';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-import { TooltipsProvider } from '@/providers/tooltips-provider';
 import { Toaster } from '@/components/ui/sonner';
 import '@/css/globals.css';
-import '@/components/keenicons/assets/styles.css';
 import { Metadata, Viewport } from 'next';
-import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
-import { UserProvider } from '@/providers/user-provider';
-// import MarketingBootstrap from '@/components/analytics/MarketingBootstrap';
-import PageTracker from '@/components/analytics/PageTracker';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
     title: {
-        template: '%s | Lexrag',
-        default: 'Lexrag',
+        template: '%s | LEXRAG',
+        default: 'LEXRAG - AI-Powered Legal Research',
     },
+    description: 'Revolutionary legal research and analysis platform powered by GraphRAG technology',
     other: {
         'google-site-verification': 'IKxx-FRONvplOxvRULlgKDdlKdWD4MZFsDr7HrLtKUM',
     },
@@ -36,22 +31,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     return (
         <html className="h-full" suppressHydrationWarning>
             <body className={cn('antialiased flex h-full text-base text-foreground bg-background', inter.className)}>
-                <QueryProvider>
-                    <ThemeProvider>
-                        <TooltipsProvider>
-                            <UserProvider>
-                                <PageTracker />
-                                {/** comments in code strictly in English
-                                 * MarketingBootstrap is intentionally disabled; PageTracker persists marketing
-                                 * just before pageOncePerLocation() to avoid duplicate init calls.
-                                 */}
-                                {/** <MarketingBootstrap /> */}
-                                <Suspense>{children}</Suspense>
-                                <Toaster />
-                            </UserProvider>
-                        </TooltipsProvider>
-                    </ThemeProvider>
-                </QueryProvider>
+                <ThemeProvider>
+                    <Suspense>{children}</Suspense>
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );

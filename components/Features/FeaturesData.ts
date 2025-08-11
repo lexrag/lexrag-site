@@ -35,16 +35,7 @@ export interface FeatureData {
         icon: string;
         label: string;
         badge: string;
-        badgeColor:
-            | 'success'
-            | 'secondary'
-            | 'primary'
-            | 'destructive'
-            | 'info'
-            | 'mono'
-            | 'warning'
-            | null
-            | undefined;
+        badgeColor: string;
     }[];
 }
 
