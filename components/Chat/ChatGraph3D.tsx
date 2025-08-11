@@ -1270,11 +1270,17 @@ const ChatGraph3D = ({
             const targetNode = processedData.nodes.find((node) => node.id === payload.id);
             if (!targetNode) return;
 
-            track_graph_zoomed({
-                thread_id: threadId || 'unknown',
-                zoom_type: 'node',
-                target_id: payload.id,
-            }).catch(console.error);
+            try {
+                track_graph_zoomed({
+                    thread_id: threadId || 'unknown',
+                    zoom_type: 'node',
+                    target_id: payload.id,
+                });
+                // track_graph_zoomed returns void; avoid chaining .catch on undefined
+                // .catch(console.error)
+            } catch (e) {
+                console.error(e);
+            }
 
             const nodeX = targetNode.x || payload.x || 0;
             const nodeY = targetNode.y || payload.y || 0;
@@ -1493,11 +1499,16 @@ const ChatGraph3D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                track_node_collapsed({
-                    thread_id: threadId || 'unknown',
-                    target_id: node.id,
-                    by_user: true,
-                }).catch(console.error);
+                try {
+                    track_node_collapsed({
+                        thread_id: threadId || 'unknown',
+                        target_id: node.id,
+                        by_user: true,
+                    });
+                    // .catch(console.error)
+                } catch (e) {
+                    console.error(e);
+                }
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1564,11 +1575,16 @@ const ChatGraph3D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                            // .catch(console.error)
+                        } catch (e) {
+                            console.error(e);
+                        }
 
                         setTimeout(() => {
                             const optimalDistance = calculateOptimalZoomDistance();
@@ -1579,21 +1595,31 @@ const ChatGraph3D = ({
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                            // .catch(console.error)
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     // Mark node as expanded even if no children to prevent repeated API calls
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    track_node_expanded({
-                        thread_id: threadId || 'unknown',
-                        target_id: node.id,
-                        by_user: true,
-                    }).catch(console.error);
+                    try {
+                        track_node_expanded({
+                            thread_id: threadId || 'unknown',
+                            target_id: node.id,
+                            by_user: true,
+                        });
+                        // .catch(console.error)
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
             }
         } catch (error) {

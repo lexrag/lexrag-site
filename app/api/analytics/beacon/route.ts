@@ -8,7 +8,8 @@ export async function POST(req: Request) {
         if (Math.random() < 0.01) {
             console.error('[analytics/beacon] missing NEXT_PUBLIC_API_BASE_URL');
         }
-        return new Response('', { status: 204 });
+        // 204 responses must not include a body
+        return new Response(null, { status: 204 });
     }
 
     const backendUrl = `${apiBase.replace(/\/$/, '')}/analytics/beacon`;
@@ -18,11 +19,27 @@ export async function POST(req: Request) {
     headers.set('content-type', 'application/json');
 
     // Forward cookies for session-based auth
-    const cookies = req.headers.get('cookie');
-    if (cookies) headers.set('cookie', cookies);
+    const cookieHeader = req.headers.get('cookie') || '';
+    if (cookieHeader) headers.set('cookie', cookieHeader);
 
     // Forward Authorization if present (e.g., Bearer <token>)
-    const auth = req.headers.get('authorization');
+    let auth = req.headers.get('authorization');
+
+    // If Authorization is missing, try to pull the JWT from cookie `token`
+    // and synthesize Authorization so backend can attach identity to events
+    if (!auth && cookieHeader) {
+        const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+        if (match && match[1]) {
+            try {
+                const raw = decodeURIComponent(match[1]);
+                if (raw) {
+                    auth = `Bearer ${raw}`;
+                }
+            } catch {
+                // ignore malformed cookie
+            }
+        }
+    }
     if (auth) headers.set('authorization', auth);
 
     try {
@@ -32,7 +49,10 @@ export async function POST(req: Request) {
             body,
             // Server-to-server; CORS not needed here
         });
-        // Mirror backend status; expected 204
+        // Mirror backend status; expected 204. 204 must not include a body.
+        if (res.status === 204) {
+            return new Response(null, { status: 204 });
+        }
         const text = await res.text();
         return new Response(text, { status: res.status });
     } catch (e) {
@@ -40,8 +60,8 @@ export async function POST(req: Request) {
         if (Math.random() < 0.01) {
             console.error('[analytics/beacon] proxy error', e);
         }
-        // Do not throw to client; swallow to avoid UI errors
-        return new Response('', { status: 204 });
+        // Do not throw to client; swallow to avoid UI errors. 204 must not include a body.
+        return new Response(null, { status: 204 });
     }
 }
 

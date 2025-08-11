@@ -1053,11 +1053,15 @@ const ChatGraph2D = ({
         try {
             if (expandedNodes.has(node.id)) {
                 console.log('Collapsing node:', node.id);
-                track_node_collapsed({
-                    thread_id: threadId || 'unknown',
-                    target_id: node.id,
-                    by_user: true,
-                }).catch(console.error);
+                try {
+                    track_node_collapsed({
+                        thread_id: threadId || 'unknown',
+                        target_id: node.id,
+                        by_user: true,
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
                 removeNodeDescendants(node.id);
             } else {
                 console.log('Expanding node:', node.id);
@@ -1097,30 +1101,42 @@ const ChatGraph2D = ({
                             [node.id]: new Set(filteredNewNodes.map((n: any) => n.id)),
                         }));
 
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
 
                         console.log('Successfully expanded node with', filteredNewNodes.length, 'new children');
                     } else {
                         console.log('No new nodes to add (all already exist)');
                         setExpandedNodes((prev) => new Set([...prev, node.id]));
-                        track_node_expanded({
-                            thread_id: threadId || 'unknown',
-                            target_id: node.id,
-                            by_user: true,
-                        }).catch(console.error);
+                        try {
+                            track_node_expanded({
+                                thread_id: threadId || 'unknown',
+                                target_id: node.id,
+                                by_user: true,
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
                 } else {
                     console.log('No children found for node:', node.id);
                     setExpandedNodes((prev) => new Set([...prev, node.id]));
-                    track_node_expanded({
-                        thread_id: threadId || 'unknown',
-                        target_id: node.id,
-                        by_user: true,
-                    }).catch(console.error);
+                    try {
+                        track_node_expanded({
+                            thread_id: threadId || 'unknown',
+                            target_id: node.id,
+                            by_user: true,
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
             }
         } catch (error) {
@@ -1578,14 +1594,15 @@ const ChatGraph2D = ({
 
     return (
         <div className="relative">
-            {/* Track time spent viewing graph */}
+            {/* Track time spent viewing graph - pulses enabled with longer interval */}
             <ContentTimeTracker
                 areaId="chat_graph_2d"
                 extra={{
                     thread_id: threadId || 'unknown',
                     graph_view: '2d',
                 }}
-                disablePulses={true}
+                disablePulses={false}
+                pulseIntervalMs={300000}
                 minThresholdMs={3000}
                 finalMinThresholdMs={5000}
                 sampleOneOutOf={10}

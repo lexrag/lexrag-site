@@ -1,27 +1,25 @@
-# syntax=docker.io/docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
-FROM node:18-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+# ---------- Build stage ----------
+FROM node:22-slim AS build
+# All comments in code strictly in English
+ENV NODE_ENV=development
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# Install base tools for native builds if needed
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ pkg-config \
+ && rm -rf /var/lib/apt/lists/*
 
+# Copy manifests first to leverage Docker layer cache
+COPY package*.json ./
+COPY .npmrc ./.npmrc
+RUN npm ci
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-
+# Copy sources and build
+COPY . .
+ 
+# Expose Next.js public env at build time so they are inlined in the bundle
 ARG NEXT_PUBLIC_API_BASE_URL
 ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_BASE_PATH
@@ -32,70 +30,56 @@ ARG NEXT_PUBLIC_SEGMENT_ENABLED
 ARG NEXT_PUBLIC_SEGMENT_DEBUG
 ARG NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND
 ARG NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED
-ARG NEXT_PUBLIC_ANALYTICS_HANDOFF_URL
 ARG NEXT_PUBLIC_ANALYTICS_VIA_BEACON
 ARG NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES
 ARG NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES
 
-ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
-ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH
-ENV NEXT_PUBLIC_VERIFICATION_CODE_TTL=$NEXT_PUBLIC_VERIFICATION_CODE_TTL
-ENV NEXT_PUBLIC_JWT_EXPIRATION_MINUTES=$NEXT_PUBLIC_JWT_EXPIRATION_MINUTES
-ENV NEXT_PUBLIC_SEGMENT_WRITE_KEY=$NEXT_PUBLIC_SEGMENT_WRITE_KEY
-ENV NEXT_PUBLIC_SEGMENT_ENABLED=$NEXT_PUBLIC_SEGMENT_ENABLED
-ENV NEXT_PUBLIC_SEGMENT_DEBUG=$NEXT_PUBLIC_SEGMENT_DEBUG
-ENV NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=$NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND
-ENV NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=$NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED
-ENV NEXT_PUBLIC_ANALYTICS_HANDOFF_URL=$NEXT_PUBLIC_ANALYTICS_HANDOFF_URL
-ENV NEXT_PUBLIC_ANALYTICS_VIA_BEACON=$NEXT_PUBLIC_ANALYTICS_VIA_BEACON
-ENV NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=$NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES
-ENV NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=$NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
+    NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
+    NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH \
+    NEXT_PUBLIC_VERIFICATION_CODE_TTL=$NEXT_PUBLIC_VERIFICATION_CODE_TTL \
+    NEXT_PUBLIC_JWT_EXPIRATION_MINUTES=$NEXT_PUBLIC_JWT_EXPIRATION_MINUTES \
+    NEXT_PUBLIC_SEGMENT_WRITE_KEY=$NEXT_PUBLIC_SEGMENT_WRITE_KEY \
+    NEXT_PUBLIC_SEGMENT_ENABLED=$NEXT_PUBLIC_SEGMENT_ENABLED \
+    NEXT_PUBLIC_SEGMENT_DEBUG=$NEXT_PUBLIC_SEGMENT_DEBUG \
+    NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND=$NEXT_PUBLIC_ANALYTICS_IDENTITY_FRONTEND \
+    NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED=$NEXT_PUBLIC_ANALYTICS_SAMPLE_VIEW_CHANGED \
+    NEXT_PUBLIC_ANALYTICS_VIA_BEACON=$NEXT_PUBLIC_ANALYTICS_VIA_BEACON \
+    NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES=$NEXT_PUBLIC_ANALYTICS_DISABLE_PULSES \
+    NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES=$NEXT_PUBLIC_ANALYTICS_SAMPLE_CONTENT_PULSES
+# Ensure Next.js builds with production semantics
+RUN NODE_ENV=production npm run build
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Production image, copy all the files and run next
-FROM base AS runner
+# ---------- Runtime stage ----------
+FROM node:22-slim AS runtime
+ENV NODE_ENV=production
 WORKDIR /app
 
-ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
+# Create non-root user
+RUN useradd -m -u 10001 nodeuser
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Copy only what's required to run
+COPY package*.json ./
+COPY .npmrc ./.npmrc
+RUN npm ci --omit=dev
 
-COPY --from=builder /app/public ./public
+# Next.js standalone runtime layout
+COPY --from=build /app/public ./public
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Runtime env for server-side routes
+# Runtime env for server-side routes (read by app code)
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ARG NEXT_PUBLIC_BASE_PATH
+ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH
 
-USER nextjs
+# Drop privileges
+USER nodeuser
 
 EXPOSE 3000
-
 ENV PORT=3000
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]

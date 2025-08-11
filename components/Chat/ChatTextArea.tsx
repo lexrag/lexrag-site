@@ -26,13 +26,15 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
                 // const wordCount = input.trim().split(/\s+/).length;
                 // const complexity = questionLength > 200 ? 'high' : questionLength > 100 ? 'medium' : 'low';
 
-                track_question_submitted({
-                    thread_id: threadId || pathname.split('/').pop() || 'new',
-                    length: questionLength,
-                    has_files: false, // TODO: Add file detection logic
-                }).catch((error) => {
+                try {
+                    track_question_submitted({
+                        thread_id: threadId || pathname.split('/').pop() || 'new',
+                        length: questionLength,
+                        has_files: false, // TODO: Add file detection logic
+                    });
+                } catch (error) {
                     console.error('Error tracking question submitted:', error);
-                });
+                }
             }
 
             sendMessage(input, isNewConversation);
@@ -56,13 +58,15 @@ const ChatTextArea = ({ input, setInput, sendMessage, activeMsgType, toggleMsgTy
 
     return (
         <div className="flex flex-col w-full mt-2 md:p-3 p-2 rounded-md border bg-background border-border hover:shadow-lg transition-shadow min-h-[72px] md:min-h-[72px] min-h-[60px] flex-shrink-0 chat-input-container">
-            {/* Track time spent in chat input */}
+            {/* Track time spent in chat input - pulses enabled with longer interval */}
             <ContentTimeTracker
                 areaId="chat_input"
                 extra={{
                     thread_id: threadId || pathname.split('/').pop() || 'unknown',
                     is_new_conversation: isNewConversation,
                 }}
+                disablePulses={false}
+                pulseIntervalMs={300000}
             />
 
             <textarea
