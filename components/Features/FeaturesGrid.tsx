@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { H4, PBase } from '@/components/ui/typography';
+import { H4, PSM} from '@/components/ui/typography';
 
 // type FeatureCategory = 'search' | 'query' | 'storage' | 'analytics';
 
@@ -70,7 +70,7 @@ const ProductFeatures = ({
                                     className={cn(
                                         'relative overflow-hidden flex flex-col gap-5 p-5 lg:p-5 rounded-xl items-center justify-around',
                                         'border border-transparent shadow-md transition-all hover:shadow-lg',
-                                        'dark:bg-coal-300 light:bg-white',
+                                        'dark:bg-coal-300 bg-blue-50',
                                         colors.border,
                                     )}
                                 >
@@ -95,9 +95,9 @@ const ProductFeatures = ({
                                                 <H4 className={cn('mb-px', colors.icon_color)}>
                                                     {feat.title}
                                                 </H4>
-                                                <PBase className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                                <PSM className="text-2sm dark:text-gray-400 light:text-gray-500">
                                                     {feat.subtitle}
-                                                </PBase>
+                                                </PSM>
                                             </div>
                                         </div>
 
@@ -114,9 +114,9 @@ const ProductFeatures = ({
                                     </div>
 
                                     {showDescription && (
-                                        <PBase className="text-2sm dark:text-gray-400 light:text-gray-500">
+                                        <PSM className="text-2sm dark:text-gray-400 light:text-gray-500">
                                             {feat.description}
-                                        </PBase>
+                                        </PSM>
                                     )}
 
                                     {showBottomBadges && (

@@ -2,6 +2,7 @@
   /* Brand Colors */
   --Brand-Primary-Phase-Green: #06df72;
   --Brand-Primary-Midnight-Core: #17245c;
+  --Brand-Primary-Axis-Indigo: #593edc;
   
   /* Primary color for components */
   --primary: hsl(var(--primary));

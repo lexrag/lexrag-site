@@ -55,7 +55,7 @@ const badgeVariants = cva(
             {
                 variant: 'primary',
                 appearance: 'outline',
-                className: 'bg-primary/10 border-primary/10 text-primary',
+                className: 'bg-sky-50 border-cyan-500 text-cyan-500',
             },
             {
                 variant: 'secondary',
@@ -66,19 +66,19 @@ const badgeVariants = cva(
                 variant: 'success',
                 appearance: 'outline',
                 className:
-                    'border bg-green-100 text-green-700 border-green-200 dark:text-green-600 dark:bg-green-950/50 dark:border-green-950',
+                    'border bg-violet-50 text-purple-700 border-purple-200 dark:text-purple-600 dark:bg-purple-950/50 dark:border-purple-950',
             },
             {
                 variant: 'warning',
                 appearance: 'outline',
                 className:
-                    'border bg-yellow-100 text-yellow-700 border-yellow-200 dark:text-yellow-600 dark:bg-yellow-950/50 dark:border-yellow-950',
+                    'border bg-emerald-100 text-emerald-700 border-emerald-200 dark:text-emerald-600 dark:bg-emerald-950/50 dark:border-emerald-950',
             },
             {
                 variant: 'info',
                 appearance: 'outline',
                 className:
-                    'border bg-violet-100 text-violet-700 border-violet-200 dark:text-violet-600 dark:bg-violet-950/50 dark:border-violet-950',
+                    'border bg-violet-200 text-violet-700 border-violet-200 dark:text-violet-600 dark:bg-violet-950/50 dark:border-violet-950',
             },
             {
                 variant: 'mono',
@@ -95,7 +95,7 @@ const badgeVariants = cva(
             {
                 variant: 'primary',
                 appearance: 'light',
-                className: 'bg-primary/10 border-0 text-primary',
+                className: 'bg-sky-500 border-0 text-cyan-500',
             },
             {
                 variant: 'secondary',
@@ -105,17 +105,17 @@ const badgeVariants = cva(
             {
                 variant: 'success',
                 appearance: 'light',
-                className: 'border bg-green-100 border-0 text-green-700 dark:text-green-600 dark:bg-green-950/50',
+                className: 'border bg-violet-50 border-0 text-purple-700 dark:text-purple-600 dark:bg-purple-950/50',
             },
             {
                 variant: 'warning',
                 appearance: 'light',
-                className: 'border bg-yellow-100 border-0 text-yellow-700 dark:text-yellow-600 dark:bg-yellow-950/50',
+                className: 'border bg-emerald-100 border-0 text-emerald-700 dark:text-emerald-600 dark:bg-emerald-950/50',
             },
             {
                 variant: 'info',
                 appearance: 'light',
-                className: 'border bg-violet-100 border-0 text-violet-700 dark:text-violet-600 dark:bg-violet-950/50',
+                className: 'border bg-violet-200 border-0 text-violet-700 dark:text-violet-600 dark:bg-violet-950/50',
             },
             {
                 variant: 'mono',
@@ -131,7 +131,7 @@ const badgeVariants = cva(
             {
                 variant: 'primary',
                 appearance: 'ghost',
-                className: 'text-primary',
+                className: 'text-cyan-500',
             },
             {
                 variant: 'secondary',
@@ -141,12 +141,12 @@ const badgeVariants = cva(
             {
                 variant: 'success',
                 appearance: 'ghost',
-                className: 'text-green-500',
+                className: 'text-purple-500',
             },
             {
                 variant: 'warning',
                 appearance: 'ghost',
-                className: 'text-yellow-500',
+                className: 'text-emerald-500',
             },
             { variant: 'info', appearance: 'ghost', className: 'text-violet-500' },
             { variant: 'mono', appearance: 'ghost', className: 'text-foreground' },

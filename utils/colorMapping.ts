@@ -1,4 +1,5 @@
 // badgeColorMapping.ts
+import '@/components/ui/css-variables.css';
 
 // 1. Maps badge values (e.g. "search", "freemium") to variant names used in <Badge />
 export const badgeColorMapping: Record<
@@ -39,24 +40,25 @@ export const categoryColorScheme: Record<
     }
 > = {
     search: {
-        icon_color: 'text-blue-500 dark:text-blue-300',
-        border: 'hover:border-blue-500 dark:hover:border-blue-300',
-        gradient: 'from-blue-400 via-blue-500 to-blue-600 dark:from-blue-300 dark:via-blue-400 dark:to-blue-500',
+        icon_color: 'text-cyan-500 dark:text-cyan-300',
+        border: 'hover:border-cyan-500 dark:hover:border-cyan-300',
+        gradient: 'from-cyan-400 via-cyan-500 to-cyan-600 dark:from-cyan-300 dark:via-cyan-400 dark:to-cyan-500',
     },
     query: {
-        icon_color: 'text-green-500 dark:text-green-300',
-        border: 'hover:border-green-500 dark:hover:border-green-300',
-        gradient: 'from-green-500 via-green-600 to-green-700',
-    },
-    storage: {
-        icon_color: 'text-yellow-500 dark:text-yellow-300',
-        border: 'hover:border-yellow-500 dark:hover:border-yellow-300',
-        gradient: 'from-yellow-500 via-yellow-600 to-yellow-700',
-    },
-    analytics: {
         icon_color: 'text-purple-500 dark:text-purple-300',
         border: 'hover:border-purple-500 dark:hover:border-purple-300',
         gradient: 'from-purple-500 via-purple-600 to-purple-700',
+    },
+    storage: {
+        icon_color: 'text-emerald-500 dark:text-emerald-300',
+        border: 'hover:border-emerald-500 dark:hover:border-emerald-300',
+        gradient: 'from-emerald-500 via-emerald-600 to-emerald-700',
+    },
+    analytics: {
+        icon_color: 'text-[var(--Brand-Primary-Axis-Indigo)] dark:text-[var(--Brand-Primary-Axis-Indigo)]',
+        border: 'hover:border-[var(--Brand-Primary-Axis-Indigo)] dark:hover:border-[var(--Brand-Primary-Axis-Indigo)]',
+        gradient:
+            'from-[var(--Brand-Primary-Axis-Indigo)] via-[var(--Brand-Primary-Axis-Indigo)] to-[var(--Brand-Primary-Axis-Indigo)]',
     },
 };
 
