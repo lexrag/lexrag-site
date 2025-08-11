@@ -1,10 +1,10 @@
 'use client';
 
-import { H4, PBase } from '../ui/typography';
+import BenefitsCard from './BenefitsCard';
 
 const Benefits = () => {
     return (
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-4 sm:gap-0 mb-20">
+        <div className="grid grid-cols-1 gap-y-10 gap-x-4 sm:grid-cols-4 sm:gap-y-0 sm:gap-x-6 mb-20">
             {[
                 {
                     img: 'medal',
@@ -13,41 +13,25 @@ const Benefits = () => {
                         'GraphRAG technology ensures unmatched accuracy and delivers contextually precise legal responses',
                 },
                 {
-                    img: 'cloud-saas',
+                    img: 'magnifying-glass',
                     title: 'Graph-Vector Search',
                     description:
                         'Leverage Graph Schema to enrich semantic search results and gain complete and accurate legal context',
                 },
                 {
-                    img: 'a-bag-of-money',
+                    img: 'clock',
                     title: 'Fast & Cost-Effective',
                     description:
                         'Significantly boost your legal research and drafting efficiency, reducing time and effort while cutting costs.',
                 },
                 {
-                    img: 'mosaic-lamp',
+                    img: 'box-scaled',
                     title: 'Flexible & Scalable',
                     description:
                         'API-based modular architecture enables integration with a variety of cloud or on-premises LLMs',
                 },
             ].map((item, index) => (
-                <div key={index} className="flex flex-col items-center justify-center text-center transition-colors">
-                    <img
-                        src={`/media/images/${item.img}.png`}
-                        className="dark:hidden max-h-32 mb-6"
-                        alt={`${item.title} light`}
-                    />
-                    <img
-                        src={`/media/images/${item.img}-dark.png`}
-                        className="hidden dark:block max-h-32 mb-6"
-                        alt={`${item.title} dark`}
-                    />
-
-                    <div className="flex justify-center items-center mb-4">
-                        <H4 className="text-black dark:text-white">{item.title}</H4>
-                    </div>
-                    <PBase className="text-gray-700 dark:text-gray-300 max-w-[80%]">{item.description}</PBase>
-                </div>
+                <BenefitsCard key={index} item={item} />
             ))}
         </div>
     );
