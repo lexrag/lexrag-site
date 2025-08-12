@@ -53,7 +53,10 @@ LOCK_CONTENT=$(cat <<EOF
 EOF
 )
 
-echo "$LOCK_CONTENT" | aws s3api put-object --bucket "$(echo "$S3_BUCKET" | sed 's#s3://##')" --key "$LOCK_KEY" --body - --content-type "application/json" >/dev/null
+# Upload lock via stdin (AWS CLI v2 safe)
+echo "$LOCK_CONTENT" | aws s3 cp - "$S3_BUCKET/$LOCK_KEY" \
+  --content-type "application/json" \
+  --only-show-errors >/dev/null
 
 cleanup() {
   echo "Cleaning up lock..."
