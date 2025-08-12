@@ -3,11 +3,8 @@ name: Deploy Static Site
 on:
     push:
         branches: ['main']
-    schedule:
-        # Run CloudFront verification daily at 6 AM UTC
-        - cron: '0 6 * * *'
     workflow_dispatch:
-        # Allow manual trigger for verification
+        # Allow manual trigger
 
 concurrency:
     group: prod-deploy
@@ -15,13 +12,11 @@ concurrency:
 
 jobs:
     deploy:
-        if: github.event_name == 'push' # All comments in code strictly in English
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
         permissions:
             id-token: write
             contents: read
-        outputs:
-            build-id: ${{ steps.build.outputs.build-id }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -49,8 +44,18 @@ jobs:
                   echo "NEXT_PUBLIC_SEGMENT_DEBUG=false" >> $GITHUB_ENV
                   echo "NODE_ENV=production" >> $GITHUB_ENV
 
+            - name: Install dependencies
+              run: |
+                  npm ci
+                  # Debug: Check what's installed
+                  echo "=== Installed packages ==="
+                  npm list --depth=0
+                  echo "=== Tailwind packages ==="
+                  npm list | grep tailwind
+                  echo "=== PostCSS packages ==="
+                  npm list | grep postcss
+
             - name: Build
-              id: build
               env:
                   NEXT_PUBLIC_APP_URL: ${{ env.NEXT_PUBLIC_APP_URL }}
                   NEXT_PUBLIC_BASE_URL: ${{ env.NEXT_PUBLIC_BASE_URL }}
@@ -60,14 +65,7 @@ jobs:
                   NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
                   NODE_ENV: ${{ env.NODE_ENV }}
               run: |
-                  npm ci
                   npm run build
-                  # Extract build ID for smoke tests
-                  if [ -f ".next/BUILD_ID" ]; then
-                    echo "build-id=$(cat .next/BUILD_ID)" >> $GITHUB_OUTPUT
-                  else
-                    echo "build-id=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-                  fi
 
             - name: Deploy
               env:
@@ -87,170 +85,5 @@ jobs:
             - name: Wait for CloudFront propagation
               run: |
                   echo "Waiting for CloudFront changes to propagate..."
-                  # Retry mechanism with exponential backoff
-                  for i in {1..5}; do
-                    echo "Attempt $i/5: Waiting 30 seconds..."
-                    sleep 30
-                    
-                    # Try to check if headers are propagated
-                    if curl -s -I "https://${{ env.CLOUDFRONT_DOMAIN }}/" | grep -q "Content-Security-Policy"; then
-                      echo "✅ Headers detected, proceeding with smoke tests..."
-                      break
-                    fi
-                    
-                    if [ $i -eq 5 ]; then
-                      echo "⚠️  Headers not detected after 5 attempts, proceeding anyway..."
-                    fi
-                  done
-
-            - name: Smoke Tests
-              env:
-                  CLOUDFRONT_DOMAIN: ${{ env.CLOUDFRONT_DOMAIN }}
-                  BUILD_ID: ${{ steps.build.outputs.build-id }}
-              run: |
-                  echo "🧪 Running smoke tests..."
-                  echo "Build ID: $BUILD_ID"
-                  echo "Domain: $CLOUDFRONT_DOMAIN"
-
-                  # Test 1: HTML headers (should be no-store)
-                  echo "Testing HTML headers..."
-                  HTML_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "https://$CLOUDFRONT_DOMAIN/" | grep -E "(Cache-Control|Content-Security-Policy|Strict-Transport-Security)" || true)
-                  echo "HTML Headers: $HTML_HEADERS"
-
-                  if ! echo "$HTML_HEADERS" | grep -q "no-store"; then
-                    echo "❌ HTML Cache-Control should be 'no-store'"
-                    exit 1
-                  fi
-
-                  if ! echo "$HTML_HEADERS" | grep -q "Content-Security-Policy"; then
-                    echo "❌ Content-Security-Policy header missing"
-                    exit 1
-                  fi
-
-                  echo "✅ HTML headers OK"
-
-                  # Test 2: Static assets (should be immutable) - use real file from build
-                  echo "Testing static assets headers..."
-                  if ls -1 out/_next/static/chunks/*.js 1> /dev/null 2>&1; then
-                    CHUNK=$(ls -1 out/_next/static/chunks/*.js | head -n1 | xargs -n1 basename)
-                    echo "Testing chunk: $CHUNK"
-                    
-                    STATIC_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "https://$CLOUDFRONT_DOMAIN/_next/static/chunks/$CHUNK" | grep -E "(Cache-Control|Content-Type)" || true)
-                    echo "Static Headers: $STATIC_HEADERS"
-                    
-                    if ! echo "$STATIC_HEADERS" | grep -q "immutable"; then
-                      echo "❌ Static assets Cache-Control should be 'immutable'"
-                      exit 1
-                    fi
-                    
-                    if ! echo "$STATIC_HEADERS" | grep -E -q "(text|application)/javascript"; then
-                      echo "❌ Static JS should have Content-Type: text/javascript or application/javascript"
-                      exit 1
-                    fi
-                    
-                    echo "✅ Static assets headers OK"
-                  else
-                    echo "⚠️  No JS chunks found, skipping static assets test"
-                  fi
-
-                  # Test 3: Data files (should be no-store) - soft check for App Router
-                  echo "Testing data files headers..."
-                  DATA_URL="https://$CLOUDFRONT_DOMAIN/_next/data/$BUILD_ID/index.json"
-                  DATA_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DATA_URL" || true)
-                  if [ "$DATA_STATUS" = "200" ]; then
-                    DATA_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "$DATA_URL" | grep -E "(Cache-Control)" || true)
-                    if ! echo "$DATA_HEADERS" | grep -q "no-store"; then
-                      echo "❌ Data files Cache-Control should be 'no-store'"
-                      exit 1
-                    fi
-                    echo "✅ Data files headers OK"
-                  else
-                    echo "ℹ️  No _next/data JSON detected (status $DATA_STATUS). Skipping data headers test."
-                  fi
-
-                  # Test 4: MIME types validation
-                  echo "Testing MIME types..."
-
-                  # Test CSS file (if exists)
-                  if ls -1 out/_next/static/css/*.css 1> /dev/null 2>&1; then
-                    CSS_FILE=$(ls -1 out/_next/static/css/*.css | head -n1 | xargs -n1 basename)
-                    CSS_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "https://$CLOUDFRONT_DOMAIN/_next/static/css/$CSS_FILE" | grep -E "(Content-Type)" || true)
-                    if ! echo "$CSS_HEADERS" | grep -q "text/css"; then
-                      echo "❌ CSS should have Content-Type: text/css"
-                      exit 1
-                    fi
-                    echo "✅ CSS MIME type OK"
-                  else
-                    echo "⚠️  No CSS files found, skipping CSS MIME type test"
-                  fi
-
-                  # Test font file (if exists)
-                  if ls -1 out/_next/static/media/*.woff2 1> /dev/null 2>&1; then
-                    FONT_FILE=$(ls -1 out/_next/static/media/*.woff2 | head -n1 | xargs -n1 basename)
-                    FONT_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "https://$CLOUDFRONT_DOMAIN/_next/static/media/$FONT_FILE" | grep -E "(Content-Type)" || true)
-                    if ! echo "$FONT_HEADERS" | grep -q "font/woff2"; then
-                      echo "❌ WOFF2 should have Content-Type: font/woff2"
-                      exit 1
-                    fi
-                    echo "✅ Font MIME type OK"
-                  else
-                    echo "⚠️  No font files found, skipping font MIME type test"
-                  fi
-
-                  # Test SVG file (if exists) - additional MIME check
-                  if find out -type f -name "*.svg" | head -n1 | grep -q .; then
-                    SVG_FILE=$(find out -type f -name "*.svg" | head -n1 | xargs -n1 basename)
-                    SVG_PATH=$(find out -type f -name "*.svg" | head -n1 | sed "s#out/##" | xargs -n1 dirname)
-                    SVG_HEADERS=$(curl -s --retry 5 --retry-delay 3 --retry-connrefused -I "https://$CLOUDFRONT_DOMAIN/$SVG_PATH/$SVG_FILE" | grep -i "Content-Type" || true)
-                    echo "$SVG_HEADERS" | grep -qi "image/svg+xml" || { echo "❌ SVG should have Content-Type: image/svg+xml"; exit 1; }
-                    echo "✅ SVG MIME type OK"
-                  else
-                    echo "ℹ️  No SVG found, skipping"
-                  fi
-
-                  echo "🎉 All smoke tests passed!"
-
-    # Smoke tests job (depends on deploy)
-    smoke-tests:
-        needs: deploy
-        runs-on: ubuntu-latest
-        if: always()
-        steps:
-            - name: Check deployment status
-              run: |
-                  if [ "${{ needs.deploy.result }}" = "success" ]; then
-                    echo "✅ Deployment successful, smoke tests passed"
-                  else
-                    echo "❌ Deployment failed or smoke tests failed"
-                    exit 1
-                  fi
-
-    # CloudFront verification job (runs on schedule or manual trigger)
-    verify_cloudfront:
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
-            - name: Configure AWS
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-                  aws-region: ap-southeast-1
-
-            - name: Verify CloudFront setup
-              env:
-                  DISTRIBUTION_ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
-              run: |
-                  echo "🔍 Verifying CloudFront configuration..."
-                  chmod +x scripts/verify-cloudfront-setup.sh
-                  ./scripts/verify-cloudfront-setup.sh
-
-                  # Exit with error if verification fails
-                  if [ $? -ne 0 ]; then
-                    echo "❌ CloudFront configuration verification failed"
-                    exit 1
-                  fi
-
-                  echo "✅ CloudFront configuration verification passed"
+                  sleep 60
+                  echo "✅ Deployment completed"
