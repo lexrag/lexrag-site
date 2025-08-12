@@ -2,8 +2,30 @@
 
 const BackgroundSVG = () => {
     return (
-        <div className="absolute top-30 left-110 right-0 w-full h-auto pointer-events-none -z-0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 731 480" className="mx-auto mt-[-50px] max-w-[90%]">
+        <div
+            className="
+        absolute 
+        top-20 
+        left-0 
+        w-full 
+        flex 
+        justify-end 
+        overflow-visible 
+        pointer-events-none 
+        -z-10
+      "
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 751 500"
+                className="
+          max-w-[250%] translate-x-[0%] translate-y-[80%]
+          sm:max-w-[180%] sm:translate-x-[0%] sm:translate-y-[50%]
+          md:max-w-[120%] md:translate-x-[15%] md:translate-y-[20%]
+          lg:max-w-[100%] lg:translate-x-[27%] lg:translate-y-0
+          xl:max-w-[90%] xl:translate-x-[27%] xl:translate-y-0
+        "
+            >
                 <defs>
                     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="0" dy="14" stdDeviation="4.5" floodOpacity="0.1" />
@@ -18,13 +40,14 @@ const BackgroundSVG = () => {
                     stroke="#EBF0FF"
                     strokeWidth="2"
                     filter="url(#shadow)"
+                    transform="translate(6, 40)"
                 />
                 <path
                     d="M702.613 225.064L328.141 441.265C311.106 451.1 281.616 450.022 262.278 438.857L27.8009 303.481C8.46235 292.316 6.59472 275.29 23.6297 265.455L184.586 172.527C193.563 167.344 197.966 159.977 196.769 152.143L188.881 100.507C187.684 92.6734 192.09 85.3049 201.064 80.1237L326.317 7.80894C343.352 -2.02623 372.842 -0.947935 392.181 10.2172L698.442 187.037C717.78 198.202 719.648 215.228 702.613 225.064Z"
                     fill="#B25BDE"
                     stroke="#EBF0FF"
                     strokeWidth="2"
-                    transform="translate(6, 10)"
+                    transform="translate(6, 20)"
                 />
                 <image
                     href="/media/images/background-img.gif"
