@@ -1,5 +1,6 @@
 // All comments in code strictly in English
 import { execSync } from 'node:child_process';
+import path from 'node:path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -23,6 +24,14 @@ const nextConfig = {
             // Fallback if git is not available in CI (should not happen)
             return `${Date.now()}`;
         }
+    },
+    webpack: (config) => {
+        config.resolve = config.resolve || {};
+        config.resolve.alias = {
+            ...(config.resolve.alias || {}),
+            '@': path.resolve(__dirname),
+        };
+        return config;
     },
 };
 
