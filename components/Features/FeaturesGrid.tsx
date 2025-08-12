@@ -22,8 +22,8 @@ const ProductFeatures = ({
     showBottomBadges = true,
     maxHeightBeforeShowAll = 500,
 }: ProductFeaturesProps) => {
-    const visibleFeats = combinedFeaturesData;
     const [showAll, setShowAll] = useState(false);
+    const visibleFeats = combinedFeaturesData;
     const toggleShowAll = () => setShowAll(!showAll);
 
     return (

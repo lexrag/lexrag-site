@@ -1,0 +1,192 @@
+import React from 'react';
+
+const CheckmarkIcon = ({ className = '', ...props }) => {
+    return (
+        <svg
+            width="141"
+            height="154"
+            viewBox="0 0 141 154"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={`transition-all duration-300 ${className}`}
+            {...props}
+        >
+            <style>
+                {`
+          .hoverable-element {
+            transition: all 0.3s ease;
+          }
+          
+          .glow-effect {
+            transition: filter 0.3s ease;
+          }
+          
+          svg:hover .glow-effect {
+            filter: drop-shadow(0 0 25px rgba(89, 62, 220, 0.8)) drop-shadow(0 0 50px rgba(89, 62, 220, 0.4));
+          }
+          .inside-circle {
+            transition: all 0.3s ease;
+          }
+
+          svg:hover .inside-circle {
+            fill: purple;
+            fill-opacity: 1;
+          }
+          
+          svg:hover .hoverable-element {
+            fill: rgba(255, 255, 255, 0.3);
+            stroke: rgba(255, 255, 255, 0.9);
+          }
+          
+          svg:hover .checkmark {
+            stroke: #ffffff;
+            filter: drop-shadow(0 0 10px rgba(89, 62, 220, 0.8));
+          }
+        `}
+            </style>
+
+            <g filter="url(#filter0_f_3999_1901)" className="">
+                <path
+                    d="M70.3437 116.708C95.6937 116.708 116.244 96.1576 116.244 70.8075C116.244 45.4575 95.6937 24.9072 70.3437 24.9072C44.9936 24.9072 24.4434 45.4575 24.4434 70.8075C24.4434 96.1576 44.9936 116.708 70.3437 116.708Z"
+                    fill="url(#paint0_linear_3999_1901)"
+                    fillOpacity="0.19"
+                    className="inside-circle"
+                />
+                <path
+                    d="M70.3438 24.9717C95.6582 24.9717 116.18 45.4931 116.18 70.8076C116.18 96.1221 95.6582 116.644 70.3438 116.644C45.0293 116.644 24.5079 96.1221 24.5078 70.8076C24.5078 45.4931 45.0292 24.9717 70.3438 24.9717Z"
+                    stroke="url(#paint1_linear_3999_1901)"
+                    strokeOpacity="0.8"
+                    strokeWidth="0.128656"
+                    className="hoverable-element"
+                />
+            </g>
+            <circle
+                cx="70.3437"
+                cy="71.1279"
+                r="45.9003"
+                fill="white"
+                fillOpacity="0.08"
+                className="hoverable-element glow-effect"
+            />
+            <circle
+                cx="70.3437"
+                cy="71.1279"
+                r="45.5603"
+                stroke="url(#paint2_linear_3999_1901)"
+                strokeOpacity="0.8"
+                strokeWidth="0.680005"
+            />
+            <foreignObject x="2.00403" y="3.4679" width="136.001" height="159.802">
+                <div
+                    style={{
+                        backdropFilter: 'blur(5.1px)',
+                        clipPath: 'url(#bgblur_0_3999_1901_clip_path)',
+                        height: '100%',
+                        width: '100%',
+                    }}
+                />
+            </foreignObject>
+            <g data-figma-bg-blur-radius="10.2001">
+                <mask id="path-5-inside-1_3999_1901" fill="white">
+                    <path d="M70.0039 13.668C101.926 13.668 127.805 39.5465 127.805 71.4688C127.805 94.784 113.999 114.874 94.1172 124.013V153.069L70.5 137.141L46.8828 153.069V124.458C26.4698 115.539 12.2043 95.1698 12.2041 71.4688C12.2041 39.5466 38.0818 13.6682 70.0039 13.668ZM70.0039 37.4678C51.2263 37.468 36.0039 52.6911 36.0039 71.4688C36.0042 90.2462 51.2265 105.468 70.0039 105.469C88.7815 105.469 104.005 90.2463 104.005 71.4688C104.005 52.691 88.7817 37.4678 70.0039 37.4678Z" />
+                </mask>
+                <path
+                    d="M70.0039 13.668C101.926 13.668 127.805 39.5465 127.805 71.4688C127.805 94.784 113.999 114.874 94.1172 124.013V153.069L70.5 137.141L46.8828 153.069V124.458C26.4698 115.539 12.2043 95.1698 12.2041 71.4688C12.2041 39.5466 38.0818 13.6682 70.0039 13.668ZM70.0039 37.4678C51.2263 37.468 36.0039 52.6911 36.0039 71.4688C36.0042 90.2462 51.2265 105.468 70.0039 105.469C88.7815 105.469 104.005 90.2463 104.005 71.4688C104.005 52.691 88.7817 37.4678 70.0039 37.4678Z"
+                    fill="url(#paint3_linear_3999_1901)"
+                />
+                <path
+                    d="M70.0039 13.668V12.988H70.0039L70.0039 13.668ZM127.805 71.4688L128.485 71.4688V71.4688H127.805ZM94.1172 124.013L93.8332 123.395L93.4372 123.577V124.013H94.1172ZM94.1172 153.069L93.737 153.633L94.7972 154.348V153.069H94.1172ZM70.5 137.141L70.8802 136.577L70.5 136.32L70.1198 136.577L70.5 137.141ZM46.8828 153.069H46.2028V154.348L47.263 153.633L46.8828 153.069ZM46.8828 124.458H47.5628V124.013L47.1551 123.835L46.8828 124.458ZM12.2041 71.4688H11.5241V71.4688L12.2041 71.4688ZM70.0039 37.4678L70.0039 36.7878H70.0039L70.0039 37.4678ZM36.0039 71.4688H35.3239V71.4688L36.0039 71.4688ZM70.0039 105.469L70.0039 106.149H70.0039L70.0039 105.469ZM104.005 71.4688L104.685 71.4688V71.4688H104.005ZM70.0039 13.668V14.348C101.551 14.348 127.125 39.9221 127.125 71.4688H127.805H128.485C128.485 39.1709 102.302 12.988 70.0039 12.988V13.668ZM127.805 71.4688L127.125 71.4687C127.125 94.5086 113.483 114.363 93.8332 123.395L94.1172 124.013L94.4012 124.631C114.515 115.385 128.485 95.0593 128.485 71.4688L127.805 71.4688ZM94.1172 124.013H93.4372V153.069H94.1172H94.7972V124.013H94.1172ZM94.1172 153.069L94.4974 152.506L70.8802 136.577L70.5 137.141L70.1198 137.704L93.737 153.633L94.1172 153.069ZM70.5 137.141L70.1198 136.577L46.5026 152.506L46.8828 153.069L47.263 153.633L70.8802 137.704L70.5 137.141ZM46.8828 153.069H47.5628V124.458H46.8828H46.2028V153.069H46.8828ZM46.8828 124.458L47.1551 123.835C26.9808 115.02 12.8843 94.8899 12.8841 71.4687L12.2041 71.4688L11.5241 71.4688C11.5243 95.4497 25.9588 116.057 46.6105 125.081L46.8828 124.458ZM12.2041 71.4688H12.8841C12.8841 39.9222 38.4574 14.3482 70.0039 14.348L70.0039 13.668L70.0039 12.988C37.7063 12.9882 11.5241 39.1711 11.5241 71.4688H12.2041ZM70.0039 37.4678L70.0039 36.7878C50.8507 36.788 35.3239 52.3156 35.3239 71.4688H36.0039H36.6839C36.6839 53.0666 51.6019 38.148 70.0039 38.1478L70.0039 37.4678ZM36.0039 71.4688L35.3239 71.4688C35.3242 90.6218 50.8509 106.148 70.0039 106.149L70.0039 105.469L70.0039 104.789C51.602 104.788 36.6842 89.8706 36.6839 71.4687L36.0039 71.4688ZM70.0039 105.469L70.0039 106.149C89.1571 106.149 104.685 90.6219 104.685 71.4688L104.005 71.4688L103.325 71.4687C103.325 89.8707 88.406 104.789 70.0039 104.789L70.0039 105.469ZM104.005 71.4688H104.685C104.685 52.3154 89.1572 36.7878 70.0039 36.7878L70.0039 37.4678L70.0039 38.1478C88.4061 38.1478 103.325 53.0665 103.325 71.4688H104.005Z"
+                    fill="url(#paint4_linear_3999_1901)"
+                    fillOpacity="0.8"
+                    mask="url(#path-5-inside-1_3999_1901)"
+                    className="hoverable-element"
+                />
+            </g>
+            <path
+                d="M48.9209 60.2488L68.1024 82.349L94.1406 31.3486"
+                stroke="white"
+                strokeWidth="8.16006"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="checkmark"
+            />
+
+            <defs>
+                <filter
+                    id="filter0_f_3999_1901"
+                    x="0.513359"
+                    y="0.977226"
+                    width="139.661"
+                    height="139.661"
+                    filterUnits="userSpaceOnUse"
+                    colorInterpolationFilters="sRGB"
+                >
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                    <feGaussianBlur stdDeviation="11.965" result="effect1_foregroundBlur_3999_1901" />
+                </filter>
+                <clipPath id="bgblur_0_3999_1901_clip_path" transform="translate(-2.00403 -3.4679)">
+                    <path d="M70.0039 13.668C101.926 13.668 127.805 39.5465 127.805 71.4688C127.805 94.784 113.999 114.874 94.1172 124.013V153.069L70.5 137.141L46.8828 153.069V124.458C26.4698 115.539 12.2043 95.1698 12.2041 71.4688C12.2041 39.5466 38.0818 13.6682 70.0039 13.668ZM70.0039 37.4678C51.2263 37.468 36.0039 52.6911 36.0039 71.4688C36.0042 90.2462 51.2265 105.468 70.0039 105.469C88.7815 105.469 104.005 90.2463 104.005 71.4688C104.005 52.691 88.7817 37.4678 70.0039 37.4678Z" />
+                </clipPath>
+                <linearGradient
+                    id="paint0_linear_3999_1901"
+                    x1="27.8728"
+                    y1="79.4533"
+                    x2="245.335"
+                    y2="35.2317"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="white" />
+                    <stop offset="0.51" stopColor="white" />
+                    <stop offset="1" stopColor="white" />
+                </linearGradient>
+                <linearGradient
+                    id="paint1_linear_3999_1901"
+                    x1="70.3437"
+                    y1="24.9072"
+                    x2="70.3437"
+                    y2="116.708"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="white" stopOpacity="0" />
+                    <stop offset="1" stopColor="white" />
+                </linearGradient>
+                <linearGradient
+                    id="paint2_linear_3999_1901"
+                    x1="70.3437"
+                    y1="25.2275"
+                    x2="70.3437"
+                    y2="117.028"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="white" stopOpacity="0" />
+                    <stop offset="1" stopColor="white" />
+                </linearGradient>
+                <linearGradient
+                    id="paint3_linear_3999_1901"
+                    x1="70.0044"
+                    y1="13.668"
+                    x2="70.0044"
+                    y2="170.069"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="white" stopOpacity="0.2" />
+                    <stop offset="1" stopColor="white" stopOpacity="0.5" />
+                </linearGradient>
+                <linearGradient
+                    id="paint4_linear_3999_1901"
+                    x1="70.0044"
+                    y1="13.668"
+                    x2="70.0044"
+                    y2="151.029"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="white" stopOpacity="0" />
+                    <stop offset="1" stopColor="white" />
+                </linearGradient>
+            </defs>
+        </svg>
+    );
+};
+
+export default CheckmarkIcon;

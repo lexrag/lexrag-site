@@ -1,13 +1,14 @@
 "use client";
 
-import Link from 'next/link';
+import { useState } from 'react';
 import LiquidGlass from '@/components/liquid-glass';
 import { getAppUrl } from '@/lib/app-config';
+import AuthModal from '@/components/auth/AuthModal';
 import '@/components/ui/css-variables.css';
 
 const SigninButton = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const signinUrl = `${getAppUrl()}/auth/signin`;
-
     return (
         <div className="flex items-center gap-8">
             <div className="tab">
@@ -23,18 +24,20 @@ const SigninButton = () => {
                     cornerRadius={100}
                     mode="standard"
                     padding="8px 16px"
+                    onClick={() => {
+                        setIsModalOpen(true);
+                    }}
                 >
-                    <Link
-                        className="block text-axis-indigo text-base font-medium px-2 whitespace-nowrap"
-                        href={signinUrl}
-                        passHref
-                    >
-                        Sign In
-                    </Link>
+                    <span className="block text-axis-indigo text-base font-medium px-2 whitespace-nowrap">Sign In</span>
+
                 </LiquidGlass>
             </div>
+
+            <AuthModal open={isModalOpen} onOpenChange={setIsModalOpen} initialMode="signin" />
         </div>
     );
 };
 
 export default SigninButton;
+
+
