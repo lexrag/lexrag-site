@@ -28,35 +28,35 @@ export const Logo = ({ variant }: LogoProps) => {
     if (isHomePage) {
         return (
             <Image
-                className="max-h-[48px] transition-transform duration-300 hover:scale-105"
+                className="max-h-[38px] transition-transform duration-300 hover:scale-105"
                 src="/media/lexrag-logo-secondary.svg"
                 alt="lexrag logo dark"
-                width={280}
-                height={48}
+                width={224}
+                height={38}
                 priority
-                style={{ width: '280px', height: '48px' }}
+                style={{ width: '224px', height: '38px' }}
             />
         );
     }
     return (
         <>
             <Image
-                className="dark:hidden max-h-[48px] transition-transform duration-300 hover:scale-105"
+                className="dark:hidden max-h-[38px] transition-transform duration-300 hover:scale-105"
                 src="/media/lexrag-logo-secondary.svg"
                 alt="lexrag logo light"
-                width={280}
-                height={48}
+                width={224}
+                height={38}
                 priority
-                style={{ width: '280px', height: '48px' }}
+                style={{ width: '224px', height: '38px' }}
             />
             <Image
-                className="hidden dark:block max-h-[48px] transition-transform duration-300 hover:scale-105"
+                className="hidden dark:block max-h-[38px] transition-transform duration-300 hover:scale-105"
                 src="/media/lexrag-logo-secondary.svg"
                 alt="lexrag logo dark"
-                width={280}
-                height={48}
+                width={224}
+                height={38}
                 priority
-                style={{ width: '280px', height: '48px' }}
+                style={{ width: '224px', height: '38px' }}
             />
         </>
     );

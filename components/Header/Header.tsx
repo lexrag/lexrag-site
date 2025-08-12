@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import LiquidGlass from '@/components/liquid-glass';
 import HeaderCornerMenu from './HeaderCornerMenu';
 import { links } from './HeaderLinks';
 import { Logo } from './Logo';
@@ -28,7 +29,20 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
             )}
         >
             <div className="flex justify-between items-center ">
-                <div className="flex items-center gap-2 py-[15px] px-1 lg:px-12 rounded-4xl lg:bg-white/10 bg-white/0 lg:shadow-[0_0_8.88px_0_rgba(0,0,0,0.1)] lg:backdrop-blur-[8.88px] lg:border-t border-[#fff] mr-auto">
+                <LiquidGlass
+                    centered={false}
+                    compact
+                    displacementScale={50}
+                    blurAmount={0.01}
+                    saturation={130}
+                    aberrationIntensity={2}
+                    elasticity={0}
+                    cornerRadius={400}
+                    mode="prominent"
+                    padding="0px"
+                    className="mr-auto"
+                >
+                    <div className="flex items-center gap-2 py-[15px] px-1 lg:px-12 rounded-4xl lg:bg-white/10 bg-white/0 lg:shadow-[0_0_8.88px_0_rgba(0,0,0,0.1)] lg:border-t border-[#fff]">
                     {onOpenSidebar && (
                         <Button
                             variant="ghost"
@@ -63,26 +77,27 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                             );
                         })}
                     </ul>
-                </div>
+                    </div>
+                </LiquidGlass>
                 <HeaderCornerMenu />
 
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden ml-3 hover:bg-transparent hover:opacity-80 transition-all duration-500 relative"
+                    className="lg:hidden ml-3 hover:bg-transparent hover:opacity-80 transition-all duration-100 relative"
                     aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                     <div className="relative w-6 h-6">
                         <Menu
                             className={cn(
-                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-300',
+                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-100',
                                 isMobileMenuOpen ? 'opacity-0' : 'opacity-100',
                             )}
                         />
                         <X
                             className={cn(
-                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-300',
+                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-100',
                                 isMobileMenuOpen ? 'opacity-100' : 'opacity-0',
                             )}
                         />

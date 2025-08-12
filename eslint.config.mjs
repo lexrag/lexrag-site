@@ -23,7 +23,7 @@ const eslintConfig = [
         },
     }),
     {
-        ignores: ['.next/**', 'node_modules/**', 'components/common/**', 'app/components/**', 'out/**'],
+        ignores: ['.next/**', 'node_modules/**', 'components/common/**', 'app/components/**', 'out/**', '.tmp/**'],
     },
 ];
 

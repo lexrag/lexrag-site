@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { ShinyButton } from '../magicui/shiny-button';
 import { PSM } from '../ui/typography';
 import SocialAuthButtons from './SocialAuthButtons';
@@ -78,9 +76,9 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 <div className="flex justify-center">
                     <ShinyButton
                         typeof="submit"
-                        className="border-[0.1] shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px] 
-                        bg-[rgba(255,255,255,0.1)] hover:bg-[var(--Brand-Primary-Phase-Green)] 
-                        transition-colors duration-200 text-[var(--Brand-Primary-Midnight-Core)]"
+                        className="border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
+                        bg-transparent hover:bg-transparent
+                        transition-colors duration-200 text-white"
                     >
                         {mode === 'signup' ? 'Sign Up' : 'Sign In'}
                     </ShinyButton>
@@ -94,7 +92,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 <SocialAuthButtons />
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 mb-10 text-center">
                 <p className="text-sm">
                     {mode === 'signup' ? 'Have an account?' : "Don't have an account?"}{' '}
                     <button onClick={onToggleMode} className="text-[var(--Brand-Primary-Axis-Indigo)] hover:underline">
