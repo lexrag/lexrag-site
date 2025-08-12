@@ -63,6 +63,12 @@ jobs:
                   ls -la components/Landing/
                   ls -la components/Layout/
                   ls -la components/ui/
+                  echo "=== Checking tsconfig paths ==="
+                  cat tsconfig.json | grep -A 10 "paths"
+                  echo "=== Checking actual imports in files ==="
+                  grep -r "from '@/components" app/ --include="*.tsx" | head -10
+                  echo "=== Checking if components exist ==="
+                  find components -name "*.tsx" | head -20
 
             - name: Build
               env:
