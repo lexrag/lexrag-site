@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { getCategoryColorScheme } from '@/utils/colorMapping';
 import { cn } from '@/lib/utils';
 import { H4, PSM } from '@/components/ui/typography';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import '@/components/ui/css-variables.css';
 
 interface ProductFeaturesProps {
     gridClassName?: string;
@@ -22,6 +24,7 @@ const ProductFeatures = ({
     showBottomBadges = true,
     maxHeightBeforeShowAll = 500,
 }: ProductFeaturesProps) => {
+    const [showAll, setShowAll] = useState(false);
     const visibleFeats = combinedFeaturesData;
 
     return (
@@ -29,7 +32,7 @@ const ProductFeatures = ({
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{
-                    maxHeight: `${maxHeightBeforeShowAll}px`,
+                    maxHeight: showAll ? 'none' : `${maxHeightBeforeShowAll}px`,
                 }}
             >
                 <div className={gridClassName}>
@@ -100,7 +103,14 @@ const ProductFeatures = ({
                 </div>
             </div>
             <div className="text-center mt-8">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Show All</Button>
+                <Button
+                    className="border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.1)] 
+                    shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] backdrop-blur-[2.78px] hover:bg-primary/90
+                    text-[var(--Brand-Primary-Midnight-Core)]"
+                    onClick={() => setShowAll((prev) => !prev)}
+                >
+                    {showAll ? 'Show Less' : 'Show All'}
+                </Button>
             </div>
         </div>
     );
