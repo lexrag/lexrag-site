@@ -63,8 +63,8 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[300px] p-6">
-            <div className="absolute inset-0 bg-[rgba(23,36,92,0.12)] backdrop-blur-md shadow-[0_0_25px_0_rgba(0,0,0,0.12)] z-0" />
+        <div className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[300px] p-6">
+            <div className="absolute inset-0 bg-[rgba(23,36,92,0.12)] backdrop-blur-md group-hover:backdrop-blur-3xl shadow-[0_0_25px_0_rgba(0,0,0,0.12)] z-0 transition-all duration-300" />
 
             <div className="relative z-10 flex flex-col items-center h-full justify-between">
                 {getIcon(item.img)}
