@@ -50,8 +50,8 @@ jobs:
                   node --version
                   echo "=== NPM version ==="
                   npm --version
-                  echo "=== Installing dependencies ==="
-                  npm ci
+                  echo "=== Installing dependencies (including dev) ==="
+                  NODE_ENV= npm ci --include=dev
                   echo "=== Installed packages ==="
                   npm list --depth=0 | cat
                   echo "=== Tailwind packages ==="
