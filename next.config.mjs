@@ -26,10 +26,11 @@ const nextConfig = {
         }
     },
     webpack: (config) => {
+        // Stabilize '@' alias in ESM/CI
         config.resolve = config.resolve || {};
         config.resolve.alias = {
             ...(config.resolve.alias || {}),
-            '@': path.resolve(__dirname),
+            '@': path.resolve(process.cwd()),
         };
         return config;
     },
