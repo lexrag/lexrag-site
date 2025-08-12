@@ -9,6 +9,7 @@ const BackgroundSVG = () => {
         left-0 
         w-full 
         flex 
+        flex-col
         justify-end 
         overflow-visible 
         pointer-events-none 
@@ -19,11 +20,11 @@ const BackgroundSVG = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 751 500"
                 className="
-          max-w-[250%] translate-x-[0%] translate-y-[80%]
-          sm:max-w-[180%] sm:translate-x-[0%] sm:translate-y-[50%]
-          md:max-w-[120%] md:translate-x-[15%] md:translate-y-[20%]
-          lg:max-w-[100%] lg:translate-x-[27%] lg:translate-y-0
-          xl:max-w-[90%] xl:translate-x-[27%] xl:translate-y-0
+          max-w-[210%] translate-x-[0%] translate-y-[80%]
+          sm:max-w-[140%] sm:translate-x-[0%] sm:translate-y-[50%]
+          md:max-w-[60%] md:translate-x-[90%] md:translate-y-[20%]
+          lg:max-w-[60%] lg:translate-x-[100%] lg:translate-y-0
+          xl:max-w-[50%] xl:translate-x-[115%] xl:translate-y-0
         "
             >
                 <defs>
@@ -59,6 +60,54 @@ const BackgroundSVG = () => {
                 <path
                     d="M702.613 225.064L328.141 441.265C311.106 451.1 281.616 450.022 262.278 438.857L27.8009 303.481C8.46235 292.316 6.59472 275.29 23.6297 265.455L184.586 172.527C193.563 167.344 197.966 159.977 196.769 152.143L188.881 100.507C187.684 92.6734 192.09 85.3049 201.064 80.1237L326.317 7.80894C343.352 -2.02623 372.842 -0.947935 392.181 10.2172L698.442 187.037C717.78 198.202 719.648 215.228 702.613 225.064Z"
                     fill="none"
+                    stroke="#EBF0FF"
+                    strokeWidth="2"
+                />
+            </svg>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 751 500"
+                className="
+          max-w-[210%] translate-x-[0%] translate-y-[80%]
+          sm:max-w-[140%] sm:translate-x-[0%] sm:translate-y-[50%]
+          md:max-w-[60%] md:translate-x-[65%] md:translate-y-[40%]
+          lg:max-w-[60%] lg:translate-x-[75%] lg:translate-y-[20%]
+          xl:max-w-[50%] xl:translate-x-[90%] xl:translate-y-[20%]
+        "
+            >
+                <defs>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="14" stdDeviation="4.5" floodOpacity="0.1" />
+                    </filter>
+                    <clipPath id="clip-shape">
+                        <path d="M702.613 225.064L328.141 441.265C311.106 451.1 281.616 450.022 262.278 438.857L27.8009 303.481C8.46235 292.316 6.59472 275.29 23.6297 265.455L184.586 172.527C193.563 167.344 197.966 159.977 196.769 152.143L188.881 100.507C187.684 92.6734 192.09 85.3049 201.064 80.1237L326.317 7.80894C343.352 -2.02623 372.842 -0.947935 392.181 10.2172L698.442 187.037C717.78 198.202 719.648 215.228 702.613 225.064Z" />
+                    </clipPath>
+                </defs>
+                <path
+                    d="M392.611 447.338C374.679 457.691 344.14 456.667 324.413 445.278L18.1519 268.458C-1.57489 257.069 -3.34804 239.437 14.583 229.084L396.372 8.65771C414.304 -1.69499 444.844 -0.6716 464.571 10.7178L699.048 146.093C718.775 157.482 720.547 175.115 702.616 185.467L538.514 280.211C529.632 285.339 525.172 292.595 526.222 300.307L533.314 352.403C534.416 360.499 529.731 368.172 520.311 373.61L392.611 447.338Z"
+                    fill="#06DF72"
+                    stroke="#EBF0FF"
+                    strokeWidth="2"
+                    filter="url(#shadow)"
+                    transform="translate(6, 40)"
+                />
+            </svg>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="451"
+                viewBox="0 0 751 500"
+                fill="none"
+                className="
+          max-w-[210%] translate-x-[30%] translate-y-[65%]
+          sm:max-w-[140%] sm:translate-x-[0%] sm:translate-y-[80%]
+          md:max-w-[60%] md:translate-x-[30%] md:translate-y-[-110%]
+          lg:max-w-[60%] lg:translate-x-[60%] lg:translate-y-[-140]
+          xl:max-w-[50%] xl:translate-x-[60%] xl:translate-y-[-140%]
+        "
+            >
+                <path
+                    d="M316.452 8.30908C334.065 -1.85992 364.337 -0.662469 384.047 10.7173L690.308 187.537C710.019 198.917 712.093 216.394 694.479 226.563L320.008 442.765C302.395 452.934 272.123 451.736 252.412 440.356L17.9359 304.981C-1.7745 293.602 -3.84846 276.124 13.7648 265.955L174.721 173.027C183.421 168.004 187.717 160.848 186.55 153.206L178.662 101.57C177.436 93.5447 181.948 85.9646 191.199 80.6235L316.452 8.30908Z"
+                    fill="#593EDC"
                     stroke="#EBF0FF"
                     strokeWidth="2"
                 />
