@@ -2,9 +2,9 @@
 
 /* Override Next.js default fonts */
 @layer base {
-  html {
-    font-family: 'Instrument Sans', 'Inter', system-ui, sans-serif;
-  }
+    html {
+        font-family: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+    }
 }
 
 /* 1. Global base layer */
@@ -130,10 +130,10 @@
 
 /* Hide scrollbars for horizontally scrollable containers */
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Safari and Chrome */
+    display: none; /* Safari and Chrome */
 }
