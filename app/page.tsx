@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
+import { H3 } from '@/components/ui/typography';
 import ProductFeatures from '@/components/Features/FeaturesGrid';
 import Header from '@/components/Header/Header';
 import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
-import { H3 } from '@/components/ui/typography';
 import '@/components/ui/css-variables.css';
+import BackgroundSVG from '@/components/Landing/BackgroundSVG';
 
 export const metadata: Metadata = {
     title: 'LEXRAG',
@@ -17,7 +18,8 @@ const LandingPage = () => {
         <div className="overflow-y-auto bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] min-h-screen">
             <Header className="px-[10%]" />
 
-            <main className="px-[10%]">
+            <main className="px-[10%] z-1 relative">
+                <BackgroundSVG />
                 <section>
                     <Hero />
                 </section>
