@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import AuthModal from '@/components/auth/AuthModal';
+import Link from 'next/link';
+import { getAppUrl } from '@/lib/app-config';
 import { ShinyButton } from '@/components/magicui/shiny-button';
 import '@/components/ui/css-variables.css';
 
 const SigninButton = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const signinUrl = `${getAppUrl()}/auth/signin`;
     return (
         <>
             <div className="flex items-center gap-8">

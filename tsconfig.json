@@ -8,12 +8,14 @@
         "forceConsistentCasingInFileNames": true,
         "noEmit": true,
         "esModuleInterop": true,
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
         "incremental": true,
+        "baseUrl": ".",
+        "allowSyntheticDefaultImports": true,
         "plugins": [
             {
                 "name": "next"
@@ -21,9 +23,10 @@
         ],
         "paths": {
             "@/*": ["./*"],
+            "@/components/*": ["./components/*"],
             "@/partials/*": ["./app/components/partials/*"]
         }
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-    "exclude": ["node_modules", "app/components"]
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/**/*"],
+    "exclude": ["node_modules"]
 }

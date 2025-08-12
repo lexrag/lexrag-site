@@ -33,17 +33,11 @@ const paragraphStyles = {
     sm: 'text-[12px] sm:text-[12px] md:text-[12px] font-normal leading-[130%] sm:leading-[130%] md:leading-[130%] tracking-[0]',
 };
 
-export const Heading: React.FC<HeadingProps> = ({ 
-    variant, 
-    children, 
-    className,
-    as,
-    style
-}) => {
+export const Heading: React.FC<HeadingProps> = ({ variant, children, className, as, style }) => {
     const Component = as || variant;
     const baseStyles = 'font-instrument-sans';
     const variantStyles = headingStyles[variant];
-    
+
     return (
         <Component className={cn(baseStyles, variantStyles, className)} style={style}>
             {children}
@@ -51,17 +45,11 @@ export const Heading: React.FC<HeadingProps> = ({
     );
 };
 
-export const Paragraph: React.FC<ParagraphProps> = ({ 
-    variant, 
-    children, 
-    className,
-    as = 'p',
-    style
-}) => {
+export const Paragraph: React.FC<ParagraphProps> = ({ variant, children, className, as = 'p', style }) => {
     const Component = as;
     const baseStyles = 'font-instrument-sans';
     const variantStyles = paragraphStyles[variant];
-    
+
     return (
         <Component className={cn(baseStyles, variantStyles, className)} style={style}>
             {children}
@@ -69,36 +57,20 @@ export const Paragraph: React.FC<ParagraphProps> = ({
     );
 };
 
-export const H1: React.FC<Omit<HeadingProps, 'variant'>> = (props) => (
-    <Heading variant="h1" {...props} />
-);
+export const H1: React.FC<Omit<HeadingProps, 'variant'>> = (props) => <Heading variant="h1" {...props} />;
 
-export const H2: React.FC<Omit<HeadingProps, 'variant'>> = (props) => (
-    <Heading variant="h2" {...props} />
-);
+export const H2: React.FC<Omit<HeadingProps, 'variant'>> = (props) => <Heading variant="h2" {...props} />;
 
-export const H3: React.FC<Omit<HeadingProps, 'variant'>> = (props) => (
-    <Heading variant="h3" {...props} />
-);
+export const H3: React.FC<Omit<HeadingProps, 'variant'>> = (props) => <Heading variant="h3" {...props} />;
 
-export const H4: React.FC<Omit<HeadingProps, 'variant'>> = (props) => (
-    <Heading variant="h4" {...props} />
-);
+export const H4: React.FC<Omit<HeadingProps, 'variant'>> = (props) => <Heading variant="h4" {...props} />;
 
-export const PXL: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => (
-    <Paragraph variant="xl" {...props} />
-);
+export const PXL: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => <Paragraph variant="xl" {...props} />;
 
-export const PLG: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => (
-    <Paragraph variant="lg" {...props} />
-);
+export const PLG: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => <Paragraph variant="lg" {...props} />;
 
-export const PBase: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => (
-    <Paragraph variant="base" {...props} />
-);
+export const PBase: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => <Paragraph variant="base" {...props} />;
 
-export const PSM: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => (
-    <Paragraph variant="sm" {...props} />
-);
+export const PSM: React.FC<Omit<ParagraphProps, 'variant'>> = (props) => <Paragraph variant="sm" {...props} />;
 
-export type { HeadingProps, ParagraphProps, HeadingVariant, ParagraphVariant }; 
+export type { HeadingProps, ParagraphProps, HeadingVariant, ParagraphVariant };

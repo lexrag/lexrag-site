@@ -63,11 +63,7 @@ const UseCases = () => {
                         </div>
 
                         <div className="pt-8 pb-4 pr-4 flex flex-col items-center justify-center text-left rounded-[24px] bg-gradient-to-b from-[#694AFF] to-[#D6B9FA] transition-colors">
-                            <img
-                                src="/media/images/cloud.svg"
-                                className="max-h-32 mb-6"
-                                alt="Flexible & Scalable"
-                            />
+                            <img src="/media/images/cloud.svg" className="max-h-32 mb-6" alt="Flexible & Scalable" />
                             <div className="flex flex-col gap-8">
                                 <div className="">
                                     <H4 className="text-white dark:text-white pl-8">Flexible & Scalable</H4>

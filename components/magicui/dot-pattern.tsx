@@ -3,6 +3,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { ClientOnly } from '@/components/util/ClientOnly';
 
 /**
  *  DotPattern Component Props
@@ -58,9 +59,10 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
  * - When glow is enabled, dots will animate with random delays and durations
  * - Uses Motion for animations
  * - Dots color can be controlled via the text color utility classes
+ * - Wrapped in ClientOnly to prevent hydration mismatches
  */
 
-export function DotPattern({
+function DotPatternInner({
     width = 16,
     height = 16,
     // x = 0,
@@ -149,5 +151,14 @@ export function DotPattern({
                 />
             ))}
         </svg>
+    );
+}
+
+// Export wrapped component to prevent hydration mismatches
+export function DotPattern(props: DotPatternProps) {
+    return (
+        <ClientOnly>
+            <DotPatternInner {...props} />
+        </ClientOnly>
     );
 }

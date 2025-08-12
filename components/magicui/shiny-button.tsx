@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, type MotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { ClientOnly } from '@/components/util/ClientOnly';
 import '@/components/ui/css-variables.css';
 
 const animationProps: MotionProps = {
@@ -31,7 +32,7 @@ interface ShinyButtonProps extends Omit<React.HTMLAttributes<HTMLElement>, keyof
     className?: string;
 }
 
-export const ShinyButton = React.forwardRef<HTMLButtonElement, ShinyButtonProps>(
+const ShinyButtonInner = React.forwardRef<HTMLButtonElement, ShinyButtonProps>(
     ({ children, className, ...props }, ref) => {
         return (
             <motion.button
@@ -66,5 +67,16 @@ export const ShinyButton = React.forwardRef<HTMLButtonElement, ShinyButtonProps>
         );
     },
 );
+
+ShinyButtonInner.displayName = 'ShinyButtonInner';
+
+// Export wrapped component to prevent hydration mismatches
+export const ShinyButton = React.forwardRef<HTMLButtonElement, ShinyButtonProps>((props, ref) => {
+    return (
+        <ClientOnly>
+            <ShinyButtonInner {...props} ref={ref} />
+        </ClientOnly>
+    );
+});
 
 ShinyButton.displayName = 'ShinyButton';

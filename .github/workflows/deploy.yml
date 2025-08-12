@@ -1,75 +1,76 @@
-name: Deploy Marketing Site to S3 + CloudFront
+name: Deploy Static Site
 
 on:
     push:
-        branches:
-            - main
-            - feature/temporary_landing
+        branches: ['main']
     workflow_dispatch:
-        # Manual trigger for deployment
+        # Allow manual trigger
 
-env:
-    AWS_REGION: ap-southeast-1
-    S3_BUCKET: lexrag-site
-    CLOUDFRONT_DISTRIBUTION_ID: E1KNCYS7QKEZ5Q
+concurrency:
+    group: prod-deploy
+    cancel-in-progress: true
 
 jobs:
     deploy:
-        name: Build & Deploy Marketing Site
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
-
         permissions:
             id-token: write
             contents: read
-
         steps:
-            - name: Checkout code
+            - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Setup Node.js
+            - name: Use Node 22
               uses: actions/setup-node@v4
               with:
-                  node-version: '22.x'
-                  cache: 'npm'
+                  node-version: '22'
 
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Run linting
-              run: npm run lint
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v2
+            - name: Configure AWS
+              uses: aws-actions/configure-aws-credentials@v4
               with:
                   role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-                  aws-region: ${{ env.AWS_REGION }}
+                  aws-region: ap-southeast-1
 
-            - name: Build static site
+            - name: Set env
               run: |
-                  npm run build
+                  echo "CLOUDFRONT_DISTRIBUTION_ID=E1KNCYS7QKEZ5Q" >> $GITHUB_ENV
+                  echo "S3_BUCKET=s3://lexrag-site" >> $GITHUB_ENV
+                  echo "CLOUDFRONT_DOMAIN=d26ppb9osin3vx.cloudfront.net" >> $GITHUB_ENV
+                  echo "NEXT_PUBLIC_BASE_URL=https://d26ppb9osin3vx.cloudfront.net" >> $GITHUB_ENV
+                  echo "NEXT_PUBLIC_BASE_PATH=" >> $GITHUB_ENV
+                  echo "NEXT_PUBLIC_APP_URL=https://app.lexrag.com" >> $GITHUB_ENV
+                  echo "NEXT_PUBLIC_SEGMENT_ENABLED=true" >> $GITHUB_ENV
+                  echo "NEXT_PUBLIC_SEGMENT_DEBUG=false" >> $GITHUB_ENV
+                  echo "NODE_ENV=production" >> $GITHUB_ENV
+
+            - name: Install dependencies
               env:
-                  NEXT_PUBLIC_APP_URL: https://app.lexrag.com
-                  NEXT_PUBLIC_BASE_URL: https://d26ppb9osin3vx.cloudfront.net
-                  NEXT_PUBLIC_SEGMENT_ENABLED: true
-                  NEXT_PUBLIC_SEGMENT_DEBUG: false
+                  NODE_ENV: ""
+              run: npm ci --include=dev
+
+            - name: Build
+              env:
+                  NEXT_PUBLIC_APP_URL: ${{ env.NEXT_PUBLIC_APP_URL }}
+                  NEXT_PUBLIC_BASE_URL: ${{ env.NEXT_PUBLIC_BASE_URL }}
+                  NEXT_PUBLIC_BASE_PATH: ${{ env.NEXT_PUBLIC_BASE_PATH }}
+                  NEXT_PUBLIC_SEGMENT_ENABLED: ${{ env.NEXT_PUBLIC_SEGMENT_ENABLED }}
                   NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${{ secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY }}
-                  NEXT_PUBLIC_ANALYTICS_VIA_BEACON: false
-                  NODE_ENV: production
+                  NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
+                  NODE_ENV: ${{ env.NODE_ENV }}
+              run: npm run build
 
-            - name: Deploy to S3
+            - name: Deploy
+              env:
+                  DISTRIBUTION_ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
+                  S3_BUCKET: ${{ env.S3_BUCKET }}
+                  NEXT_PUBLIC_APP_URL: ${{ env.NEXT_PUBLIC_APP_URL }}
+                  NEXT_PUBLIC_BASE_URL: ${{ env.NEXT_PUBLIC_BASE_URL }}
+                  NEXT_PUBLIC_BASE_PATH: ${{ env.NEXT_PUBLIC_BASE_PATH }}
+                  NEXT_PUBLIC_SEGMENT_ENABLED: ${{ env.NEXT_PUBLIC_SEGMENT_ENABLED }}
+                  NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${{ secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY }}
+                  NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
+                  NODE_ENV: ${{ env.NODE_ENV }}
               run: |
-                  aws s3 sync out/ s3://${{ env.S3_BUCKET }} --delete --cache-control "public, max-age=31536000, immutable"
-                  aws s3 cp out/ s3://${{ env.S3_BUCKET }} --recursive --exclude "*" --include "*.html" --cache-control "public, max-age=0, no-cache, no-store, must-revalidate"
-                  aws s3 cp out/ s3://${{ env.S3_BUCKET }} --recursive --exclude "*" --include "*.xml" --cache-control "public, max-age=0, no-cache, no-store, must-revalidate"
-
-            - name: Invalidate CloudFront cache
-              run: |
-                  aws cloudfront create-invalidation \
-                      --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
-                      --paths "/*"
-
-            - name: Deploy complete
-              run: |
-                  echo "✅ Deployment completed successfully!"
-                  echo "🌐 Site URL: https://d26ppb9osin3vx.cloudfront.net"
-                  echo "📊 CloudFront Distribution: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"
+                  chmod +x scripts/deploy.sh
+                  ./scripts/deploy.sh

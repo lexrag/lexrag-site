@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
+import { getAppUrl } from '@/lib/app-config';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import PageTitle from '@/components/Layout/PageTitle';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { getAppUrl } from '@/lib/app-config';
 
 interface FAQ {
     question: string;
@@ -17,63 +17,63 @@ export const metadata: Metadata = {
 
 const faqs: FAQ[] = [
     {
-        question: "What is LEXRAG and how does it work?",
-        answer: "LEXRAG is an AI-powered legal research and analysis platform that uses GraphRAG technology to provide intelligent insights from legal documents. Our system creates knowledge graphs from legal texts, enabling users to ask complex questions and receive accurate, contextual answers with source citations."
+        question: 'What is LEXRAG and how does it work?',
+        answer: 'LEXRAG is an AI-powered legal research and analysis platform that uses GraphRAG technology to provide intelligent insights from legal documents. Our system creates knowledge graphs from legal texts, enabling users to ask complex questions and receive accurate, contextual answers with source citations.',
     },
     {
-        question: "What types of legal documents can LEXRAG analyze?",
-        answer: "LEXRAG can analyze various legal documents including case law, legislation, regulations, contracts, legal opinions, and academic papers. Our system is designed to handle documents from multiple jurisdictions and legal systems."
+        question: 'What types of legal documents can LEXRAG analyze?',
+        answer: 'LEXRAG can analyze various legal documents including case law, legislation, regulations, contracts, legal opinions, and academic papers. Our system is designed to handle documents from multiple jurisdictions and legal systems.',
     },
     {
-        question: "Is LEXRAG suitable for law firms of all sizes?",
-        answer: "Yes, LEXRAG is designed to scale from solo practitioners to large law firms. Our platform offers different subscription tiers and can be customized to meet the specific needs of your practice."
+        question: 'Is LEXRAG suitable for law firms of all sizes?',
+        answer: 'Yes, LEXRAG is designed to scale from solo practitioners to large law firms. Our platform offers different subscription tiers and can be customized to meet the specific needs of your practice.',
     },
     {
-        question: "How accurate is the information provided by LEXRAG?",
-        answer: "LEXRAG provides highly accurate information by combining verified legal databases with AI analysis. Our system cross-references multiple sources and maintains transparency about the sources used for each response."
+        question: 'How accurate is the information provided by LEXRAG?',
+        answer: 'LEXRAG provides highly accurate information by combining verified legal databases with AI analysis. Our system cross-references multiple sources and maintains transparency about the sources used for each response.',
     },
     {
-        question: "Can LEXRAG be integrated with existing legal software?",
-        answer: "Yes, LEXRAG offers API integration capabilities and can be connected with popular legal practice management software, document management systems, and research platforms."
+        question: 'Can LEXRAG be integrated with existing legal software?',
+        answer: 'Yes, LEXRAG offers API integration capabilities and can be connected with popular legal practice management software, document management systems, and research platforms.',
     },
     {
-        question: "What jurisdictions does LEXRAG cover?",
-        answer: "LEXRAG currently focuses on Singaporean and Asian legal systems, with plans to expand to other jurisdictions. Our technology is designed to be adaptable to different legal frameworks."
+        question: 'What jurisdictions does LEXRAG cover?',
+        answer: 'LEXRAG currently focuses on Singaporean and Asian legal systems, with plans to expand to other jurisdictions. Our technology is designed to be adaptable to different legal frameworks.',
     },
     {
-        question: "How does LEXRAG ensure data security and privacy?",
-        answer: "We implement enterprise-grade security measures including data encryption, secure access controls, and compliance with international data protection regulations. All data processing follows strict privacy protocols."
+        question: 'How does LEXRAG ensure data security and privacy?',
+        answer: 'We implement enterprise-grade security measures including data encryption, secure access controls, and compliance with international data protection regulations. All data processing follows strict privacy protocols.',
     },
     {
-        question: "What kind of support does LEXRAG provide?",
-        answer: "LEXRAG offers comprehensive support including onboarding assistance, training programs, technical support, and dedicated account management for enterprise clients."
+        question: 'What kind of support does LEXRAG provide?',
+        answer: 'LEXRAG offers comprehensive support including onboarding assistance, training programs, technical support, and dedicated account management for enterprise clients.',
     },
     {
-        question: "How can I get started with LEXRAG?",
-        answer: function(appUrl: string) {
+        question: 'How can I get started with LEXRAG?',
+        answer: function (appUrl: string) {
             return `You can start by visiting our application at ${appUrl} to explore the platform. We offer free trials and demos to help you understand how LEXRAG can benefit your legal practice.`;
-        }
-    }
+        },
+    },
 ];
 
 const FAQPage = () => {
     const appUrl = getAppUrl();
-    
+
     return (
         <div className="overflow-y-auto">
             <Header className="" />
 
             <main className="pt-20">
                 <PageTitle title="Frequently Asked Questions" finalTitle="FAQ" />
-                
+
                 <section className="pb-20 px-[10%]">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-gray-900 dark:text-white">
                             Frequently Asked Questions
                         </h2>
                         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                            Find answers to common questions about LEXRAG, our technology, and how we can help 
-                            transform your legal practice.
+                            Find answers to common questions about LEXRAG, our technology, and how we can help transform
+                            your legal practice.
                         </p>
                     </div>
 
@@ -97,16 +97,16 @@ const FAQPage = () => {
                             Still have questions? We're here to help!
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <a 
+                            <a
                                 href={appUrl}
-                                target="_blank" 
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                             >
                                 Try LEXRAG
                             </a>
-                            <a 
-                                href="mailto:support@lexrag.com" 
+                            <a
+                                href="mailto:support@lexrag.com"
                                 className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
                             >
                                 Contact Support

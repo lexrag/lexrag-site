@@ -12,7 +12,7 @@
         "start": "next start --port 3001",
         "build:staging": "cp .env.staging .env.local && next build",
         "build:static": "next build && next export",
-        "deploy": "npm run build && aws s3 sync ./out/ s3://lexrag-site/ && aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'",
+        "deploy": "S3_BUCKET=s3://lexrag-site DISTRIBUTION_ID=$CLOUDFRONT_DISTRIBUTION_ID NEXT_PUBLIC_APP_URL=https://app.lexrag.com NEXT_PUBLIC_BASE_URL=https://d26ppb9osin3vx.cloudfront.net/ NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_SEGMENT_ENABLED=true NEXT_PUBLIC_SEGMENT_WRITE_KEY=8MIbGPXtsepP3Fw9BH1Kg27lp3dPTBWe NEXT_PUBLIC_SEGMENT_DEBUG=false NODE_ENV=production ./scripts/deploy.sh",
         "lint": "tsc --noEmit && eslint .",
         "format": "prettier --write ."
     },
@@ -49,6 +49,8 @@
         "@radix-ui/react-tooltip": "^1.2.7",
         "@remixicon/react": "^4.6.0",
         "@segment/analytics-next": "^1.81.1",
+        "@tailwindcss/postcss": "^4.1.8",
+        "autoprefixer": "^10.4.21",
         "class-variance-authority": "^0.7.1",
         "classnames": "^2.5.1",
         "clsx": "^2.1.1",
@@ -58,6 +60,7 @@
         "motion": "^12.23.11",
         "next": "15.3.3",
         "next-themes": "^0.4.6",
+        "postcss": "^8.5.4",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-hook-form": "^7.57.0",
@@ -65,26 +68,24 @@
         "react-wrap-balancer": "^1.1.1",
         "sonner": "^2.0.5",
         "tailwind-merge": "^3.3.1",
+        "tailwindcss": "^4.1.8",
         "tailwindcss-animate": "^1.0.7",
         "vaul": "^1.1.2",
         "zod": "^3.25.57"
     },
     "devDependencies": {
-        "@tailwindcss/postcss": "^4.1.8",
-        "@types/node": "^24.2.1",
+        "@types/node": "^20.19.10",
         "@types/react": "^19.1.7",
         "@types/react-dom": "^19.1.6",
-        "autoprefixer": "^10.4.21",
+        "case-sensitive-paths-webpack-plugin": "^2.4.0",
         "eslint": "^9.28.0",
         "eslint-config-next": "15.3.3",
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
-        "postcss": "^8.5.4",
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.12",
-        "tailwindcss": "^4.1.8",
-        "typescript": "^5.8.3"
+        "typescript": "^5.9.2"
     }
 }

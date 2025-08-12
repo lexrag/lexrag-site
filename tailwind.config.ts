@@ -33,8 +33,8 @@ const config: Config = {
                 '2xl': '1.5rem',
             },
             fontFamily: {
-                sans: ['var(--font-instrument-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
-                'instrument-sans': ['var(--font-instrument-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+                sans: ['Instrument Sans', 'Inter', 'system-ui', 'sans-serif'],
+                'instrument-sans': ['Instrument Sans', 'Inter', 'system-ui', 'sans-serif'],
             },
             keyframes: {
                 'accordion-down': {

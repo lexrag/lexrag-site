@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
+import { BarChart3, Database, FileText, Search, Shield, Users } from 'lucide-react';
+import { getAppUrl } from '@/lib/app-config';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import PageTitle from '@/components/Layout/PageTitle';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Database, BarChart3, FileText, Users, Shield } from 'lucide-react';
-import { getAppUrl } from '@/lib/app-config';
 
 export const metadata: Metadata = {
     title: 'Services - LEXRAG',
@@ -20,8 +20,8 @@ const services = [
             'Comprehensive case law analysis',
             'Legislative document research',
             'Regulatory compliance checking',
-            'Precedent identification'
-        ]
+            'Precedent identification',
+        ],
     },
     {
         title: 'Graph Database Solutions',
@@ -31,19 +31,14 @@ const services = [
             'Legal relationship mapping',
             'Data interconnection analysis',
             'Scalable graph architecture',
-            'Real-time data updates'
-        ]
+            'Real-time data updates',
+        ],
     },
     {
         title: 'AI-Powered Legal Insights',
         description: 'Machine learning and AI solutions for legal document analysis',
         icon: BarChart3,
-        features: [
-            'Document classification',
-            'Risk assessment',
-            'Compliance monitoring',
-            'Predictive analytics'
-        ]
+        features: ['Document classification', 'Risk assessment', 'Compliance monitoring', 'Predictive analytics'],
     },
     {
         title: 'Document Processing',
@@ -53,50 +48,40 @@ const services = [
             'OCR and text extraction',
             'Document structure analysis',
             'Metadata extraction',
-            'Content summarization'
-        ]
+            'Content summarization',
+        ],
     },
     {
         title: 'Legal Team Collaboration',
         description: 'Collaborative tools for legal teams and organizations',
         icon: Users,
-        features: [
-            'Shared workspace',
-            'Document sharing',
-            'Team analytics',
-            'Access control'
-        ]
+        features: ['Shared workspace', 'Document sharing', 'Team analytics', 'Access control'],
     },
     {
         title: 'Compliance & Security',
         description: 'Enterprise-grade security and compliance solutions',
         icon: Shield,
-        features: [
-            'Data encryption',
-            'Access auditing',
-            'Compliance reporting',
-            'GDPR compliance'
-        ]
-    }
+        features: ['Data encryption', 'Access auditing', 'Compliance reporting', 'GDPR compliance'],
+    },
 ];
 
 const ServicesPage = () => {
     const appUrl = getAppUrl();
-    
+
     return (
         <div className="overflow-y-auto">
             <Header className="" />
 
             <main className="pt-20">
                 <PageTitle title="Our Services" finalTitle="Services" />
-                
+
                 <section className="pb-20 px-[10%]">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-gray-900 dark:text-white">
                             Comprehensive Legal Technology Services
                         </h2>
                         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                            We provide end-to-end solutions for legal data analysis, research, and AI-powered insights 
+                            We provide end-to-end solutions for legal data analysis, research, and AI-powered insights
                             using cutting-edge GraphRAG technology.
                         </p>
                     </div>
@@ -111,14 +96,15 @@ const ServicesPage = () => {
                                         </div>
                                         <CardTitle className="text-xl">{service.title}</CardTitle>
                                     </div>
-                                    <CardDescription className="text-base">
-                                        {service.description}
-                                    </CardDescription>
+                                    <CardDescription className="text-base">{service.description}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <ul className="space-y-2">
                                         {service.features.map((feature, featureIndex) => (
-                                            <li key={featureIndex} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                            <li
+                                                key={featureIndex}
+                                                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                                            >
                                                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                                                 {feature}
                                             </li>
@@ -133,9 +119,9 @@ const ServicesPage = () => {
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
                             Ready to transform your legal practice with AI-powered insights?
                         </p>
-                        <a 
+                        <a
                             href={appUrl}
-                            target="_blank" 
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                         >

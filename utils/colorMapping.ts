@@ -25,7 +25,9 @@ export const badgeColorMapping: Record<
 };
 
 // Function to get badge color variant
-export const getBadgeColor = (value: string): 'primary' | 'success' | 'warning' | 'info' | 'destructive' | 'secondary' => {
+export const getBadgeColor = (
+    value: string,
+): 'primary' | 'success' | 'warning' | 'info' | 'destructive' | 'secondary' => {
     return badgeColorMapping[value] || 'secondary';
 };
 
@@ -40,9 +42,9 @@ export const getFeatureTextColor = (index: number): string => {
         'text-pink-600',
         'text-yellow-600',
         'text-teal-600',
-        'text-cyan-600'
+        'text-cyan-600',
     ];
-    
+
     return colors[index % colors.length];
 };
 

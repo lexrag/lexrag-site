@@ -16,7 +16,7 @@ const FeaturesPage = () => {
 
             <main className="pt-20">
                 <PageTitle title="Product Features" finalTitle="Features" />
-                
+
                 <section id="product-features" className="pb-20">
                     <div className="text-center mb-10">
                         <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-gray-900 dark:text-white">

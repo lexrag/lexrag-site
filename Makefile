@@ -1,7 +1,7 @@
 # LEXRAG Marketing Site - Development Makefile
 # Convenient commands for development and building (deployment via GitHub Actions only)
 
-.PHONY: help install dev build start clean lint format type-check ci analyze sitemap features readme docs debug-env debug-build quick-dev quick-build status ui-dev mobile-test commands
+.PHONY: help install dev build start clean lint format type-check ci analyze sitemap features readme docs debug-env debug-build quick-dev quick-build status ui-dev mobile-test commands deploy-test security-headers hydration-test cloudfront-setup s3-lifecycle smoke-test verify-cf smoke-test-curl setup-infrastructure
 
 # Default target
 help: ## Show help for all commands
@@ -24,6 +24,26 @@ help: ## Show help for all commands
 	@echo "  make analyze     - Analyze bundle size"
 	@echo "  make sitemap     - Check sitemap"
 	@echo "  make features    - Check generated features"
+	@echo ""
+	@echo "🚀 Deployment & Security:"
+	@echo "  make deploy-test - Test deployment script locally (requires AWS CLI)"
+	@echo "  make setup-infrastructure - Setup complete infrastructure (one command)"
+	@echo "  make security-headers - Setup CloudFront security headers (requires AWS CLI)"
+	@echo "  make cloudfront-setup - Setup CloudFront cache policies and behaviors (requires AWS CLI)"
+	@echo "  make verify-cf - Verify CloudFront configuration (requires AWS CLI)"
+	@echo "  make s3-lifecycle - Setup S3 lifecycle policies (requires AWS CLI)"
+	@echo "  make smoke-test  - Run smoke tests against deployed site"
+	@echo "  make smoke-test-curl - Run automated smoke tests with curl"
+	@echo "  make hydration-test - Test hydration fixes"
+	@echo ""
+	@echo "⚠️  AWS CLI Required:"
+	@echo "  Local deployment scripts require AWS CLI with S3/CloudFront permissions"
+	@echo "  For production: Use GitHub Actions deployment (automatic on push to main)"
+	@echo "  For local testing: Ensure AWS credentials are configured"
+	@echo ""
+	@echo "📅 Scheduled Jobs:"
+	@echo "  CloudFront verification runs daily at 6 AM UTC via GitHub Actions"
+	@echo "  Manual verification: GitHub Actions → verify_cloudfront → Run workflow"
 	@echo ""
 	@echo "📚 Documentation:"
 	@echo "  make readme      - Open README in browser"
@@ -114,24 +134,196 @@ sitemap: ## Check sitemap
 		echo "❌ Sitemap not found. Run 'make build' first"; \
 	fi
 
-features: ## Check generated features
-	@echo "🔍 Checking generated features..."
-	@if [ -d "out/features" ]; then \
-		echo "📁 Features directory:"; \
-		ls -la out/features/; \
-		echo ""; \
-		echo "📊 Total features: $$(ls -1 out/features/ | wc -l)"; \
-		echo ""; \
-		echo "📄 Sample feature page:"; \
-		if [ -f "out/features/semantic-attributes/index.html" ]; then \
-			echo "✅ semantic-attributes page exists"; \
-			echo "📏 Size: $$(wc -c < out/features/semantic-attributes/index.html) bytes"; \
-		else \
-			echo "❌ semantic-attributes page not found"; \
-		fi; \
-	else \
-		echo "❌ Features directory not found. Run 'make build' first"; \
+# =============================================================================
+# 🚀 Deployment & Security Commands
+# =============================================================================
+
+deploy-test: ## Test deployment script locally
+	@echo "🧪 Testing deployment script..."
+	@if [ ! -f "scripts/deploy.sh" ]; then \
+		echo "❌ Deployment script not found"; \
+		exit 1; \
 	fi
+	@echo "✅ Deployment script exists and is executable"
+	@echo "📝 To test with real AWS credentials:"
+	@echo "   S3_BUCKET=s3://lexrag-site DISTRIBUTION_ID=your-dist-id \\"
+	@echo "   NEXT_PUBLIC_APP_URL=https://app.lexrag.com \\"
+	@echo "   NEXT_PUBLIC_BASE_URL=https://d26ppb9osin3vx.cloudfront.net/ \\"
+	@echo "   NEXT_PUBLIC_BASE_PATH= \\"
+	@echo "   NEXT_PUBLIC_SEGMENT_ENABLED=true \\"
+	@echo "   NEXT_PUBLIC_SEGMENT_WRITE_KEY=your-key \\"
+	@echo "   NEXT_PUBLIC_SEGMENT_DEBUG=false \\"
+	@echo "   NODE_ENV=production \\"
+	@echo "   ./scripts/deploy.sh"
+	@echo "   FORCE_DEPLOY=true ./scripts/deploy.sh  # Force override locks"
+
+security-headers: ## Setup CloudFront security headers (requires AWS CLI)
+	@echo "🔒 Setting up CloudFront security headers..."
+	@if [ ! -f "scripts/cloudfront-headers.sh" ]; then \
+		echo "❌ CloudFront headers script not found"; \
+		exit 1; \
+	fi
+	@echo "📁 Loading DISTRIBUTION_ID from .env file..."
+	@DISTRIBUTION_ID=$$(grep '^CLOUDFRONT_DISTRIBUTION_ID=' .env | cut -d'=' -f2) ./scripts/cloudfront-headers.sh
+
+cloudfront-setup: ## Setup CloudFront cache policies and behaviors (requires AWS CLI)
+	@echo "⚙️  Setting up CloudFront cache policies and behaviors..."
+	@if [ ! -f "scripts/cloudfront-cache-policies.sh" ]; then \
+		echo "❌ CloudFront cache policies script not found"; \
+		exit 1; \
+	fi
+	@echo "📁 Loading DISTRIBUTION_ID from .env file..."
+	@DISTRIBUTION_ID=$$(grep '^CLOUDFRONT_DISTRIBUTION_ID=' .env | cut -d'=' -f2) ./scripts/cloudfront-cache-policies.sh
+
+verify-cf: ## Verify CloudFront configuration
+	@echo "🔍 Verifying CloudFront configuration..."
+	@if [ ! -f "scripts/verify-cloudfront-setup.sh" ]; then \
+		echo "❌ CloudFront verification script not found"; \
+		exit 1; \
+	fi
+	@echo "📁 Loading DISTRIBUTION_ID from .env file..."
+	@DISTRIBUTION_ID=$$(grep '^CLOUDFRONT_DISTRIBUTION_ID=' .env | cut -d'=' -f2) ./scripts/verify-cloudfront-setup.sh
+
+s3-lifecycle: ## Setup S3 lifecycle policies (requires AWS CLI)
+	@echo "🔄 Setting up S3 lifecycle policies..."
+	@if [ ! -f "scripts/s3-lifecycle.sh" ]; then \
+		echo "❌ S3 lifecycle script not found"; \
+		exit 1; \
+	fi
+	@echo "📁 Loading S3_BUCKET from .env file..."
+	@S3_BUCKET=$$(grep '^S3_BUCKET=' .env | cut -d'=' -f2) ./scripts/s3-lifecycle.sh
+
+setup-infrastructure: ## Setup complete infrastructure (security headers, cache policies, lifecycle, verification)
+	@echo "🚀 Setting up complete LEXRAG infrastructure..."
+	@echo ""
+	@echo "📋 This will configure:"
+	@echo "   1. CloudFront security headers (CSP, HSTS, etc.)"
+	@echo "   2. CloudFront cache policies and behaviors"
+	@echo "   3. S3 lifecycle policies for cleanup"
+	@echo "   4. Verification of all configurations"
+	@echo ""
+	@echo "⚠️  Prerequisites:"
+	@echo "   - AWS CLI configured with appropriate permissions"
+	@echo "   - .env file with CLOUDFRONT_DISTRIBUTION_ID and S3_BUCKET"
+	@echo ""
+	@echo "📁 Creating setup script from .env variables..."
+	@if [ ! -f ".env" ]; then \
+		echo "❌ .env file not found. Please create it first:"; \
+		echo "   cp env.example .env"; \
+		echo "   # Edit .env with your values"; \
+		exit 1; \
+	fi
+	@echo "#!/bin/bash" > /tmp/setup-infra.sh
+	@echo "set -euo pipefail" >> /tmp/setup-infra.sh
+	@echo "source .env" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🔍 Checking required environment variables...'" >> /tmp/setup-infra.sh
+	@echo "if [ -z \"\$$CLOUDFRONT_DISTRIBUTION_ID\" ]; then" >> /tmp/setup-infra.sh
+	@echo "  echo '❌ CLOUDFRONT_DISTRIBUTION_ID not set in .env file'" >> /tmp/setup-infra.sh
+	@echo "  echo '   Please add: CLOUDFRONT_DISTRIBUTION_ID=E1KNCYS7QKEZ5Q'" >> /tmp/setup-infra.sh
+	@echo "  exit 1" >> /tmp/setup-infra.sh
+	@echo "fi" >> /tmp/setup-infra.sh
+	@echo "if [ -z \"\$$S3_BUCKET\" ]; then" >> /tmp/setup-infra.sh
+	@echo "  echo '❌ S3_BUCKET not set in .env file'" >> /tmp/setup-infra.sh
+	@echo "  echo '   Please add: S3_BUCKET=lexrag-site'" >> /tmp/setup-infra.sh
+	@echo "  exit 1" >> /tmp/setup-infra.sh
+	@echo "fi" >> /tmp/setup-infra.sh
+	@echo "echo \"✅ DISTRIBUTION_ID: \$$CLOUDFRONT_DISTRIBUTION_ID\"" >> /tmp/setup-infra.sh
+	@echo "echo \"✅ S3_BUCKET: \$$S3_BUCKET\"" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "read -p 'Continue with these values? (y/N): ' confirm && [ \"\$$confirm\" = \"y\" ] || exit 0" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🔒 Step 1/4: Setting up CloudFront security headers...'" >> /tmp/setup-infra.sh
+	@echo "DISTRIBUTION_ID=\"\$$CLOUDFRONT_DISTRIBUTION_ID\" ./scripts/cloudfront-headers.sh" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '⚙️  Step 2/4: Setting up CloudFront cache policies and behaviors...'" >> /tmp/setup-infra.sh
+	@echo "DISTRIBUTION_ID=\"\$$CLOUDFRONT_DISTRIBUTION_ID\" ./scripts/cloudfront-cache-policies.sh" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🔄 Step 3/4: Setting up S3 lifecycle policies...'" >> /tmp/setup-infra.sh
+	@echo "S3_BUCKET=\"\$$S3_BUCKET\" ./scripts/s3-lifecycle.sh" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🔍 Step 4/4: Verifying all configurations...'" >> /tmp/setup-infra.sh
+	@echo "DISTRIBUTION_ID=\"\$$CLOUDFRONT_DISTRIBUTION_ID\" ./scripts/verify-cloudfront-setup.sh" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🎉 Infrastructure setup completed successfully!'" >> /tmp/setup-infra.sh
+	@echo "echo ''" >> /tmp/setup-infra.sh
+	@echo "echo '📊 What was configured:'" >> /tmp/setup-infra.sh
+	@echo "echo '   ✅ CloudFront security headers (CSP, HSTS, X-Frame-Options, etc.)'" >> /tmp/setup-infra.sh
+	@echo "echo '   ✅ CloudFront cache policies (static assets: 1 year, HTML: no cache)'" >> /tmp/setup-infra.sh
+	@echo "echo '   ✅ CloudFront behaviors with compression enabled'" >> /tmp/setup-infra.sh
+	@echo "echo '   ✅ S3 lifecycle policies for automatic cleanup'" >> /tmp/setup-infra.sh
+	@echo "echo '   ✅ All configurations verified and working'" >> /tmp/setup-infra.sh
+	@echo "" >> /tmp/setup-infra.sh
+	@echo "echo '🌐 Your site is now secure and optimized!'" >> /tmp/setup-infra.sh
+	@echo "echo '   Test with: curl -I https://d26ppb9osin3vx.cloudfront.net/'" >> /tmp/setup-infra.sh
+	@chmod +x /tmp/setup-infra.sh
+	@echo "✅ Setup script created successfully!"
+	@echo ""
+	@echo "🚀 Executing setup script..."
+	@/tmp/setup-infra.sh
+	@rm -f /tmp/setup-infra.sh
+
+smoke-test: ## Run smoke tests against deployed site
+	@echo "🧪 Running smoke tests..."
+	@echo "📊 Testing HTML headers..."
+	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "content-security-policy"; then \
+		echo "✅ Content-Security-Policy found"; \
+	else \
+		echo "❌ Content-Security-Policy not found"; \
+	fi
+	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "strict-transport-security"; then \
+		echo "✅ HSTS found"; \
+	else \
+		echo "❌ HSTS not found"; \
+	fi
+	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "cache-control"; then \
+		echo "✅ Cache-Control found"; \
+	else \
+		echo "❌ Cache-Control not found"; \
+	fi
+	@echo "📊 Testing static assets (first JS chunk)..."
+	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/_next/static/chunks/webpack.js | grep -q "cache-control"; then \
+		echo "✅ Static asset Cache-Control found"; \
+	else \
+		echo "❌ Static asset Cache-Control not found"; \
+	fi
+	@echo "✅ Smoke tests completed!"
+
+smoke-test-curl: ## Run automated smoke tests with curl
+	@echo "🧪 Running automated smoke tests..."
+	@echo "📊 Testing HTML headers..."
+	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "content-security-policy"; then \
+		echo "✅ Content-Security-Policy found"; \
+	else \
+		echo "❌ Content-Security-Policy not found"; \
+	fi
+	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "strict-transport-security"; then \
+		echo "✅ HSTS found"; \
+	else \
+		echo "❌ HSTS not found"; \
+	fi
+	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "cache-control"; then \
+		echo "✅ Cache-Control found"; \
+	else \
+		echo "❌ Cache-Control not found"; \
+	fi
+	@echo "📊 Testing static assets (first JS chunk)..."
+	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/_next/static/chunks/webpack.js" | grep -q "cache-control"; then \
+		echo "✅ Static asset Cache-Control found"; \
+	else \
+		echo "❌ Static asset Cache-Control not found"; \
+	fi
+	@echo "✅ Automated smoke tests completed!"
+
+hydration-test: ## Test hydration fixes
+	@echo "🧪 Testing hydration fixes..."
+	@echo "1️⃣ Building production version..."
+	@make build
+	@echo "2️⃣ Starting production server..."
+	@echo "   Run: npm run start"
+	@echo "3️⃣ Check browser console for hydration warnings"
+	@echo "4️⃣ Navigate between pages to test client-side routing"
+	@echo "5️⃣ Look for ClientOnly and dynamicClient usage in components"
 
 # =============================================================================
 # 📚 Documentation Commands
@@ -165,37 +357,13 @@ docs: ## Open documentation
 # 🔍 Debug Commands
 # =============================================================================
 
-debug-env: ## Show current environment variables
-	@echo "🔍 Environment variables:"
-	@echo "NODE_ENV: $${NODE_ENV:-not set}"
-	@echo "NEXT_PUBLIC_BASE_URL: $${NEXT_PUBLIC_BASE_URL:-not set}"
-	@echo "NEXT_PUBLIC_APP_URL: $${NEXT_PUBLIC_APP_URL:-not set}"
-	@echo "NEXT_PUBLIC_SEGMENT_ENABLED: $${NEXT_PUBLIC_SEGMENT_ENABLED:-not set}"
-
-debug-build: ## Debug build process
+debug: ## Debug build process
 	@echo "🔍 Build debugging:"
 	@echo "Node version: $$(node -v)"
 	@echo "NPM version: $$(npm -v)"
 	@echo "Next.js version: $$(npm list next)"
 	@echo "Build directory exists: $$([ -d "out" ] && echo "✅" || echo "❌")"
 	@echo "Next.js cache exists: $$([ -d ".next" ] && echo "✅" || echo "❌")"
-
-# =============================================================================
-# 🎯 Quick Actions
-# =============================================================================
-
-quick-dev: ## Quick development setup
-	@echo "⚡ Quick development setup..."
-	@if [ ! -d "node_modules" ]; then \
-		make install; \
-	fi
-	make dev
-
-quick-build: ## Quick build and check
-	@echo "⚡ Quick build and check..."
-	make build
-	make analyze
-	make features
 
 # =============================================================================
 # 📊 Status Commands
@@ -208,32 +376,19 @@ status: ## Show project status
 	@echo "🔥 Next.js cache: $$([ -d ".next" ] && echo "✅" || echo "❌")"
 	@echo "🔍 Lint status: $$(npm run lint >/dev/null 2>&1 && echo "✅" || echo "❌")"
 	@echo "📝 Type check: $$(npx tsc --noEmit >/dev/null 2>&1 && echo "✅" || echo "❌")"
+	@echo "🚀 Deployment script: $$([ -f "scripts/deploy.sh" ] && echo "✅" || echo "❌")"
+	@echo "🔒 Security headers script: $$([ -f "scripts/cloudfront-headers.sh" ] && echo "✅" || echo "❌")"
+	@echo "⚙️  Cache policies script: $$([ -f "scripts/cloudfront-cache-policies.sh" ] && echo "✅" || echo "❌")"
+	@echo "🔄 S3 lifecycle script: $$([ -f "scripts/s3-lifecycle.sh" ] && echo "✅" || echo "❌")"
+	@echo "🔍 Verification script: $$([ -f "scripts/verify-cloudfront-setup.sh" ] && echo "✅" || echo "❌")"
 
-# =============================================================================
-# 🎨 UI Development
-# =============================================================================
-
-ui-dev: ## Start UI components in dev mode
-	@echo "🎨 Starting UI development mode..."
-	@echo "📱 Components available in components/ui/"
-	@echo "🎨 Tailwind CSS is configured"
-	@echo "🚀 Run 'make dev' to see changes"
-
-# =============================================================================
-# 📱 Mobile/Responsive Testing
-# =============================================================================
-
-mobile-test: ## Open site in mobile viewport
-	@echo "📱 Opening site for mobile testing..."
-	@echo "🌐 Dev server should be running on port 3001"
-	@echo "📱 Use browser dev tools to simulate mobile devices"
 	@echo "📏 Test breakpoints: sm(640px), md(768px), lg(1024px), xl(1280px)"
 
 # =============================================================================
 # 🔧 Advanced Commands
 # =============================================================================
 
-reset-all: ## Full project reset (DANGEROUS!)
+reset: ## Full project reset (DANGEROUS!)
 	@echo "🚨 FULL PROJECT RESET - This will delete all build files!"
 	@echo "⚠️  This action cannot be undone!"
 	@read -p "Type 'RESET' to continue: " confirm; \

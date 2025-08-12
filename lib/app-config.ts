@@ -13,7 +13,7 @@ interface AppConfig {
 
 function getAppConfigInternal(): AppConfig {
     const isProduction = process.env.NODE_ENV === 'production';
-    
+
     return {
         appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com',
         appUrlDev: process.env.NEXT_PUBLIC_APP_URL_DEV || 'http://localhost:3000',

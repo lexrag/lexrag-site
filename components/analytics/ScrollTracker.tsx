@@ -20,8 +20,8 @@ export default function ScrollTracker() {
 
             // Track at 25%, 50%, 75%, and 100% scroll depths
             const trackingPoints = [25, 50, 75, 100];
-            
-            trackingPoints.forEach(point => {
+
+            trackingPoints.forEach((point) => {
                 if (scrollDepth >= point && lastTrackedDepth.current < point) {
                     trackScrollDepth(pathname, point, {
                         scroll_position: scrollTop,
@@ -38,7 +38,7 @@ export default function ScrollTracker() {
         scrollRef.current = 0;
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
