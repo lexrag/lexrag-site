@@ -46,14 +46,23 @@ jobs:
 
             - name: Install dependencies
               run: |
+                  echo "=== Node version ==="
+                  node --version
+                  echo "=== NPM version ==="
+                  npm --version
+                  echo "=== Installing dependencies ==="
                   npm ci
-                  # Debug: Check what's installed
                   echo "=== Installed packages ==="
                   npm list --depth=0
                   echo "=== Tailwind packages ==="
                   npm list | grep tailwind
                   echo "=== PostCSS packages ==="
                   npm list | grep postcss
+                  echo "=== Checking component paths ==="
+                  ls -la components/Header/
+                  ls -la components/Landing/
+                  ls -la components/Layout/
+                  ls -la components/ui/
 
             - name: Build
               env:
@@ -65,6 +74,13 @@ jobs:
                   NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
                   NODE_ENV: ${{ env.NODE_ENV }}
               run: |
+                  echo "=== Build environment ==="
+                  echo "NODE_ENV: $NODE_ENV"
+                  echo "=== Checking tsconfig paths ==="
+                  cat tsconfig.json | grep -A 10 "paths"
+                  echo "=== Checking component imports ==="
+                  grep -r "from '@/components" app/ --include="*.tsx" | head -10
+                  echo "=== Starting build ==="
                   npm run build
 
             - name: Deploy
