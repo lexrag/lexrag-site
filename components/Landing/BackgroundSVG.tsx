@@ -20,8 +20,8 @@ const BackgroundSVG = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 751 500"
                 className="
-          max-w-[210%] translate-x-[20%] translate-y-[60%]
-          sm:max-w-[140%] sm:translate-x-[20%] sm:translate-y-[60%]
+          max-w-[210%] translate-x-[20%] translate-y-[70%]
+          sm:max-w-[140%] sm:translate-x-[20%] sm:translate-y-[70%]
           md:max-w-[60%] md:translate-x-[90%] md:translate-y-[20%]
           lg:max-w-[60%] lg:translate-x-[100%] lg:translate-y-0
           xl:max-w-[50%] xl:translate-x-[115%] xl:translate-y-0
@@ -98,8 +98,8 @@ const BackgroundSVG = () => {
                 viewBox="0 0 751 500"
                 fill="none"
                 className="
-          max-w-[210%] translate-x-[30%] translate-y-[65%]
-          sm:max-w-[140%] sm:translate-x-[0%] sm:translate-y-[80%]
+          max-w-[210%] translate-x-[40%] translate-y-[65%]
+          sm:max-w-[140%] sm:translate-x-[40%] sm:translate-y-[65%]
           md:max-w-[60%] md:translate-x-[30%] md:translate-y-[-110%]
           lg:max-w-[60%] lg:translate-x-[60%] lg:translate-y-[-140]
           xl:max-w-[50%] xl:translate-x-[60%] xl:translate-y-[-140%]
