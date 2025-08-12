@@ -20,8 +20,8 @@ const BackgroundSVG = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 751 500"
                 className="
-          max-w-[210%] translate-x-[0%] translate-y-[80%]
-          sm:max-w-[140%] sm:translate-x-[0%] sm:translate-y-[50%]
+          max-w-[210%] translate-x-[20%] translate-y-[60%]
+          sm:max-w-[140%] sm:translate-x-[20%] sm:translate-y-[60%]
           md:max-w-[60%] md:translate-x-[90%] md:translate-y-[20%]
           lg:max-w-[60%] lg:translate-x-[100%] lg:translate-y-0
           xl:max-w-[50%] xl:translate-x-[115%] xl:translate-y-0

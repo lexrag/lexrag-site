@@ -13,10 +13,10 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         if (iconName === 'medal') {
             return (
                 <>
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <CheckmarkIcon />
                     </div>
-                    <img src="/media/images/medal.svg" className="md:hidden max-h-24 mb-4" alt={`${item.title}`} />
+                    <img src="/media/images/medal.svg" className="lg:hidden max-h-24 mb-4" alt={`${item.title}`} />
                 </>
             );
         }
@@ -24,10 +24,10 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         if (iconName === 'clock') {
             return (
                 <>
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <ClockIcon />
                     </div>
-                    <img src="/media/images/clock.svg" className="md:hidden max-h-24 mb-4" alt={`${item.title}`} />
+                    <img src="/media/images/clock.svg" className="lg:hidden max-h-24 mb-4" alt={`${item.title}`} />
                 </>
             );
         }
@@ -35,12 +35,12 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         if (iconName === 'magnifying-glass') {
             return (
                 <>
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <MagnifyingGlassIcon />
                     </div>
                     <img
                         src="/media/images/magnifying-glass.svg"
-                        className="md:hidden max-h-24 mb-4"
+                        className="lg:hidden max-h-24 mb-4"
                         alt={`${item.title}`}
                     />
                 </>
@@ -50,15 +50,13 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         if (iconName === 'box-scaled') {
             return (
                 <>
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <BoxScaledIcon />
                     </div>
-                    <img src="/media/images/box-scaled.svg" className="md:hidden max-h-24 mb-4" alt={`${item.title}`} />
+                    <img src="/media/images/box-scaled.svg" className="lg:hidden max-h-24 mb-4" alt={`${item.title}`} />
                 </>
             );
         }
-
-        // Default fallback for any other icon names
         return <img src={`/media/images/${iconName}.svg`} className="max-h-24 mb-4" alt={`${item.title}`} />;
     };
 
