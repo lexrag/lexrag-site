@@ -22,7 +22,7 @@ const badgeVariants = cva(
     {
         variants: {
             variant: {
-                primary: 'bg-primary text-primary-foreground',
+                primary: 'bg-stream-blue-light text-stream-blue',
                 secondary: 'bg-secondary text-secondary-foreground',
                 success: 'bg-green-500 text-white',
                 warning: 'bg-yellow-500 text-white',
@@ -41,8 +41,8 @@ const badgeVariants = cva(
                 true: 'opacity-50 pointer-events-none',
             },
             size: {
-                lg: 'rounded-md px-[0.5rem] h-7 min-w-7 gap-1.5 text-xs [&_svg]:size-3.5',
-                md: 'rounded-md px-[0.45rem] h-6 min-w-6 gap-1.5 text-xs [&_svg]:size-3.5 ',
+                lg: 'rounded-full px-[0.5rem] h-7 min-w-7 gap-1.5 text-xs [&_svg]:size-3.5',
+                md: 'rounded-full px-[0.45rem] h-6 min-w-6 gap-1.5 text-xs [&_svg]:size-3.5 ',
                 sm: 'rounded-sm px-[0.325rem] h-5 min-w-5 gap-1 text-[0.6875rem] leading-[0.75rem] [&_svg]:size-3',
                 xs: 'rounded-sm px-[0.25rem] h-4 min-w-4 gap-1 text-[0.625rem] leading-[0.5rem] [&_svg]:size-3',
             },
@@ -55,7 +55,7 @@ const badgeVariants = cva(
             {
                 variant: 'primary',
                 appearance: 'outline',
-                className: 'bg-sky-50 border-cyan-500 text-cyan-500',
+                className: 'bg-stream-blue-light border-stream-blue text-stream-blue',
             },
             {
                 variant: 'secondary',

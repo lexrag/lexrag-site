@@ -19,19 +19,22 @@ const FeatureParams = ({ rows, className }: FeatureParamsProps) => {
     if (!rows || rows.length === 0) return null;
 
     return (
-        <Card className={cn('w-full', className)}>
-            <CardHeader>
+        <Card className={cn('w-full bg-white border-cloud-tint', className)}>
+            <CardHeader className="border-cloud-tint">
                 <CardHeading>
-                    <CardTitle>Feature Parameters</CardTitle>
+                    <CardTitle className="text-midnight-core">Feature Parameters</CardTitle>
                 </CardHeading>
             </CardHeader>
 
             <CardContent className="flex flex-col divide-y divide-border px-4 py-1">
                 {rows.map((row, index) => (
-                    <div key={index} className="flex items-center justify-between py-3 gap-3">
+                    <div key={index} className="flex items-center justify-between py-3 gap-3 border-cloud-tint">
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center shrink-0 w-7 h-7">
-                                <i className={`ki-filled ${row.icon} text-base`} aria-hidden="true"></i>
+                            <div className="flex items-center justify-center shrink-0 rounded-full border border-midnight-core w-7 h-7">
+                                <i
+                                    className={`ki-filled ${row.icon} text-base text-midnight-core`}
+                                    aria-hidden="true"
+                                ></i>
                             </div>
                             <span className="text-sm text-muted-foreground">{row.label}</span>
                         </div>

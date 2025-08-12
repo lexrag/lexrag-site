@@ -27,11 +27,29 @@
     --input: oklch(92% 0.004 286.32); /* --color-zinc-200 */
     --ring: oklch(87.1% 0.006 286.286); /* --color-zinc-400 */
     --radius: 0.5rem;
+
+    /* === Brand palette (from spec) === */
+    /* Primary */
+    --axis-indigo: #593edc;
+    --phase-green: #06df72;
+    --midnight-core: #17245c;
+    --cloud-tint: #ebf0ff;
+
+    /* Base */
+    --bright-grey: #c3c3c3;
+    --dark-grey: #808080;
+    --black: #000000;
+    --white: #ffffff;
+
+    /* Secondary */
+    --stream-blue: #1bd3fc;
+    --ion-violet: #825bde;
+    --static-lilac: #bbbcfa;
 }
 
 .dark {
     /** Base Colors **/
-    --background: oklch(14.1% 0.005 285.823); /* --color-zinc-950 */
+    --background: var(--color-cloud-tint); /* --color-zinc-950 */
     --foreground: oklch(98.5% 0 0); /* --color-zinc-50 */
     --card: oklch(14.1% 0.005 285.823); /* --color-zinc-950 */
     --card-foreground: oklch(98.5% 0 0); /* --color-zinc-50 */
@@ -54,6 +72,21 @@
     --border: oklch(27.4% 0.006 286.033); /* --color-zinc-800 */
     --input: oklch(27.4% 0.006 286.033); /* --color-zinc-800 */
     --ring: oklch(27.4% 0.006 286.033); /* --color-zinc-600 */
+
+    --axis-indigo: #593edc;
+    --phase-green: #06df72;
+    --midnight-core: #17245c;
+    --cloud-tint: #ebf0ff;
+
+    --bright-grey: #c3c3c3;
+    --dark-grey: #808080;
+    --black: #000000;
+    --white: #ffffff;
+
+    --stream-blue: #1bd3fc;
+    --stream-blue-light: #f0fcff;
+    --ion-violet: #825bde;
+    --static-lilac: #bbbcfa;
 }
 
 /** Theme Setup **/
@@ -101,6 +134,25 @@
     --animate-collapsible-down: collapsible-down 0.2s ease-out;
     --animate-collapsible-up: collapsible-up 0.2s ease-out;
     --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+
+    /* === Expose brand palette as Tailwind color tokens === */
+    /* Primary */
+    --color-axis-indigo: var(--axis-indigo);
+    --color-phase-green: var(--phase-green);
+    --color-midnight-core: var(--midnight-core);
+    --color-cloud-tint: var(--cloud-tint);
+
+    /* Base */
+    --color-bright-grey: var(--bright-grey);
+    --color-dark-grey: var(--dark-grey);
+    --color-black: var(--black);
+    --color-white: var(--white);
+
+    /* Secondary */
+    --color-stream-blue: var(--stream-blue);
+    --color-stream-blue-light: var(--stream-blue-light);
+    --color-ion-violet: var(--ion-violet);
+    --color-static-lilac: var(--static-lilac);
 
     @keyframes accordion-down {
         from {

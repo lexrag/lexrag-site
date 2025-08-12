@@ -3,7 +3,8 @@ import FeaturePageTemplate from '@/components/Features/FeaturePageTemplate';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
-import PageTitle from '@/components/Layout/PageTitle';
+
+// import PageTitle from '@/components/Layout/PageTitle';
 
 export const dynamic = 'force-static';
 export const dynamicParams = false;
@@ -23,8 +24,8 @@ const FeatureDetailPage = () => {
         <div className="overflow-y-auto">
             <Header className="" />
 
-            <main className="pt-20">
-                <PageTitle title="Feature Details" finalTitle="Features" />
+            <main className="pt-12">
+                {/* <PageTitle title="Feature Details" finalTitle="Features" /> */}
 
                 <section className="pb-20">
                     <FeaturePageTemplate />

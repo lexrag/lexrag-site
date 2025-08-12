@@ -101,6 +101,7 @@ jspm_packages/
 
 # Temporary folders
 tmp/
+.tmp/
 temp/
 
 # Editor directories and files
