@@ -45,64 +45,9 @@ jobs:
                   echo "NODE_ENV=production" >> $GITHUB_ENV
 
             - name: Install dependencies
-              run: |
-                  echo "=== Node version ==="
-                  node --version
-                  echo "=== NPM version ==="
-                  npm --version
-                  echo "=== Installing dependencies (including dev) ==="
-                  NODE_ENV= npm ci --include=dev
-                  echo "=== Installed packages ==="
-                  npm list --depth=0 | cat
-                  echo "=== Tailwind packages ==="
-                  npm list | grep tailwind || true
-                  echo "=== PostCSS packages ==="
-                  npm list | grep postcss || true
-                  echo "=== Checking component paths ==="
-                  ls -la components/Header/ || true
-                  ls -la components/Landing/ || true
-                  ls -la components/Layout/ || true
-                  ls -la components/ui/ || true
-                  echo "=== Checking tsconfig paths ==="
-                  cat tsconfig.json | grep -A 10 "paths" || true
-                  echo "=== Checking actual imports in files ==="
-                  grep -R "from '@/components" app/ --include="*.tsx" | head -10 || true
-                  echo "=== Listing first component files ==="
-                  find components -name "*.tsx" | head -20 || true
-
-            - name: Assert case-sensitive paths (prebuild)
-              run: |
-                  echo "=== Git-tracked files (case-sensitive) ==="
-                  git ls-tree -r --name-only HEAD | egrep -n '^(components/(Header|Landing|Layout|ui)/|app/)' | head -200 || true
-
-                  echo "=== Check exact import targets ==="
-                  for p in \
-                    "components/Header/Header" \
-                    "components/Landing/Footer" \
-                    "components/Layout/CardFlash" \
-                    "components/Layout/PageTitle" \
-                    "components/ui/card"; do
-                    echo "--- $p.* / $p/index.* ---"
-                    git ls-tree -r --name-only HEAD | egrep -n "^${p}\\.(tsx|ts|jsx|js)$|^${p}/index\\.(tsx|ts|jsx|js)$" || echo "!! MISSING: $p"
-                  done
-
-                  echo "=== Case of directories as seen by FS ==="
-                  ls -ld components/* || true
-
-            - name: Hard fail if any import target is missing
-              run: |
-                  MISSING=0
-                  for p in \
-                    "components/Header/Header" \
-                    "components/Landing/Footer" \
-                    "components/Layout/CardFlash" \
-                    "components/Layout/PageTitle" \
-                    "components/ui/card"; do
-                    if ! git ls-tree -r --name-only HEAD | egrep -q "^${p}\\.(tsx|ts|jsx|js)$|^${p}/index\\.(tsx|ts|jsx|js)$"; then
-                      echo "❌ Missing: $p"; MISSING=1;
-                    fi
-                  done
-                  exit $MISSING
+              env:
+                  NODE_ENV: ""
+              run: npm ci --include=dev
 
             - name: Build
               env:
@@ -113,11 +58,7 @@ jobs:
                   NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${{ secrets.NEXT_PUBLIC_SEGMENT_WRITE_KEY }}
                   NEXT_PUBLIC_SEGMENT_DEBUG: ${{ env.NEXT_PUBLIC_SEGMENT_DEBUG }}
                   NODE_ENV: ${{ env.NODE_ENV }}
-              run: |
-                  echo "=== Build environment ==="
-                  echo "NODE_ENV: $NODE_ENV"
-                  echo "=== Starting build ==="
-                  npm run build
+              run: npm run build
 
             - name: Deploy
               env:
@@ -133,9 +74,3 @@ jobs:
               run: |
                   chmod +x scripts/deploy.sh
                   ./scripts/deploy.sh
-
-            - name: Wait for CloudFront propagation
-              run: |
-                  echo "Waiting for CloudFront changes to propagate..."
-                  sleep 60
-                  echo "✅ Deployment completed"

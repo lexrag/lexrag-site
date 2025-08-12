@@ -1,7 +1,7 @@
 # LEXRAG Marketing Site - Development Makefile
 # Convenient commands for development and building (deployment via GitHub Actions only)
 
-.PHONY: help install dev build start clean lint format type-check ci analyze sitemap features readme docs debug-env debug-build quick-dev quick-build status ui-dev mobile-test commands deploy-test security-headers hydration-test cloudfront-setup s3-lifecycle smoke-test verify-cloudfront smoke-test-curl setup-infrastructure
+.PHONY: help install dev build start clean lint format type-check ci analyze sitemap features readme docs debug-env debug-build quick-dev quick-build status ui-dev mobile-test commands deploy-test security-headers hydration-test cloudfront-setup s3-lifecycle smoke-test verify-cf smoke-test-curl setup-infrastructure
 
 # Default target
 help: ## Show help for all commands
@@ -30,7 +30,7 @@ help: ## Show help for all commands
 	@echo "  make setup-infrastructure - Setup complete infrastructure (one command)"
 	@echo "  make security-headers - Setup CloudFront security headers (requires AWS CLI)"
 	@echo "  make cloudfront-setup - Setup CloudFront cache policies and behaviors (requires AWS CLI)"
-	@echo "  make verify-cloudfront - Verify CloudFront configuration (requires AWS CLI)"
+	@echo "  make verify-cf - Verify CloudFront configuration (requires AWS CLI)"
 	@echo "  make s3-lifecycle - Setup S3 lifecycle policies (requires AWS CLI)"
 	@echo "  make smoke-test  - Run smoke tests against deployed site"
 	@echo "  make smoke-test-curl - Run automated smoke tests with curl"
@@ -175,7 +175,7 @@ cloudfront-setup: ## Setup CloudFront cache policies and behaviors (requires AWS
 	@echo "📁 Loading DISTRIBUTION_ID from .env file..."
 	@DISTRIBUTION_ID=$$(grep '^CLOUDFRONT_DISTRIBUTION_ID=' .env | cut -d'=' -f2) ./scripts/cloudfront-cache-policies.sh
 
-verify-cloudfront: ## Verify CloudFront configuration
+verify-cf: ## Verify CloudFront configuration
 	@echo "🔍 Verifying CloudFront configuration..."
 	@if [ ! -f "scripts/verify-cloudfront-setup.sh" ]; then \
 		echo "❌ CloudFront verification script not found"; \

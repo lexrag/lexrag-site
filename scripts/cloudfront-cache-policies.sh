@@ -4,6 +4,13 @@ set -euo pipefail
 
 : "${DISTRIBUTION_ID:?DISTRIBUTION_ID is required}"
 
+# Load existing response headers policy id if available
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+RESPONSE_HEADERS_POLICY_ID=""
+if [ -f ""${SCRIPT_DIR}"/.cloudfront-policy-id" ]; then
+  RESPONSE_HEADERS_POLICY_ID=$(cat ""${SCRIPT_DIR}"/.cloudfront-policy-id")
+fi
+
 # Create temporary directory
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -85,15 +92,6 @@ echo "✅ HTML cache policy created with ID: $HTML_CACHE_POLICY_ID"
 
 # --- Get Response Headers Policy ID ---
 echo "Getting Response Headers Policy ID..."
-# Read policy ID from file created by cloudfront-headers.sh
-if [ -f ".cloudfront-policy-id" ]; then
-  RESPONSE_HEADERS_POLICY_ID=$(cat .cloudfront-policy-id)
-  echo "✅ Found Response Headers Policy ID from file: $RESPONSE_HEADERS_POLICY_ID"
-else
-  echo "❌ Response Headers Policy ID file not found. Run ./scripts/cloudfront-headers.sh first."
-  exit 1
-fi
-
 if [ -z "$RESPONSE_HEADERS_POLICY_ID" ]; then
   echo "❌ Response Headers Policy ID is empty. Run ./scripts/cloudfront-headers.sh first."
   exit 1
