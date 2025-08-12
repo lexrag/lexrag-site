@@ -65,13 +65,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# --- Phase 0: Build ---
-echo "Building static site..."
-npm ci
-npm run build
-# If you keep 'output: export' you get 'out/' directly from next build
-# Otherwise uncomment:
-# npm run build:static
+# --- Phase 0: Use pre-built output from CI ---
+echo "Using prebuilt static site from '$BUILD_DIR'..."
+if [ ! -d "$BUILD_DIR" ]; then
+  echo "Error: build directory '$BUILD_DIR' not found. Ensure 'npm run build' ran in CI before deploy." >&2
+  exit 1
+fi
 
 # --- Phase A: Upload hashed static assets first (no delete) ---
 echo "Uploading hashed static assets..."
