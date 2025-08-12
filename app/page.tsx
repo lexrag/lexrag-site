@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const LandingPage = () => {
     return (
         <div className="overflow-y-auto overflow-x-hidden bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] min-h-screen">
-            <Header className="px-[10%]" />
+            <Header className="" />
 
             <main className="px-[10%] z-1 relative">
                 <BackgroundSVG />
