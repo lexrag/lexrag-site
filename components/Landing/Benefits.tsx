@@ -85,23 +85,23 @@ const Benefits = () => {
                 <div
                     ref={scrollContainerRef}
                     onScroll={updateScrollButtons}
-                    className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+                    className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {benefits.map((item, index) => (
-                        <div key={index} className="flex-shrink-0 w-80 snap-start">
+                        <div key={index} className="flex-shrink-0 w-72 md:w-80 snap-start">
                             <BenefitsCard item={item} />
                         </div>
                     ))}
                 </div>
 
-                <div className="flex justify-center items-center mb-6">
-                    <div className="flex gap-2">
+                <div className="flex justify-center items-center mt-4 mb-6">
+                    <div className="flex gap-3">
                         <button
                             onClick={() => scroll('left')}
                             disabled={!canScrollLeft}
-                            className={`p-2 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
-                                canScrollLeft ? 'bg-white/20' : 'bg-white/10 cursor-not-allowed'
+                            className={`p-3 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
+                                canScrollLeft ? 'bg-white/20 hover:bg-white/30' : 'bg-white/10 cursor-not-allowed'
                             }`}
                             aria-label="Scroll left"
                         >
@@ -110,8 +110,8 @@ const Benefits = () => {
                         <button
                             onClick={() => scroll('right')}
                             disabled={!canScrollRight}
-                            className={`p-2 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
-                                canScrollRight ? 'bg-white/20' : 'bg-white/10 cursor-not-allowed'
+                            className={`p-3 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
+                                canScrollRight ? 'bg-white/20 hover:bg-white/30' : 'bg-white/10 cursor-not-allowed'
                             }`}
                             aria-label="Scroll right"
                         >
