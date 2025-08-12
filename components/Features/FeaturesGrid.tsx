@@ -37,11 +37,7 @@ const ProductFeatures = ({
                         const colors = getCategoryColorScheme(feat.category);
 
                         return (
-                            <a
-                                key={index}
-                                href={feat.link}
-                                className="group block"
-                            >
+                            <a key={index} href={feat.link} className="group block">
                                 <div
                                     className={cn(
                                         'relative overflow-hidden flex flex-col gap-5 p-5 lg:p-5 rounded-xl items-center justify-around',
@@ -75,38 +71,24 @@ const ProductFeatures = ({
 
                                         {showSideBadges && (
                                             <div className="flex items-center gap-2">
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="text-xs px-2 py-1"
-                                                >
+                                                <Badge variant="secondary" className="text-xs px-2 py-1">
                                                     {feat.category}
                                                 </Badge>
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="text-xs px-2 py-1"
-                                                >
+                                                <Badge variant="secondary" className="text-xs px-2 py-1">
                                                     {feat.plan}
                                                 </Badge>
                                             </div>
                                         )}
                                     </div>
 
-                                    {showDescription && (
-                                        <p className="text-2sm text-gray-500">{feat.description}</p>
-                                    )}
+                                    {showDescription && <p className="text-2sm text-gray-500">{feat.description}</p>}
 
                                     {showBottomBadges && (
                                         <div className="flex w-full items-center justify-start gap-3">
-                                            <Badge
-                                                variant="secondary"
-                                                className="text-xs px-2 py-1"
-                                            >
+                                            <Badge variant="secondary" className="text-xs px-2 py-1">
                                                 {feat.category}
                                             </Badge>
-                                            <Badge
-                                                variant="secondary"
-                                                className="text-xs px-2 py-1"
-                                            >
+                                            <Badge variant="secondary" className="text-xs px-2 py-1">
                                                 {feat.plan}
                                             </Badge>
                                         </div>
@@ -118,9 +100,7 @@ const ProductFeatures = ({
                 </div>
             </div>
             <div className="text-center mt-8">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Show All
-                </Button>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Show All</Button>
             </div>
         </div>
     );

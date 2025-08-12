@@ -1,29 +1,29 @@
 :root {
-  /* Brand Colors */
-  --Brand-Primary-Phase-Green: #06df72;
-  --Brand-Primary-Midnight-Core: #17245c;
-  --Brand-Primary-Axis-Indigo: #593edc;
-  
-  /* Primary color for components */
-  --primary: hsl(var(--primary));
-  
-  /* Layout variables */
-  --header-height: var(--header-height-default);
-  --sidebar-width: 280px;
-  --page-bg: #ffffff;
-  --page-bg-dark: #0f0f0f;
-  
-  /* Scrollbar and viewport variables */
-  --removed-body-scroll-bar-size: 0px;
-  --vh: 1vh;
-  
-  /* Radix UI variables */
-  --radix-select-trigger-height: 40px;
-  --radix-select-trigger-width: 200px;
-  --radix-navigation-menu-viewport-height: 300px;
-  --radix-navigation-menu-viewport-width: 400px;
-  
-  /* Input and scrollbar variables */
-  --input: hsl(var(--input));
-  --scrollbar-thumb-color: var(--input);
-} 
+    /* Brand Colors */
+    --Brand-Primary-Phase-Green: #06df72;
+    --Brand-Primary-Midnight-Core: #17245c;
+    --Brand-Primary-Axis-Indigo: #593edc;
+
+    /* Primary color for components */
+    --primary: hsl(var(--primary));
+
+    /* Layout variables */
+    --header-height: var(--header-height-default);
+    --sidebar-width: 280px;
+    --page-bg: #ffffff;
+    --page-bg-dark: #0f0f0f;
+
+    /* Scrollbar and viewport variables */
+    --removed-body-scroll-bar-size: 0px;
+    --vh: 1vh;
+
+    /* Radix UI variables */
+    --radix-select-trigger-height: 40px;
+    --radix-select-trigger-width: 200px;
+    --radix-navigation-menu-viewport-height: 300px;
+    --radix-navigation-menu-viewport-width: 400px;
+
+    /* Input and scrollbar variables */
+    --input: hsl(var(--input));
+    --scrollbar-thumb-color: var(--input);
+}

@@ -23,17 +23,21 @@ export function MegaMenu() {
         <NavigationMenu>
             <NavigationMenuList className="gap-0">
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger
-                        className={cn(linkClass, 'relative')}
-                    >
-                        Menu
-                    </NavigationMenuTrigger>
+                    <NavigationMenuTrigger className={cn(linkClass, 'relative')}>Menu</NavigationMenuTrigger>
                     <NavigationMenuContent className="p-4">
                         <div className="grid grid-cols-1 gap-2">
-                            <Link href="/features" className="text-sm hover:text-primary">Features</Link>
-                            <Link href="/services" className="text-sm hover:text-primary">Services</Link>
-                            <Link href="/technology/graphrag" className="text-sm hover:text-primary">Technology</Link>
-                            <Link href="/company" className="text-sm hover:text-primary">Company</Link>
+                            <Link href="/features" className="text-sm hover:text-primary">
+                                Features
+                            </Link>
+                            <Link href="/services" className="text-sm hover:text-primary">
+                                Services
+                            </Link>
+                            <Link href="/technology/graphrag" className="text-sm hover:text-primary">
+                                Technology
+                            </Link>
+                            <Link href="/company" className="text-sm hover:text-primary">
+                                Company
+                            </Link>
                         </div>
                     </NavigationMenuContent>
                 </NavigationMenuItem>

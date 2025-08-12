@@ -1,9 +1,9 @@
 'use client';
 
-import CardFlash from '@/components/Layout/CardFlash';
-import PageTitle from '@/components/Layout/PageTitle';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
+import CardFlash from '@/components/Layout/CardFlash';
+import PageTitle from '@/components/Layout/PageTitle';
 
 const Article = () => {
     return (
@@ -16,9 +16,7 @@ const Article = () => {
                 <div className="px-[15%]">
                     <div className="flex flex-col gap-5 lg:gap-8">
                         <div className="flex flex-col gap-5 lg:gap-8">
-                            <div
-                                className="flex flex-col h-[700px] overflow-y-auto gap-5 pr-2 scrollbar-hide"
-                            >
+                            <div className="flex flex-col h-[700px] overflow-y-auto gap-5 pr-2 scrollbar-hide">
                                 <h2
                                     className="text-2xl font-semibold text-center text-gray-900 mb-5"
                                     suppressHydrationWarning
@@ -78,7 +76,7 @@ const Article = () => {
                                             'GraphRAG has already been successfully implemented by LEXRAG, as demonstrated by practical use cases featured on our website. Specific applications include handling case law, preparing legal opinions, and supporting legal research.',
                                             'The technology enables rapid and precise analysis of the interconnections among precedents, legislative acts, and regulatory documents, resulting in well-founded legal opinions. Automated analytical reports significantly enhance the credibility of the outcomes.',
                                             'Furthermore, tools for both academic and practical research enable the visualization of complex legal relationships in Singapore and other Asian jurisdictions. The integration of GraphRAG ensures that every response is not only precise but also based on up-to-date, structured information—a crucial factor for market success.',
-                                            'By leveraging GraphRAG, LEXRAG operates effectively in a rapidly changing legislative landscape, outpacing competitors who rely on outdated fine-tuning methods. This adoption guarantees unmatched accuracy, transparency, and responsiveness in legal analysis, solidifying LEXRAG\'s leadership in innovative legal technologies.',
+                                            "By leveraging GraphRAG, LEXRAG operates effectively in a rapidly changing legislative landscape, outpacing competitors who rely on outdated fine-tuning methods. This adoption guarantees unmatched accuracy, transparency, and responsiveness in legal analysis, solidifying LEXRAG's leadership in innovative legal technologies.",
                                         ]}
                                     />
                                 </div>

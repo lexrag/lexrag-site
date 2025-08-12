@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Linkedin, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { H4 } from '@/components/ui/typography';
 import { Logo } from '@/components/Header/Logo';
 import { WordRotate } from '@/components/magicui/word-rotate';
-import { H4 } from '@/components/ui/typography';
+import { ClientOnly } from '@/components/util/ClientOnly';
 import '@/components/ui/css-variables.css';
 
-const Footer = () => {
+const FooterInner = () => {
     const currentYear = new Date().getFullYear();
     const links = {
         product: [
@@ -44,7 +45,7 @@ const Footer = () => {
                             viewport={{ once: true }}
                         >
                             <div className="flex items-center mb-3">
-                                <Logo variant='white' />
+                                <Logo variant="white" />
                             </div>
                             <div className="italic font-medium text-white mb-4">
                                 <WordRotate
@@ -80,16 +81,11 @@ const Footer = () => {
                                     transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
                                     viewport={{ once: true }}
                                 >
-                                    <H4 className="font-medium mb-4 capitalize text-white">
-                                        {category}
-                                    </H4>
+                                    <H4 className="font-medium mb-4 capitalize text-white">{category}</H4>
                                     <ul className="text-base space-y-2">
                                         {items.map((item, index) => (
                                             <li key={index}>
-                                                <Link
-                                                    href={item.href}
-                                                    className="text-white hover:text-emerald-500"
-                                                >
+                                                <Link href={item.href} className="text-white hover:text-emerald-500">
                                                     {item.label}
                                                 </Link>
                                             </li>
@@ -106,13 +102,20 @@ const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="flex order-2 md:order-1 gap-2 font-normal">
                         <span className="text-white">© {currentYear}</span>
-                        <span className="text-white">
-                            LEXRAG PTE. LTD. All rights reserved
-                        </span>
+                        <span className="text-white">LEXRAG PTE. LTD. All rights reserved</span>
                     </div>
                 </div>
             </div>
         </footer>
+    );
+};
+
+// Export wrapped component to prevent hydration mismatches
+const Footer = () => {
+    return (
+        <ClientOnly>
+            <FooterInner />
+        </ClientOnly>
     );
 };
 

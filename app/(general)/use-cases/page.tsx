@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
-import PageTitle from '@/components/Layout/PageTitle';
 import UseCases from '@/components/Landing/UseCases';
+import PageTitle from '@/components/Layout/PageTitle';
 
 export const metadata: Metadata = {
     title: 'Use Cases - LEXRAG',
@@ -16,7 +16,7 @@ const UseCasesPage = () => {
 
             <main className="pt-20">
                 <PageTitle title="Use Cases" finalTitle="Use Cases" />
-                
+
                 <section id="use-cases" className="pb-20">
                     <UseCases />
                 </section>

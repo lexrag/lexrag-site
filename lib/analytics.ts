@@ -488,12 +488,16 @@ export const track_error_occurred = (p: ErrorOccurredProps) => track('error_occu
 export const track_help_requested = (p: HelpRequestedProps) => track('help_requested', p);
 
 // Search events
-export const track_search_performed = debounce((p: SearchPerformedProps) => track('search_performed', {
-    ...p,
-    // comments in code strictly in English
-    // Clip oversize query to keep payload small and safe
-    query: typeof p.query === 'string' && p.query.length > 500 ? p.query.slice(0, 500) : p.query,
-}), 700);
+export const track_search_performed = debounce(
+    (p: SearchPerformedProps) =>
+        track('search_performed', {
+            ...p,
+            // comments in code strictly in English
+            // Clip oversize query to keep payload small and safe
+            query: typeof p.query === 'string' && p.query.length > 500 ? p.query.slice(0, 500) : p.query,
+        }),
+    700,
+);
 
 // File events
 export const track_file_uploaded = (p: FileUploadedProps) => track('file_uploaded', p);
