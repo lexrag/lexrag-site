@@ -1,7 +1,27 @@
 import * as React from 'react';
 
-const ClockIcon = () => (
-    <svg width={114} height={120} viewBox="0 0 114 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+const ClockIcon = ({ className = '', ...props }) => (
+    <svg 
+        width={114} 
+        height={120} 
+        viewBox="0 0 114 120" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className={`transition-all duration-300 ${className}`}
+        {...props}
+    >
+        <style>
+            {`
+                .clock-hand {
+                    transition: stroke 0.3s ease;
+                }
+                
+                svg:hover .clock-hand {
+                    stroke: green;
+                }
+            `}
+        </style>
+        
         <mask id="path-1-inside-1_3999_1364" fill="white">
             <path d="M61.7119 0C65.4674 0 68.5126 3.04437 68.5127 6.7998V11.9775C92.1836 17.9929 109.693 39.4458 109.693 64.9883C109.693 95.1942 85.2059 119.681 55 119.681C24.7942 119.68 0.307771 95.1941 0.307617 64.9883C0.307617 39.446 17.8167 17.9932 41.4873 11.9775V6.7998C41.4874 3.04437 44.5326 0 48.2881 0H61.7119Z" />
         </mask>
@@ -25,6 +45,7 @@ const ClockIcon = () => (
                 strokeWidth={8.16006}
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="clock-hand"
             />
         </g>
         <defs>

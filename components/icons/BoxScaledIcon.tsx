@@ -1,7 +1,27 @@
 import * as React from 'react';
 
-const BoxScaledIcon = () => (
-    <svg width={124} height={138} viewBox="0 0 124 138" fill="none" xmlns="http://www.w3.org/2000/svg">
+const BoxScaledIcon = ({ className = '', ...props }) => (
+    <svg 
+        width={124} 
+        height={138} 
+        viewBox="0 0 124 138" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className={`transition-all duration-300 ${className}`}
+        {...props}
+    >
+        <style>
+            {`
+                .box-faces {
+                    transition: fill 0.3s ease;
+                }
+                
+                svg:hover .box-faces {
+                    fill: purple;
+                }
+            `}
+        </style>
+        
         <path
             d="M0.96875 104.188V33.8049L62.2885 1.15918L123.118 33.8049V104.188L62.2885 137.16L0.96875 104.188Z"
             fill="url(#paint0_linear_3999_1420)"
@@ -9,12 +29,22 @@ const BoxScaledIcon = () => (
             strokeWidth={0.680005}
             strokeMiterlimit={10}
         />
-        <path d="M62.0123 107.158V69.0023L28.8936 49.9873V88.0802L62.0123 107.158Z" fill="white" />
-        <path d="M62.0117 107.158V69.0023L95.1934 49.9873V88.0802L62.0117 107.158Z" fill="white" fillOpacity={0.42} />
+        <path 
+            d="M62.0123 107.158V69.0023L28.8936 49.9873V88.0802L62.0123 107.158Z" 
+            fill="white" 
+            className="box-faces"
+        />
+        <path 
+            d="M62.0117 107.158V69.0023L95.1934 49.9873V88.0802L62.0117 107.158Z" 
+            fill="white" 
+            fillOpacity={0.42} 
+            className="box-faces"
+        />
         <path
             d="M62.0123 30.9092L28.8936 49.9871L62.0123 69.002L95.194 49.9871L62.0123 30.9092Z"
             fill="white"
             fillOpacity={0.42}
+            className="box-faces"
         />
         <path
             d="M61.5467 26.9424C61.5467 27.1302 61.6989 27.2824 61.8867 27.2824C62.0745 27.2824 62.2267 27.1302 62.2267 26.9424L61.8867 26.9424L61.5467 26.9424ZM62.1271 9.07221C61.9944 8.93943 61.7791 8.93943 61.6463 9.07221L59.4825 11.236C59.3498 11.3688 59.3498 11.584 59.4825 11.7168C59.6153 11.8496 59.8306 11.8496 59.9634 11.7168L61.8867 9.79347L63.8101 11.7168C63.9428 11.8496 64.1581 11.8496 64.2909 11.7168C64.4237 11.584 64.4237 11.3688 64.2909 11.236L62.1271 9.07221ZM61.8867 26.9424L62.2267 26.9424L62.2267 9.31263L61.8867 9.31263L61.5467 9.31263L61.5467 26.9424L61.8867 26.9424Z"

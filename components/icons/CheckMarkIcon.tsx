@@ -24,6 +24,14 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
           svg:hover .glow-effect {
             filter: drop-shadow(0 0 25px rgba(89, 62, 220, 0.8)) drop-shadow(0 0 50px rgba(89, 62, 220, 0.4));
           }
+          .inside-circle {
+            transition: all 0.3s ease;
+          }
+
+          svg:hover .inside-circle {
+            fill: purple;
+            fill-opacity: 1;
+          }
           
           svg:hover .hoverable-element {
             fill: rgba(255, 255, 255, 0.3);
@@ -42,7 +50,7 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
                     d="M70.3437 116.708C95.6937 116.708 116.244 96.1576 116.244 70.8075C116.244 45.4575 95.6937 24.9072 70.3437 24.9072C44.9936 24.9072 24.4434 45.4575 24.4434 70.8075C24.4434 96.1576 44.9936 116.708 70.3437 116.708Z"
                     fill="url(#paint0_linear_3999_1901)"
                     fillOpacity="0.19"
-                    className="hoverable-element"
+                    className="inside-circle"
                 />
                 <path
                     d="M70.3438 24.9717C95.6582 24.9717 116.18 45.4931 116.18 70.8076C116.18 96.1221 95.6582 116.644 70.3438 116.644C45.0293 116.644 24.5079 96.1221 24.5078 70.8076C24.5078 45.4931 45.0292 24.9717 70.3438 24.9717Z"
