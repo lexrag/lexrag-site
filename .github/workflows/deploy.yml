@@ -53,22 +53,56 @@ jobs:
                   echo "=== Installing dependencies ==="
                   npm ci
                   echo "=== Installed packages ==="
-                  npm list --depth=0
+                  npm list --depth=0 | cat
                   echo "=== Tailwind packages ==="
-                  npm list | grep tailwind
+                  npm list | grep tailwind || true
                   echo "=== PostCSS packages ==="
-                  npm list | grep postcss
+                  npm list | grep postcss || true
                   echo "=== Checking component paths ==="
-                  ls -la components/Header/
-                  ls -la components/Landing/
-                  ls -la components/Layout/
-                  ls -la components/ui/
+                  ls -la components/Header/ || true
+                  ls -la components/Landing/ || true
+                  ls -la components/Layout/ || true
+                  ls -la components/ui/ || true
                   echo "=== Checking tsconfig paths ==="
-                  cat tsconfig.json | grep -A 10 "paths"
+                  cat tsconfig.json | grep -A 10 "paths" || true
                   echo "=== Checking actual imports in files ==="
-                  grep -r "from '@/components" app/ --include="*.tsx" | head -10
-                  echo "=== Checking if components exist ==="
-                  find components -name "*.tsx" | head -20
+                  grep -R "from '@/components" app/ --include="*.tsx" | head -10 || true
+                  echo "=== Listing first component files ==="
+                  find components -name "*.tsx" | head -20 || true
+
+            - name: Assert case-sensitive paths (prebuild)
+              run: |
+                  echo "=== Git-tracked files (case-sensitive) ==="
+                  git ls-tree -r --name-only HEAD | egrep -n '^(components/(Header|Landing|Layout|ui)/|app/)' | head -200 || true
+
+                  echo "=== Check exact import targets ==="
+                  for p in \
+                    "components/Header/Header" \
+                    "components/Landing/Footer" \
+                    "components/Layout/CardFlash" \
+                    "components/Layout/PageTitle" \
+                    "components/ui/card"; do
+                    echo "--- $p.* / $p/index.* ---"
+                    git ls-tree -r --name-only HEAD | egrep -n "^${p}\\.(tsx|ts|jsx|js)$|^${p}/index\\.(tsx|ts|jsx|js)$" || echo "!! MISSING: $p"
+                  done
+
+                  echo "=== Case of directories as seen by FS ==="
+                  ls -ld components/* || true
+
+            - name: Hard fail if any import target is missing
+              run: |
+                  MISSING=0
+                  for p in \
+                    "components/Header/Header" \
+                    "components/Landing/Footer" \
+                    "components/Layout/CardFlash" \
+                    "components/Layout/PageTitle" \
+                    "components/ui/card"; do
+                    if ! git ls-tree -r --name-only HEAD | egrep -q "^${p}\\.(tsx|ts|jsx|js)$|^${p}/index\\.(tsx|ts|jsx|js)$"; then
+                      echo "❌ Missing: $p"; MISSING=1;
+                    fi
+                  done
+                  exit $MISSING
 
             - name: Build
               env:
@@ -82,10 +116,6 @@ jobs:
               run: |
                   echo "=== Build environment ==="
                   echo "NODE_ENV: $NODE_ENV"
-                  echo "=== Checking tsconfig paths ==="
-                  cat tsconfig.json | grep -A 10 "paths"
-                  echo "=== Checking component imports ==="
-                  grep -r "from '@/components" app/ --include="*.tsx" | head -10
                   echo "=== Starting build ==="
                   npm run build
 
