@@ -1,40 +1,30 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import FeaturePageTemplate from '@/components/Features/FeaturePageTemplate';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
-import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
-
-// import PageTitle from '@/components/Layout/PageTitle';
-
-export const dynamic = 'force-static';
-export const dynamicParams = false;
 
 export const metadata: Metadata = {
     title: 'Feature Details - LEXRAG',
     description: 'Detailed information about LEXRAG features and capabilities',
 };
 export async function generateStaticParams() {
-    return combinedFeaturesData.map((feature) => ({
-        feature: feature.key,
-    }));
+    return combinedFeaturesData.map((feature) => ({ feature: feature.key }));
 }
 
-const FeatureDetailPage = () => {
+export default async function FeatureDetailPage({ params }: { params: Promise<{ feature: string }> }) {
+    const { feature } = await params;
+    const data = combinedFeaturesData.find((f) => f.key === feature);
+    if (!data) return notFound();
+
     return (
         <div className="overflow-y-auto">
-            <Header className="" />
-
             <main className="pt-12">
-                {/* <PageTitle title="Feature Details" finalTitle="Features" /> */}
-
                 <section className="pb-20">
-                    <FeaturePageTemplate />
+                    <FeaturePageTemplate feature={data} />
                 </section>
             </main>
-
             <Footer />
         </div>
     );
-};
-
-export default FeatureDetailPage;
+}

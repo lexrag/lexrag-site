@@ -43,6 +43,13 @@ const ProductFeatures = ({
     const toggleShowAll = () => setShowAll(!showAll);
 
     const expandedHeight = isMobile ? '4000px' : '2000px';
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
 
     return (
         <div className="relative pb-4">
