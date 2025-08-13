@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCategoryColorScheme } from '@/utils/colorMapping';
 import { cn } from '@/lib/utils';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
@@ -25,6 +25,14 @@ const ProductFeatures = ({
     const [showAll, setShowAll] = useState(false);
     const visibleFeats = combinedFeaturesData;
     const toggleShowAll = () => setShowAll(!showAll);
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
 
     return (
         <div className="relative pb-4">

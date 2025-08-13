@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardHeading, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,14 @@ interface FeatureParamsProps {
 }
 
 const FeatureParams = ({ rows, className }: FeatureParamsProps) => {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
     if (!rows || rows.length === 0) return null;
 
     return (

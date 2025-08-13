@@ -5,9 +5,6 @@ import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 
-export const dynamic = 'force-static';
-export const dynamicParams = false;
-
 export const metadata: Metadata = {
     title: 'Feature Details - LEXRAG',
     description: 'Detailed information about LEXRAG features and capabilities',
