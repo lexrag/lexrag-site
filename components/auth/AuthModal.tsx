@@ -27,10 +27,10 @@ export default function AuthModal({ open, onOpenChange, initialMode = 'signin' }
                     <LiquidGlass
                         centered={false}
                         compact
-                        displacementScale={64}
-                        blurAmount={0.08}
+                        displacementScale={200}
+                        blurAmount={0.0008}
                         saturation={130}
-                        aberrationIntensity={2}
+                        aberrationIntensity={0}
                         elasticity={0.02}
                         cornerRadius={24}
                         mode="prominent"
