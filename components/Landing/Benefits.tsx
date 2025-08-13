@@ -76,7 +76,7 @@ const Benefits = () => {
         <div className="relative mb-20">
             <div className="hidden lg:grid lg:grid-cols-4 lg:gap-6">
                 {benefits.map((item, index) => (
-                    <div key={index}>
+                    <div key={index} className="h-full">
                         <BenefitsCard item={item} />
                     </div>
                 ))}
@@ -89,7 +89,7 @@ const Benefits = () => {
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {benefits.map((item, index) => (
-                        <div key={index} className="flex-shrink-0 w-72 md:w-80 snap-start">
+                        <div key={index} className="flex-shrink-0 w-72 md:w-80 h-full snap-start">
                             <BenefitsCard item={item} />
                         </div>
                     ))}
