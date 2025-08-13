@@ -21,7 +21,7 @@ export default function AuthModal({ open, onOpenChange, initialMode = 'signin' }
     return (
         <LiquidGlassModal open={open} onOpenChange={onOpenChange}>
             <DialogHeader className="w-full text-center">
-                <DialogTitle className="text-3xl font-semibold text-center text-[var(--color-phase-green)] w-full">
+                <DialogTitle className="text-3xl font-semibold text-center text-white w-full">
                     Get Started Now
                 </DialogTitle>
             </DialogHeader>

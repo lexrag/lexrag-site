@@ -12,7 +12,7 @@ export default function TermsCheckbox({ checked, onChange }: TermsCheckboxProps)
     return (
         <div className="flex items-center space-x-2 w-full">
             <Checkbox id="agreeToTerms" checked={checked} onCheckedChange={onChange} required />
-            <Label htmlFor="agreeToTerms" className="text-sm text-gray-600">
+            <Label htmlFor="agreeToTerms" className="text-sm text-white">
                 I agree to the{' '}
                 <a href="/terms-and-conditions/terms-conditions" className="text-[var(--Brand-Primary-Axis-Indigo)]">
                     Terms & Conditions

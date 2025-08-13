@@ -34,8 +34,8 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
         <>
             <form onSubmit={handleSubmit} className="space-y-4 mt-6 w-full">
                 {mode === 'signup' && (
-                    <div className="space-y-2 w-full">
-                        <Label htmlFor="name">Name</Label>
+                    <div className="flex flex-col gap-1 space-y-2 w-full">
+                        <Label className='text-white' htmlFor="name">Name</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -45,8 +45,8 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         />
                     </div>
                 )}
-                <div className="space-y-2 w-full">
-                    <Label htmlFor="email">Email Address</Label>
+                <div className="flex flex-col gap-1 space-y-2 w-full">
+                    <Label className='text-white' htmlFor="email">Email Address</Label>
                     <Input
                         id="email"
                         type="email"
@@ -56,8 +56,8 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         required
                     />
                 </div>
-                <div className="space-y-2 w-full">
-                    <Label htmlFor="password">Password</Label>
+                <div className="flex flex-col gap-1 space-y-2 w-full">
+                    <Label className='text-white' htmlFor="password">Password</Label>
                     <Input
                         id="password"
                         type="password"
@@ -68,7 +68,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                     />
                 </div>
                 {mode === 'signup' && (
-                    <div className="space-y-2 w-full">
+                    <div className="flex flex-col gap-1 space-y-2 w-full">
                         <TermsCheckbox
                             checked={formData.agreeToTerms}
                             onChange={(checked) => handleInputChange('agreeToTerms', checked)}
@@ -79,7 +79,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                     <ShinyButton
                         typeof="submit"
                         className="border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
-                        bg-transparent hover:bg-transparent
+                        bg-transparent hover:scale-105 hover:text-emerald-500
                         transition-colors duration-200 text-white"
                     >
                         {mode === 'signup' ? 'Sign Up' : 'Sign In'}
