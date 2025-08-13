@@ -148,7 +148,7 @@ deploy-test: ## Test deployment script locally
 	@echo "📝 To test with real AWS credentials:"
 	@echo "   S3_BUCKET=s3://lexrag-site DISTRIBUTION_ID=your-dist-id \\"
 	@echo "   NEXT_PUBLIC_APP_URL=https://app.lexrag.com \\"
-	@echo "   NEXT_PUBLIC_BASE_URL=https://d26ppb9osin3vx.cloudfront.net/ \\"
+	@echo "   NEXT_PUBLIC_BASE_URL=https://lexrag.com/ \\"
 	@echo "   NEXT_PUBLIC_BASE_PATH= \\"
 	@echo "   NEXT_PUBLIC_SEGMENT_ENABLED=true \\"
 	@echo "   NEXT_PUBLIC_SEGMENT_WRITE_KEY=your-key \\"
@@ -255,7 +255,7 @@ setup-infrastructure: ## Setup complete infrastructure (security headers, cache 
 	@echo "echo '   ✅ All configurations verified and working'" >> /tmp/setup-infra.sh
 	@echo "" >> /tmp/setup-infra.sh
 	@echo "echo '🌐 Your site is now secure and optimized!'" >> /tmp/setup-infra.sh
-	@echo "echo '   Test with: curl -I https://d26ppb9osin3vx.cloudfront.net/'" >> /tmp/setup-infra.sh
+	@echo "echo '   Test with: curl -I https://lexrag.com/'" >> /tmp/setup-infra.sh
 	@chmod +x /tmp/setup-infra.sh
 	@echo "✅ Setup script created successfully!"
 	@echo ""
@@ -266,23 +266,23 @@ setup-infrastructure: ## Setup complete infrastructure (security headers, cache 
 smoke-test: ## Run smoke tests against deployed site
 	@echo "🧪 Running smoke tests..."
 	@echo "📊 Testing HTML headers..."
-	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "content-security-policy"; then \
+	@if curl -s -I https://lexrag.com/ | grep -q "content-security-policy"; then \
 		echo "✅ Content-Security-Policy found"; \
 	else \
 		echo "❌ Content-Security-Policy not found"; \
 	fi
-	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "strict-transport-security"; then \
+	@if curl -s -I https://lexrag.com/ | grep -q "strict-transport-security"; then \
 		echo "✅ HSTS found"; \
 	else \
 		echo "❌ HSTS not found"; \
 	fi
-	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/ | grep -q "cache-control"; then \
+	@if curl -s -I https://lexrag.com/ | grep -q "cache-control"; then \
 		echo "✅ Cache-Control found"; \
 	else \
 		echo "❌ Cache-Control not found"; \
 	fi
 	@echo "📊 Testing static assets (first JS chunk)..."
-	@if curl -s -I https://d26ppb9osin3vx.cloudfront.net/_next/static/chunks/webpack.js | grep -q "cache-control"; then \
+	@if curl -s -I https://lexrag.com/_next/static/chunks/webpack.js | grep -q "cache-control"; then \
 		echo "✅ Static asset Cache-Control found"; \
 	else \
 		echo "❌ Static asset Cache-Control not found"; \
@@ -292,23 +292,23 @@ smoke-test: ## Run smoke tests against deployed site
 smoke-test-curl: ## Run automated smoke tests with curl
 	@echo "🧪 Running automated smoke tests..."
 	@echo "📊 Testing HTML headers..."
-	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "content-security-policy"; then \
+	@if curl -s -I "https://lexrag.com/" | grep -q "content-security-policy"; then \
 		echo "✅ Content-Security-Policy found"; \
 	else \
 		echo "❌ Content-Security-Policy not found"; \
 	fi
-	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "strict-transport-security"; then \
+	@if curl -s -I "https://lexrag.com/" | grep -q "strict-transport-security"; then \
 		echo "✅ HSTS found"; \
 	else \
 		echo "❌ HSTS not found"; \
 	fi
-	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/" | grep -q "cache-control"; then \
+	@if curl -s -I "https://lexrag.com/" | grep -q "cache-control"; then \
 		echo "✅ Cache-Control found"; \
 	else \
 		echo "❌ Cache-Control not found"; \
 	fi
 	@echo "📊 Testing static assets (first JS chunk)..."
-	@if curl -s -I "https://d26ppb9osin3vx.cloudfront.net/_next/static/chunks/webpack.js" | grep -q "cache-control"; then \
+	@if curl -s -I "https://lexrag.com/_next/static/chunks/webpack.js" | grep -q "cache-control"; then \
 		echo "✅ Static asset Cache-Control found"; \
 	else \
 		echo "❌ Static asset Cache-Control not found"; \

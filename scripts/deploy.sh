@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Set default values for Next.js and Segment variables if not provided
 export NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://app.lexrag.com}"
-export NEXT_PUBLIC_BASE_URL="${NEXT_PUBLIC_BASE_URL:-https://d26ppb9osin3vx.cloudfront.net/}"
+export NEXT_PUBLIC_BASE_URL="${NEXT_PUBLIC_BASE_URL:-https://lexrag.com/}"
 export NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-}"
 export NEXT_PUBLIC_SEGMENT_ENABLED="${NEXT_PUBLIC_SEGMENT_ENABLED:-true}"
 export NEXT_PUBLIC_SEGMENT_WRITE_KEY="${NEXT_PUBLIC_SEGMENT_WRITE_KEY:-8MIbGPXtsepP3Fw9BH1Kg27lp3dPTBWe}"

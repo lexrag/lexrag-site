@@ -14,6 +14,23 @@ HEADERS_JSON=$(cat <<'JSON'
 {
   "Name": "lexrag-security-headers",
   "Comment": "Security headers including CSP/HSTS/etc for LEXRAG static site",
+  "CorsConfig": {
+    "AccessControlAllowOrigins": {
+      "Quantity": 2,
+      "Items": ["https://lexrag.com", "https://www.lexrag.com"]
+    },
+    "AccessControlAllowHeaders": {
+      "Quantity": 1,
+      "Items": ["*"]
+    },
+    "AccessControlAllowMethods": {
+      "Quantity": 3,
+      "Items": ["GET", "HEAD", "OPTIONS"]
+    },
+    "AccessControlMaxAgeSec": 86400,
+    "AccessControlAllowCredentials": false,
+    "OriginOverride": true
+  },
   "SecurityHeadersConfig": {
     "StrictTransportSecurity": {
       "Override": true,
@@ -26,7 +43,7 @@ HEADERS_JSON=$(cat <<'JSON'
     "ReferrerPolicy": { "Override": true, "ReferrerPolicy": "strict-origin-when-cross-origin" },
     "ContentSecurityPolicy": {
       "Override": true,
-      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' https://cdn.segment.com https://*.segment.com https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://snap.licdn.com https://googleads.g.doubleclick.net 'unsafe-inline'; connect-src 'self' https://api.segment.io https://*.segment.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com https://*.linkedin.com https://*.licdn.com https://www.google.com https://analytics.google.com https://googleads.g.doubleclick.net https://*.doubleclick.net; img-src 'self' data: https: https://www.google-analytics.com https://stats.g.doubleclick.net https://*.hotjar.com https://*.hotjar.io https://px.ads.linkedin.com https://*.licdn.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; base-uri 'self'; frame-ancestors 'none'; frame-src 'self' https://www.googletagmanager.com https://td.doubleclick.net https://*.doubleclick.net https://www.google.com; form-action 'self';"
+      "ContentSecurityPolicy": "default-src 'self'; script-src 'self' https://cdn.segment.com https://*.segment.com https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://snap.licdn.com https://googleads.g.doubleclick.net 'unsafe-inline'; connect-src 'self' https://api.segment.io https://*.segment.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com https://*.linkedin.com https://*.licdn.com https://www.google.com https://analytics.google.com https://googleads.g.doubleclick.net https://*.doubleclick.net; img-src 'self' data: https: https://www.google-analytics.com https://stats.g.doubleclick.net https://*.hotjar.com https://*.hotjar.io https://px.ads.linkedin.com https://*.licdn.com; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://lexrag.com https://*.cloudfront.net; base-uri 'self'; frame-ancestors 'none'; frame-src 'self' https://www.googletagmanager.com https://td.doubleclick.net https://*.doubleclick.net https://www.google.com; form-action 'self';"
     }
   }
 }
