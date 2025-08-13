@@ -64,34 +64,35 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         <div className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[300px] p-6">
             <style>{`
                 .group:hover .box-faces {
-                    fill: #9333ea !important;
+                    fill: #B25BDE !important;
                 }
                 .group:hover .hoverable-element {
                     fill: rgba(255, 255, 255, 0.3) !important;
                     stroke: rgba(255, 255, 255, 0.9) !important;
                 }
                 .group:hover .glow-effect {
-                    filter: drop-shadow(0 0 25px rgba(89, 62, 220, 0.8)) drop-shadow(0 0 50px rgba(89, 62, 220, 0.4)) !important;
+                    filter: drop-shadow(0 0 25px rgba(105,74,255,255)) drop-shadow(0 0 50px rgba(89, 62, 220, 0.4)) !important;
                 }
                 .group:hover .inside-circle {
-                    fill: #9333ea !important;
+                    fill: #694aff !important;
                     fill-opacity: 1 !important;
                 }
                 .group:hover .checkmark {
                     stroke: #ffffff !important;
-                    filter: drop-shadow(0 0 10px rgba(89, 62, 220, 0.8)) !important;
+                    filter: drop-shadow(0 0 10px rgba(105,74,255,255)) !important;
                 }
                 .group:hover .clock-hand {
-                    stroke: #22c55e !important;
+                    stroke: #05df71 !important;
+                    filter: drop-shadow(0 0 10px rgba(5, 223, 113, 0.8)) drop-shadow(0 0 20px rgba(5, 223, 113, 0.6)) !important;
                 }
                 .group:hover .ellipse-purple {
-                    fill: #9333ea !important;
+                    fill: #B25BDE !important;
                 }
                 .group:hover .ellipse-green {
-                    fill: #22c55e !important;
+                    fill: #05df71 !important;
                 }
                 .group:hover .ellipse-blue {
-                    fill: #3b82f6 !important;
+                    fill: #694aff !important;
                 }
             `}</style>
             <div className="absolute inset-0 bg-[rgba(23,36,92,0.12)] backdrop-blur-md group-hover:backdrop-blur-2xl shadow-[0_0_25px_0_rgba(0,0,0,0.12)] z-0 transition-all duration-300" />
