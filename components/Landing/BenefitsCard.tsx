@@ -64,26 +64,28 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <LiquidGlass
-            className="group transition-all duration-300 h-full shadow-none"
-            centered={false}
-            compact
-            displacementScale={30}
-            blurAmount={0.01}
-            saturation={50}
-            aberrationIntensity={0}
-            elasticity={0}
-            cornerRadius={50}
-            mode="standard"
-            padding="0px 0px"
-            overLight={isHovered}
-        >
-            <div
-                className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[350px] p-6"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+        <div className="relative h-full">
+            <div className="absolute inset-0 z-9 bg-[rgba(23,36,92,0.12)] pointer-events-none rounded-[50px]"></div>
+            <LiquidGlass
+                className="group transition-all duration-300 h-full shadow-none z-10 relative"
+                centered={false}
+                compact
+                displacementScale={30}
+                blurAmount={0.01}
+                saturation={50}
+                aberrationIntensity={0}
+                elasticity={0}
+                cornerRadius={50}
+                mode="standard"
+                padding="0px 0px"
+                overLight={isHovered}
             >
-                <style>{`
+                <div
+                    className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[350px] p-6"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    <style>{`
                 .glass__warp:hover {
                     blur(100px)
                 }
@@ -120,17 +122,18 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
                     fill: #694aff !important;
                 }
             `}</style>
-                <div className="relative z-10 flex flex-col items-center h-full justify-between">
-                    <div className="transition-transform duration-300">{getIcon(item.img)}</div>
-                    <div className="flex flex-col gap-2">
-                        <div className="flex justify-center items-center mb-3">
-                            <H4 className="text-white text-lg">{item.title}</H4>
+                    <div className="relative z-10 flex flex-col items-center h-full justify-between">
+                        <div className="transition-transform duration-300">{getIcon(item.img)}</div>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex justify-center items-center mb-3">
+                                <H4 className="text-white text-lg">{item.title}</H4>
+                            </div>
+                            <PBase className="text-white max-w-[90%] text-sm leading-relaxed">{item.description}</PBase>
                         </div>
-                        <PBase className="text-white max-w-[90%] text-sm leading-relaxed">{item.description}</PBase>
                     </div>
                 </div>
-            </div>
-        </LiquidGlass>
+            </LiquidGlass>
+        </div>
     );
 };
 
