@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import ProductFeatures from '@/components/Features/FeaturesGrid';
-import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 
 export const metadata: Metadata = {
@@ -11,8 +10,6 @@ export const metadata: Metadata = {
 const FeaturesPage = () => {
     return (
         <div className="overflow-y-auto">
-            <Header className="" />
-
             <main className="pt-20">
                 {/* <PageTitle title="Product Features" finalTitle="Features" /> */}
 

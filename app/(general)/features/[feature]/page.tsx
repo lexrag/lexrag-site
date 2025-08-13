@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import FeaturePageTemplate from '@/components/Features/FeaturePageTemplate';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
-import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
 
     return (
         <div className="overflow-y-auto">
-            <Header className="" />
             <main className="pt-12">
                 <section className="pb-20">
                     <FeaturePageTemplate feature={data} />
