@@ -11,7 +11,7 @@ const SigninButton = () => {
         <div className="flex items-center gap-8">
             <div className="tab">
                 <LiquidGlass
-                    className=""
+                    className="group transition-all duration-200 hover:scale-105"
                     centered={false}
                     compact
                     displacementScale={50}
@@ -26,8 +26,10 @@ const SigninButton = () => {
                         setIsModalOpen(true);
                     }}
                 >
-                    <span className="block text-axis-indigo text-base font-medium px-2 whitespace-nowrap">Sign In</span>
-
+                    <span className="block text-axis-indigo group-hover:text-emerald-500 
+                    text-base font-medium px-2 whitespace-nowrap transition-colors duration-200">
+                        Sign In
+                    </span>
                 </LiquidGlass>
             </div>
 
@@ -37,5 +39,3 @@ const SigninButton = () => {
 };
 
 export default SigninButton;
-
-

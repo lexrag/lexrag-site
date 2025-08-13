@@ -67,7 +67,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                                     <Link
                                         className={cn(
                                             'text-base font-semibold px-6 py-4 rounded-full transition-all text-midnight-core',
-                                            isActive ? 'bg-phase-green' : 'hover:bg-phase-green',
+                                            isActive ? 'text-emerald-500' : 'hover:text-emerald-500',
                                         )}
                                         href={item.href}
                                     >

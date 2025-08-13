@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { getCategoryColorScheme } from '@/utils/colorMapping';
 import { cn } from '@/lib/utils';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
+import LiquidGlass from '../liquid-glass';
 import { Badge } from '../ui/badge';
-import { ButtonRounded } from '../ui/button-rounded';
 
 const useMediaQuery = (query: string) => {
     const [matches, setMatches] = useState(false);
@@ -138,10 +138,28 @@ const ProductFeatures = ({
                 </div>
             </div>
             {visibleFeats.length > 0 && (
-                <div className="text-center mt-8">
-                    <ButtonRounded onClick={toggleShowAll} className="transition-all duration-300">
-                        {showAll ? 'Show Less' : 'Show All'}
-                    </ButtonRounded>
+                <div className="flex justify-center text-center mt-8">
+                    <LiquidGlass
+                        className="group transition-all duration-200 hover:scale-105"
+                        centered={false}
+                        compact
+                        displacementScale={50}
+                        blurAmount={0.01}
+                        saturation={130}
+                        aberrationIntensity={2}
+                        elasticity={0.05}
+                        cornerRadius={100}
+                        mode="standard"
+                        padding="8px 16px"
+                        onClick={toggleShowAll}
+                    >
+                        <span
+                            className="block text-axis-indigo group-hover:text-emerald-500 
+                    text-base font-medium px-2 whitespace-nowrap transition-colors duration-200"
+                        >
+                            {showAll ? 'Show Less' : 'Show All'}
+                        </span>
+                    </LiquidGlass>
                 </div>
             )}
         </div>
