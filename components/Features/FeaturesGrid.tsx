@@ -1,11 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCategoryColorScheme } from '@/utils/colorMapping';
 import { cn } from '@/lib/utils';
 import { combinedFeaturesData } from '@/components/Features/FeaturesData';
 import { Badge } from '../ui/badge';
 import { ButtonRounded } from '../ui/button-rounded';
+
+const useMediaQuery = (query: string) => {
+    const [matches, setMatches] = useState(false);
+    useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        media.addEventListener('change', listener);
+        return () => media.removeEventListener('change', listener);
+    }, [matches, query]);
+    return matches;
+};
 
 interface ProductFeaturesProps {
     gridClassName?: string;
@@ -23,15 +37,19 @@ const ProductFeatures = ({
     maxHeightBeforeShowAll = 500,
 }: ProductFeaturesProps) => {
     const [showAll, setShowAll] = useState(false);
+    const isMobile = useMediaQuery('(max-width: 768px)');
     const visibleFeats = combinedFeaturesData;
+
     const toggleShowAll = () => setShowAll(!showAll);
+
+    const expandedHeight = isMobile ? '4000px' : '2000px';
 
     return (
         <div className="relative pb-4">
             <div
                 className="transition-max-height duration-500 pt-2 ease-in-out overflow-hidden"
                 style={{
-                    maxHeight: showAll ? '2000px' : `${maxHeightBeforeShowAll}px`,
+                    maxHeight: showAll ? expandedHeight : `${maxHeightBeforeShowAll}px`,
                 }}
             >
                 <div className={gridClassName}>
