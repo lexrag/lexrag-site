@@ -195,7 +195,11 @@ const GlassContainer = forwardRef<
     }
 
     return (
-      <div ref={ref} className={`relative ${className} ${active ? "active" : ""} ${Boolean(onClick) ? "cursor-pointer" : ""}`} style={style} onClick={onClick}>
+      <div ref={ref} className={`relative ${className} ${active ? "active" : ""} ${Boolean(onClick) ? "cursor-pointer" : ""}`} style={{
+        ...style,
+        width: style?.width === "100%" ? "100%" : undefined,
+        height: style?.height === "100%" ? "100%" : undefined,
+      }} onClick={onClick}>
         <GlassFilter mode={mode} id={filterId} displacementScale={displacementScale} aberrationIntensity={aberrationIntensity} width={glassSize.width} height={glassSize.height} shaderMapUrl={shaderMapUrl} />
 
         <div
@@ -203,13 +207,16 @@ const GlassContainer = forwardRef<
           style={{
             borderRadius: `${cornerRadius}px`,
             position: "relative",
-            display: "inline-flex",
+            display: "flex",
             alignItems: "center",
+            justifyContent: "center",
             gap: "24px",
             padding,
             overflow: "hidden",
             transition: "all 0.2s ease-in-out",
             boxShadow: overLight ? "0px 16px 70px rgba(0, 0, 0, 0.75)" : "0px 12px 40px rgba(0, 0, 0, 0.25)",
+            width: "100%",
+            minHeight: "100%",
           }}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
@@ -230,12 +237,16 @@ const GlassContainer = forwardRef<
 
           {/* user content stays sharp */}
           <div
-            className="transition-all duration-150 ease-in-out text-white"
+            className="transition-all duration-150 ease-in-out text-white w-full"
             style={{
               position: "relative",
               zIndex: 1,
               font: "500 20px/1 system-ui",
               textShadow: overLight ? "0px 2px 12px rgba(0, 0, 0, 0)" : "0px 2px 12px rgba(0, 0, 0, 0.4)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             {children}
@@ -438,11 +449,29 @@ export default function LiquidGlass({
     const updateGlassSize = () => {
       if (glassRef.current) {
         const rect = glassRef.current.getBoundingClientRect()
-        setGlassSize({ width: rect.width, height: rect.height })
+        const contentWidth = glassRef.current.scrollWidth
+        const contentHeight = glassRef.current.scrollHeight
+        const containerWidth = rect.width
+        const containerHeight = rect.height
+        
+        setGlassSize({ 
+          width: Math.max(contentWidth, containerWidth), 
+          height: Math.max(contentHeight, containerHeight) 
+        })
       }
     }
 
     updateGlassSize()
+    
+    if (glassRef.current) {
+      const resizeObserver = new ResizeObserver(updateGlassSize)
+      resizeObserver.observe(glassRef.current)
+      
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }
+    
     window.addEventListener("resize", updateGlassSize)
     return () => window.removeEventListener("resize", updateGlassSize)
   }, [])
@@ -456,12 +485,16 @@ export default function LiquidGlass({
     ...style,
     transform: transformStyle,
     transition: "all ease-out 0.2s",
+    width: centered ? undefined : (style?.width === "100%" ? "100%" : undefined),
+    height: centered ? undefined : (style?.height === "100%" ? "100%" : undefined),
   }
 
   const positionStyles = {
     position: baseStyle.position || "relative",
     top: centered ? baseStyle.top || "50%" : baseStyle.top,
     left: centered ? baseStyle.left || "50%" : baseStyle.left,
+    width: centered ? undefined : (baseStyle.width === "100%" ? "100%" : undefined),
+    height: centered ? undefined : (baseStyle.height === "100%" ? "100%" : undefined),
   } as CSSProperties
 
   return (

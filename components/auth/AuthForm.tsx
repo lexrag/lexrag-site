@@ -32,9 +32,9 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+            <form onSubmit={handleSubmit} className="space-y-4 mt-6 w-full">
                 {mode === 'signup' && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 w-full">
                         <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
@@ -45,7 +45,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         />
                     </div>
                 )}
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                     <Label htmlFor="email">Email Address</Label>
                     <Input
                         id="email"
@@ -56,7 +56,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         required
                     />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                     <Label htmlFor="password">Password</Label>
                     <Input
                         id="password"
@@ -68,10 +68,12 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                     />
                 </div>
                 {mode === 'signup' && (
-                    <TermsCheckbox
-                        checked={formData.agreeToTerms}
-                        onChange={(checked) => handleInputChange('agreeToTerms', checked)}
-                    />
+                    <div className="space-y-2 w-full">
+                        <TermsCheckbox
+                            checked={formData.agreeToTerms}
+                            onChange={(checked) => handleInputChange('agreeToTerms', checked)}
+                        />
+                    </div>
                 )}
                 <div className="flex justify-center">
                     <ShinyButton
@@ -85,14 +87,14 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 </div>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-6 w-full">
                 <div className="flex justify-center">
                     <PSM>Or</PSM>
                 </div>
                 <SocialAuthButtons />
             </div>
 
-            <div className="mt-6 mb-10 text-center">
+            <div className="mt-6 mb-10 text-center w-full">
                 <p className="text-sm">
                     {mode === 'signup' ? 'Have an account?' : "Don't have an account?"}{' '}
                     <button onClick={onToggleMode} className="text-[var(--Brand-Primary-Axis-Indigo)] hover:underline">

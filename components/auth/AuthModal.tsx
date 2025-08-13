@@ -23,7 +23,7 @@ export default function AuthModal({ open, onOpenChange, initialMode = 'signin' }
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="bg-transparent border-0 p-0 sm:max-w-md w-full max-w-sm mx-auto rounded-[24px]">
-                <div ref={containerRef}>
+                <div ref={containerRef} className="relative w-full">
                     <LiquidGlass
                         centered={false}
                         compact
@@ -36,10 +36,11 @@ export default function AuthModal({ open, onOpenChange, initialMode = 'signin' }
                         mode="prominent"
                         padding="64px"
                         mouseContainer={containerRef}
+                        style={{ width: '100%', height: '100%' }}
                     >
-                        <div className="flex flex-col gap-6 text-white">
-                            <DialogHeader>
-                                <DialogTitle className="text-3xl font-semibold text-left text-[var(--Brand-Primary-Phase-Green)]">
+                        <div className="flex flex-col gap-6 text-white w-full items-center">
+                            <DialogHeader className="w-full text-center">
+                                <DialogTitle className="text-3xl font-semibold text-center text-[var(--Brand-Primary-Phase-Green)] w-full">
                                     Get Started Now
                                 </DialogTitle>
                             </DialogHeader>

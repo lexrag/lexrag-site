@@ -10,7 +10,7 @@ interface TermsCheckboxProps {
 
 export default function TermsCheckbox({ checked, onChange }: TermsCheckboxProps) {
     return (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-full">
             <Checkbox id="agreeToTerms" checked={checked} onCheckedChange={onChange} required />
             <Label htmlFor="agreeToTerms" className="text-sm text-gray-600">
                 I agree to the{' '}
