@@ -11,7 +11,7 @@ type Props = { feature: FeatureData };
 const FeaturePageTemplate = ({ feature }: Props) => {
     return (
         <section className="lg:pt-48 pt-32 px-4">
-            <h2 className="lg:mb-20 mb-12 text-midnight-core text-4xl lg:text-6xl">Dossier Compilation</h2>
+            <h2 className="lg:mb-20 mb-12 text-midnight-core text-4xl lg:text-6xl">{feature.title}</h2>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
                 <div className="flex flex-col gap-5 lg:gap-7.5 col-span-2">
