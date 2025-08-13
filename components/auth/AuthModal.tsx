@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 import AuthForm from './AuthForm';
 import LiquidGlass from '@/components/liquid-glass';
 
@@ -40,7 +40,7 @@ export default function AuthModal({ open, onOpenChange, initialMode = 'signin' }
                     >
                         <div className="flex flex-col gap-6 text-white w-full items-center">
                             <DialogHeader className="w-full text-center">
-                                <DialogTitle className="text-3xl font-semibold text-center text-[var(--Brand-Primary-Phase-Green)] w-full">
+                                <DialogTitle className="text-3xl font-semibold text-center text-[var(--color-phase-green)] w-full">
                                     Get Started Now
                                 </DialogTitle>
                             </DialogHeader>
