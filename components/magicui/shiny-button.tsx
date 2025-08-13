@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, type MotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ClientOnly } from '@/components/util/ClientOnly';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const animationProps: MotionProps = {
     initial: { '--x': '100%', scale: 0.8 },

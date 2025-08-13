@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import LiquidGlass from '@/components/liquid-glass';
 import AuthModal from '@/components/auth/AuthModal';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const SigninButton = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

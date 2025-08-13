@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const HeaderNavigation = () => {
     const scrollToSection = (sectionId: string) => {
@@ -16,14 +16,14 @@ const HeaderNavigation = () => {
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
-                    className="rounded-[80px] hover:bg-[var(--Brand-Primary-Phase-Green)] transition-colors duration-200 text-[var(--Brand-Primary-Midnight-Core)]"
+                    className="rounded-[80px] hover:bg-[var(--color-phase-green)] transition-colors duration-200 text-[var(--color-midnight-core)]"
                     onClick={() => scrollToSection('how-it-works')}
                 >
                     Use Cases
                 </Button>
                 <Button
                     variant="ghost"
-                    className="rounded-[80px] hover:bg-[var(--Brand-Primary-Phase-Green)] transition-colors duration-200 text-[var(--Brand-Primary-Midnight-Core)]"
+                    className="rounded-[80px] hover:bg-[var(--color-phase-green)] transition-colors duration-200 text-[var(--color-midnight-core)]"
                     onClick={() => scrollToSection('product-features')}
                 >
                     Features

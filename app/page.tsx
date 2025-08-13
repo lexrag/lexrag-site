@@ -6,7 +6,7 @@ import Benefits from '@/components/Landing/Benefits';
 import Footer from '@/components/Landing/Footer';
 import Hero from '@/components/Landing/Hero';
 import UseCases from '@/components/Landing/UseCases';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 import BackgroundSVG from '@/components/Landing/BackgroundSVG';
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ const LandingPage = () => {
                 <section id="product-features" className="">
                     {/* TODO: keep sections title separately for reuse */}
                     <div className="mb-10">
-                        <H3 className="mb-2 transition-colors duration-300 text-[var(--Brand-Primary-Midnight-Core)] pl-8">
+                        <H3 className="mb-2 transition-colors duration-300 text-[var(--color-midnight-core)] pl-8">
                             Product Features
                         </H3>
                     </div>

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import BenefitsCard from './BenefitsCard';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const Benefits = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -100,7 +100,7 @@ const Benefits = () => {
                         <button
                             onClick={() => scroll('left')}
                             disabled={!canScrollLeft}
-                            className={`p-3 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
+                            className={`p-3 rounded-full transition-all duration-200 text-[var(--color-axis-indigo)] ${
                                 canScrollLeft ? 'bg-white/20 hover:bg-white/30' : 'bg-white/10 cursor-not-allowed'
                             }`}
                             aria-label="Scroll left"
@@ -110,7 +110,7 @@ const Benefits = () => {
                         <button
                             onClick={() => scroll('right')}
                             disabled={!canScrollRight}
-                            className={`p-3 rounded-full transition-all duration-200 text-[var(--Brand-Primary-Axis-Indigo)] ${
+                            className={`p-3 rounded-full transition-all duration-200 text-[var(--color-axis-indigo)] ${
                                 canScrollRight ? 'bg-white/20 hover:bg-white/30' : 'bg-white/10 cursor-not-allowed'
                             }`}
                             aria-label="Scroll right"

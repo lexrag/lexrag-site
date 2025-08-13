@@ -1,5 +1,5 @@
 // badgeColorMapping.ts
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 // 1. Maps badge values (e.g. "search", "freemium") to variant names used in <Badge />
 export const badgeColorMapping: Record<
@@ -73,10 +73,10 @@ export const categoryColorScheme: Record<
         gradient: 'from-emerald-500 via-emerald-600 to-emerald-700',
     },
     analytics: {
-        icon_color: 'text-[var(--Brand-Primary-Axis-Indigo)]',
-        border: 'hover:border-[var(--Brand-Primary-Axis-Indigo)]',
+        icon_color: 'text-[var(--color-axis-indigo)]',
+        border: 'hover:border-[var(--color-axis-indigo)]',
         gradient:
-            'from-[var(--Brand-Primary-Axis-Indigo)] via-[var(--Brand-Primary-Axis-Indigo)] to-[var(--Brand-Primary-Axis-Indigo)]',
+            'from-[var(--color-axis-indigo)] via-[var(--color-axis-indigo)] to-[var(--color-axis-indigo)]',
     },
 };
 

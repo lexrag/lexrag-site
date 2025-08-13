@@ -8,7 +8,7 @@ import { H4 } from '@/components/ui/typography';
 import { Logo } from '@/components/Header/Logo';
 import { WordRotate } from '@/components/magicui/word-rotate';
 import { ClientOnly } from '@/components/util/ClientOnly';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const FooterInner = () => {
     const currentYear = new Date().getFullYear();
@@ -33,7 +33,7 @@ const FooterInner = () => {
     ];
 
     return (
-        <footer className="bg-[var(--Brand-Primary-Axis-Indigo)] relative overflow-hidden px-[10%]">
+        <footer className="bg-[var(--color-axis-indigo)] relative overflow-hidden px-[10%]">
             <div className="container px-6 mx-auto pt-14 pb-6 border-b border-border/50">
                 <div className="flex flex-col lg:flex-row justify-between items-start">
                     {/* Logo and description - Left side */}
@@ -60,7 +60,7 @@ const FooterInner = () => {
                                         href={social.href}
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className="size-9 border bg-white border-border/60 text-[var(--Brand-Primary-Axis-Indigo)] rounded-full flex items-center justify-center hover:bg-emerald-500 hover:border-emerald-500 transition-colors"
+                                        className="size-9 border bg-white border-border/60 text-[var(--color-axis-indigo)] rounded-full flex items-center justify-center hover:bg-emerald-500 hover:border-emerald-500 transition-colors"
                                         aria-label={social.label}
                                     >
                                         <social.icon className="size-4" />

@@ -1,12 +1,12 @@
 import { H3, H4, PBase } from '@/components/ui/typography';
-import '@/components/ui/css-variables.css';
+import '@/css/themes/reui.css';
 
 const UseCases = () => {
     return (
         <>
             <div className="min-h-[60vh] py-10">
                 <div className="mb-10">
-                    <H3 className="text-[var(--Brand-Primary-Midnight-Core)] mb-5 pl-8">Use Cases</H3>
+                    <H3 className="text-[var(--color-midnight-core)] mb-5 pl-8">Use Cases</H3>
                 </div>
 
                 <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-6">
