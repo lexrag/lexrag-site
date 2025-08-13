@@ -2,31 +2,6 @@ import * as React from 'react';
 
 const MagnifyingGlass = ({ className = '', ...props }) => (
     <svg className={className} width={185} height={168} viewBox="0 0 185 168" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <style>
-            {`
-                .ellipse-purple {
-                    transition: fill 0.3s ease;
-                }
-                
-                .ellipse-green {
-                    transition: fill 0.3s ease;
-                }
-                
-                .ellipse-blue {
-                    transition: fill 0.3s ease;
-                }
-                
-                svg:hover .purple {
-                    fill: purple;
-                }
-                svg:hover .green {
-                    fill: green;
-                }
-                svg:hover .blue {
-                    fill: blue;
-                }
-            `}
-        </style>
         <line x1={57.0198} y1={118.682} x2={81.5} y2={72.4414} stroke="white" strokeWidth={0.680005} />
         <line x1={102.557} y1={135.945} x2={82.8371} y2={74.7447} stroke="white" strokeWidth={0.680005} />
         <line x1={149.125} y1={71.5802} x2={83.1641} y2={72.2602} stroke="white" strokeWidth={0.680005} />
@@ -40,56 +15,56 @@ const MagnifyingGlass = ({ className = '', ...props }) => (
                 fill="url(#paint0_linear_3999_1568)"
             />
         </g>
-        <circle cx={81.8016} cy={71.2401} r={10.2001} fill="white" className="green" />
+        <circle cx={81.8016} cy={71.2401} r={10.2001} fill="white" className="ellipse-green" />
         <g filter="url(#filter1_f_3999_1568)">
             <path
                 d="M44.8079 40.4556C49.1643 40.4556 52.6959 36.9241 52.6959 32.5677C52.6959 28.2112 49.1643 24.6797 44.8079 24.6797C40.4515 24.6797 36.9199 28.2112 36.9199 32.5677C36.9199 36.9241 40.4515 40.4556 44.8079 40.4556Z"
                 fill="url(#paint1_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={44.8079} cy={32.888} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={44.8079} cy={32.888} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <g filter="url(#filter2_f_3999_1568)">
             <path
                 d="M84.2474 42.4957C88.6038 42.4957 92.1354 38.9641 92.1354 34.6077C92.1354 30.2513 88.6038 26.7197 84.2474 26.7197C79.8909 26.7197 76.3594 30.2513 76.3594 34.6077C76.3594 38.9641 79.8909 42.4957 84.2474 42.4957Z"
                 fill="url(#paint2_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={84.2474} cy={34.928} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={84.2474} cy={34.928} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <g filter="url(#filter3_f_3999_1568)">
             <path
                 d="M56.3685 127.497C60.7249 127.497 64.2565 123.965 64.2565 119.609C64.2565 115.252 60.7249 111.721 56.3685 111.721C52.012 111.721 48.4805 115.252 48.4805 119.609C48.4805 123.965 52.012 127.497 56.3685 127.497Z"
                 fill="url(#paint3_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={56.3685} cy={119.929} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={56.3685} cy={119.929} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <g filter="url(#filter4_f_3999_1568)">
             <path
                 d="M122.327 40.4556C126.684 40.4556 130.215 36.9241 130.215 32.5677C130.215 28.2112 126.684 24.6797 122.327 24.6797C117.971 24.6797 114.439 28.2112 114.439 32.5677C114.439 36.9241 117.971 40.4556 122.327 40.4556Z"
                 fill="url(#paint4_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={122.327} cy={32.888} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={122.327} cy={32.888} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <g filter="url(#filter5_f_3999_1568)">
             <path
                 d="M152.249 79.2164C156.606 79.2164 160.137 75.6848 160.137 71.3284C160.137 66.972 156.606 63.4404 152.249 63.4404C147.893 63.4404 144.361 66.972 144.361 71.3284C144.361 75.6848 147.893 79.2164 152.249 79.2164Z"
                 fill="url(#paint5_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={152.249} cy={71.6487} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={152.249} cy={71.6487} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <g filter="url(#filter6_f_3999_1568)">
             <path
                 d="M31.888 87.2574C36.2444 87.2574 39.776 83.7258 39.776 79.3694C39.776 75.013 36.2444 71.4814 31.888 71.4814C27.5316 71.4814 24 75.013 24 79.3694C24 83.7258 27.5316 87.2574 31.888 87.2574Z"
                 fill="url(#paint6_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={31.888} cy={79.6897} rx={7.88799} ry={7.88797} fill="white" className="blue" />
+        <ellipse cx={31.888} cy={79.6897} rx={7.88799} ry={7.88797} fill="white" className="ellipse-blue" />
         <g filter="url(#filter7_f_3999_1568)">
             <path
                 d="M102.609 143.136C106.965 143.136 110.497 139.605 110.497 135.248C110.497 130.892 106.965 127.36 102.609 127.36C98.2523 127.36 94.7207 130.892 94.7207 135.248C94.7207 139.605 98.2523 143.136 102.609 143.136Z"
                 fill="url(#paint7_linear_3999_1568)"
             />
         </g>
-        <ellipse cx={102.609} cy={135.569} rx={7.88799} ry={7.88797} fill="white" className="purple" />
+        <ellipse cx={102.609} cy={135.569} rx={7.88799} ry={7.88797} fill="white" className="ellipse-purple" />
         <foreignObject x={66.0714} y={44.632} width={99.1951} height={123.513}>
             <div
                 style={{

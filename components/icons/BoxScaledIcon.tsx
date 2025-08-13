@@ -10,18 +10,6 @@ const BoxScaledIcon = ({ className = '', ...props }) => (
         className={`transition-all duration-300 ${className}`}
         {...props}
     >
-        <style>
-            {`
-                .box-faces {
-                    transition: fill 0.3s ease;
-                }
-                
-                svg:hover .box-faces {
-                    fill: purple;
-                }
-            `}
-        </style>
-        
         <path
             d="M0.96875 104.188V33.8049L62.2885 1.15918L123.118 33.8049V104.188L62.2885 137.16L0.96875 104.188Z"
             fill="url(#paint0_linear_3999_1420)"

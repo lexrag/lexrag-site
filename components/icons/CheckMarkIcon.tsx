@@ -11,40 +11,6 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
             className={`transition-all duration-300 ${className}`}
             {...props}
         >
-            <style>
-                {`
-          .hoverable-element {
-            transition: all 0.3s ease;
-          }
-          
-          .glow-effect {
-            transition: filter 0.3s ease;
-          }
-          
-          svg:hover .glow-effect {
-            filter: drop-shadow(0 0 25px rgba(89, 62, 220, 0.8)) drop-shadow(0 0 50px rgba(89, 62, 220, 0.4));
-          }
-          .inside-circle {
-            transition: all 0.3s ease;
-          }
-
-          svg:hover .inside-circle {
-            fill: purple;
-            fill-opacity: 1;
-          }
-          
-          svg:hover .hoverable-element {
-            fill: rgba(255, 255, 255, 0.3);
-            stroke: rgba(255, 255, 255, 0.9);
-          }
-          
-          svg:hover .checkmark {
-            stroke: #ffffff;
-            filter: drop-shadow(0 0 10px rgba(89, 62, 220, 0.8));
-          }
-        `}
-            </style>
-
             <g filter="url(#filter0_f_3999_1901)" className="">
                 <path
                     d="M70.3437 116.708C95.6937 116.708 116.244 96.1576 116.244 70.8075C116.244 45.4575 95.6937 24.9072 70.3437 24.9072C44.9936 24.9072 24.4434 45.4575 24.4434 70.8075C24.4434 96.1576 44.9936 116.708 70.3437 116.708Z"
@@ -148,8 +114,8 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
                     y2="116.708"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stopColor="white" stopOpacity="0" />
-                    <stop offset="1" stopColor="white" />
+                    <stop stopColor="white" stopOpacity={0} />
+                    <stop offset={1} stopColor="white" />
                 </linearGradient>
                 <linearGradient
                     id="paint2_linear_3999_1901"
@@ -159,8 +125,8 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
                     y2="117.028"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stopColor="white" stopOpacity="0" />
-                    <stop offset="1" stopColor="white" />
+                    <stop stopColor="white" stopOpacity={0} />
+                    <stop offset={1} stopColor="white" />
                 </linearGradient>
                 <linearGradient
                     id="paint3_linear_3999_1901"
@@ -170,8 +136,8 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
                     y2="170.069"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stopColor="white" stopOpacity="0.2" />
-                    <stop offset="1" stopColor="white" stopOpacity="0.5" />
+                    <stop stopColor="white" stopOpacity={0.2} />
+                    <stop offset={1} stopColor="white" stopOpacity={0.5} />
                 </linearGradient>
                 <linearGradient
                     id="paint4_linear_3999_1901"
@@ -181,8 +147,8 @@ const CheckmarkIcon = ({ className = '', ...props }) => {
                     y2="151.029"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stopColor="white" stopOpacity="0" />
-                    <stop offset="1" stopColor="white" />
+                    <stop stopColor="white" stopOpacity={0} />
+                    <stop offset={1} stopColor="white" />
                 </linearGradient>
             </defs>
         </svg>
