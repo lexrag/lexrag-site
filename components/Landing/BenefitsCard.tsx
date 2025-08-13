@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import BoxScaledIcon from '../icons/BoxScaledIcon';
 import CheckmarkIcon from '../icons/CheckMarkIcon';
 import ClockIcon from '../icons/ClockIcon';
@@ -60,10 +61,11 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
         }
         return <img src={`/media/images/${iconName}.svg`} className="max-h-24 mb-4" alt={`${item.title}`} />;
     };
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
         <LiquidGlass
-            className="group transition-all duration-300 h-full"
+            className="group transition-all duration-300 h-full shadow-none"
             centered={false}
             compact
             displacementScale={30}
@@ -74,8 +76,13 @@ const BenefitsCard = ({ item }: BenefitsCardProps) => {
             cornerRadius={50}
             mode="standard"
             padding="0px 0px"
+            overLight={isHovered}
         >
-            <div className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[350px] p-6">
+            <div
+                className="group relative flex flex-col items-center justify-center text-center rounded-[30px] overflow-hidden h-full min-h-[350px] p-6"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
                 <style>{`
                 .glass__warp:hover {
                     blur(100px)
