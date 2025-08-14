@@ -15,18 +15,46 @@ interface AuthFormProps {
 
 export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
     const [formData, setFormData] = useState({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
+        confirmPassword: '',
         agreeToTerms: false,
     });
 
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
     const handleInputChange = (field: string, value: string | boolean) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+            setErrors((prev) => ({ ...prev, [field]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (mode === 'signup') {
+            if (formData.password.length < 6) {
+                newErrors.password = 'Password must be at least 6 characters long';
+            }
+            if (formData.password !== formData.confirmPassword) {
+                newErrors.confirmPassword = 'Passwords do not match';
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
         console.log('Form submitted:', { mode, formData });
     };
 
@@ -34,19 +62,39 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
         <>
             <form onSubmit={handleSubmit} className="space-y-4 mt-6 w-full">
                 {mode === 'signup' && (
-                    <div className="flex flex-col gap-1 space-y-2 w-full">
-                        <Label className='text-white' htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
-                            placeholder="Enter your full name"
-                            required
-                        />
+                    <div className="flex gap-2">
+                        <div className="flex flex-col gap-1 space-y-2 w-full">
+                            <Label className="text-white" htmlFor="firstName">
+                                First Name
+                            </Label>
+                            <Input
+                                id="firstName"
+                                value={formData.firstName}
+                                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                placeholder="Your First Name"
+                                required
+                                className='bg-transparent !placeholder-white !text-white'
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1 space-y-2 w-full">
+                            <Label className="text-white" htmlFor="lastName">
+                                Last Name
+                            </Label>
+                            <Input
+                                id="lastName"
+                                value={formData.lastName}
+                                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                                placeholder="Your Last Name"
+                                required
+                                className='bg-transparent !placeholder-white !text-white'
+                            />
+                        </div>
                     </div>
                 )}
                 <div className="flex flex-col gap-1 space-y-2 w-full">
-                    <Label className='text-white' htmlFor="email">Email Address</Label>
+                    <Label className="text-white" htmlFor="email">
+                        Email Address
+                    </Label>
                     <Input
                         id="email"
                         type="email"
@@ -54,10 +102,13 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         placeholder="Enter your email"
                         required
+                        className='bg-transparent !placeholder-white !text-white'
                     />
                 </div>
                 <div className="flex flex-col gap-1 space-y-2 w-full">
-                    <Label className='text-white' htmlFor="password">Password</Label>
+                    <Label className="text-white" htmlFor="password">
+                        Password
+                    </Label>
                     <Input
                         id="password"
                         type="password"
@@ -65,8 +116,25 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         onChange={(e) => handleInputChange('password', e.target.value)}
                         placeholder="Enter your password"
                         required
+                        className='bg-transparent !placeholder-white !text-white'
                     />
                 </div>
+                {mode === 'signup' && (
+                    <div className="flex flex-col gap-1 space-y-2 w-full">
+                        <Label className="text-white" htmlFor="confirmPassword">
+                            Confirm Password
+                        </Label>
+                        <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                            placeholder="Confirm your password"
+                            required
+                            className='bg-transparent !placeholder-white !text-white'
+                        />
+                    </div>
+                )}
                 {mode === 'signup' && (
                     <div className="flex flex-col gap-1 space-y-2 w-full">
                         <TermsCheckbox
