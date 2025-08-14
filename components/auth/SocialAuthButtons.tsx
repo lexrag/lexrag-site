@@ -7,9 +7,8 @@ export default function SocialAuthButtons() {
     const startGoogle = async () => {
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-            const useProxy = typeof window !== 'undefined' && window.location.hostname === 'localhost' && API_BASE?.includes('localhost');
-            const url = useProxy ? '/api/auth/google/link' : `${API_BASE}/auth/signin/google`;
-            const res = await fetch(url);
+            if (!API_BASE) return;
+            const res = await fetch(`${API_BASE}/auth/signin/google`);
             const data = await res.json();
             const redirect = data?.redirect_url || data?.auth_url;
             if (res.ok && redirect) {
@@ -21,9 +20,8 @@ export default function SocialAuthButtons() {
     const startLinkedIn = async () => {
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-            const useProxy = typeof window !== 'undefined' && window.location.hostname === 'localhost' && API_BASE?.includes('localhost');
-            const url = useProxy ? '/api/auth/linkedin/link' : `${API_BASE}/auth/signin/linkedin`;
-            const res = await fetch(url);
+            if (!API_BASE) return;
+            const res = await fetch(`${API_BASE}/auth/signin/linkedin`);
             const data = await res.json();
             const redirect = data?.auth_url || data?.redirect_url;
             if (res.ok && redirect) {
