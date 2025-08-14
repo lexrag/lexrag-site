@@ -22,12 +22,21 @@ const SigninButton = () => {
                     cornerRadius={100}
                     mode="standard"
                     padding="8px 16px"
+                    style={{
+                        boxShadow: 'none',
+                        filter: 'none'
+                    }}
                     onClick={() => {
                         setIsModalOpen(true);
                     }}
                 >
-                    <span className="block text-axis-indigo group-hover:text-emerald-500 
-                    text-base font-medium px-2 whitespace-nowrap transition-colors duration-200">
+                    <span 
+                        className="block text-axis-indigo group-hover:text-emerald-500 
+                    text-base font-medium px-2 whitespace-nowrap transition-colors duration-200"
+                        style={{
+                            textShadow: 'none'
+                        }}
+                    >
                         Sign In
                     </span>
                 </LiquidGlass>
