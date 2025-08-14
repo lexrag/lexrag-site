@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import '@/css/themes/reui.css';
 import LiquidGlass from '@/components/liquid-glass';
@@ -19,6 +19,7 @@ interface LiquidGlassModalProps {
     aberrationIntensity?: number;
     elasticity?: number;
     mode?: 'prominent' | 'standard' | 'polar' | 'shader';
+    isVisible?: boolean;
 }
 
 export default function LiquidGlassModal({
@@ -27,19 +28,26 @@ export default function LiquidGlassModal({
     children,
     maxWidth = 'sm:max-w-md w-full max-w-sm',
     cornerRadius = 24,
-    padding = '64px',
+    padding = '34px',
     displacementScale = 200,
     blurAmount = 0.0008,
     saturation = 130,
     aberrationIntensity = 0,
     elasticity = 0.02,
     mode = 'prominent',
+    isVisible = true,
 }: LiquidGlassModalProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className={`bg-transparent border-0 p-0 ${maxWidth} mx-auto rounded-[${cornerRadius}px]`}>
+            <DialogContent 
+                className={`bg-transparent border-0 p-0 ${maxWidth} mx-auto rounded-[${cornerRadius}px] !animate-none !data-[state=open]:animate-none !data-[state=closed]:animate-none`}
+                style={{ 
+                    visibility: isVisible ? 'visible' : 'hidden',
+                    opacity: 1
+                }}
+            >
                 <div ref={containerRef} className="relative w-full">
                     <LiquidGlass
                         centered={false}

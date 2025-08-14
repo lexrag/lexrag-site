@@ -151,6 +151,7 @@ const GlassContainer = forwardRef<
     glassSize?: { width: number; height: number }
     onClick?: () => void
     mode?: "standard" | "polar" | "prominent" | "shader"
+    isReady?: boolean
   }>
 >(
   (
@@ -173,6 +174,7 @@ const GlassContainer = forwardRef<
       glassSize = { width: 270, height: 69 },
       onClick,
       mode = "standard",
+      isReady = true,
     },
     ref,
   ) => {
@@ -190,7 +192,7 @@ const GlassContainer = forwardRef<
     }, [mode, glassSize.width, glassSize.height])
 
     const backdropStyle = {
-      filter: isFirefox ? null : `url(#${filterId})`,
+      filter: isFirefox || !isReady ? null : `url(#${filterId})`,
       backdropFilter: `blur(${(overLight ? 12 : 4) + blurAmount * 32}px) saturate(${saturation}%)`,
     }
 
@@ -200,7 +202,9 @@ const GlassContainer = forwardRef<
         width: style?.width === "100%" ? "100%" : undefined,
         height: style?.height === "100%" ? "100%" : undefined,
       }} onClick={onClick}>
-        <GlassFilter mode={mode} id={filterId} displacementScale={displacementScale} aberrationIntensity={aberrationIntensity} width={glassSize.width} height={glassSize.height} shaderMapUrl={shaderMapUrl} />
+        {isReady && (
+          <GlassFilter mode={mode} id={filterId} displacementScale={displacementScale} aberrationIntensity={aberrationIntensity} width={glassSize.width} height={glassSize.height} shaderMapUrl={shaderMapUrl} />
+        )}
 
         <div
           className="glass"
@@ -306,6 +310,7 @@ export default function LiquidGlass({
   const [glassSize, setGlassSize] = useState({ width: 270, height: 69 })
   const [internalGlobalMousePos, setInternalGlobalMousePos] = useState({ x: 0, y: 0 })
   const [internalMouseOffset, setInternalMouseOffset] = useState({ x: 0, y: 0 })
+  const [isReady, setIsReady] = useState(false)
 
   // Use external mouse position if provided, otherwise use internal
   const globalMousePos = externalGlobalMousePos || internalGlobalMousePos
@@ -444,7 +449,7 @@ export default function LiquidGlass({
     }
   }, [globalMousePos, elasticity, calculateFadeInFactor])
 
-  // Update glass size whenever component mounts or window resizes
+  // Update glass size and set ready state
   useEffect(() => {
     const updateGlassSize = () => {
       if (glassRef.current) {
@@ -454,14 +459,22 @@ export default function LiquidGlass({
         const containerWidth = rect.width
         const containerHeight = rect.height
         
-        setGlassSize({ 
-          width: Math.max(contentWidth, containerWidth), 
-          height: Math.max(contentHeight, containerHeight) 
-        })
+        const newSize = { 
+          width: Math.max(contentWidth, containerWidth, 270), 
+          height: Math.max(contentHeight, containerHeight, 69) 
+        }
+        
+        setGlassSize(newSize)
+        
+        if (!isReady) {
+         setIsReady(true)
+        }
       }
     }
 
-    updateGlassSize()
+    if (glassRef.current) {
+      updateGlassSize()
+    }
     
     if (glassRef.current) {
       const resizeObserver = new ResizeObserver(updateGlassSize)
@@ -474,7 +487,7 @@ export default function LiquidGlass({
     
     window.addEventListener("resize", updateGlassSize)
     return () => window.removeEventListener("resize", updateGlassSize)
-  }, [])
+  }, [isReady])
 
   const translatePart = centered
     ? `translate(calc(-50% + ${calculateElasticTranslation().x}px), calc(-50% + ${calculateElasticTranslation().y}px))`
@@ -547,12 +560,13 @@ export default function LiquidGlass({
         overLight={overLight}
         onClick={onClick}
         mode={mode}
+        isReady={isReady}
       >
         {children}
       </GlassContainer>
 
       {/* Border layer 1 - extracted from glass container */}
-      {!compact && (
+      {!compact && isReady && (
         <span
           style={{
             ...positionStyles,
@@ -581,7 +595,7 @@ export default function LiquidGlass({
       )}
 
       {/* Border layer 2 - duplicate with mix-blend-overlay */}
-      {!compact && (
+      {!compact && isReady && (
         <span
           style={{
             ...positionStyles,
@@ -609,7 +623,7 @@ export default function LiquidGlass({
       )}
 
       {/* Hover effects */}
-      {!compact && Boolean(onClick) && (
+      {!compact && isReady && Boolean(onClick) && (
         <>
           <div
             style={{
@@ -660,5 +674,3 @@ export default function LiquidGlass({
     </>
   )
 }
-
-
