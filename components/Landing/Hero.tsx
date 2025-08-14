@@ -1,4 +1,4 @@
-import { H1, PLG } from '@/components/ui/typography';
+import { H1, PLG, PXL } from '@/components/ui/typography';
 import '@/css/themes/reui.css';
 
 const LandingHeading = () => {
@@ -13,7 +13,7 @@ const LandingHeading = () => {
                         Confidence in
                         <br /> Every Decision
                     </H1>
-                    <PLG>legal AI with graph-vector context</PLG>
+                    <PXL>legal AI with graph-vector context</PXL>
                 </div>
             </div>
         </>
