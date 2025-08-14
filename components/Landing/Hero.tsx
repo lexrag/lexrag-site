@@ -1,4 +1,4 @@
-import { H1, PLG, PXL } from '@/components/ui/typography';
+import { H1, PXL } from '@/components/ui/typography';
 import '@/css/themes/reui.css';
 
 const LandingHeading = () => {

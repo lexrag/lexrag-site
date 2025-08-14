@@ -48,14 +48,67 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!validateForm()) {
             return;
         }
 
-        console.log('Form submitted:', { mode, formData });
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+            if (!API_BASE) {
+                setErrors({ form: 'API base URL is not configured' });
+                return;
+            }
+            if (mode === 'signin') {
+                const endpoint = `${API_BASE}/auth/signin`;
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: formData.email, password: formData.password }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    setErrors({ form: data?.error || 'Sign in failed' });
+                    return;
+                }
+                const appBase = process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com';
+                const signinPath = process.env.NEXT_PUBLIC_APP_SIGNIN_REDIRECT_PATH || '/';
+                const redirectUrl = `${appBase}${signinPath}`;
+                window.location.href = redirectUrl;
+            } else {
+                const endpoint = `${API_BASE}/auth/signup`;
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        first_name: formData.firstName,
+                        last_name: formData.lastName,
+                        email: formData.email,
+                        password: formData.password,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    setErrors({ form: data?.error || 'Sign up failed' });
+                    return;
+                }
+                try {
+                    await fetch(`${API_BASE}/auth/send-code/${encodeURI(formData.email)}`, {
+                        method: 'POST',
+                    });
+                } catch {}
+
+                // After successful signup, redirect to app route that shows verify-email flow
+                const appBase = process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com';
+                const signupPath = process.env.NEXT_PUBLIC_APP_SIGNUP_REDIRECT_PATH || '/auth/email-verification';
+                const redirectUrl = `${appBase}${signupPath}/${encodeURI(formData.email)}`;
+                window.location.href = redirectUrl;
+            }
+        } catch (err: any) {
+            setErrors({ form: err?.message || 'Network error' });
+        }
     };
 
     return (
@@ -142,6 +195,9 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                             onChange={(checked) => handleInputChange('agreeToTerms', checked)}
                         />
                     </div>
+                )}
+                {errors.form && (
+                    <div className="text-red-400 text-sm text-center">{errors.form}</div>
                 )}
                 <div className="flex justify-center">
                     <ShinyButton

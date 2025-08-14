@@ -4,8 +4,32 @@ import { FaGoogle, FaLinkedinIn } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 
 export default function SocialAuthButtons() {
-    const handleSocialAuth = (provider: string) => {
-        console.log(`${provider} auth clicked`);
+    const startGoogle = async () => {
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+            const useProxy = typeof window !== 'undefined' && window.location.hostname === 'localhost' && API_BASE?.includes('localhost');
+            const url = useProxy ? '/api/auth/google/link' : `${API_BASE}/auth/signin/google`;
+            const res = await fetch(url);
+            const data = await res.json();
+            const redirect = data?.redirect_url || data?.auth_url;
+            if (res.ok && redirect) {
+                window.location.href = redirect;
+            }
+        } catch {}
+    };
+
+    const startLinkedIn = async () => {
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+            const useProxy = typeof window !== 'undefined' && window.location.hostname === 'localhost' && API_BASE?.includes('localhost');
+            const url = useProxy ? '/api/auth/linkedin/link' : `${API_BASE}/auth/signin/linkedin`;
+            const res = await fetch(url);
+            const data = await res.json();
+            const redirect = data?.auth_url || data?.redirect_url;
+            if (res.ok && redirect) {
+                window.location.href = redirect;
+            }
+        } catch {}
     };
 
     return (
@@ -15,7 +39,7 @@ export default function SocialAuthButtons() {
                 className="group w-full flex items-center justify-center gap-2 border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
                         bg-transparent hover:bg-transparent 
                         transition-colors duration-200 text-white hover:scale-105 hover:text-emerald-500"
-                onClick={() => handleSocialAuth('google')}
+                onClick={startGoogle}
             >
                 <FaGoogle size={20} className="text-white group-hover:text-emerald-500" />
                 Google
@@ -25,7 +49,7 @@ export default function SocialAuthButtons() {
                 className="group w-full flex items-center justify-center gap-2 border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
                         bg-transparent hover:bg-transparent 
                         transition-colors duration-200 text-white hover:scale-105 hover:text-emerald-500"
-                onClick={() => handleSocialAuth('linkedin')}
+                onClick={startLinkedIn}
             >
                 <FaLinkedinIn size={20} className="text-white group-hover:text-emerald-500" />
                 LinkedIn

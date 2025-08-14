@@ -2,17 +2,20 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
     images: {
         unoptimized: true,
     },
-    output: 'export',
+    // Use static export only in production. In dev we need dynamic routes (/api/*) for local proxying.
+    output: isProd ? 'export' : undefined,
     trailingSlash: true,
     reactStrictMode: false,
     devIndicators: false,
-    assetPrefix: process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : '',
+    assetPrefix: isProd ? process.env.NEXT_PUBLIC_BASE_URL : '',
     poweredByHeader: false,
     productionBrowserSourceMaps: true,
     // Ensure a deterministic buildId bound to the commit
