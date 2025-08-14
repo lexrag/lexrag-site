@@ -110,6 +110,13 @@ make deploy
 - **X-Frame-Options**: Clickjacking protection
 - **X-Content-Type-Options**: MIME type sniffing protection
 
+### CloudFront Response Headers (CSP + CORS)
+
+- Response Headers Policy applied via scripts sets:
+  - Content-Security-Policy including: `font-src 'self' data: https://lexrag.com https://*.cloudfront.net`
+  - CORS for cross-origin fonts/assets: `Access-Control-Allow-Origin: https://lexrag.com` and `https://www.lexrag.com`
+  - HSTS, Referrer-Policy, X-Frame-Options, X-Content-Type-Options
+
 ### Caching Strategy
 
 - **Static Assets** (`/_next/static/*`): Long-term cache
@@ -136,6 +143,57 @@ make build         # Build verification
 make smoke-test        # Manual smoke tests
 make smoke-test-curl   # Automated smoke tests
 ```
+
+## 🛠️ Operations (S3 + CloudFront) — Quick checklist
+
+Use these steps for domain/headers/cache updates without changing anything beyond S3 and CloudFront.
+
+1) Headers policy (CSP + CORS)
+- Prereq: `.env` has `CLOUDFRONT_DISTRIBUTION_ID`
+- Apply/update headers policy and attach to behaviors:
+```bash
+make security-headers
+```
+
+2) Cache policies and behaviors
+- Create long‑TTL for `/_next/static/*` and no‑cache for HTML/data; attach headers and enable compression:
+```bash
+make cloudfront-setup
+```
+
+3) Build with the desired public base URL for assets
+- Prefer serving assets from the primary domain:
+```bash
+NEXT_PUBLIC_BASE_URL=https://lexrag.com/ NODE_ENV=production npm run build
+```
+
+4) Deploy to S3 + invalidate HTML/data in CloudFront
+```bash
+S3_BUCKET=s3://lexrag-site DISTRIBUTION_ID=$CLOUDFRONT_DISTRIBUTION_ID \
+NEXT_PUBLIC_BASE_URL=https://lexrag.com/ NODE_ENV=production \
+./scripts/deploy.sh
+```
+
+5) Verify CloudFront config and runtime headers
+```bash
+make verify-cf
+make smoke-test
+# Optional: check CORS on an asset
+curl -sI -H "Origin: https://lexrag.com" \
+  https://lexrag.com/_next/static/chunks/webpack.js | cat
+```
+
+Notes
+- Errors like `ERR_BLOCKED_BY_CLIENT` on `px.ads.linkedin.com` are from ad blockers, not infra issues.
+- Only S3/CloudFront changes are required for headers/cache/CORS.
+
+## 📋 When requesting similar changes later, provide
+
+- CloudFront distribution ID and site domain (e.g., `lexrag.com`)
+- Target S3 bucket (e.g., `s3://lexrag-site`)
+- Desired `NEXT_PUBLIC_BASE_URL` for assets (e.g., `https://lexrag.com/`)
+- Any extra allowed origins for CORS (if different from `lexrag.com/www`)
+- Third‑party domains to include in CSP (analytics, tag managers, etc.)
 
 ### Code Quality
 
