@@ -126,7 +126,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                                 onChange={(e) => handleInputChange('firstName', e.target.value)}
                                 placeholder="Your First Name"
                                 required
-                                className='bg-transparent !placeholder-white !text-white'
+                                className='bg-transparent text-white border !border-white focus-visible:!border-white focus:text-white focus:placeholder-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none transition-colors transition-shadow duration-200'
                             />
                         </div>
                         <div className="flex flex-col gap-1 space-y-2 w-full">
@@ -139,7 +139,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                                 onChange={(e) => handleInputChange('lastName', e.target.value)}
                                 placeholder="Your Last Name"
                                 required
-                                className='bg-transparent !placeholder-white !text-white'
+                                className='bg-transparent text-white border !border-white focus-visible:!border-white focus:text-white focus:placeholder-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none transition-colors transition-shadow duration-200'
                             />
                         </div>
                     </div>
@@ -155,7 +155,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         placeholder="Enter your email"
                         required
-                        className='bg-transparent !placeholder-white !text-white'
+                        className='bg-transparent text-white border !border-white focus-visible:!border-white focus:text-white focus:placeholder-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none transition-colors transition-shadow duration-200'
                     />
                 </div>
                 <div className="flex flex-col gap-1 space-y-2 w-full">
@@ -169,7 +169,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                         onChange={(e) => handleInputChange('password', e.target.value)}
                         placeholder="Enter your password"
                         required
-                        className='bg-transparent !placeholder-white !text-white'
+                        className='bg-transparent text-white border !border-white focus-visible:!border-white focus:text-white focus:placeholder-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none transition-colors transition-shadow duration-200'
                     />
                 </div>
                 {mode === 'signup' && (
@@ -184,7 +184,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                             placeholder="Confirm your password"
                             required
-                            className='bg-transparent !placeholder-white !text-white'
+                            className='bg-transparent text-white border !border-white focus-visible:!border-white focus:text-white focus:placeholder-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none transition-colors transition-shadow duration-200'
                         />
                     </div>
                 )}
