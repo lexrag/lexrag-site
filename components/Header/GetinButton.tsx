@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from 'react';
 import LiquidGlass from '@/components/liquid-glass';
-import AuthModal from '@/components/auth/AuthModal';
 import '@/css/themes/reui.css';
 
-const SigninButton = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const GetinButton = () => {
+    const appBase = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com').replace(/\/+$/, '');
+    const appPath = '/chat/new';
     return (
         <div className="flex items-center gap-8">
             <div className="tab">
@@ -27,7 +26,7 @@ const SigninButton = () => {
                         filter: 'none'
                     }}
                     onClick={() => {
-                        setIsModalOpen(true);
+                        window.location.href = `${appBase}${appPath}`;
                     }}
                 >
                     <span 
@@ -37,14 +36,12 @@ const SigninButton = () => {
                             textShadow: 'none'
                         }}
                     >
-                        Sign In
+                        Get In
                     </span>
                 </LiquidGlass>
             </div>
-
-            <AuthModal open={isModalOpen} onOpenChange={setIsModalOpen} initialMode="signin" />
         </div>
     );
 };
 
-export default SigninButton;
+export default GetinButton;
