@@ -1,6 +1,6 @@
 'use client';
 
-import GetinButton from '@/components/Header/GetinButton';
+import GetinButton from './GetinButton';
 
 const HeaderCornerMenu = () => {
     return (
