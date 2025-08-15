@@ -167,7 +167,9 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
             <div
                 className={cn(
                     'grid transition-all duration-300 lg:hidden',
-                    isMobileMenuOpen ? 'grid-rows-[1fr] pt-10' : 'grid-rows-[0fr]',
+                    isMobileMenuOpen
+                        ? 'grid-rows-[1fr] pt-10 backdrop-blur-md bg-white/10 rounded-[20px] border border-white/20'
+                        : 'grid-rows-[0fr]',
                 )}
             >
                 <div className="overflow-hidden sm:px-10 px-2">
@@ -177,17 +179,24 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                             isMobileMenuOpen ? 'opacity-100' : 'opacity-0',
                         )}
                     >
-                        {links.map((item) => (
-                            <li key={item.name}>
-                                <Link
-                                    className="text-axis-indigo hover:text-phase-green transition-colors"
-                                    href={item.href}
-                                    onClick={(e) => handleLinkClick(e, item.href)}
-                                >
-                                    {item.name}
-                                </Link>
-                            </li>
-                        ))}
+                        {links.map((item) => {
+                            const isActive = pathname === '/' && currentHash === item.href;
+                            return (
+                                <li key={item.name}>
+                                    <Link
+                                        className={cn(
+                                            'relative text-base font-semibold px-6 py-4 rounded-full transition-colors text-midnight-core',
+                                            'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-midnight-core after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
+                                            isActive ? 'after:w-full' : 'hover:after:w-full',
+                                        )}
+                                        href={item.href}
+                                        onClick={(e) => handleLinkClick(e, item.href)}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                </li>
+                            );
+                        })}
                     </ul>
                     <div className="mt-[28px] mb-4 flex gap-2">
                         <Link className="inline-block hover:opacity-80 transition-opacity" href={'/'}>
