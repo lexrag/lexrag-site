@@ -31,25 +31,25 @@ export default function SocialAuthButtons() {
     };
 
     return (
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-5">
             <Button
                 variant="outline"
                 className="group w-full flex items-center justify-center gap-2 border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
                         bg-transparent hover:bg-transparent 
-                        transition-colors duration-200 text-white hover:scale-105 hover:text-emerald-500"
+                        transition-colors duration-200 text-white hover:scale-105 hover:font-bold"
                 onClick={startGoogle}
             >
-                <FaGoogle size={20} className="text-white group-hover:text-emerald-500" />
+                <FaGoogle size={20} className="text-white group-hover:font-bold" />
                 Google
             </Button>
             <Button
                 variant="outline"
                 className="group w-full flex items-center justify-center gap-2 border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
                         bg-transparent hover:bg-transparent 
-                        transition-colors duration-200 text-white hover:scale-105 hover:text-emerald-500"
+                        transition-colors duration-200 text-white hover:scale-105 hover:font-bold"
                 onClick={startLinkedIn}
             >
-                <FaLinkedinIn size={20} className="text-white group-hover:text-emerald-500" />
+                <FaLinkedinIn size={20} className="text-white group-hover:font-bold" />
                 LinkedIn
             </Button>
         </div>

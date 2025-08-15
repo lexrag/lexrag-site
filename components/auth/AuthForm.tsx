@@ -77,6 +77,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 const signinPath = process.env.NEXT_PUBLIC_APP_SIGNIN_REDIRECT_PATH || '/';
                 const redirectUrl = `${appBase}${signinPath}`;
                 window.location.href = redirectUrl;
+
             } else {
                 const endpoint = `${API_BASE}/auth/signup`;
                 const res = await fetch(endpoint, {
@@ -199,11 +200,11 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 {errors.form && (
                     <div className="text-red-400 text-sm text-center">{errors.form}</div>
                 )}
-                <div className="flex justify-center">
+                <div className="mt-8 flex justify-center">
                     <ShinyButton
                         typeof="submit"
                         className="border-[0.1] border-white/50 hover:border-white/70 shadow-[0_0_8.881px_0_rgba(0,0,0,0.1)] rounded-[73.553px]
-                        bg-transparent hover:scale-105 hover:text-emerald-500
+                        bg-transparent hover:scale-105 hover:font-bold
                         transition-colors duration-200 text-white"
                     >
                         {mode === 'signup' ? 'Sign Up' : 'Sign In'}
@@ -211,9 +212,9 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
                 </div>
             </form>
 
-            <div className="mt-6 w-full">
+            <div className="w-full">
                 <div className="flex justify-center">
-                    <PSM>Or</PSM>
+                    <PSM>or</PSM>
                 </div>
                 <SocialAuthButtons />
             </div>
@@ -221,7 +222,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
             <div className="mt-6 mb-10 text-center w-full">
                 <p className="text-sm">
                     {mode === 'signup' ? 'Have an account?' : "Don't have an account?"}{' '}
-                    <button onClick={onToggleMode} className="text-[var(--Brand-Primary-Axis-Indigo)] hover:underline">
+                    <button onClick={onToggleMode} className="hover:underline cursor-pointer">
                         {mode === 'signup' ? 'Sign In' : 'Sign Up'}
                     </button>
                 </p>

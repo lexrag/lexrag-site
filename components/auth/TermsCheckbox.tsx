@@ -14,11 +14,11 @@ export default function TermsCheckbox({ checked, onChange }: TermsCheckboxProps)
             <Checkbox id="agreeToTerms" checked={checked} onCheckedChange={onChange} required />
             <Label htmlFor="agreeToTerms" className="text-sm text-white">
                 I agree to the{' '}
-                <a href="/terms-and-conditions/terms-conditions" className="text-[var(--Brand-Primary-Axis-Indigo)]">
+                <a href="/terms-and-conditions/terms-conditions" className="hover:underline text-[var(--Brand-Primary-Axis-Indigo)]">
                     Terms & Conditions
                 </a>{' '}
                 and{' '}
-                <a href="/terms-and-conditions/privacy-policy" className="text-[var(--Brand-Primary-Axis-Indigo)]">
+                <a href="/terms-and-conditions/privacy-policy" className="hover:underline text-[var(--Brand-Primary-Axis-Indigo)]">
                     Privacy Policy
                 </a>
             </Label>
