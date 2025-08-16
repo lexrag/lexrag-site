@@ -80,7 +80,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                             <Menu className="size-6" />
                         </Button>
                     )}
-                    <Link href={'/'} onClick={handleLogoClick}>
+                    <Link href={'/'} onClick={handleLogoClick} className="mx-[5px]">
                         <div className="scale-80">
                             <Logo />
                         </div>
@@ -105,12 +105,12 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                     }}
                 >
                     <div
-                        className="flex items-center gap-2 py-[15px] px-1 lg:px-7 rounded-4xl lg:bg-white/10 bg-white/0 lg:border-t border-[#fff]"
+                        className="flex items-center gap-2 py-[15px] px-1 lg:px-10 rounded-4xl lg:bg-white/10 bg-white/0 lg:border-t border-[#fff]"
                         style={{
                             textShadow: 'none',
                         }}
                     >
-                        <Link href={'/'} onClick={handleLogoClick}>
+                        <Link href={'/'} onClick={handleLogoClick} className="mx-[15px]">
                             <Logo />
                         </Link>
                         <ul className="lg:flex gap-2 hidden">
@@ -123,7 +123,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                                             className={cn(
                                                 'relative text-base font-semibold px-6 py-3 rounded-full transition-colors text-[#593EDC]',
                                                 'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-[#06DF72] after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
-                                                isActive ? 'after:w-3/4' : 'hover:after:w-3/5',
+                                                isActive ? 'after:w-3/5' : 'hover:after:w-3/5',
                                             )}
                                             href={item.href}
                                             onClick={(e) => handleLinkClick(e, item.href)}
