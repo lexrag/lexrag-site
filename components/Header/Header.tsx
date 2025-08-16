@@ -105,7 +105,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                     }}
                 >
                     <div
-                        className="flex items-center gap-2 py-[15px] px-1 lg:px-12 rounded-4xl lg:bg-white/10 bg-white/0 lg:border-t border-[#fff]"
+                        className="flex items-center gap-2 py-[15px] px-1 lg:px-7 rounded-4xl lg:bg-white/10 bg-white/0 lg:border-t border-[#fff]"
                         style={{
                             textShadow: 'none',
                         }}
@@ -121,9 +121,9 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                                     <li key={item.name}>
                                         <Link
                                             className={cn(
-                                                'relative text-base font-semibold px-6 py-4 rounded-full transition-colors text-midnight-core',
-                                                'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-midnight-core after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
-                                                isActive ? 'after:w-full' : 'hover:after:w-full',
+                                                'relative text-base font-semibold px-6 py-3 rounded-full transition-colors text-[#593EDC]',
+                                                'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-[#06DF72] after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
+                                                isActive ? 'after:w-3/4' : 'hover:after:w-3/5',
                                             )}
                                             href={item.href}
                                             onClick={(e) => handleLinkClick(e, item.href)}
@@ -185,9 +185,9 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                                 <li key={item.name}>
                                     <Link
                                         className={cn(
-                                            'relative text-base font-semibold px-6 py-4 rounded-full transition-colors text-midnight-core',
-                                            'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-midnight-core after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
-                                            isActive ? 'after:w-full' : 'hover:after:w-full',
+                                            'relative text-base font-semibold px-6 py-4 rounded-full transition-colors text-[#593EDC]',
+                                            'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-[#06DF72] after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
+                                            isActive ? 'after:w-3/4' : 'hover:after:w-3/4',
                                         )}
                                         href={item.href}
                                         onClick={(e) => handleLinkClick(e, item.href)}

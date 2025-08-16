@@ -15,12 +15,12 @@ export const Logo = ({ variant }: LogoProps) => {
         return (
             <Image
                 className="max-h-[30px] transition-transform duration-300 hover:scale-105"
-                src="/media/LEXRAG__Landscape_sRGB_White.svg"
+                src="/media/lexrag_logo_white.svg"
                 alt="lexrag logo white"
                 width={130}
                 height={30}
                 priority
-                style={{ width: '130px', height: '30px' }}
+                style={{ width: '130px', height: '28px' }}
             />
         );
     }
@@ -28,13 +28,13 @@ export const Logo = ({ variant }: LogoProps) => {
     if (isHomePage) {
         return (
             <Image
-                className="max-h-[38px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo-secondary.svg"
+                className="max-h-[38px] transition-transform duration-300 hover:scale-103"
+                src="/media/lexrag_logo_primary_two_tone.svg"
                 alt="lexrag logo dark"
-                width={224}
-                height={38}
+                width={200}
+                height={41}
                 priority
-                style={{ width: '224px', height: '38px' }}
+                style={{ width: '224px', height: '48px' }}
             />
         );
     }
@@ -42,21 +42,21 @@ export const Logo = ({ variant }: LogoProps) => {
         <>
             <Image
                 className="dark:hidden max-h-[38px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo-secondary.svg"
+                src="/media/lexrag_logo_primary_two_tone.svg"
                 alt="lexrag logo light"
-                width={224}
-                height={38}
+                width={200}
+                height={41}
                 priority
-                style={{ width: '224px', height: '38px' }}
+                style={{ width: '224px', height: '48px' }}
             />
             <Image
                 className="hidden dark:block max-h-[38px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag-logo-secondary.svg"
+                src="/media/lexrag_logo_primary_two_tone.svg"
                 alt="lexrag logo dark"
-                width={224}
-                height={38}
+                width={200}
+                height={41}
                 priority
-                style={{ width: '224px', height: '38px' }}
+                style={{ width: '224px', height: '48px' }}
             />
         </>
     );
