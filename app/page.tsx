@@ -42,7 +42,7 @@ const LandingPage = () => {
                         }}
                     >
                         <div className="p-8 md:py-16">
-                            <h1 className="text-2xl md:text-7xl font-extrabold text-white">Cooming soon</h1>
+                            <h1 className="text-2xl md:text-7xl font-extrabold text-white uppercase">Coming soon</h1>
                             <h5 className="pl-2 mt-1 text-sm md:text-2xl font-bold text-white">
                                 Our website is under construction
                             </h5>
