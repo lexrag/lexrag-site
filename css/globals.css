@@ -20,6 +20,7 @@
 @import './components/apexcharts.css';
 @import './components/leaflet.css';
 @import './components/rating.css';
+@import './components//whatIs.css';
 
 /* 5. Keenicons */
 @import '../components/keenicons/assets/duotone/style.css';

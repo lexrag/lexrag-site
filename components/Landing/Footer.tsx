@@ -16,7 +16,7 @@ const FooterInner = () => {
         product: [
             { label: 'Features', href: '/features' },
             { label: 'Services', href: '/services' },
-            { label: 'Technology', href: '/technology/graphrag' },
+            { label: 'Technology', href: '/technology' },
             { label: 'Use Cases', href: '/use-cases' },
         ],
         legal: [

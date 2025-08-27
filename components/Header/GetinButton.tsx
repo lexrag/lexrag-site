@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import LiquidGlass from '@/components/liquid-glass';
 import '@/css/themes/reui.css';
@@ -23,20 +23,20 @@ const GetinButton = () => {
                     padding="8px 16px"
                     style={{
                         boxShadow: 'none',
-                        filter: 'none'
+                        filter: 'none',
                     }}
                     onClick={() => {
                         window.location.href = `${appBase}${appPath}`;
                     }}
                 >
-                    <span 
+                    <span
                         className="block text-axis-indigo group-hover:text-emerald-500 
                     text-base font-medium px-2 whitespace-nowrap transition-colors duration-200"
                         style={{
-                            textShadow: 'none'
+                            textShadow: 'none',
                         }}
                     >
-                        Get In
+                        Sign In
                     </span>
                 </LiquidGlass>
             </div>
