@@ -21,7 +21,9 @@ export default function SecurityCompliance({ className }: { className: string })
                         height={70}
                         alt="image"
                     />
-                    <span className="text-midnight-core md:mb-[43px] text-center">Enterprise-grade encryption</span>
+                    <span className="text-midnight-core md:mb-[43px] text-center text-[14px] md:text-base">
+                        Enterprise-grade encryption
+                    </span>
                 </Link>
 
                 <Link
@@ -35,7 +37,9 @@ export default function SecurityCompliance({ className }: { className: string })
                         height={70}
                         alt="image"
                     />
-                    <span className="text-midnight-core md:mb-[43px] text-center">SG data-localization</span>
+                    <span className="text-midnight-core md:mb-[43px] text-center text-[14px] md:text-base">
+                        SG data-localization
+                    </span>
                 </Link>
 
                 <Link
@@ -49,7 +53,9 @@ export default function SecurityCompliance({ className }: { className: string })
                         height={70}
                         alt="image"
                     />
-                    <span className="text-midnight-core md:mb-[43px] text-center">Compliance-ready</span>
+                    <span className="text-midnight-core md:mb-[43px] text-center text-[14px] md:text-base">
+                        Compliance-ready
+                    </span>
                 </Link>
             </div>
         </section>
