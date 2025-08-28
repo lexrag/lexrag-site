@@ -161,14 +161,14 @@ const Technology = () => {
 
             <div className="flex flex-wrap md:flex-nowrap justify-between  md:justify-center gap-8 md:gap-[84px] mb-[75px] px-4">
                 <Link
-                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
                     href="/technology"
                 >
                     See demo
                 </Link>
 
                 <Link
-                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
                     href="/technology"
                 >
                     Start free

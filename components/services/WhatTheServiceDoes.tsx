@@ -74,7 +74,7 @@ function CardItem({
                 <h6 className="font-semibold md:text-2xl text-lg mb-5 mr-auto leading-[110%]">{feature.title}</h6>
                 <p className="text-[16px] md:leading-[130%] leading-[110%] font-normal mb-6">{feature.description}</p>
                 <Link
-                    className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-4 md:px-[36px] rounded-full transition-colors hover:opacity-85"
+                    className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-4 md:px-[36px] rounded-full transition-colors"
                     href={feature.href}
                 >
                     Learn more

@@ -82,19 +82,19 @@ const ServicesPage = () => {
 
                 <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-68 md:mt-[52px]">
                     <Link
-                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
                         href="/services"
                     >
                         Book Demo
                     </Link>
                     <Link
-                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
                         href="/services"
                     >
                         Start Free
                     </Link>
                     <Link
-                        className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors"
                         href="/pricing"
                     >
                         See pricing
@@ -129,6 +129,28 @@ const ServicesPage = () => {
             <HowItWorks className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
             <Outcomes className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
             <Intergrations className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
+
+            <div className="flex flex-wrap md:flex-nowrap justify-between  md:justify-center gap-8 md:gap-[84px] mb-[75px] px-4">
+                <Link
+                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
+                    href="/technology"
+                >
+                    See demo
+                </Link>
+
+                <Link
+                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
+                    href="/technology"
+                >
+                    Start free
+                </Link>
+                <Link
+                    className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors text-axis-indigo"
+                    href="/technology"
+                >
+                    See pricing
+                </Link>
+            </div>
 
             <Footer />
         </div>

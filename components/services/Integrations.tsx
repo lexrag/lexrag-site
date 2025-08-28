@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { cx } from '@/utils/cx';
 
 export default function Intergrations({ className }: { className: string }) {
@@ -25,6 +26,15 @@ export default function Intergrations({ className }: { className: string }) {
                 <div className="md:block hidden">
                     <Image src="/media/service/integration.svg" width={378} height={326} alt="image" />
                 </div>
+            </div>
+
+            <div className="text-center">
+                <Link
+                    className="inline-block mx-auto mt-[50px] text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
+                    href="/services"
+                >
+                    Explore Synthetic Panel
+                </Link>
             </div>
         </section>
     );
