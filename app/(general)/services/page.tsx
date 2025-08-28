@@ -1,135 +1,134 @@
 import { Metadata } from 'next';
-import { BarChart3, Database, FileText, Search, Shield, Users } from 'lucide-react';
-import { getAppUrl } from '@/lib/app-config';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import Link from 'next/link';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
-import PageTitle from '@/components/Layout/PageTitle';
+import LiquidGlass from '@/components/liquid-glass';
+import HowItWorks from '@/components/services/HowItWorks';
+import Intergrations from '@/components/services/Integrations';
+import Outcomes from '@/components/services/Outcomes';
+import WhatTheServiceDoes from '@/components/services/WhatTheServiceDoes';
+import Tilt3D from '@/components/tilt3d/Tilt3D';
 
 export const metadata: Metadata = {
     title: 'Services - LEXRAG',
     description: 'Comprehensive legal data analysis and research services powered by GraphRAG technology',
 };
 
-const services = [
-    {
-        title: 'Legal Research & Analysis',
-        description: 'Advanced legal research using graph-based data analysis and AI-powered insights',
-        icon: Search,
-        features: [
-            'Comprehensive case law analysis',
-            'Legislative document research',
-            'Regulatory compliance checking',
-            'Precedent identification',
-        ],
-    },
-    {
-        title: 'Graph Database Solutions',
-        description: 'Custom graph database implementations for legal data management',
-        icon: Database,
-        features: [
-            'Legal relationship mapping',
-            'Data interconnection analysis',
-            'Scalable graph architecture',
-            'Real-time data updates',
-        ],
-    },
-    {
-        title: 'AI-Powered Legal Insights',
-        description: 'Machine learning and AI solutions for legal document analysis',
-        icon: BarChart3,
-        features: ['Document classification', 'Risk assessment', 'Compliance monitoring', 'Predictive analytics'],
-    },
-    {
-        title: 'Document Processing',
-        description: 'Automated legal document processing and analysis',
-        icon: FileText,
-        features: [
-            'OCR and text extraction',
-            'Document structure analysis',
-            'Metadata extraction',
-            'Content summarization',
-        ],
-    },
-    {
-        title: 'Legal Team Collaboration',
-        description: 'Collaborative tools for legal teams and organizations',
-        icon: Users,
-        features: ['Shared workspace', 'Document sharing', 'Team analytics', 'Access control'],
-    },
-    {
-        title: 'Compliance & Security',
-        description: 'Enterprise-grade security and compliance solutions',
-        icon: Shield,
-        features: ['Data encryption', 'Access auditing', 'Compliance reporting', 'GDPR compliance'],
-    },
-];
-
 const ServicesPage = () => {
-    const appUrl = getAppUrl();
-
     return (
         <div className="overflow-y-auto">
             <Header className="" />
-
-            <main className="pt-20">
-                <PageTitle title="Our Services" finalTitle="Services" />
-
-                <section className="pb-20 px-[10%]">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-gray-900 dark:text-white">
-                            Comprehensive Legal Technology Services
-                        </h2>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                            We provide end-to-end solutions for legal data analysis, research, and AI-powered insights
-                            using cutting-edge GraphRAG technology.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {services.map((service, index) => (
-                            <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                                            <service.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                                        </div>
-                                        <CardTitle className="text-xl">{service.title}</CardTitle>
-                                    </div>
-                                    <CardDescription className="text-base">{service.description}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-2">
-                                        {service.features.map((feature, featureIndex) => (
-                                            <li
-                                                key={featureIndex}
-                                                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
-                                            >
-                                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-
-                    <div className="text-center mt-16">
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            Ready to transform your legal practice with AI-powered insights?
-                        </p>
-                        <a
-                            href={appUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4">
+                <div className="hidden md:block">
+                    <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+                        <LiquidGlass
+                            className="group max-w-[900px]"
+                            centered={false}
+                            compact
+                            displacementScale={0}
+                            blurAmount={0.01}
+                            saturation={200}
+                            aberrationIntensity={2}
+                            elasticity={0.05}
+                            cornerRadius={30}
+                            mode="standard"
+                            padding="8px 16px"
+                            style={{
+                                boxShadow: 'none',
+                                filter: 'none',
+                            }}
                         >
-                            Get Started
-                        </a>
-                    </div>
-                </section>
-            </main>
+                            <div className="md:p-10 p-3">
+                                <h1
+                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-midnight-core"
+                                    style={{
+                                        fontFamily: 'Instrument Sans',
+                                    }}
+                                >
+                                    Legal Research in Seconds — with Trusted Sources
+                                </h1>
+                                <h4
+                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                                    style={{
+                                        fontFamily: 'Instrument Sans',
+                                    }}
+                                >
+                                    Transparent AI reasoning with citations you can trace and verify.
+                                </h4>
+                            </div>
+                        </LiquidGlass>
+                    </Tilt3D>
+                </div>
+
+                <div className="md:p-10 md:hidden">
+                    <h1
+                        className="text-[32px]/[110%] md:text-[64px]/[110%] font-normal text-midnight-core mb-[25px]"
+                        style={{
+                            fontFamily: 'Instrument Sans',
+                        }}
+                    >
+                        Legal Research in Seconds — with Trusted Sources
+                    </h1>
+                    <h4
+                        className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                        style={{
+                            fontFamily: 'Instrument Sans',
+                        }}
+                    >
+                        Transparent AI reasoning with citations you can trace and verify.
+                    </h4>
+                </div>
+
+                <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-68 md:mt-[52px]">
+                    <Link
+                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        href="/services"
+                    >
+                        Book Demo
+                    </Link>
+                    <Link
+                        className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        href="/services"
+                    >
+                        Start Free
+                    </Link>
+                    <Link
+                        className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
+                        href="/pricing"
+                    >
+                        See pricing
+                    </Link>
+                </div>
+
+                <div className="bg-axis-indigo rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-around mt-[54px] mb-[75px]">
+                    <Link href="/services" className="hover:opacity-75 transition-opacity">
+                        #Legal Accuracy
+                    </Link>
+                    <Link href="/services" className="hover:opacity-75 transition-opacity">
+                        #Explainable AI
+                    </Link>
+                    <Link href="/services" className="hover:opacity-75 transition-opacity">
+                        #Case Assessment
+                    </Link>
+                    <Link href="/services" className="hover:opacity-75 transition-opacity">
+                        #Neighbor Services
+                    </Link>
+                </div>
+            </section>
+
+            <Image
+                className="absolute right-0 top-64 md:top-12 md:w-[707px] md:h-[421px] w-[400px] h-[250px]"
+                src={'/media/service/service-hero-bg.svg'}
+                alt="image"
+                width={707}
+                height={421}
+            />
+
+            <WhatTheServiceDoes className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
+            <HowItWorks className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
+            <Outcomes className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
+            <Intergrations className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
 
             <Footer />
         </div>
