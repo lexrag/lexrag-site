@@ -9,6 +9,7 @@ type Tilt3DProps = {
     perspective?: number;
     scale?: number;
     radius?: number;
+    hoverGlow?: boolean;
     children: React.ReactNode;
 };
 
@@ -18,6 +19,7 @@ export default function Tilt3D({
     perspective = 1000,
     scale = 1.02,
     radius = 24,
+    hoverGlow = false,
     children,
 }: Tilt3DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -82,9 +84,8 @@ export default function Tilt3D({
         <div
             ref={containerRef}
             className={cx(
-                'relative inline-block will-change-transform',
-
-                '[transform-style:preserve-3d] select-none',
+                'relative inline-block will-change-transform [transform-style:preserve-3d] select-none',
+                hoverGlow && 'group',
                 className,
             )}
             style={
@@ -94,19 +95,21 @@ export default function Tilt3D({
                 } as React.CSSProperties
             }
         >
-            <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-[var(--r,24px)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                style={
-                    {
-                        background:
-                            'radial-gradient(220px 220px at var(--tilt-x) var(--tilt-y), rgba(255,255,255,0.22), rgba(255,255,255,0.0) 60%)',
-                        transform: 'translateZ(60px)',
+            {hoverGlow && (
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-[var(--r,24px)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                    style={
+                        {
+                            background:
+                                'radial-gradient(220px 220px at var(--tilt-x) var(--tilt-y), rgba(255,255,255,0.22), rgba(255,255,255,0.0) 60%)',
+                            transform: 'translateZ(60px)',
+                            '--r': `${radius}px`,
+                        } as React.CSSProperties
+                    }
+                />
+            )}
 
-                        '--r': `${radius}px`,
-                    } as React.CSSProperties
-                }
-            />
             <div
                 ref={innerRef}
                 className="transform-gpu [backface-visibility:hidden]"
