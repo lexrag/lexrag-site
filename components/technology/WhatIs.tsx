@@ -92,7 +92,7 @@ export default function WhatIs({ items = DEFAULT_FEATURES, initialIndex = 0, cla
             <h2 className="text-midnight-core text-[28px] md:text-[64px] mb-[52px]">What is it</h2>
 
             <div className="flex gap-6 flex-wrap md:flex-nowrap">
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-col gap-2 flex-1">
                     {items.map((it, i) => {
                         const isActive = i === index;
                         const panelId = `feature-panel-${it.id}`;
@@ -106,13 +106,13 @@ export default function WhatIs({ items = DEFAULT_FEATURES, initialIndex = 0, cla
                                     aria-expanded={isActive}
                                     onClick={() => setIndex(i)}
                                     className={cx(
-                                        'group relative isolate flex w-full items-center gap-[15px] rounded-2xl px-5 py-5 text-left',
+                                        'group relative isolate flex w-full items-center gap-5 rounded-2xl p-4 text-left',
                                         'bg-white/70 focus:bg-white cursor-pointer',
                                         'transition-[transform,box-shadow] duration-300 ease-out will-change-transform',
                                         isActive ? 'shadow-lg' : 'hover:shadow-md',
 
                                         'before:absolute before:inset-0 before:-z-10 before:rounded-2xl',
-                                        'before:bg-gradient-to-b before:from-[#BBBCFA] before:to-[#694AFF]',
+                                        'before:bg-gradient-to-b before:from-[#907bf6] before:to-[#694AFF]',
                                         'before:opacity-0 before:transition-opacity before:duration-300 before:ease-out',
                                         isActive ? 'before:opacity-100' : 'hover:before:opacity-100',
                                     )}
@@ -150,9 +150,14 @@ export default function WhatIs({ items = DEFAULT_FEATURES, initialIndex = 0, cla
                                     )}
                                 >
                                     <div className="overflow-hidden">
-                                        <article className="relative w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-[#C8B7FF] to-[#694AFF] p-5 text-white shadow-md">
+                                        <article className="relative w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-[#694AFF] to-[#694AFF] p-5 text-white shadow-md">
                                             <div className="flex gap-3 items-start font-semibold text-phase-green select-none">
-                                                <span className="w-16 font-normal text-[36px] md:text-[48px]">
+                                                <span
+                                                    style={{
+                                                        fontFamily: 'Instrument Sans',
+                                                    }}
+                                                    className="w-16 font-normal text-[36px] md:text-[48px]"
+                                                >
                                                     {String(it.id).padStart(2, '0')}
                                                 </span>
                                                 <Image
@@ -198,7 +203,7 @@ export default function WhatIs({ items = DEFAULT_FEATURES, initialIndex = 0, cla
                 <div
                     role="tabpanel"
                     aria-labelledby={`feature-${active.id}`}
-                    className="relative w-full md:w-[693px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#C8B7FF] to-[#694AFF] p-6 text-white shadow-xl hidden md:block"
+                    className="relative w-full md:w-[693px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#907bf6] to-[#694AFF] p-6 text-white shadow-xl hidden md:block"
                 >
                     <div className="flex gap-3 items-start text-5xl font-semibold text-phase-green select-none">
                         <span className="text-[64px] w-20 font-normal">{String(active.id).padStart(2, '0')}</span>

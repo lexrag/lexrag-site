@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { LinkPrimary } from '@/components/ui/link-primary';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
@@ -60,7 +61,7 @@ const Technology = () => {
                                         fontFamily: 'Instrument Sans',
                                     }}
                                 >
-                                    Get verifiable answers from authoritative legal sources
+                                    Verifiable Answers Authoritative Sources
                                 </h1>
                                 <h4
                                     className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
@@ -68,7 +69,7 @@ const Technology = () => {
                                         fontFamily: 'Instrument Sans',
                                     }}
                                 >
-                                    Powered by Graph + Vector + RAG
+                                    powered by graph + vector + RAG
                                 </h4>
                             </div>
                         </LiquidGlass>
@@ -82,7 +83,7 @@ const Technology = () => {
                             fontFamily: 'Instrument Sans',
                         }}
                     >
-                        Get verifiable answers from authoritative legal sources
+                        Verifiable Answers Authoritative Sources
                     </h1>
                     <h4
                         className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
@@ -90,7 +91,7 @@ const Technology = () => {
                             fontFamily: 'Instrument Sans',
                         }}
                     >
-                        Powered by Graph + Vector + RAG
+                        powered by graph + vector + RAG
                     </h4>
                 </div>
 
@@ -116,7 +117,7 @@ const Technology = () => {
                     </Link>
                 </div>
 
-                <div className="bg-axis-indigo rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-20">
+                <div className="bg-static-lilac rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-20">
                     {BADGES.map(({ icon, label, href }) => (
                         <LiquidGlass
                             key={label}
@@ -145,40 +146,49 @@ const Technology = () => {
                 </div>
             </section>
 
-            <Image
-                className="absolute right-0 top-60 md:top-28 md:w-[707px] md:h-[421px] w-[400px] h-[250px]"
-                src={'/media/technology/technology.svg'}
-                alt="image"
-                width={707}
-                height={421}
-            />
-
             <WhatIs className="max-w-[1200px] mx-auto px-4" />
             <HowItWorks />
             <WhyItsBetter className="max-w-[1200px] mx-auto  mb-20 md:mb-[128px] px-4" />
             <IntegrationOptions className="max-w-[1200px] mx-auto mb-20 md:mb-[75px] px-4" />
             <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" />
 
-            <div className="flex flex-wrap md:flex-nowrap justify-between  md:justify-center gap-8 md:gap-[84px] mb-[75px] px-4">
-                <Link
-                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
-                    href="/technology"
-                >
-                    See demo
-                </Link>
+            <div className="max-w-[1200px] mx-auto mb-[145px] px-4">
+                <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+                    <LiquidGlass
+                        className="group max-w-[600px]"
+                        centered={false}
+                        compact
+                        displacementScale={0}
+                        blurAmount={0.01}
+                        saturation={200}
+                        aberrationIntensity={2}
+                        elasticity={0.05}
+                        cornerRadius={30}
+                        mode="standard"
+                        padding="8px 16px"
+                        style={{
+                            boxShadow: 'none',
+                            filter: 'none',
+                        }}
+                    >
+                        <div className="md:p-10 p-3">
+                            <h4
+                                className="text-[20px]/[21px] md:text-[32px]/[120%] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                                style={{
+                                    fontFamily: 'Instrument Sans',
+                                }}
+                            >
+                                “Confidence in technology grows through experience: by testing, integrating, and relying
+                                on it, you discover that security and usability go hand in hand.”
+                            </h4>
+                            <p className="text-midnight-core mt-5 text-sm md:text-base">A. Author</p>
+                        </div>
+                    </LiquidGlass>
+                </Tilt3D>
 
-                <Link
-                    className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-opacity hover:opacity-85"
-                    href="/technology"
-                >
-                    Start free
-                </Link>
-                <Link
-                    className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors text-axis-indigo"
-                    href="/technology"
-                >
-                    See pricing
-                </Link>
+                <div className="mt-13">
+                    <LinkPrimary href="/technology">Get started</LinkPrimary>
+                </div>
             </div>
 
             <Footer />
