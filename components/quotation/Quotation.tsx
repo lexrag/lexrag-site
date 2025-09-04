@@ -39,7 +39,7 @@ export default function Quotation({ className }: { className?: string }) {
             </Tilt3D>
 
             <div className="mt-13">
-                <LinkPrimary href="/technology">Get started</LinkPrimary>
+                <LinkPrimary href="https://app.lexrag.com/auth/signup">Get started</LinkPrimary>
             </div>
         </div>
     );

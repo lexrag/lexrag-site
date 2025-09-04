@@ -98,7 +98,7 @@ const Technology = () => {
                 <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-64 md:mt-[52px]">
                     <Link
                         className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
-                        href="/technology"
+                        href="https://app.lexrag.com/auth/signup"
                     >
                         Register Free
                     </Link>
