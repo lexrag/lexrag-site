@@ -7,28 +7,20 @@ type Card = {
 
 const CARDS: Card[] = [
     {
-        title: '70%',
-        desc: 'Research speed vs. manual work',
+        title: '8h → 15min',
+        desc: 'Legal research with LEXRAG',
     },
     {
-        title: '500+',
-        desc: 'Legal teams onboarded',
+        title: '3× Faster',
+        desc: 'From black-box AI to transparent, verifiable reasoning',
     },
     {
-        title: 'Global',
-        desc: 'Multi-jurisdiction support',
+        title: '100 %',
+        desc: 'Answers backed by authoritative citation',
     },
     {
-        title: '10,000+',
-        desc: 'Cases cited and mapped',
-    },
-    {
-        title: '99%',
-        desc: 'Citation accuracy',
-    },
-    {
-        title: '24/7',
-        desc: 'Audit trail & traceability',
+        title: '70% Stronger',
+        desc: 'Smarter research → stronger arguments',
     },
 ];
 
@@ -46,18 +38,16 @@ export default function Outcomes({ className }: { className: string }) {
                                     key={card.title}
                                     className={cx(
                                         'bg-[#FFFFFF4D] border rounded-3xl xl:h-[191px] h-[150px] flex flex-col items-center justify-center px-4',
-                                        idx == 0 || idx == 4
-                                            ? 'xl:w-[180px] md:w-full w-[47%]'
-                                            : 'xl:w-[242px] md:w-full w-[47%]',
-                                        idx == 2 || idx == 3
+                                        idx == 1 || idx == 2 ? 'md:w-[304px] w-full' : 'md:flex-1 w-full',
+                                        idx == 1 || idx == 2
                                             ? 'bg-gradient-to-b to-[#06DF72] from-[#06DF7299] border-phase-green'
                                             : 'border-white',
                                     )}
                                 >
                                     <h6
                                         className={cx(
-                                            'font-bold xl:text-[50px] text-[24px] text-phase-green mb-6',
-                                            idx === 2 || idx === 3 ? 'text-white' : '',
+                                            'font-extrabold xl:text-[50px] text-[34px] text-phase-green mb-2 md:mb-6',
+                                            idx === 1 || idx === 2 ? 'text-white' : '',
                                         )}
                                     >
                                         {card.title}
@@ -69,11 +59,8 @@ export default function Outcomes({ className }: { className: string }) {
                     </div>
 
                     <div className="bg-[#FFFFFF4D] border border-white md:px-8 px-4 rounded-3xl w-full xl:w-[384px] flex flex-col items-center justify-center p-4">
-                        <h6 className={cx('font-bold text-[50px] text-phase-green mb-6')}>1,200+</h6>
-                        <p className="text-midnight-core">
-                            Already trusted by boutique firms, mid-size practices, and global law firms — showing
-                            adoption across the full spectrum of the legal industry.
-                        </p>
+                        <h6 className={cx('font-bold md:text-[50px] text-[32px] text-phase-green mb-6')}>By lawyers</h6>
+                        <p className="text-midnight-core">Built for lawyers’ workflows</p>
                     </div>
                 </div>
             </div>

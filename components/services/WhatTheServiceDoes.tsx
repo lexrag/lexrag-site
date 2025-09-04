@@ -4,7 +4,11 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import { cx } from '@/utils/cx';
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { WhatTheServiceDoesCard1, WhatTheServiceDoesCard2, WhatTheServiceDoesCard3 } from '@/components/services/icons/WhatTheServiceDoesCards';
+import {
+    WhatTheServiceDoesCard1,
+    WhatTheServiceDoesCard2,
+    WhatTheServiceDoesCard3,
+} from '@/components/services/icons/WhatTheServiceDoesCards';
 
 type Feature = {
     id: number;
@@ -59,8 +63,10 @@ function CardItem({
     const scale = useTransform(progress, [start, end], prefersReduce ? [1, 1] : [0.975, 1]);
 
     const renderIcon = () => {
-        if (feature.id === 1) return <WhatTheServiceDoesCard1 className="mb-6 md:w-[136px] md:h-[136px] w-[65px] h-[65px]" />;
-        if (feature.id === 2) return <WhatTheServiceDoesCard2 className="mb-6 md:w-[136px] md:h-[136px] w-[65px] h-[65px]" />;
+        if (feature.id === 1)
+            return <WhatTheServiceDoesCard1 className="mb-6 md:w-[136px] md:h-[136px] w-[65px] h-[65px]" />;
+        if (feature.id === 2)
+            return <WhatTheServiceDoesCard2 className="mb-6 md:w-[136px] md:h-[136px] w-[65px] h-[65px]" />;
         return <WhatTheServiceDoesCard3 className="mb-6 md:w-[136px] md:h-[136px] w-[65px] h-[65px]" />;
     };
 
@@ -75,8 +81,12 @@ function CardItem({
                 .group:hover .accent-rect { stroke: #05df71 !important; fill: #05df71 !important; }
                 `}</style>
                 {renderIcon()}
-                <h6 className="font-semibold md:text-2xl text-lg mb-5 leading-[110%] transition-colors group-hover:text-axis-indigo text-center">{feature.title}</h6>
-                <p className="text-[16px] md:leading-[130%] leading-[110%] font-normal mb-6 transition-colors group-hover:text-axis-indigo text-center">{feature.description}</p>
+                <h6 className="font-semibold md:text-2xl text-lg mb-5 leading-[110%] transition-colors group-hover:text-axis-indigo text-center text-midnight-core">
+                    {feature.title}
+                </h6>
+                <p className="text-[16px] md:leading-[130%] leading-[110%] font-normal mb-6 transition-colors group-hover:text-axis-indigo text-center text-midnight-core">
+                    {feature.description}
+                </p>
                 <Link
                     className="text-axis-indigo border border-phase-green hover:bg-phase-green font-medium text-base py-2 px-4 md:px-[36px] rounded-full transition-colors"
                     href={feature.href}

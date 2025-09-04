@@ -13,9 +13,9 @@ const FeaturesPage = () => {
             <main className="pt-20">
                 {/* <PageTitle title="Product Features" finalTitle="Features" /> */}
 
-                <section id="product-features" className="pb-20">
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl md:text-4xl pt-28 mb-2 font-semibold transition-colors duration-300 text-midnight-core">
+                <section id="product-features" className="pb-12">
+                    <div className="text-center mb-6">
+                        <h3 className="text-2xl md:text-4xl pt-16 mb-2 font-semibold transition-colors duration-300 text-midnight-core">
                             Product Features
                         </h3>
                         <p className="font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">
@@ -24,7 +24,7 @@ const FeaturesPage = () => {
                         </p>
                     </div>
                     <ProductFeatures
-                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-4 min-h-[230px]"
+                        gridClassName="grid grid-cols-1 md:grid-cols-4 lg:pr-[14%] lg:pl-[14%] gap-3 min-h-[230px]"
                         showDescription={true}
                         showSideBadges={false}
                         showBottomBadges={true}

@@ -134,10 +134,7 @@ const Technology = () => {
                             padding="8px 16px"
                             style={{ boxShadow: 'none', filter: 'none' }}
                         >
-                            <Link
-                                href={href}
-                                className="hover:opacity-75 transition-opacity flex items-center gap-[10px]"
-                            >
+                            <Link href={href} className="hover:opacity-75 transition-opacity flex items-center gap-3">
                                 <Image src={icon} width={20} height={20} alt={label} />
                                 <span className="text-[14px] font-medium">{label}</span>
                             </Link>
