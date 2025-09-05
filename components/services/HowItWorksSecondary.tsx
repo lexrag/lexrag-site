@@ -278,9 +278,8 @@ function CardItem({ feature, x, y, index }: { feature: Feature; x: number; y: nu
                     <div
                         className="absolute text-sm text-black rounded-lg pointer-events-none bottom-full left-1/2 -translate-x-1/2 w-[280px] transform transition-all duration-200 ease-out"
                         style={{
-                            backgroundColor: index === 4 ? '#06DF7299' : '#BBBCFA',
-                            boxShadow:
-                                index === 4 ? `0 0 20px rgba(6, 223, 114, 0.3)` : `0 0 20px rgba(187, 188, 250, 0.5)`,
+                            backgroundColor: index === 4 ? '#06DF7299' : '#CDC5F5',
+                            boxShadow: index === 4 ? `0 0 20px rgba(6, 223, 114, 0.3)` : `0 0 20px #CDC5F5`,
                             padding: '16px',
                             marginBottom: '15px',
                             zIndex: index === 4 ? 70 : 50,
@@ -295,7 +294,7 @@ function CardItem({ feature, x, y, index }: { feature: Feature; x: number; y: nu
                                 height: 0,
                                 borderLeft: '12px solid transparent',
                                 borderRight: '12px solid transparent',
-                                borderTop: index === 4 ? '12px solid #06DF7299' : '12px solid #BBBCFA',
+                                borderTop: index === 4 ? '12px solid #06DF7299' : '12px solid #CDC5F5',
                                 marginTop: '-1px',
                             }}
                         />
