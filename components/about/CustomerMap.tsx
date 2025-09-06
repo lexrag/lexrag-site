@@ -67,37 +67,49 @@ function CardItem({
             style={{ y, scale, transformOrigin: 'bottom center' }}
             className="will-change-[transform] w-full flex-1 hover:scale-102 transition-all duration-500 group cursor-pointer"
         >
-            <div className="relative md:p-10 p-4 flex justify-start flex-col items-start w-full rounded-3xl bg-gradient-to-br from-[#593EDC8C] to-[#FF5C00E5] group-hover:to-[#694AFF] group-hover:from-[#7f6be5] transition-all md:h-[279px] h-auto min-h-[240px]">
-                <div className="flex items-center gap-4 mr-auto">
-                    <Image src={feature.img} className="" alt={feature.title} width={30} height={30} />
-                    <h6 className="md:text-[24px] text-[18px] font-semibold">{feature.title}</h6>
-                </div>
+            <div className="relative md:h-[279px] h-auto min-h-[240px] [perspective:1000px]">
+                <div className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-700 group-hover:[transform:rotateY(180deg)]">
+                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] md:p-10 p-4 flex justify-start flex-col items-start rounded-3xl bg-gradient-to-br from-[#593EDC8C] to-[#FF5C00E5]">
+                        <div className="flex items-center gap-4 mr-auto">
+                            <Image src={feature.img} className="" alt={feature.title} width={30} height={30} />
+                            <h6 className="md:text-[24px] text-[18px] font-semibold">{feature.title}</h6>
+                        </div>
 
-                <div className="group-hover:opacity-0 absolute md:top-16 top-12 transition-opacity">
-                    <div className="text-[#EE5000] rounded-full border border-[#EE5000] py-0.5 px-3 font-medium bg-[#FFEFE5] my-5 w-max md:text-base text-sm">
-                        Problem
+                        <div className="mt-2">
+                            <div className="text-[#EE5000] rounded-full border border-[#EE5000] py-0.5 px-3 font-medium bg-[#FFEFE5] my-5 w-max md:text-base text-sm">
+                                Problem
+                            </div>
+
+                            <ul className="list-disc pl-6">
+                                {feature.problems.map((item) => (
+                                    <li key={item} className="md:max-w-[284px] max-w-[250px] md:text-base text-sm">
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
 
-                    <ul className="list-disc pl-6">
-                        {feature.problems.map((item) => (
-                            <li key={item} className="md:max-w-[284px] max-w-[250px] md:text-base text-sm">
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="group-hover:opacity-100 opacity-0 absolute md:top-16 top-12 transition-opacity">
-                    <div className="text-phase-green rounded-full border border-phase-green py-0.5 px-3 font-medium bg-[#E6FCF1] my-5 w-max md:text-base text-sm">
-                        Solution
-                    </div>
+                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] md:p-10 p-4 flex justify-start flex-col items-start rounded-3xl bg-gradient-to-br from-[#7f6be5] to-[#694AFF]">
+                        <div className="flex items-center gap-4 mr-auto">
+                            <Image src={feature.img} className="" alt={feature.title} width={30} height={30} />
+                            <h6 className="md:text-[24px] text-[18px] font-semibold">{feature.title}</h6>
+                        </div>
 
-                    <ul className="list-disc pl-6">
-                        {feature.solutions.map((item) => (
-                            <li key={item} className="md:max-w-[284px] max-w-[250px] md:text-base text-sm">
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
+                        <div className="mt-2">
+                            <div className="text-phase-green rounded-full border border-phase-green py-0.5 px-3 font-medium bg-[#E6FCF1] my-5 w-max md:text-base text-sm">
+                                Solution
+                            </div>
+
+                            <ul className="list-disc pl-6">
+                                {feature.solutions.map((item) => (
+                                    <li key={item} className="md:max-w-[284px] max-w-[250px] md:text-base text-sm">
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </motion.div>

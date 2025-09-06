@@ -121,20 +121,20 @@ const Technology = () => {
                     {BADGES.map(({ icon, label, href }) => (
                         <LiquidGlass
                             key={label}
-                            className="group max-w-[759px] border border-white rounded-3xl"
+                            className="max-w-[759px] border border-white rounded-3xl transition-colors [&:has(a:hover)]:bg-ion-violet"
                             centered={false}
                             compact
                             displacementScale={0}
                             blurAmount={1}
-                            saturation={250}
+                            saturation={175}
                             aberrationIntensity={4}
-                            elasticity={0.05}
+                            elasticity={0.1}
                             cornerRadius={24}
                             mode="standard"
                             padding="8px 16px"
                             style={{ boxShadow: 'none', filter: 'none' }}
                         >
-                            <Link href={href} className="hover:opacity-75 transition-opacity flex items-center gap-3">
+                            <Link href={href} className="flex items-center gap-3">
                                 <Image src={icon} width={20} height={20} alt={label} />
                                 <span className="text-[14px] font-medium">{label}</span>
                             </Link>
