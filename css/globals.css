@@ -20,6 +20,7 @@
 @import './components/apexcharts.css';
 @import './components/leaflet.css';
 @import './components/rating.css';
+@import './components//whatIs.css';
 
 /* 5. Keenicons */
 @import '../components/keenicons/assets/duotone/style.css';
@@ -136,4 +137,27 @@
 
 .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
+}
+
+/* Variable Fonts Support */
+.variable-proximity-demo {
+    font-family: var(--font-instrument-sans, "Instrument Sans", sans-serif);
+    font-feature-settings: "kern" 1;
+    font-variant-ligatures: common-ligatures;
+    font-size: 2rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* Ensure variable font support is enabled */
+@supports (font-variation-settings: normal) {
+    .variable-proximity-demo {
+        font-variation-settings: 'wght' 400;
+    }
+}
+
+@media (max-width: 768px) {
+    .variable-proximity-demo {
+        font-size: 1.5rem;
+    }
 }

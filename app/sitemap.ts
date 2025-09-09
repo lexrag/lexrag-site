@@ -14,10 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 1,
         },
         {
-            url: `${baseUrl}/features`,
+            url: `${baseUrl}/benefits`,
             lastModified: new Date(),
             changeFrequency: 'weekly' as const,
-            priority: 0.9,
+            priority: 0.8,
         },
         {
             url: `${baseUrl}/services`,
@@ -42,12 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             lastModified: new Date(),
             changeFrequency: 'weekly' as const,
             priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/technology/graphrag`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly' as const,
-            priority: 0.8,
         },
         {
             url: `${baseUrl}/terms-and-conditions`,

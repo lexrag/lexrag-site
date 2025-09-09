@@ -14,9 +14,9 @@ const FooterInner = () => {
     const currentYear = new Date().getFullYear();
     const links = {
         product: [
-            { label: 'Features', href: '/features' },
+            { label: 'Benefits', href: '/benefits' },
             { label: 'Services', href: '/services' },
-            { label: 'Technology', href: '/technology/graphrag' },
+            { label: 'Technology', href: '/technology' },
             { label: 'Use Cases', href: '/use-cases' },
         ],
         legal: [
@@ -97,7 +97,7 @@ const FooterInner = () => {
                     </div>
                 </div>
 
-                <Separator className="my-6 bg-border/50" />
+                <Separator className="my-6 bg-border/50 bg-white/10" />
 
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="flex order-2 md:order-1 gap-2 font-normal">

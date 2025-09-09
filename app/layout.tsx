@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </head>
             <body
                 className={cn(
-                    'antialiased flex h-full text-base text-foreground bg-background font-instrument-sans',
+                    'antialiased text-base text-foreground bg-background font-instrument-sans',
                     instrumentSans.variable,
                 )}
             >
