@@ -56,7 +56,7 @@ const HomePage = () => {
                 </div>
             </div>
 
-            <div className="pt-20 md:pt-[120px] relative">
+            <div className="pt-20 md:pt-[120px] relative" data-section-bg="dark">
                 <HeroSlider />
                 <div className="max-w-[1200px] mx-auto  relative z-10 px-4">
                     <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-[52px]">
@@ -131,12 +131,24 @@ const HomePage = () => {
 
                 
             </div>
-            <VariableProximityText />
-            <TheEngine className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
-            <ServicesOverview className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
-            <Benefits />
-            <WhoWeAre className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" isExpanded={false} />
-            <SecurityCompliance className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            <div data-section-bg="light">
+                <VariableProximityText />
+            </div>
+            <div data-section-bg="light">
+                <TheEngine className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
+            </div>
+            <div data-section-bg="light">
+                <ServicesOverview className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
+            </div>
+            <div data-section-bg="light">
+                <Benefits />
+            </div>
+            <div data-section-bg="light">
+                <WhoWeAre className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" isExpanded={false} />
+            </div>
+            <div data-section-bg="light">
+                <SecurityCompliance className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            </div>
 
             <Footer />
         </div>

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import { LinkPrimary } from '@/components/ui/link-primary';
 import CustomerMap from '@/components/about/CustomerMap';
 import OurValues from '@/components/about/OurValues';
@@ -9,9 +10,8 @@ import WhoWeAre from '@/components/about/WhoWeAre';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
-import Tilt3D from '@/components/tilt3d/Tilt3D';
 import Particles from '@/components/Particles/Particles';
-import { cn } from '@/lib/utils';
+import Tilt3D from '@/components/tilt3d/Tilt3D';
 
 export const metadata: Metadata = {
     title: 'About',
@@ -54,7 +54,7 @@ const About = () => {
                 </div>
             </div>
 
-            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[150px] relative z-10 px-4">
+            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[150px] relative z-10 px-4" data-section-bg="dark">
                 <div className="hidden md:block">
                     <Tilt3D maxTilt={10} perspective={1100} scale={1.03} radius={24}>
                         <LiquidGlass
@@ -118,12 +118,12 @@ const About = () => {
                 <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-[52px]">
                     <LinkPrimary href="/services">Services</LinkPrimary>
                     <LinkPrimary href="/technology">Technology</LinkPrimary>
-                    <LinkPrimary variant="outline" href="https://app.lexrag.com/auth/signup">
+                    <LinkPrimary className="text-white" variant="outline" href="https://app.lexrag.com/auth/signup">
                         {' '}
                         Register Free
                     </LinkPrimary>
                 </div>
-                <div className="bg-static-lilac rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-12">
+                <div className="bg-[#8B78E7] rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-12">
                     {BADGES.map(({ icon, label, href }) => (
                         <LiquidGlass
                             key={label}
@@ -149,10 +149,14 @@ const About = () => {
                 </div>
             </section>
 
-            <WhoWeAre className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
-            <OurValues className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            <div data-section-bg="light">
+                <WhoWeAre className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" isExpanded={true} />
+            </div>
+            <div data-section-bg="light">
+                <OurValues className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow" data-section-bg="light">
                 <h2 className="mb-28 text-3xl md:text-5xl text-midnight-core max-w-[1200px] mx-auto px-4 mt-40">
                     Roadmap & Vision
                 </h2>
@@ -162,7 +166,9 @@ const About = () => {
                 </div>
             </div>
 
-            <CustomerMap className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            <div data-section-bg="light">
+                <CustomerMap className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
+            </div>
 
             <Footer />
         </div>

@@ -11,6 +11,7 @@ import LiquidGlass from '@/components/liquid-glass';
 import HeaderCornerMenu from './HeaderCornerMenu';
 import { links } from './HeaderLinks';
 import { Logo } from './Logo';
+import { useSectionBackground } from '@/hooks/use-section-background';
 
 interface HeaderProps {
     className?: string;
@@ -21,6 +22,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [currentHash, setCurrentHash] = useState('');
+    const currentBackground = useSectionBackground();
 
     useEffect(() => {
         setCurrentHash(window.location.hash);
@@ -121,7 +123,8 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                                     <li key={item.name}>
                                         <Link
                                             className={cn(
-                                                'relative text-base font-semibold px-6 py-3 rounded-full transition-colors text-white',
+                                                'relative text-base font-semibold px-6 py-3 rounded-full transition-colors',
+                                                currentBackground === 'dark' ? 'text-white' : 'text-axis-indigo',
                                                 'after:content-[""] after:absolute after:left-1/2 after:bottom-1 after:h-[2px] after:bg-[#06DF72] after:w-0 after:transition-all after:duration-300 after:origin-center after:-translate-x-1/2',
                                                 isActive ? 'after:w-3/5' : 'hover:after:w-3/5',
                                             )}
@@ -150,13 +153,15 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                     <div className="relative w-6 h-6">
                         <Menu
                             className={cn(
-                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-100',
+                                'size-6 absolute inset-0 transition-all duration-300',
+                                currentBackground === 'dark' ? 'text-white' : 'text-axis-indigo',
                                 isMobileMenuOpen ? 'opacity-0' : 'opacity-100',
                             )}
                         />
                         <X
                             className={cn(
-                                'size-6 text-axis-indigo absolute inset-0 transition-opacity duration-100',
+                                'size-6 absolute inset-0 transition-all duration-300',
+                                currentBackground === 'dark' ? 'text-white' : 'text-axis-indigo',
                                 isMobileMenuOpen ? 'opacity-100' : 'opacity-0',
                             )}
                         />
