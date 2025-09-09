@@ -56,12 +56,12 @@ export default function HeroSlider() {
                 <div ref={emblaRef} className="py-16">
                     <div className="flex">
                         {HERO_SLIDES.map((slide) => (
-                            <div key={slide.id} className="flex-[0_0_100%] w-screen min-w-0 px-10 xl:px-24 2xl:px-96">
+                            <div key={slide.id} className="flex-[0_0_100%] w-screen min-w-0 px-10 xl:px-24 2xl:px-72">
                                 <LiquidGlass
-                                    className="group w-full max-w-[801px] border border-white/50 rounded-3xl"
+                                    className="group w-full max-w-[801px] border border-white/15 rounded-[44px] overflow-hidden"
                                     centered={false}
                                     compact
-                                    displacementScale={0}
+                                    displacementScale={150}
                                     blurAmount={0.01}
                                     saturation={100}
                                     aberrationIntensity={2}

@@ -10,6 +10,8 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
+import Particles from '@/components/Particles/Particles';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
     title: 'About',
@@ -33,20 +35,39 @@ const About = () => {
         <div className="overflow-y-auto">
             <Header className="" />
 
-            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4">
+            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
+                <Particles
+                    className={cn('[mask-image:radial-gradient1000px_circle_at_center,white,transparent)] ')}
+                    particleColors={['#fdfeff', '#06DF72', '#bbbcfa', '#9b8bea']}
+                    particleCount={400}
+                    particleSpread={9}
+                    speed={0.15}
+                    rotationMode="reverse"
+                    particleBaseSize={200}
+                    moveParticlesOnHover={true}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40">
+                    <div className="absolute inset-0 backdrop-blur-md" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cloud-tint" />
+                </div>
+            </div>
+
+            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[150px] relative z-10 px-4">
                 <div className="hidden md:block">
-                    <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+                    <Tilt3D maxTilt={10} perspective={1100} scale={1.03} radius={24}>
                         <LiquidGlass
-                            className="group max-w-[759px]"
+                            className="group max-w-[759px] border border-white/15 rounded-[44px] overflow-hidden"
                             centered={false}
                             compact
-                            displacementScale={0}
+                            displacementScale={100}
                             blurAmount={0.01}
-                            saturation={200}
+                            saturation={100}
                             aberrationIntensity={2}
                             elasticity={0.05}
                             cornerRadius={30}
-                            mode="standard"
+                            mode="prominent"
                             padding="8px 16px"
                             style={{
                                 boxShadow: 'none',
@@ -55,7 +76,7 @@ const About = () => {
                         >
                             <div className="md:p-10 p-3">
                                 <h1
-                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-midnight-core"
+                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-white"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}
@@ -63,7 +84,7 @@ const About = () => {
                                     Trustworthy AI for Legal Professionals
                                 </h1>
                                 <h4
-                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-white/80 font-normal"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}

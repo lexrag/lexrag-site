@@ -92,7 +92,7 @@ const Header = ({ className = '', onOpenSidebar }: HeaderProps) => {
                     compact
                     displacementScale={50}
                     blurAmount={0.01}
-                    saturation={130}
+                    saturation={100}
                     aberrationIntensity={2}
                     elasticity={0}
                     cornerRadius={400}

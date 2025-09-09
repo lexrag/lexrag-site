@@ -44,6 +44,10 @@ const HomePage = () => {
                     alphaParticles={false}
                     disableRotation={false}
                 />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40">
+                    <div className="absolute inset-0 backdrop-blur-md" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cloud-tint" />
+                </div>
             </div>
 
             <div className="pt-20 md:pt-[120px] relative">
@@ -119,7 +123,7 @@ const HomePage = () => {
                     </div>
                 </div>
 
-                <div className="h-[160px] absolute bg-gradient-to-t from-cloud-tint to-transparent bottom-16 -translate-y-2 right-0 left-0"></div>
+                
             </div>
 
             <div className="max-w-[1200px] mx-auto mt-[75px] bg-gradient-to-b from-[#FFFFFF4D] to-[#FFFFFF99] border border-white p-10 flex justify-center rounded-3xl mb-[1000px]">
