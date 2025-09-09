@@ -47,7 +47,7 @@ export default function Benefits() {
                                 )}
                             >
                                 <div className="mr-auto">
-                                    <h2 className="md:text-[40px] text-[20px]/[110%] font-medium text-white">
+                                    <h2 className="md:text-[40px] text-[20px]/[110%] font-medium text-white mb-8">
                                         {item.title}
                                     </h2>
                                     <p className="md:text-[24px] text-[16px]/[110%] text-white">{item.description}</p>
