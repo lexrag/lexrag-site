@@ -31,13 +31,13 @@ const HomePage = () => {
         <div className="overflow-x-hidden flex-1 relative">
             <Header className="" />
 
-            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#131319]">
+            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
                 <Particles
                     className={cn('[mask-image:radial-gradient1000px_circle_at_center,white,transparent)] ')}
                     particleColors={['#fdfeff', '#06DF72', '#bbbcfa', '#9b8bea']}
                     particleCount={400}
                     particleSpread={9}
-                    speed={0.11}
+                    speed={0.15}
                     rotationMode="reverse"
                     particleBaseSize={200}
                     moveParticlesOnHover={true}

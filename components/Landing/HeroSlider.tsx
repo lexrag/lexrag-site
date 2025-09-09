@@ -58,12 +58,12 @@ export default function HeroSlider() {
                         {HERO_SLIDES.map((slide) => (
                             <div key={slide.id} className="flex-[0_0_100%] w-screen min-w-0 px-10 xl:px-24 2xl:px-96">
                                 <LiquidGlass
-                                    className="group w-full max-w-[801px]"
+                                    className="group w-full max-w-[801px] border border-white/50 rounded-3xl"
                                     centered={false}
                                     compact
                                     displacementScale={0}
                                     blurAmount={0.01}
-                                    saturation={200}
+                                    saturation={100}
                                     aberrationIntensity={2}
                                     elasticity={0.05}
                                     cornerRadius={30}
