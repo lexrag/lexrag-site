@@ -10,6 +10,8 @@ import '@/css/themes/reui.css';
 import Link from 'next/link';
 import { Timer } from '@/components/ui/timer';
 import LiquidGlass from '@/components/liquid-glass';
+import Particles from '@/components/Particles/Particles';
+import { cn } from '@/lib/utils';
 
 // import BackgroundSVG from '@/components/Landing/BackgroundSVG';
 
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
 
 const LandingPage = () => {
     return (
-        <div className="overflow-hidden bg-gradient-to-br from-[#D4D8E6] via-[#EBF0FF] to-[#D4D8E6] flex-grow-1">
+        <div className="overflow-hidden bg-[#131319] flex-grow-1 relative min-h-screen">
             {/* <Header className="" /> */}
 
             <main className="px-[10%] z-1 relative text-center">
@@ -90,16 +92,21 @@ const LandingPage = () => {
                 </section> */}
             </main>
 
-            <video
-                className="pointer-events-none select-none absolute inset-0 h-full w-full object-cover z-0 motion-reduce:hidden"
-                src="/media/video/3d_graph_demo.m4v"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-hidden="true"
-            />
+            <Particles
+                        className={cn(
+                            'absolute inset-0',
+                            '[mask-image:radial-gradient1000px_circle_at_center,white,transparent)]',
+                        )}
+                        particleColors={["#fdfeff", "#06DF72","#bbbcfa", "#9b8bea"]}
+                        particleCount={400}
+                        particleSpread={9}                        
+                        speed={0.11}
+                        rotationMode="reverse"
+                        particleBaseSize={200}
+                        moveParticlesOnHover={true}
+                        alphaParticles={false}
+                        disableRotation={false}
+                    />
 
             {/* <Footer /> */}
         </div>
