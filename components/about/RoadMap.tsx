@@ -56,7 +56,7 @@ export function RoadMap() {
                             className="group absolute z-10 bottom-0 translate-y-1 flex flex-col items-center"
                             style={{ left: `${leftPosition}px` }}
                         >
-                            <div className="text-[42px] text-[#A2A7BE] group-hover:text-phase-green transition-colors w-[250px] mx-auto text-center">
+                            <div className="text-[30px] text-[#A2A7BE] group-hover:text-phase-green transition-colors w-[250px] mx-auto text-center">
                                 {item.title}
                             </div>
                             <div className="h-[78px] w-[1px] bg-white transition-colors group-hover:bg-phase-green"></div>
@@ -79,7 +79,9 @@ export function RoadMap() {
                                 {/* Tooltip */}
                                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
                                     <div className="bg-[#E6FCF1] text-midnight-core px-3 py-2 rounded-lg text-sm shadow-lg w-max">
-                                        <p className="max-w-[206px] text-center">{item.description}</p>
+                                        <p className="max-w-[236px] text-center text-[18px]/[120%]">
+                                            {item.description}
+                                        </p>
 
                                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-8 border-r-transparent border-b-4 border-b-[#E6FCF1]"></div>
                                     </div>
