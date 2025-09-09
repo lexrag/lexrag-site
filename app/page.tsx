@@ -26,10 +26,10 @@ type Badge = {
 };
 
 const BADGES: Badge[] = [
-    { icon: '/media/technology/explainable.svg', label: 'Explainable & Source-Traceable', href: '/home' },
-    { icon: '/media/technology/search.svg', label: 'No AI Hallucinations', href: '/home' },
-    { icon: '/media/technology/vendor.svg', label: 'Interoperable with Any LLM', href: '/home' },
-    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/home' },
+    { icon: '/media/technology/explainable.svg', label: 'Explainable & Source-Traceable', href: '/technology' },
+    { icon: '/media/technology/search.svg', label: 'No AI Hallucinations', href: '/technology' },
+    { icon: '/media/technology/vendor.svg', label: 'Interoperable with Any LLM', href: '/technology' },
+    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/technology' },
 ];
 
 const HomePage = () => {
@@ -46,7 +46,7 @@ const HomePage = () => {
                     speed={0.15}
                     rotationMode="reverse"
                     particleBaseSize={200}
-                    moveParticlesOnHover={true}
+                    moveParticlesOnHover={false}
                     alphaParticles={false}
                     disableRotation={false}
                 />
@@ -56,6 +56,7 @@ const HomePage = () => {
                 </div>
             </div>
 
+            
             <div className="pt-20 md:pt-[120px] relative" data-section-bg="dark">
                 <HeroSlider />
                 <div className="max-w-[1200px] mx-auto  relative z-10 px-4">
@@ -70,37 +71,8 @@ const HomePage = () => {
                             className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors"
                             href="/services"
                         >
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M12.53 20.4201H6.21C3.05 20.4201 2 18.3201 2 16.2101V7.79008C2 4.63008 3.05 3.58008 6.21 3.58008H12.53C15.69 3.58008 16.74 4.63008 16.74 7.79008V16.2101C16.74 19.3701 15.68 20.4201 12.53 20.4201Z"
-                                    stroke="#fff"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                                <path
-                                    d="M19.5202 17.1001L16.7402 15.1501V8.84013L19.5202 6.89013C20.8802 5.94013 22.0002 6.52013 22.0002 8.19013V15.8101C22.0002 17.4801 20.8802 18.0601 19.5202 17.1001Z"
-                                    stroke="#fff"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                                <path
-                                    d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z"
-                                    stroke="#fff"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                            </svg>
 
-                            <span className="text-white">Watch demo</span>
+                            <span className="text-white hover:text-axis-indigo">Explore Services</span>
                         </Link>
                     </div>
                     <div className="bg-[#8B78E7] rounded-3xl md:rounded-full py-[18px] flex flex-wrap items-center justify-center mt-[72px] mb-12 gap-3 md:gap-8">

@@ -44,7 +44,7 @@ const About = () => {
                     speed={0.15}
                     rotationMode="reverse"
                     particleBaseSize={200}
-                    moveParticlesOnHover={true}
+                    moveParticlesOnHover={false}
                     alphaParticles={false}
                     disableRotation={false}
                 />
@@ -55,10 +55,9 @@ const About = () => {
             </div>
 
             <section className="max-w-[1200px] mx-auto pt-20 md:pt-[150px] relative z-10 px-4" data-section-bg="dark">
-                <div className="hidden md:block">
-                    <Tilt3D maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+                <div className="hidden md:block">              
                         <LiquidGlass
-                            className="group max-w-[759px] border border-white/15 rounded-[44px] overflow-hidden"
+                            className="group max-w-[759px]"
                             centered={false}
                             compact
                             displacementScale={100}
@@ -74,26 +73,28 @@ const About = () => {
                                 filter: 'none',
                             }}
                         >
-                            <div className="md:p-10 p-3">
-                                <h1
-                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-white"
-                                    style={{
-                                        fontFamily: 'Instrument Sans',
-                                    }}
-                                >
-                                    Trustworthy AI for Legal Professionals
-                                </h1>
-                                <h4
-                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-white/80 font-normal"
-                                    style={{
-                                        fontFamily: 'Instrument Sans',
-                                    }}
-                                >
-                                    сlear, defensible tools for lawyers
-                                </h4>
-                            </div>
+                            <Tilt3D maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+                                <div className="md:p-10 p-3">
+                                    <h1
+                                        className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-white"
+                                        style={{
+                                            fontFamily: 'Instrument Sans',
+                                        }}
+                                    >
+                                        Trustworthy AI for Legal Professionals
+                                    </h1>
+                                    <h4
+                                        className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-white/80 font-normal"
+                                        style={{
+                                            fontFamily: 'Instrument Sans',
+                                        }}
+                                    >
+                                        сlear, defensible tools for lawyers
+                                    </h4>
+                                </div>
+                            </Tilt3D>
                         </LiquidGlass>
-                    </Tilt3D>
+                    
                 </div>
 
                 <div className="md:p-10 md:hidden">
