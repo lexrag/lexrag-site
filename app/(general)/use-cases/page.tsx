@@ -1,19 +1,13 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
-import { LinkPrimary } from '@/components/ui/link-primary';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
-import BackgroundSVG from '@/components/use-cases/BackgroundSvg';
 import Benefits from '@/components/use-cases/Benefits';
-import CompareAlternatives from '@/components/use-cases/CompareAlternatives';
-import FAQ from '@/components/use-cases/FAQ';
 import HowItWorks from '@/components/use-cases/HowItWorks';
 // import IntegrationsDeployment from '@/components/use-cases/IntegrationsDeployment';
 import LiveExamples from '@/components/use-cases/LiveExample';
-import PricingPlans from '@/components/use-cases/PricingPlans';
 import TailoredSections from '@/components/use-cases/TailoredSections';
 import WhatThisServiceDoes from '@/components/use-cases/WhatThisServiceDoes';
 import WhyThisMatter from '@/components/use-cases/WhyThisMatters';
@@ -25,20 +19,6 @@ export const metadata: Metadata = {
     title: 'Use Cases',
     description: 'Discover how LEXRAG can be used in various legal scenarios and applications',
 };
-
-
-type Badge = {
-    icon: string;
-    label: string;
-    href: string;
-};
-
-const BADGES: Badge[] = [
-    { icon: '/media/technology/explainable.svg', label: 'Explainable AI', href: '/benefits' },
-    { icon: '/media/technology/search.svg', label: 'Source-traceable', href: '/benefits' },
-    { icon: '/media/technology/vendor.svg', label: 'No Vendor Lock-in', href: '/benefits' },
-    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/benefits' },
-];
 
 const UseCasesPage = () => {
     return (
@@ -170,13 +150,6 @@ const UseCasesPage = () => {
             {/* <PricingPlans className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
             {/* <FAQ className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" /> */}
 
-            {/* <div className="hidden mb-[75px] md:flex justify-center gap-[84px]">
-                <LinkPrimary href="/use-cases">See demo</LinkPrimary>
-                <LinkPrimary href="/use-cases">Start free</LinkPrimary>
-                <LinkPrimary variant="outline" href="/use-cases">
-                    See pricing
-                </LinkPrimary>
-            </div> */}
              <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" />
             <Footer />
         </div>

@@ -14,6 +14,7 @@ import LiquidGlass from '@/components/liquid-glass';
 import Particles from '@/components/Particles/Particles';
 import SecurityCompliance from '@/components/technology/SecurityCompliance';
 
+
 export const metadata: Metadata = {
     title: 'Home - LEXRAG',
     description: 'Verifiable answers for legal research, document review and case assessment.',
@@ -104,7 +105,7 @@ const HomePage = () => {
                 
             </div>
             <div data-section-bg="light">
-                <VariableProximityText />
+                    <VariableProximityText />
             </div>
             <div data-section-bg="light">
                 <TheEngine className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />

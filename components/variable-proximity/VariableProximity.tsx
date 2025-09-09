@@ -155,7 +155,8 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
         });
     });
 
-    const words = label.split(' ');
+    // Support explicit line breaks using <br> or \n in the label
+    const lines = useMemo(() => label.split(/<br\s*\/?>(?:\s*)|\n/g), [label]);
     let letterIndex = 0;
 
     return (
@@ -170,27 +171,33 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
             className={className}
             {...restProps}
         >
-            {words.map((word, wordIndex) => (
-                <span key={wordIndex} className="inline-block whitespace-nowrap">
-                    {word.split('').map((letter) => {
-                        const currentLetterIndex = letterIndex++;
-                        return (
-                            <motion.span
-                                key={currentLetterIndex}
-                                ref={(el) => {
-                                    letterRefs.current[currentLetterIndex] = el;
-                                }}
-                                style={{
-                                    display: 'inline-block',
-                                    fontVariationSettings: interpolatedSettingsRef.current[currentLetterIndex],
-                                }}
-                                aria-hidden="true"
-                            >
-                                {letter}
-                            </motion.span>
-                        );
-                    })}
-                    {wordIndex < words.length - 1 && <span className="inline-block">&nbsp;</span>}
+            {lines.map((line, lineIdx) => (
+                <span key={`line-${lineIdx}`} className="inline">
+                    {line.split(' ').map((word, wordIndex) => (
+                        <span key={`w-${lineIdx}-${wordIndex}`} className="inline-block whitespace-nowrap">
+                            {word.split('').map((letter) => {
+                                const currentLetterIndex = letterIndex++;
+                                return (
+                                    <motion.span
+                                        key={currentLetterIndex}
+                                        ref={(el) => {
+                                            letterRefs.current[currentLetterIndex] = el;
+                                        }}
+                                        style={{
+                                            display: 'inline-block',
+                                            fontVariationSettings:
+                                                interpolatedSettingsRef.current[currentLetterIndex],
+                                        }}
+                                        aria-hidden="true"
+                                    >
+                                        {letter}
+                                    </motion.span>
+                                );
+                            })}
+                            {wordIndex < line.split(' ').length - 1 && <span className="inline-block">&nbsp;</span>}
+                        </span>
+                    ))}
+                    {lineIdx < lines.length - 1 && <br />}
                 </span>
             ))}
             <span className="sr-only">{label}</span>

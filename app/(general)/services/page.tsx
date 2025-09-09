@@ -6,8 +6,6 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Particles from '@/components/Particles/Particles';
-import Quotation from '@/components/quotation/Quotation';
-import ExploreAllServices from '@/components/services/ExploreAllServices';
 import HowItWorks from '@/components/services/HowItWorks';
 import HowItWorksWrapper from '@/components/services/HowItWorksWrapper';
 // import Intergrations from '@/components/services/Integrations';
