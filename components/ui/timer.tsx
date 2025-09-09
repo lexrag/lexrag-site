@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 type Parts = { d: number; h: number; m: number; s: number; finished: boolean };
 
-const TARGET_TS = new Date('2025-09-08T00:00:00+03:00').getTime();
+const TARGET_TS = new Date('2025-09-10T00:00:00+03:00').getTime();
 
 const calc = (): Parts => {
     const now = Date.now();
