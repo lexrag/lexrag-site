@@ -73,7 +73,7 @@ function CardItem({
     );
 }
 
-export default function WhoWeAre({ className }: { className: string }) {
+export default function WhoWeAre({ className, isExpanded }: { className?: string; isExpanded: boolean }) {
     const prefersReduce = useReducedMotion();
     const sectionRef = useRef<HTMLElement | null>(null);
 
@@ -100,36 +100,46 @@ export default function WhoWeAre({ className }: { className: string }) {
                 ))}
             </div>
 
-            <div className="flex md:flex-row flex-col md:px-[60px] md:py-[99px] px-5 py-8 rounded-3xl md:gap-10 gap-6 bg-gradient-to-b from-[#FFFFFF4D] to-white">
-                <div className="md:min-w-[380px] w-full">
-                    <h5 className="md:max-w-[293px] max-w-full text-midnight-core mb-6 md:mb-10 md:text-[36px]/[110%] text-[24px]/[120%]">
-                        Next-Generation Legal Intelligence
-                    </h5>
-                    <div className="flex justify-center md:justify-start">
-                        <Image src="/media/about/next-generation.svg" height={273} width={390} alt="next-generation" className="md:w-[390px] md:h-[273px] w-[280px] h-auto" />
+            {isExpanded && (
+                <div className="flex md:flex-row flex-col md:px-[60px] md:py-[99px] px-5 py-8 rounded-3xl md:gap-10 gap-6 bg-gradient-to-b from-[#FFFFFF4D] to-white">
+                    <div className="md:min-w-[380px] w-full">
+                        <h5 className="md:max-w-[293px] max-w-full text-midnight-core mb-6 md:mb-10 md:text-[36px]/[110%] text-[24px]/[120%]">
+                            Next-Generation Legal Intelligence
+                        </h5>
+                        <div className="flex justify-center md:justify-start">
+                            <Image
+                                src="/media/about/next-generation.svg"
+                                height={273}
+                                width={390}
+                                alt="next-generation"
+                                className="md:w-[390px] md:h-[273px] w-[280px] h-auto"
+                            />
+                        </div>
+                    </div>
+                    <div className="md:max-w-[660px] w-full">
+                        <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
+                            LEXRAG is a next-generation legal intelligence platform designed to bring clarity, speed,
+                            and accountability into legal practice.
+                        </p>
+                        <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
+                            Our graph-based engine maps connections between statutes, regulations, and precedents,
+                            offering deeper, contextual insights than traditional keyword or semantic search tools.
+                        </p>
+                        <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
+                            What sets LEXRAG apart is its focus on explainability and transparency. Every answer is
+                            traceable to specific legal sources, making recommendations verifiable and defensible. This
+                            level of precision is unmatched in the market and makes LEXRAG ideal for high-stakes legal
+                            work.
+                        </p>
+                        <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
+                            We are a team of lawyers, developers, and product strategists who believe that technology
+                            should support legal professionals, not replace them. From solo practitioners to global law
+                            firms, we build tools that meet the demands of modern practice: faster, safer, and
+                            verifiable.
+                        </p>
                     </div>
                 </div>
-                <div className="md:max-w-[660px] w-full">
-                    <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
-                        LEXRAG is a next-generation legal intelligence platform designed to bring clarity, speed, and
-                        accountability into legal practice.
-                    </p>
-                    <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
-                        Our graph-based engine maps connections between statutes, regulations, and precedents, offering
-                        deeper, contextual insights than traditional keyword or semantic search tools.
-                    </p>
-                    <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
-                        What sets LEXRAG apart is its focus on explainability and transparency. Every answer is
-                        traceable to specific legal sources, making recommendations verifiable and defensible. This
-                        level of precision is unmatched in the market and makes LEXRAG ideal for high-stakes legal work.
-                    </p>
-                    <p className="md:text-[18px]/[120%] text-[16px]/[130%] text-midnight-core mb-4 md:mb-6">
-                        We are a team of lawyers, developers, and product strategists who believe that technology should
-                        support legal professionals, not replace them. From solo practitioners to global law firms, we
-                        build tools that meet the demands of modern practice: faster, safer, and verifiable.
-                    </p>
-                </div>
-            </div>
+            )}
         </section>
     );
 }

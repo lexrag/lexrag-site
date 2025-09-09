@@ -185,7 +185,7 @@ export default function PricingPlans({ className }: { className?: string }) {
             />
 
             <div className="mt-3 md:mt-[52px] text-center mb-[55px]">
-                <LinkPrimary href="/use-cases">Learn more</LinkPrimary>
+                <LinkPrimary href="/use-cases">Choose Your Plan</LinkPrimary>
             </div>
         </section>
     );

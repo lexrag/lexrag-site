@@ -2,11 +2,17 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import WhoWeAre from '@/components/about/WhoWeAre';
 import Header from '@/components/Header/Header';
+import Benefits from '@/components/home/Benefits';
+import ServicesOverview from '@/components/home/ServicesOverview';
+import TheEngine from '@/components/home/TheEngine';
+import VariableProximityText from '@/components/home/VariableProximityText';
 import Footer from '@/components/Landing/Footer';
 import HeroSlider from '@/components/Landing/HeroSlider';
 import LiquidGlass from '@/components/liquid-glass';
 import Particles from '@/components/Particles/Particles';
+import SecurityCompliance from '@/components/technology/SecurityCompliance';
 
 export const metadata: Metadata = {
     title: 'Home - LEXRAG',
@@ -28,7 +34,7 @@ const BADGES: Badge[] = [
 
 const HomePage = () => {
     return (
-        <div className="overflow-x-hidden flex-1 relative">
+        <div className="overflow-y-hidden">
             <Header className="" />
 
             <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
@@ -125,12 +131,12 @@ const HomePage = () => {
 
                 
             </div>
-
-            <div className="max-w-[1200px] mx-auto mt-[75px] bg-gradient-to-b from-[#FFFFFF4D] to-[#FFFFFF99] border border-white p-10 flex justify-center rounded-3xl mb-[1000px]">
-                <p className="max-w-[960px] text-axis-indigo text-[54px]/[110%]">
-                    Verifiable answers for legal research, document review and case assessment.
-                </p>
-            </div>
+            <VariableProximityText />
+            <TheEngine className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
+            <ServicesOverview className="max-w-[1200px] mx-auto px-4 mb-8 md:mb-[75px]" />
+            <Benefits />
+            <WhoWeAre className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" isExpanded={false} />
+            <SecurityCompliance className="max-w-[1200px] mx-auto px-4 md:mb-[75px] mb-8" />
 
             <Footer />
         </div>
