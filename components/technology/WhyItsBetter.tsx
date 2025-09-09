@@ -53,15 +53,15 @@ export default function WhyItsBetter({ className = '', items = DEFAULT_ITEMS }: 
             <div className="flex md:flex-row flex-col md:gap-[84px] mt-8 gap-4 items-start">
                 <Link
                     className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
-                    href="/technology"
+                    href="/benefits"
                 >
-                    See the tech in action
+                    See the benefits
                 </Link>
                 <Link
                     className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors text-axis-indigo"
-                    href="/technology"
+                    href="https://app.lexrag.com/auth/signup"
                 >
-                    Start Free Trial
+                    Register Free
                 </Link>
             </div>
         </section>

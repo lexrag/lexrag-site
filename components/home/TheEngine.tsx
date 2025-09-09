@@ -57,13 +57,13 @@ function CardItem({ card, index }: { card: ICard; index: number }) {
                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                         <LiquidGlass
                             key={card.title}
-                            className="w-full h-full"
+                            className="w-full h-full bg-[#e4e4fd] rounded-[24px] overflow-hidden"
                             centered={false}
                             compact
                             displacementScale={0}
                             blurAmount={1}
-                            saturation={175}
-                            aberrationIntensity={4}
+                            saturation={100}
+                            aberrationIntensity={0}
                             elasticity={0.1}
                             cornerRadius={24}
                             mode="standard"
@@ -79,13 +79,13 @@ function CardItem({ card, index }: { card: ICard; index: number }) {
                     {/* Back side */}
                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
                         <LiquidGlass
-                            className="w-full h-full"
+                            className="w-full h-full bg-[#d6d7fc] rounded-[24px] overflow-hidden"
                             centered={false}
                             compact
                             displacementScale={0}
                             blurAmount={1}
-                            saturation={175}
-                            aberrationIntensity={4}
+                            saturation={100}
+                            aberrationIntensity={0}
                             elasticity={0.1}
                             cornerRadius={24}
                             mode="standard"

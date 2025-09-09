@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { LinkPrimary } from '@/components/ui/link-primary';
+// import { LinkPrimary } from '@/components/ui/link-primary';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Particles from '@/components/Particles/Particles';
-import HowItWorks from '@/components/technology/HowItWorks';
+// import HowItWorks from '@/components/technology/HowItWorks';
 import IntegrationOptions from '@/components/technology/IntegrationOptions';
 import SecurityCompliance from '@/components/technology/SecurityCompliance';
 import WhatIs from '@/components/technology/WhatIs';
@@ -16,7 +16,7 @@ import WhyItsBetter from '@/components/technology/WhyItsBetter';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
 
 export const metadata: Metadata = {
-    title: 'Technology - LEXRAG',
+    title: 'Technology',
 };
 
 type Badge = {
@@ -26,10 +26,10 @@ type Badge = {
 };
 
 const BADGES: Badge[] = [
-    { icon: '/media/technology/explainable.svg', label: 'Explainable AI', href: '/technology' },
-    { icon: '/media/technology/search.svg', label: 'Source-traceable', href: '/technology' },
-    { icon: '/media/technology/vendor.svg', label: 'No Vendor Lock-in', href: '/technology' },
-    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/technology' },
+    { icon: '/media/technology/explainable.svg', label: 'Explainable AI', href: '/benefits' },
+    { icon: '/media/technology/search.svg', label: 'Source-traceable', href: '/benefits' },
+    { icon: '/media/technology/vendor.svg', label: 'No Vendor Lock-in', href: '/benefits' },
+    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/benefits' },
 ];
 
 const Technology = () => {
@@ -46,7 +46,7 @@ const Technology = () => {
                     speed={0.15}
                     rotationMode="reverse"
                     particleBaseSize={200}
-                    moveParticlesOnHover={true}
+                    moveParticlesOnHover={false}
                     alphaParticles={false}
                     disableRotation={false}
                 />
@@ -174,7 +174,7 @@ const Technology = () => {
             <IntegrationOptions className="max-w-[1200px] mx-auto mb-20 md:mb-[75px] px-4" />
             <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" />
 
-            <div className="max-w-[1200px] mx-auto mb-[145px] px-4">
+            {/* <div className="max-w-[1200px] mx-auto mb-[145px] px-4">
                 <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
                     <LiquidGlass
                         className="group max-w-[600px]"
@@ -211,7 +211,7 @@ const Technology = () => {
                 <div className="mt-13">
                     <LinkPrimary href="/technology">Get started</LinkPrimary>
                 </div>
-            </div>
+            </div> */}
 
             <Footer />
         </div>

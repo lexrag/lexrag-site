@@ -2,10 +2,14 @@
 
 import LiquidGlass from '@/components/liquid-glass';
 import '@/css/themes/reui.css';
+import { cn } from '@/lib/utils';
+import { useSectionBackground } from '@/hooks/use-section-background';
 
 const GetinButton = () => {
     const appBase = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com').replace(/\/+$/, '');
     const appPath = '/chat/new';
+    const currentBackground = useSectionBackground();
+    const isDark = currentBackground === 'dark';
     return (
         <div className="flex items-center gap-8">
             <div className="tab">
@@ -30,8 +34,10 @@ const GetinButton = () => {
                     }}
                 >
                     <span
-                        className="block text-white group-hover:text-axis-indigo
-                    text-base font-medium px-2 whitespace-nowrap transition-colors duration-200"
+                        className={cn(
+                            'block text-base font-medium px-2 whitespace-nowrap transition-colors duration-200',
+                            isDark ? 'text-white group-hover:text-axis-indigo' : 'text-axis-indigo',
+                        )}
                         style={{
                             textShadow: 'none',
                         }}

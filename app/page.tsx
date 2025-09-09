@@ -37,7 +37,7 @@ const HomePage = () => {
         <div className="overflow-y-hidden">
             <Header className="" />
 
-            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
+            <div className="pointer-events-none absolute left-0 right-0 top-0 h-[720px] overflow-hidden bg-[#0c122e] z-0">
                 <Particles
                     className={cn('[mask-image:radial-gradient1000px_circle_at_center,white,transparent)] ')}
                     particleColors={['#fdfeff', '#06DF72', '#bbbcfa', '#9b8bea']}
@@ -57,10 +57,10 @@ const HomePage = () => {
             </div>
 
             
-            <div className="pt-20 md:pt-[120px] relative" data-section-bg="dark">
+            <div className="pt-20 md:pt-[70px] relative z-10" data-section-bg="dark">
                 <HeroSlider />
                 <div className="max-w-[1200px] mx-auto  relative z-10 px-4">
-                    <div className="flex flex-col md:flex-row md:gap-[84px] gap-6 items-start mt-[52px]">
+                    <div className="flex flex-col md:flex-row md:gap-[70px] gap-6 items-start mt-20 md:mt-10">
                         <Link
                             className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
                             href="https://app.lexrag.com/auth/signup"

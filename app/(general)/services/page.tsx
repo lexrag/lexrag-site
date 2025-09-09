@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
+import Particles from '@/components/Particles/Particles';
 import Quotation from '@/components/quotation/Quotation';
 import ExploreAllServices from '@/components/services/ExploreAllServices';
 import HowItWorks from '@/components/services/HowItWorks';
@@ -14,7 +16,7 @@ import WhatTheServiceDoes from '@/components/services/WhatTheServiceDoes';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
 
 export const metadata: Metadata = {
-    title: 'Services - LEXRAG',
+    title: 'Services',
     description: 'Comprehensive legal data analysis and research services powered by GraphRAG technology',
 };
 
@@ -35,37 +37,55 @@ const ServicesPage = () => {
     return (
         <div className="overflow-y-auto">
             <Header className="" />
-            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4">
+            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
+                <Particles
+                    className={cn('[mask-image:radial-gradient1000px_circle_at_center,white,transparent)] ')}
+                    particleColors={['#fdfeff', '#06DF72', '#bbbcfa', '#9b8bea']}
+                    particleCount={400}
+                    particleSpread={9}
+                    speed={0.15}
+                    rotationMode="reverse"
+                    particleBaseSize={200}
+                    moveParticlesOnHover={false}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40">
+                    <div className="absolute inset-0 backdrop-blur-md" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cloud-tint" />
+                </div>
+            </div>
+            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[150px] relative z-10 px-4" data-section-bg="dark">
                 <div className="hidden md:block">
-                    <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
-                        <LiquidGlass
-                            className="group max-w-[801px]"
-                            centered={false}
-                            compact
-                            displacementScale={0}
-                            blurAmount={0.01}
-                            saturation={200}
-                            aberrationIntensity={2}
-                            elasticity={0.05}
-                            cornerRadius={30}
-                            mode="standard"
-                            padding="8px 16px"
-                            style={{
-                                boxShadow: 'none',
-                                filter: 'none',
-                            }}
-                        >
+                    <LiquidGlass
+                        className="group max-w-[759px]"
+                        centered={false}
+                        compact
+                        displacementScale={100}
+                        blurAmount={0.01}
+                        saturation={100}
+                        aberrationIntensity={2}
+                        elasticity={0.05}
+                        cornerRadius={30}
+                        mode="standard"
+                        padding="8px 16px"
+                        style={{
+                            boxShadow: 'none',
+                            filter: 'none',
+                        }}
+                    >
+                        <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
                             <div className="md:p-10 p-3">
                                 <h1
-                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-midnight-core"
+                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-white"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}
                                 >
-                                    Instant Legal Research Trusted Sources
+                                    Legal Research Trusted Sources
                                 </h1>
                                 <h4
-                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-white/80 font-normal"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}
@@ -73,8 +93,8 @@ const ServicesPage = () => {
                                     AI reasoning you can verify
                                 </h4>
                             </div>
-                        </LiquidGlass>
-                    </Tilt3D>
+                        </Tilt3D>
+                    </LiquidGlass>
                 </div>
 
                 <div className="md:p-10 md:hidden">
@@ -105,19 +125,19 @@ const ServicesPage = () => {
                     </Link>
                     <Link
                         className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors"
-                        href="/services"
+                        href="/technology"
                     >
-                        <Image
+                        {/* <Image
                             className="w-6 h-6"
                             src="/media/technology/video.svg"
                             alt="video"
                             width={24}
                             height={24}
-                        />
-                        <span className="text-axis-indigo">Watch demo</span>
+                        /> */}
+                        <span className="text-white hover:text-axis-indigo">Explore Technology</span>
                     </Link>
                 </div>
-                <div className="bg-static-lilac rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-20">
+                <div className="bg-[#8B78E7] rounded-3xl md:rounded-full py-[18px] flex flex-col md:flex-row items-center justify-center mt-[54px] mb-12 gap-4 md:gap-12">
                     {BADGES.map(({ icon, label, href }) => (
                         <LiquidGlass
                             key={label}
@@ -148,8 +168,8 @@ const ServicesPage = () => {
             <HowItWorksWrapper className="hidden lg:block" />
             <Outcomes className="max-w-[1200px] px-4 mx-auto md:mb-[75px] mb-8" />
             {/* <Intergrations className="max-w-[1200px] px-4 mx-auto mb-[75px]" /> */}
-            <ExploreAllServices className="max-w-[1200px] px-4 mx-auto md:mb-[75px] mb-8" />
-            <Quotation className="max-w-[1200px] mx-auto mb-[145px] " />
+            {/* <ExploreAllServices className="max-w-[1200px] px-4 mx-auto md:mb-[75px] mb-8" /> */}
+            {/* <Quotation className="max-w-[1200px] mx-auto mb-[145px] " /> */}
             <Footer />
         </div>
     );

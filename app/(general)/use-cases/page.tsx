@@ -17,68 +17,96 @@ import PricingPlans from '@/components/use-cases/PricingPlans';
 import TailoredSections from '@/components/use-cases/TailoredSections';
 import WhatThisServiceDoes from '@/components/use-cases/WhatThisServiceDoes';
 import WhyThisMatter from '@/components/use-cases/WhyThisMatters';
+import Particles from '@/components/Particles/Particles';
+import { cn } from '@/lib/utils';
+import SecurityCompliance from '@/components/technology/SecurityCompliance';
 
 export const metadata: Metadata = {
-    title: 'Use Cases - LEXRAG',
+    title: 'Use Cases',
     description: 'Discover how LEXRAG can be used in various legal scenarios and applications',
 };
 
+
+type Badge = {
+    icon: string;
+    label: string;
+    href: string;
+};
+
+const BADGES: Badge[] = [
+    { icon: '/media/technology/explainable.svg', label: 'Explainable AI', href: '/benefits' },
+    { icon: '/media/technology/search.svg', label: 'Source-traceable', href: '/benefits' },
+    { icon: '/media/technology/vendor.svg', label: 'No Vendor Lock-in', href: '/benefits' },
+    { icon: '/media/technology/acp.svg', label: 'API/MCP-ready', href: '/benefits' },
+];
+
 const UseCasesPage = () => {
     return (
-        <div className="overflow-y-hidden relative">
+        <div className="overflow-y-hidden">
             <Header className="" />
 
-            <BackgroundSVG
-                className="absolute hidden md:flex
-                top-20 
-                    left-0 
-                    w-full 
+            <div className="absolute inset-0 top-0 max-h-[720px] overflow-hidden bg-[#0c122e]">
+                <Particles
+                    className={cn('[mask-image:radial-gradient1000px_circle_at_center,white,transparent)] ')}
+                    particleColors={['#fdfeff', '#06DF72', '#bbbcfa', '#9b8bea']}
+                    particleCount={400}
+                    particleSpread={9}
+                    speed={0.15}
+                    rotationMode="reverse"
+                    particleBaseSize={200}
+                    moveParticlesOnHover={false}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40">
+                    <div className="absolute inset-0 backdrop-blur-md" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cloud-tint" />
+                </div>
+            </div>
 
-                    flex-col
-                    justify-end 
-                    overflow-visible
-                    md:overflow-hidden
-                    pointer-events-none 
-                    -z-10"
-            />
 
-            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4 ">
+            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4 " data-section-bg="dark">
                 <div className="hidden md:block">
-                    <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
                         <LiquidGlass
-                            className="group max-w-[892px]"
+                            className="group max-w-[759px]"
                             centered={false}
                             compact
-                            displacementScale={0}
+                            displacementScale={100}
                             blurAmount={0.01}
-                            saturation={200}
+                            saturation={100}
                             aberrationIntensity={2}
                             elasticity={0.05}
                             cornerRadius={30}
                             mode="standard"
                             padding="8px 16px"
+                            style={{
+                                boxShadow: 'none',
+                                filter: 'none',
+                            }}
                         >
+                        <Tilt3D className="group block" maxTilt={10} perspective={1100} scale={1.03} radius={24}>
+
                             <div className="md:p-10 p-3">
                                 <h1
-                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-midnight-core"
+                                    className="text-[24px]/[110%] md:text-[64px]/[110%] font-normal text-white"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}
                                 >
-                                    Case Review Automation: faster case work without errors
+                                    AI Case Review: <br />
+                                    faster & with no errors
                                 </h1>
                                 <h4
-                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
+                                    className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-white/80 font-normal"
                                     style={{
                                         fontFamily: 'Instrument Sans',
                                     }}
                                 >
-                                    For law firms, in-house teams, and academia — built on explainable AI with full
-                                    compliance and citations.
+                                    for law firms, in-house & academia
                                 </h4>
                             </div>
+                            </Tilt3D>
                         </LiquidGlass>
-                    </Tilt3D>
                 </div>
 
                 <div className="md:p-10 md:hidden">
@@ -88,7 +116,7 @@ const UseCasesPage = () => {
                             fontFamily: 'Instrument Sans',
                         }}
                     >
-                        Case Review Automation: faster case work without errors
+                        Case Review Automation: faster litigation with no errors
                     </h1>
                     <h4
                         className="text-[20px]/[21px] md:text-[40px]/[44px] mt-3 md:mt-6 max-w-[692px] text-midnight-core font-normal"
@@ -112,21 +140,21 @@ const UseCasesPage = () => {
                         className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors"
                         href="/technology"
                     >
-                        <Image
+                        {/* <Image
                             className="w-6 h-6"
                             src="/media/technology/video.svg"
                             alt="video"
                             width={24}
                             height={24}
-                        />
-                        <span className="text-axis-indigo">Watch demo</span>
+                        /> */}
+                        <span className="text-white hover:text-axis-indigo">Explore Technology</span>
                     </Link>
-                    <Link
+                    {/* <Link
                         className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors text-axis-indigo"
                         href="/pricing"
                     >
                         See pricing
-                    </Link>
+                    </Link> */}
                 </div>
 
                 <Benefits className="mt-4 md:mt-[54px] md:mb-[74px] mb-[24px]" />
@@ -137,19 +165,19 @@ const UseCasesPage = () => {
             <WhatThisServiceDoes className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
             <LiveExamples className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
             <TailoredSections className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
-            <CompareAlternatives className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" />
+            {/* <CompareAlternatives className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" /> */}
             {/* <IntegrationsDeployment className="max-w-[1200px] px-4 mx-auto mb-[75px]" /> */}
-            <PricingPlans className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
-            <FAQ className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" />
+            {/* <PricingPlans className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
+            {/* <FAQ className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" /> */}
 
-            <div className="hidden mb-[75px] md:flex justify-center gap-[84px]">
+            {/* <div className="hidden mb-[75px] md:flex justify-center gap-[84px]">
                 <LinkPrimary href="/use-cases">See demo</LinkPrimary>
                 <LinkPrimary href="/use-cases">Start free</LinkPrimary>
                 <LinkPrimary variant="outline" href="/use-cases">
                     See pricing
                 </LinkPrimary>
-            </div>
-
+            </div> */}
+             <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" />
             <Footer />
         </div>
     );

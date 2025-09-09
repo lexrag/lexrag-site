@@ -1,7 +1,7 @@
 export const links = [
-    { name: 'Product', href: '#product-features' },
-    { name: 'Solutions', href: '#why-it-better' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Resources', href: '#resources' },
+    { name: 'Benefits', href: '/benefits' },
+    { name: 'Services', href: '/services' },
+    { name: 'Technology', href: '/technology' },
+    { name: 'Use Cases', href: '/use-cases' },
     { name: 'About', href: '/about' },
 ];
