@@ -9,7 +9,7 @@ export default function VariableProximityText() {
     return (
         <div
             ref={containerRef}
-            className="relative max-w-[1200px] mx-auto mt-[75px] bg-gradient-to-b from-[#FFFFFF4D] to-[#FFFFFF99] border border-white p-10 px-[85px] rounded-3xl md:mb-[75px] mb-8"
+            className="relative max-w-[1200px] mx-auto mt-[75px] bg-gradient-to-b from-[#FFFFFF4D] to-[#FFFFFF99] border border-white p-4 md:p-10 md:px-[85px] rounded-3xl md:mb-[75px] mb-8 [--font-size-mobile:28px] [--font-size-desktop:54px]"
         >
             <VariableProximity
                 label={'Verifiable answers for legal research, document review and case assessment.'}
@@ -20,7 +20,7 @@ export default function VariableProximityText() {
                 radius={100}
                 falloff="linear"
                 style={{
-                    fontSize: 54,
+                    fontSize: 'clamp(var(--font-size-mobile), 5vw, var(--font-size-desktop))',
                 }}
             />
         </div>

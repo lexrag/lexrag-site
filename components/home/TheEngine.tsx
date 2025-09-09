@@ -50,7 +50,7 @@ const CARDS: ICard[] = [
 
 function CardItem({ card, index }: { card: ICard; index: number }) {
     return (
-        <div className="md:w-[31.5%] h-[229px] transition-all duration-500 group cursor-pointer">
+        <div className="md:w-[31.5%] w-full h-[229px] transition-all duration-500 group cursor-pointer">
             <div className="relative w-full h-full [perspective:1000px]">
                 <div className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-700 group-hover:[transform:rotateY(180deg)]">
                     {/* Front side */}

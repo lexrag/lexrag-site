@@ -52,7 +52,7 @@ export default function ServicesOverview({ className }: { className?: string }) 
         <section className={cx('', className)}>
             <h2 className="mb-4 md:mb-[55px] text-3xl md:text-5xl text-midnight-core">Services overview</h2>
 
-            <div className="flex gap-2">
+            <div className="flex md:flex-nowrap flex-wrap gap-2">
                 {CARDS.map((card, i) => (
                     <CardItem key={card.id} card={card} index={i} />
                 ))}
