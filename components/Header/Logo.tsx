@@ -1,15 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { useSectionBackground } from '@/hooks/use-section-background';
 
 interface LogoProps {
     variant?: 'default' | 'white';
 }
 
 export const Logo = ({ variant }: LogoProps) => {
-    const pathname = usePathname();
-    const isHomePage = pathname === '/';
+    const currentBackground = useSectionBackground();
 
     if (variant === 'white') {
         return (
@@ -24,37 +23,19 @@ export const Logo = ({ variant }: LogoProps) => {
         );
     }
 
-    if (isHomePage) {
-        return (
-            <Image
-                className="max-h-[30px] transition-transform duration-300 hover:scale-[1.04]"
-                src="/media/lexrag_logo_primary_two_tone.svg"
-                alt="lexrag logo dark"
-                width={130}
-                height={30}
-                priority
+    const logoSrc =
+        currentBackground === 'dark'
+            ? '/media/lexrag_logo_primary_two_tone_white.svg'
+            : '/media/lexrag_logo_primary_two_tone.svg';
 
-            />
-        );
-    }
     return (
-        <>
-            <Image
-                className="dark:hidden max-h-[30px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag_logo_primary_two_tone.svg"
-                alt="lexrag logo light"
-                width={130}
-                height={30}
-                priority
-            />
-            <Image
-                className="hidden dark:block max-h-[30px] transition-transform duration-300 hover:scale-105"
-                src="/media/lexrag_logo_primary_two_tone.svg"
-                alt="lexrag logo dark"
-                width={130}
-                height={30}
-                priority
-            />
-        </>
+        <Image
+            className="max-h-[30px] transition-transform duration-300 hover:scale-[1.04]"
+            src={logoSrc}
+            alt="lexrag logo"
+            width={130}
+            height={30}
+            priority
+        />
     );
 };
