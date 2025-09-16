@@ -2,7 +2,7 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.ENVIRONMENT === 'production';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,7 +15,7 @@ const nextConfig = {
     trailingSlash: true,
     reactStrictMode: false,
     devIndicators: false,
-    assetPrefix: isProd ? process.env.NEXT_PUBLIC_BASE_URL : '',
+    assetPrefix: process.env.NEXT_PUBLIC_BASE_URL,
     poweredByHeader: false,
     productionBrowserSourceMaps: true,
     // Ensure a deterministic buildId bound to the commit

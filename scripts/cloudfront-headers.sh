@@ -16,7 +16,7 @@ HEADERS_JSON=$(cat <<'JSON'
   "Comment": "Security headers including CSP/HSTS/etc for LEXRAG static site",
   "CorsConfig": {
     "AccessControlAllowOrigins": {
-      "Quantity": 2,
+      "Quantity": 3,
       "Items": ["https://lexrag.com", "https://www.lexrag.com", "https://dev.lexrag.com"]
     },
     "AccessControlAllowHeaders": {
