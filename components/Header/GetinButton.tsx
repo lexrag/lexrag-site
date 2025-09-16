@@ -4,6 +4,7 @@ import LiquidGlass from '@/components/liquid-glass';
 import '@/css/themes/reui.css';
 import { cn } from '@/lib/utils';
 import { useSectionBackground } from '@/hooks/use-section-background';
+import Link from 'next/link';
 
 const GetinButton = () => {
     const appBase = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.lexrag.com').replace(/\/+$/, '');
@@ -29,11 +30,8 @@ const GetinButton = () => {
                         boxShadow: 'none',
                         filter: 'none',
                     }}
-                    onClick={() => {
-                        window.location.href = `${appBase}${appPath}`;
-                    }}
                 >
-                    <span
+                    <Link
                         className={cn(
                             'block text-base font-medium px-2 whitespace-nowrap transition-colors duration-200',
                             isDark ? 'text-white group-hover:text-axis-indigo' : 'text-axis-indigo',
@@ -41,9 +39,10 @@ const GetinButton = () => {
                         style={{
                             textShadow: 'none',
                         }}
+                        href={appBase + appPath}
                     >
                         Get In
-                    </span>
+                    </Link>
                 </LiquidGlass>
             </div>
         </div>

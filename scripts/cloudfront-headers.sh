@@ -17,7 +17,7 @@ HEADERS_JSON=$(cat <<'JSON'
   "CorsConfig": {
     "AccessControlAllowOrigins": {
       "Quantity": 2,
-      "Items": ["https://lexrag.com", "https://www.lexrag.com"]
+      "Items": ["https://lexrag.com", "https://www.lexrag.com", "https://dev.lexrag.com"]
     },
     "AccessControlAllowHeaders": {
       "Quantity": 1,
