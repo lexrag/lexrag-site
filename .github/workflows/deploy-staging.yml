@@ -31,7 +31,7 @@ jobs:
             echo "Current branch: $(git branch --show-current)"
             
             # Ensure we're on dev branch
-            git checkout -b dev
+            git checkout dev
             
             # Pull latest changes
             git pull origin dev
