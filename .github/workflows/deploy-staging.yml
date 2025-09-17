@@ -1,0 +1,44 @@
+# lexrag-site/.github/workflows/deploy-staging.yml
+name: Deploy Site to Staging
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy Site Service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USERNAME }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            echo "Deploying site service..."
+            
+            # Navigate to site directory
+            cd ~/lexrag-site
+            
+            # Show current status
+            echo "Directory: $(pwd)"
+            echo "Current branch: $(git branch --show-current)"
+            
+            # Ensure we're on dev branch
+            git checkout dev
+            
+            # Pull latest changes
+            git pull origin dev
+            
+            # Make script executable
+            chmod +x ~/scripts/start_site.sh
+            
+            # Execute start script
+            echo "Starting site service..."
+            ~/scripts/start_site.sh
+            
+            echo "Site deployment completed!"
