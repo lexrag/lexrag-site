@@ -66,7 +66,7 @@ const HomePage = () => {
                             className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
                             href="https://app.lexrag.com/auth/signup"
                         >
-                            Register Free $$$
+                            Register Free $$
                         </Link>
                         <Link
                             className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors"
