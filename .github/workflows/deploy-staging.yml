@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.STAGING_USERNAME }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            source ~/.bashrc || source ~/.profile || true
+            which pm2
             
             echo "Deploying site service..."
             
