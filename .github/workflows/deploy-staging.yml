@@ -1,4 +1,3 @@
-# lexrag-site/.github/workflows/deploy-staging.yml
 name: Deploy Site to Staging
 
 on:
@@ -19,8 +18,6 @@ jobs:
           username: ${{ secrets.STAGING_USERNAME }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            echo "$(which pm2)"
-            
             echo "Deploying site service..."
             
             # Navigate to site directory
