@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+// import Link from 'next/link';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
-import Benefits from '@/components/use-cases/Benefits';
+// import Benefits from '@/components/use-cases/Benefits';
 // import HowItWorks from '@/components/use-cases/HowItWorks';
 // import IntegrationsDeployment from '@/components/use-cases/IntegrationsDeployment';
 // import LiveExamples from '@/components/use-cases/LiveExample';
@@ -13,7 +13,7 @@ import Benefits from '@/components/use-cases/Benefits';
 // import WhyThisMatter from '@/components/use-cases/WhyThisMatters';
 import Particles from '@/components/Particles/Particles';
 import { cn } from '@/lib/utils';
-import SecurityCompliance from '@/components/technology/SecurityCompliance';
+// import SecurityCompliance from '@/components/technology/SecurityCompliance';
 import UnderConstructionSection from '@/components/common/UnderConstruction';
 
 export const metadata: Metadata = {
