@@ -5,15 +5,16 @@ import Footer from '@/components/Landing/Footer';
 import LiquidGlass from '@/components/liquid-glass';
 import Tilt3D from '@/components/tilt3d/Tilt3D';
 import Benefits from '@/components/use-cases/Benefits';
-import HowItWorks from '@/components/use-cases/HowItWorks';
+// import HowItWorks from '@/components/use-cases/HowItWorks';
 // import IntegrationsDeployment from '@/components/use-cases/IntegrationsDeployment';
-import LiveExamples from '@/components/use-cases/LiveExample';
-import TailoredSections from '@/components/use-cases/TailoredSections';
-import WhatThisServiceDoes from '@/components/use-cases/WhatThisServiceDoes';
-import WhyThisMatter from '@/components/use-cases/WhyThisMatters';
+// import LiveExamples from '@/components/use-cases/LiveExample';
+// import TailoredSections from '@/components/use-cases/TailoredSections';
+// import WhatThisServiceDoes from '@/components/use-cases/WhatThisServiceDoes';
+// import WhyThisMatter from '@/components/use-cases/WhyThisMatters';
 import Particles from '@/components/Particles/Particles';
 import { cn } from '@/lib/utils';
 import SecurityCompliance from '@/components/technology/SecurityCompliance';
+import UnderConstructionSection from '@/components/common/UnderConstruction';
 
 export const metadata: Metadata = {
     title: 'Use Cases',
@@ -45,7 +46,7 @@ const UseCasesPage = () => {
             </div>
 
 
-            <section className="max-w-[1200px] mx-auto pt-20 md:pt-[120px] relative z-10 px-4 " data-section-bg="dark">
+            <section className="max-w-[1200px] mx-auto mt-10 md:pt-[120px] relative z-10 px-4 " data-section-bg="dark">
                 <div className="hidden md:block">
                         <LiquidGlass
                             className="group max-w-[759px]"
@@ -109,7 +110,7 @@ const UseCasesPage = () => {
                     </h4>
                 </div>
 
-                <div className="flex md:flex-row md:gap-[84px] gap-6 items-start mt-16 md:mt-[52px] flex-wrap md:flex-nowrap">
+                {/* <div className="flex md:flex-row md:gap-[84px] gap-6 items-start mt-16 md:mt-[52px] flex-wrap md:flex-nowrap">
                     <Link
                         className="text-axis-indigo bg-phase-green font-medium text-base py-2 px-[36px] rounded-full transition-colors hover:opacity-85"
                         href="/technology"
@@ -120,37 +121,31 @@ const UseCasesPage = () => {
                         className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors"
                         href="/technology"
                     >
-                        {/* <Image
-                            className="w-6 h-6"
-                            src="/media/technology/video.svg"
-                            alt="video"
-                            width={24}
-                            height={24}
-                        /> */}
+
                         <span className="text-white hover:text-axis-indigo">Explore Technology</span>
                     </Link>
-                    {/* <Link
+                    <Link
                         className="flex items-center gap-[6px] py-2 font-medium text-base px-[36px] border border-phase-green rounded-full hover:bg-phase-green transition-colors text-axis-indigo"
                         href="/pricing"
                     >
                         See pricing
-                    </Link> */}
-                </div>
+                    </Link>
+                </div> */}
 
-                <Benefits className="mt-4 md:mt-[54px] md:mb-[74px] mb-[24px]" />
+                {/* <Benefits className="mt-4 md:mt-[54px] md:mb-[74px] mb-[24px]" /> */}
             </section>
-
-            <WhyThisMatter className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
-            <HowItWorks className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
-            <WhatThisServiceDoes className="max-w-[1200px] px-4 mx-auto mb-[75px]" />
-            <LiveExamples className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
-            <TailoredSections className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" />
+            {/* <WhyThisMatter className="max-w-[1200px] px-4 mx-auto mb-[75px]" /> */}
+            {/* <HowItWorks className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
+            {/* <WhatThisServiceDoes className="max-w-[1200px] px-4 mx-auto mb-[75px]" /> */}
+            {/* <LiveExamples className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
+            {/* <TailoredSections className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
             {/* <CompareAlternatives className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" /> */}
             {/* <IntegrationsDeployment className="max-w-[1200px] px-4 mx-auto mb-[75px]" /> */}
             {/* <PricingPlans className="max-w-[1200px] px-4 mx-auto md:mb-[75px] md-[36px]" /> */}
             {/* <FAQ className="max-w-[1200px] px-4 mx-auto mb-[75px] md:mb-[75px] md-[36px]" /> */}
 
-             <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" />
+            <UnderConstructionSection />
+            {/* <SecurityCompliance className="max-w-[1200px] mx-auto mb-[75px] px-4" /> */}
             <Footer />
         </div>
     );
